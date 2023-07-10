@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<div class="container my-5" layout:fragment="content">
+  <div class="row">
+    <div class="col-md-6">
+
+
+      <div class="card">
+        <div class="card-header text-center alert-danger">Error</div>
+
+        <div class="card-group">
+          <p>An Error has occurred while processing your request.</p>
+        </div>
+        <div class="card-group">
+          <p th:text="${errorMessage}">Error Message</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+</html>

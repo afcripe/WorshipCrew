@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>vSchedule</title>
+
+    <meta name="description" content="Dahlia Solutions, LLC">
+    <meta name="author" content="Dahlia Solutions, LLC">
+    <link rel="icon" type="image/x-icon" href="@{favicon.ico}">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <!-- Axios -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+</head>
+
+<body class="container-fluid d-flex flex-column min-vh-100">
+
+    <!--- Header --->
+    <div th:replace="~{layouts/commonHeader :: header}">Header</div>
+
+    <!--- message from server--->
+    <th:block th:if="${session.msgSuccess}">
+        <div id="messageSuccessDiv" class="alert-fixed" th:onclick="'javascript:clearSuccess()'">
+            <div class="alert-success alert-fixed-success align-content-center">
+                <p style="text-align: center" th:text="${session.msgSuccess}"/>
+                <script  th:inline="javascript">
+                    fetch("/api/v1/app/removesuccessmsg");
+                    setTimeout(() => {
+                        clearSuccess();
+                    }, 3000);
+                    function clearSuccess() {
+                        const box = document.getElementById('messageSuccessDiv');
+                        box.style.display = 'none';
+                    }
+                </script>
+            </div>
+        </div>
+    </th:block>
+    <th:block th:if="${session.msgError}">
+        <div id="messageErrorDiv" class="alert-fixed" th:onclick="'javascript:clearError()'">
+             <div class="alert-danger align-content-center alert-fixed-danger">
+                <span th:text="${session.msgError}"/>
+                <script  th:inline="javascript">
+                    fetch("/api/v1/app/removeerrormsg");
+                    setTimeout(() => {
+                        clearError();
+                    }, 3000);
+                    function clearError() {
+                        const box = document.getElementById('messageErrorDiv');
+                        box.style.display = 'none';
+                    }
+                </script>
+             </div>
+        </div>
+    </th:block>
+
+    <div class="wrapper flex-grow-1">
+
+        <!--- Content --->
+        <section layout:fragment="content">
+            <p>Replace with layout:fragment="content"</p>
+        </section>
+
+    </div>
+
+    <!--- Footer --->
+    <div th:replace="~{layouts/commonFooter :: footer}">Footer</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+</body>
+</html>

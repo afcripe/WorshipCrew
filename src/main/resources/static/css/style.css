@@ -1,0 +1,47 @@
+.selectableItem {
+
+}
+.selectableItem:hover {
+    background-color: #daeeff;
+}
+
+.alert-fixed {
+    position: fixed;
+    text-align: center;
+    vertical-align: middle;
+    top: 5px;
+    left: 25px;
+    right:25px;
+    height: 50px;
+    z-index: 9999;
+}
+
+.alert-fixed-success {
+    margin: auto;
+    max-width: 500px;
+    text-align: center;
+    vertical-align: middle;
+    height: 100%;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+}
+
+.alert-fixed-danger {
+    margin: auto;
+    max-width: 500px;
+    text-align: center;
+    vertical-align: middle;
+    height: 100%;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+}
+
+.card-section {
+    padding: 5px 5px 5px 5px;
+    outline: 0.1em solid #a6d5ec;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+}

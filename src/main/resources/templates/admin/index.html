@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<div class="container" layout:fragment="content">
+
+  <div th:replace="~{admin/moduleHeader :: header}">Header</div>
+
+  <div class="container my-3">
+
+    <script th:inline="javascript">
+      function navAdmin(element) {
+        if(element.id == 'btnEdit') {
+          document.getElementById("dpCompanyText").style.display = "none";
+          document.getElementById("dpCompanyInput").style.display = "block";
+          document.getElementById("inputCompanyName").value = document.getElementById("textCompanyName").innerText;
+        }
+        if(element.id == 'btnSave') {
+          document.getElementById("dpCompanyText").style.display = "block";
+          document.getElementById("dpCompanyInput").style.display = "none";
+          document.getElementById("textCompanyName").innerText = document.getElementById("inputCompanyName").value;
+          fetch("/api/vi/admin/update/companyName", {
+            method: "POST",
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({name: document.getElementById("inputCompanyName").value})
+          });
+        }
+        if (element.id == 'chkMonthlyStatement') {
+          fetch("/api/vi/admin/update/monthlyStatements", {
+            method: "POST",
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({name: document.getElementById("chkMonthlyStatement").checked})
+          });
+        }
+        if (element.id == 'chkAllowVolunteerRequests') {
+          fetch("/api/vi/admin/update/allowVolunteerRequests", {
+            method: "POST",
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({name: document.getElementById("chkAllowVolunteerRequests").checked})
+          });
+        }
+      }
+    </script>
+
+    <div class="row">
+
+      <div class="col-xs-1 col-md-2">
+        <h2>Settings</h2>
+      </div>
+      <div class="col-xs-1 col-md-10">
+        <div id="dpCompanyText">
+          <span id="textCompanyName" class="fs-4" th:text="${adminSettings.companyName}"></span>
+          <i id="btnEdit" class="bi bi-pencil-square" onclick="javascript:navAdmin(this)"></i>
+        </div>
+        <div id="dpCompanyInput" style="display: none">
+          <input id="inputCompanyName">
+          <i id="btnSave" class="bi bi-save" onclick="javascript:navAdmin(this)"></i>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+
+      <div class="col-xs-1 col-md-6 col-lg-4">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">User Management</h4>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item selectableItem" style="cursor: pointer;"
+                  onclick="window.location.href='/user'">
+                List of Users
+              </li>
+              <li class="list-group-item selectableItem">
+                <div>
+                  Monthly Statements:
+                  <input id="chkMonthlyStatement" th:checked="${adminSettings.monthlyStatements}"
+                         type="checkbox" onchange="javascript:navAdmin(this)">
+                </div>
+              </li>
+              <li class="list-group-item selectableItem">
+                <div>
+                  Allow Volunteer Requests:
+                  <input id="chkAllowVolunteerRequests" th:checked="${adminSettings.allowVolunteerRequests}"
+                         type="checkbox" onchange="javascript:navAdmin(this)">
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xs-1 col-md-6 col-lg-4">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">Location Management</h4>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item selectableItem" style="cursor: pointer;"
+                  onclick="window.location.href='/location'">
+                List of Locations
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xs-1 col-md-6 col-lg-4">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">Position and Role Management</h4>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item selectableItem" style="cursor: pointer;"
+                  onclick="window.location.href='/position'">
+                List of Positions
+              </li>
+              <li class="list-group-item selectableItem" style="cursor: pointer;"
+                  onclick="window.location.href='/roles'">
+                List of User Roles
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+</html>

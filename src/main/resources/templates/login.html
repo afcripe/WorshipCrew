@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}">
+
+
+<div class="container my-5" layout:fragment="content">
+
+  <div th:replace="~{components/cardLogin :: cardFragment}">Card</div>
+
+</div>
+
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+
+<div th:fragment="cardFragment(volunteer)">
+  <div class="card" th:object="${volunteer}">
+
+    <div class="card-title alert alert-primary">
+
+      <h5>
+        <span th:text="*{firstName}"/>&nbsp; <span th:text="*{lastName}"/>
+      </h5>
+    </div>
+
+    <div class="card-body">
+      Position: <span th:text="*{position.name}"/><br/>
+      Location: <span th:text="*{location.name}"/><br/>
+      Location: <span th:text="*{contactEmail}"/>
+    </div>
+
+  </div>
+</div>
+
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}" xmlns="http://www.w3.org/1999/html">
+
+<div class="container" layout:fragment="content">
+
+  <div class="container my-3">
+    <div class="row p-2">
+      <h3>Volunteer Schedule</h3>
+    </div>
+
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <th scope="col">Title</th>
+        <th scope="col">Description</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="calendarEvent : ${calendarEvents}" class="selectableItem">
+        <td>
+          <th:block th:if="${calendarEvent.declined}">
+            <span style="font-size: 1.25em; color: orangered;">
+              <i class="bi bi-x-circle-fill"></i>
+            </span>
+          </th:block>
+          <th:block th:if="${calendarEvent.accepted}">
+            <span style="font-size: 1.25em; color: darkgreen;">
+              <i class="bi bi-check-circle-fill"></i>
+            </span>
+          </th:block>
+          <th:block th:if="!${calendarEvent.accepted} AND !${calendarEvent.declined} AND !${calendarEvent.requested}">
+            <span style="font-size: 1.25em; color: orange;">
+              <i class="bi bi-question-circle-fill"></i>
+            </span>
+          </th:block>
+          <th:block th:if="${calendarEvent.requested} AND !${calendarEvent.declined} AND !${calendarEvent.accepted}">
+            <span style="font-size: 1.25em; color: coral;">
+              <i class="bi bi-person-fill-exclamation"></i>
+            </span>
+          </th:block>
+          <span th:text="${calendarEvent.title}"/>
+        </td>
+        <td>
+          <span th:text="${calendarEvent.description}"/>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+  </div>
+
+</div>
+
+</html>

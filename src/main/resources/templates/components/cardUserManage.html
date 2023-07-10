@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+
+<div th:fragment="cardFragment(volunteer)">
+  <div class="card" th:object="${volunteer}">
+
+    <div class="card-title alert alert-info">
+      <h5>Manage</h5>
+      <script th:inline="javascript">
+        function navBtnEvent(event, element, eventId) {
+          event.stopPropagation();
+          if(element.id == 'btnSendRequest') {
+            window.location.href='/volunteer/sendrequest/'+eventId;
+          }
+          if(element.id == 'btnSendWelcome') {
+            window.location.href='/volunteer/passwordreset/'+eventId;
+          }
+        }
+      </script>
+    </div>
+
+    <div class="card-body">
+      <p>
+        <button class="btn btn-sm btn-secondary" id="btnSendRequest"
+                th:onclick="'javascript:navBtnEvent(event, this, '+*{id}+')'">
+          Send Volunteer Requests
+        </button>
+      </p>
+      <p>
+        <button class="btn btn-sm btn-secondary" id="btnSendWelcome"
+                th:onclick="'javascript:navBtnEvent(event, this, '+*{id}+')'">
+          Send Password Reset E-mail
+        </button>
+      </p>
+    </div>
+
+  </div>
+</div>
+
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<div class="container" layout:fragment="content">
+
+  <div class="container my-3" th:object="${user}">
+
+    <div class="row">
+
+      <div class="column col-lg-4">
+
+        <div class="card">
+          <div class="card-title alert alert-primary">
+            <div style="float: right">
+              <button class="btn btn-sm btn-success"
+                      th:onclick="window.location.href='/profile/edit';">Edit</button>
+            </div>
+            <h5>
+              <span th:text="*{firstName}"/> <span th:text="*{lastName}"/>
+            </h5>
+          </div>
+
+          <div class="card-body">
+
+            <div class="row p-2">
+              <div class="col-xs-12 col-sm-4">Username:</div>
+              <div class="col-xs-12 col-sm-8">
+                <button class="btn btn-sm btn-success" style="float: right"
+                        th:onclick="window.location.href='/profile/changeusername';">Change</button>
+                <span class="card-text" th:text="*{username}"></span>
+              </div>
+            </div>
+            <div class="row p-2">
+              <div class="col-xs-12 col-sm-4">Password:</div>
+              <div class="col-xs-12 col-sm-8">
+                <button class="btn btn-sm btn-success" style="float: right"
+                        th:onclick="window.location.href='/profile/changepassword';">Change</button>
+                <span class="card-text">*****</span>
+              </div>
+            </div>
+            <div class="row p-2">
+              <div class="col-xs-12 col-sm-4">E-mail:</div>
+              <div class="col-xs-12 col-sm-8">
+                <span class="card-text" th:text="*{contactEmail}"></span>
+              </div>
+            </div>
+            <div class="row p-2">
+              <div class="col-xs-12 col-sm-4">Position:</div>
+              <div class="col-xs-12 col-sm-8">
+                <span class="card-text" th:text="${userPosition}"></span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="column col-lg-4">
+          <p>&nbsp;</p>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+</html>
