@@ -13,6 +13,10 @@ public class FilterConfig extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        if (request.getSession().getAttribute("showSideNav") == null && request.getSession().getAttribute("hideSideNav") == null) {
+            request.getSession().setAttribute("showSideNav", true);
+        }
+
         // Do Filtering
         filterChain.doFilter(request, response);
     }

@@ -4,13 +4,12 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       layout:decorate="~{layouts/defaultLayout}">
 
-<div class="container my-5" layout:fragment="content">
-
+<div layout:fragment="content">
   <div sec:authorize="isAuthenticated()">
 
     <div class="row">
 
-        <h2>Welcome to Destiny Exchange</h2>
+        <h2>Welcome to Destiny Worship Exchange</h2>
 
     </div>
 
@@ -21,7 +20,7 @@
     <div th:replace="~{components/cardLogin :: cardFragment}">Card</div>
 
   </div>
-
+</div>
 
 <!--
   <div class="card-section" sec:authorize="isAuthenticated()">
@@ -44,6 +43,6 @@
     <div sec:authentication="principal.authorities"></div>
   </div>
 -->
-</div>
+
 
 </html>

@@ -8,51 +8,68 @@
       }
     }
   </script>
-  <nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top justify-content-start">
+  <nav class="navbar navbar-expand-sm navbar-dark bg-dark sticky-top justify-content-start">
     <div class="container-fluid">
+
       <a class="navbar-brand" href="/">
-        <h3><i class="bi bi-calendar-range" style="color: #F0D2C4"></i></h3>
+        <img th:src="@{/img/favicon.png}" width="32" />
       </a>
-      <button class="navbar-toggler order-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+
+      <div class="navbar-nav mr-auto d-block d-sm-none">
+        <h3 style="color: lightblue">DWeXchange</h3>
+      </div>
+      <div class="navbar-nav d-block d-sm-none mr-2" sec:authorize="isAuthenticated()">
+        <h4 style="color: lightskyblue;">
+          <i class="bi bi-cart"></i>
+        </h4>
+      </div>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="collapse navbar-collapse flex-grow-0 flex-xl-grow-1" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <th:block sec:authorize="isAuthenticated()">
-            <li class="nav-item">
-              <a class="nav-link" href="/myschedule">My Schedule</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/calendar/calendar">Calendar</a>
-            </li>
-          </th:block>
-          <th:block th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'USER_WRITE')}">
-            <li class="nav-item">
-              <a class="nav-link" href="/volunteer">Volunteers</a>
-            </li>
-          </th:block>
+
+      <div class="collapse navbar-collapse flex-grow-1" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-0 ml-2" sec:authorize="isAuthenticated()">
           <li class="nav-item">
-            <a class="nav-link" href="/support">Support</a>
+            <a class="nav-link" href="#">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Store</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Articles</a>
+          </li>
+          <li class="nav-item d-block d-sm-none" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')}">
+            <a class="nav-link" href="#">Settings</a>
+          </li>
+          <li class="nav-item d-block d-sm-none">
+            <div class="dropdown-divider"></div>
+          </li>
+          <li class="nav-item d-block d-sm-none">
+            <a class="nav-link" href="/profile">Profile</a>
+          </li>
+          <li class="nav-item d-block d-sm-none">
+            <a class="nav-link" href="/logout">Logout</a>
+          </li>
+        </ul>
+        <ul sec:authorize="isAnonymous()">
+          <li class="nav-item d-block d-sm-none">
+            <a class="nav-link" href="/login">Login</a>
           </li>
         </ul>
       </div>
 
-      <!-- Cart always visible if logged in -->
-      <div th:unless="${#lists.contains(userRoles,'USER_READ')}" sec:authorize="isAuthenticated()">
-        <ul class="navbar-nav order-1 order-xl-last ml-auto">
+        <ul class="navbar-nav ml-2 order-0 d-none d-sm-block" sec:authorize="isAuthenticated()">
           <li class="nav-item">
-            <a class="nav-link mx-2" href="#" title="Settings">
+            <a class="nav-link mx-2" href="#" title="Cart">
               <h4 style="color: lightskyblue;">
                 <i class="bi bi-cart"></i>
               </h4>
             </a>
           </li>
         </ul>
-      </div>
 
-      <div class="collapse navbar-collapse flex-grow-0 order-last">
-        <div sec:authorize="isAuthenticated()">
-          <ul class="navbar-nav me-auto">
+        <div class="collapse navbar-collapse flex-grow-0">
+          <ul class="navbar-nav me-auto order-last" sec:authorize="isAuthenticated()">
             <th:block th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')}">
               <li class="nav-item">
                 <a class="nav-link mx-2" href="/admin" title="Settings">
@@ -73,17 +90,15 @@
               </ul>
             </li>
           </ul>
-        </div>
-        <div sec:authorize="isAnonymous()">
-          <ul class="navbar-nav me-auto">
+
+          <ul class="navbar-nav me-auto order-last" sec:authorize="isAnonymous()">
             <li class="nav-item">
               <a class="btn btn-sm btn-info mx-4 px-2" href="/login">Login</a>
             </li>
           </ul>
         </div>
-      </div>
-
 
     </div>
   </nav>
+
 </div>

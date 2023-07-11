@@ -45,3 +45,8 @@
     -webkit-border-radius: 5px;
     border-radius: 5px;
 }
+
+.list-group-subitem {
+    padding-left: 25px;
+    font-size: small;
+}
