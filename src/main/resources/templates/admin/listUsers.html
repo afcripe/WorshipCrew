@@ -21,8 +21,9 @@
       <tr>
         <th scope="col">Username</th>
         <th scope="col">Name</th>
+        <th scope="col">Campus</th>
+        <th scope="col">Department</th>
         <th scope="col">Position</th>
-        <th scope="col">Location</th>
       </tr>
       </thead>
       <tbody>
@@ -30,8 +31,9 @@
           th:onclick="window.location.href='/user/[[${user.id}]]';">
         <td th:text="${user.username}"></td>
         <td><span th:text="${user.firstName}"/> <span th:text="${user.lastName}"/></td>
+        <td><span th:text="${user.campus.name}"/></td>
+        <td><span th:text="${user.department.name}"/></td>
         <td><span th:text="${user.position.name}"/></td>
-        <td><span th:text="${user.location.name}"/></td>
       </tr>
       </tbody>
     </table>

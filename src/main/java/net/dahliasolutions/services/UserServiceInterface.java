@@ -1,6 +1,7 @@
 package net.dahliasolutions.services;
 
 import net.dahliasolutions.models.Campus;
+import net.dahliasolutions.models.Department;
 import net.dahliasolutions.models.Position;
 import net.dahliasolutions.models.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -23,9 +24,11 @@ public interface UserServiceInterface extends UserDetailsService {
     List<User> findAll();
     Optional<User> findByUsername(String username);
     void updateUserPosition(String username, String positionName);
-    void updateUserLocation(String username, String locationName);
+    void updateUserCampus(String username, String campusName);
+    void updateUserDepartment(String username, String departmentName);
     void updateUserLocationByLocationId(String username, BigInteger locationId);
     List<User> findAllByPosition(Position position);
+    List<User> findAllByDepartment(Department department);
     List<User> findAllByLocation(Campus location);
     List<User> findAllByActivated();
 

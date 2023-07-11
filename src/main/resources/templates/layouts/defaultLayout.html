@@ -28,13 +28,13 @@
             displaySideNav = true;
         </script>
     </th:block>
-        <script sec:authorize="isAnonymous()">
-            forceHideSideNave = true;
-        </script>
+    <script sec:authorize="isAnonymous()">
+        forceHideSideNave = true;
+    </script>
 
 </head>
 
-<body class="container-fluid d-flex flex-column px-0 mb-0">
+<body class="container-fluid d-flex flex-column px-0 mb-0" style="overflow: hidden">
 
     <!--- Header --->
     <div th:replace="~{layouts/commonHeader :: header}">Header</div>
@@ -77,7 +77,7 @@
 
     <div class="wrapper flex-grow-1 px-0">
 
-        <div class="wrapper d-flex mb-0" style="height: calc(100vh - 88px)">
+        <div id="mainContent" class="wrapper d-flex mb-0 pb-0 pb-sm-4" style="height: calc(100vh - 64px);">
 
             <!-- Side Navigation -->
                 <div id="sideNavExpanded" class="flex-fill d-none d-sm-block px-2"
@@ -86,59 +86,35 @@
                         <h4>Navigation</h4>
                     </div>
                     <div class="list-group" sec:authorize="isAuthenticated()">
-                        <a class="list-group-item" href="/desktopDocs/home">
-                            Home
-                        </a>
-                        <a class="list-group-item list-group-subitem" href="/desktopDocs/backups">
-                            Users
-                        </a>
-                        <a class="list-group-item" href="/desktopDocs/metrics">
-                            Store
-                        </a>
-                        <a class="list-group-item" href="/desktopDocs/employees">
-                            Wiki
-                        </a>
+                        <a class="list-group-item" href="/">Home</a>
+                        <a class="list-group-item list-group-subitem" href="/user">Users</a>
+                        <a class="list-group-item" href="/store">Store</a>
+                        <a class="list-group-item" href="/wiki">Wiki</a>
                     </div>
                 </div>
                 <div id="sideNavCollapsed" class="flex-fill d-none d-sm-block px-2"
-                     style="background-color: #eeeeee; min-width: 65px; max-width: 65px; width: 65px;">
+                     style="background-color: #eeeeee; min-width: 45px; max-width: 45px; width: 45px;">
                     <div class="sidebar-header text-center" onclick="toggleSideNav(true)">
                         <h3><i class="bi bi-compass"></i></h3>
                     </div>
                     <div class="list-group" sec:authorize="isAuthenticated()">
-                        <a class="list-group-item" href="/desktopDocs/home">
+                        <a class="list-group-item p-1" href="/">
                             <i class="bi bi-house"></i>
                         </a>
-                        <a class="list-group-item" href="/desktopDocs/backups">
+                        <a class="list-group-item p-1" href="/user">
                             <i class="bi bi-person"></i>
                         </a>
-                        <a class="list-group-item" href="/desktopDocs/metrics">
+                        <a class="list-group-item p-1" href="/store">
                             <i class="bi bi-shop-window"></i>
                         </a>
-                        <a class="list-group-item" href="/desktopDocs/employees">
+                        <a class="list-group-item p-1" href="/wiki">
                             <i class="bi bi-wikipedia"></i>
                         </a>
                     </div>
                 </div>
 
             <!-- Content -->
-            <div class="container flex-fill px-2 m-2" style="overflow-x: auto; overflow-y: auto;">
-                <!-- Top Navigation -->
-                <div sec:authorize="isAuthenticated()">
-                    <nav class="navbar navbar-light d-block d-sm-none bg-light sticky-top mb-2">
-                        <ul class="nav">
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Home</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Store</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Wiki</a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
+            <div class="flex-fill px-2 m-2" style="overflow: auto; width: 100%">
                 <section layout:fragment="content">
                     <p>Replace with layout:fragment="content"</p>
                 </section>
@@ -147,7 +123,8 @@
     </div>
 
     <!--- Footer --->
-    <div class="px-2 mb-0 small" style="background-color: lightblue; height: 27px">
+    <div class="px-2 mb-0 small d-none d-sm-block"
+         style="background-color: lightblue; height: 27px; position: fixed; bottom: 0; width: 100%">
         <div style="float: right;"><small>Dahlia Solutions, LLC</small></div>
         <div>Destiny Worship</div>
     </div>

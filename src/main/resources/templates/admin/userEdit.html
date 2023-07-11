@@ -55,6 +55,30 @@
                   <input th:value="*{contactEmail}" type="text" class="form-control" id="contactEmail"  name="contactEmail">
                 </div>
               </div>
+
+              <div class="row p-2">
+                <div class="col-xs-12 col-sm-4">
+                  <label for="campus" class="form-label">Campus</label>
+                </div>
+                <div class="col-xs-12 col-sm-4">
+                  <select id="campus" name="campus" class="form-control">
+                    <option th:each="l : ${campusList}" th:value="${l.name}"
+                            th:text="${l.name}" th:selected="${l.name} == ${userCampus}"></option>
+                  </select>
+                </div>
+              </div>
+              <div class="row p-2">
+                <div class="col-xs-12 col-sm-4">
+                  <label for="department" class="form-label">Department</label>
+                </div>
+                <div class="col-xs-12 col-sm-4">
+                  <select id="department" name="department" class="form-control">
+                    <option th:each="d : ${departmentList}" th:value="${d.name}"
+                            th:text="${d.name}" th:selected="${d.name} == ${userDepartment}"></option>
+                  </select>
+                </div>
+              </div>
+
               <div class="row p-2">
                 <div class="col-xs-12 col-sm-4">
                   <label for="position" class="form-label">Position</label>
@@ -63,17 +87,6 @@
                   <select id="position" name="position" class="form-control">
                     <option th:each="p : ${positionList}" th:value="${p.name}"
                             th:text="${p.name}" th:selected="${p.name} == ${userPosition}"></option>
-                  </select>
-                </div>
-              </div>
-              <div class="row p-2">
-                <div class="col-xs-12 col-sm-4">
-                  <label for="location" class="form-label">Location</label>
-                </div>
-                <div class="col-xs-12 col-sm-4">
-                  <select id="location" name="location" class="form-control">
-                    <option th:each="l : ${locationList}" th:value="${l.name}"
-                            th:text="${l.name}" th:selected="${l.name} == ${userLocation}"></option>
                   </select>
                 </div>
               </div>

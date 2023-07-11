@@ -15,19 +15,19 @@
         const path = window.location.pathname;
 
         if(element.id == 'btnEdit') {
-          window.location.href='/location/'+eventId+'/edit';
+          window.location.href='/campus/'+eventId+'/edit';
         } else if(element.id == 'btnNew') {
-          window.location.href='/location/new';
+          window.location.href='/campus/new';
         } else if(element.id == 'btnToggleDeleted') {
           if (path.endsWith('showhidden')) {
-            window.location.href='/location';
+            window.location.href='/campus';
           } else {
-            window.location.href='/location/showhidden';
+            window.location.href='/campus/showhidden';
           }
         } else if(element.id == 'btnRestore'){
-          window.location.href='/location/'+eventId+'/restore';
+          window.location.href='/campus/'+eventId+'/restore';
         } else {
-          window.location.href='/location/'+eventId;
+          window.location.href='/campus/'+eventId;
         }
       }
     </script>
@@ -52,20 +52,20 @@
       </tr>
       </thead>
       <tbody>
-      <tr th:each="location : ${locations}" class="selectableItem" style="cursor: pointer"
-          th:onclick="'javascript:navLocationTable(event, this, '+${location.id}+')'" id="btnEdit">
-        <th:block th:if="${location.hidden}">
-          <td style="text-decoration: line-through; color: darkred"><span th:text="${location.name}"/></td>
+      <tr th:each="campus : ${campusList}" class="selectableItem" style="cursor: pointer"
+          th:onclick="'javascript:navLocationTable(event, this, '+${campus.id}+')'" id="btnEdit">
+        <th:block th:if="${campus.hidden}">
+          <td style="text-decoration: line-through; color: darkred"><span th:text="${campus.name}"/></td>
         </th:block>
-        <th:block th:unless="${location.hidden}">
-          <td><span th:text="${location.name}"/></td>
+        <th:block th:unless="${campus.hidden}">
+          <td><span th:text="${campus.name}"/></td>
         </th:block>
-        <td><span th:text="${location.city}"/></td>
-        <td><span th:text="${location.managerName}"/></td>
+        <td><span th:text="${campus.city}"/></td>
+        <td><span th:text="${campus.managerName}"/></td>
         <td style="text-decoration: line-through; color: darkred">
-          <th:block th:if="${location.hidden}">
+          <th:block th:if="${campus.hidden}">
             <button class="btn btn-sm btn-outline-success" id="btnRestore"
-                    th:onclick="'javascript:navLocationTable(event, this, '+${location.id}+')'">Restore</button>
+                    th:onclick="'javascript:navLocationTable(event, this, '+${campus.id}+')'">Restore</button>
           </th:block>
         </td>
       </tr>

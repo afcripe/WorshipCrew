@@ -73,20 +73,6 @@
                   onclick="window.location.href='/user'">
                 List of Users
               </li>
-              <li class="list-group-item selectableItem">
-                <div>
-                  Monthly Statements:
-                  <input id="chkMonthlyStatement" th:checked="${adminSettings.monthlyStatements}"
-                         type="checkbox" onchange="javascript:navAdmin(this)">
-                </div>
-              </li>
-              <li class="list-group-item selectableItem">
-                <div>
-                  Allow Volunteer Requests:
-                  <input id="chkAllowVolunteerRequests" th:checked="${adminSettings.allowVolunteerRequests}"
-                         type="checkbox" onchange="javascript:navAdmin(this)">
-                </div>
-              </li>
             </ul>
           </div>
         </div>
@@ -95,11 +81,15 @@
       <div class="col-xs-1 col-md-6 col-lg-4">
         <div class="card">
           <div class="card-body">
-            <h4 class="card-title">Location Management</h4>
+            <h4 class="card-title">Campus and Department Management</h4>
             <ul class="list-group list-group-flush">
               <li class="list-group-item selectableItem" style="cursor: pointer;"
-                  onclick="window.location.href='/location'">
-                List of Locations
+                  onclick="window.location.href='/campus'">
+                List of Campuses
+              </li>
+              <li class="list-group-item selectableItem" style="cursor: pointer;"
+                  onclick="window.location.href='/department'">
+                List of Departments
               </li>
             </ul>
           </div>

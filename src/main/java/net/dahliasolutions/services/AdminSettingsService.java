@@ -20,7 +20,7 @@ public class AdminSettingsService implements AdminSettingsServiceInterface{
             return adminSettingsRepository.save(
                     new AdminSettings(
                             BigInteger.valueOf(1),
-                            "Destiny Exchange",
+                            "Destiny Worship Exchange",
                             false,
                             true)
             );

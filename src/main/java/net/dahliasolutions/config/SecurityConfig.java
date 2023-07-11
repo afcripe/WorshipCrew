@@ -80,10 +80,10 @@ public class SecurityConfig {
                     auth.requestMatchers("/fonts/**").permitAll();
                     auth.requestMatchers("/js/**").permitAll();
                     auth.requestMatchers("/mailer/**").permitAll();
-                    auth.requestMatchers("/admin/**").hasAnyAuthority("ADMIN_READ", "ADMIN_WRITE");
-                    auth.requestMatchers("/user/**").hasAnyAuthority("ADMIN_READ", "ADMIN_WRITE");
-                    auth.requestMatchers("/location/**").hasAnyAuthority("ADMIN_READ", "ADMIN_WRITE");
-                    auth.requestMatchers("/position/**").hasAnyAuthority("ADMIN_READ", "ADMIN_WRITE");
+                    auth.requestMatchers("/admin/**").hasAnyAuthority("ADMIN_READ", "ADMIN_WRITE", "DIRECTOR_READ", "DIRECTOR_WRITE", "MANAGER_READ", "MANAGER_WRITE");
+                    auth.requestMatchers("/user/**").hasAnyAuthority("ADMIN_READ", "ADMIN_WRITE", "DIRECTOR_READ", "DIRECTOR_WRITE", "MANAGER_READ", "MANAGER_WRITE");
+                    auth.requestMatchers("/campus/**").hasAnyAuthority("ADMIN_READ", "ADMIN_WRITE", "DIRECTOR_READ", "DIRECTOR_WRITE");
+                    auth.requestMatchers("/position/**").hasAnyAuthority("ADMIN_READ", "ADMIN_WRITE", "DIRECTOR_READ", "DIRECTOR_WRITE");
                     auth.requestMatchers("/api/v1/app/removeerrormsg").permitAll();
                     auth.requestMatchers("/api/v1/app/toggleSideNav/*").permitAll();
                     auth.anyRequest().authenticated();

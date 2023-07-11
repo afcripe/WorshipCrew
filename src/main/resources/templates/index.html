@@ -4,7 +4,8 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       layout:decorate="~{layouts/defaultLayout}">
 
-<div layout:fragment="content">
+<div class="container" layout:fragment="content">
+
   <div sec:authorize="isAuthenticated()">
 
     <div class="row">
@@ -20,6 +21,7 @@
     <div th:replace="~{components/cardLogin :: cardFragment}">Card</div>
 
   </div>
+
 </div>
 
 <!--

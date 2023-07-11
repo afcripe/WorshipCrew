@@ -14,9 +14,9 @@ public interface CampusRepository extends JpaRepository<Campus, BigInteger> {
     Optional<Campus> findByName(String name);
     Optional<Campus> findByCity(String city);
 
-    @Query(value="SELECT * FROM LOCATION WHERE MANAGER_ID = :id", nativeQuery = true)
+    @Query(value="SELECT * FROM CAMPUS WHERE MANAGER_ID = :id", nativeQuery = true)
     List<Campus> findAllByManager(@Param("id") BigInteger id);
 
-    @Query(value="SELECT * FROM LOCATION WHERE HIDDEN = false", nativeQuery = true)
+    @Query(value="SELECT * FROM CAMPUS WHERE HIDDEN = false", nativeQuery = true)
     List<Campus> findAllByHiddenNot();
 }

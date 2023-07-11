@@ -22,7 +22,8 @@ public class UserController {
     private final UserRolesService rolesService;
     private final PositionService positionService;
     private final AuthService authService;
-    private final CampusService locationService;
+    private final CampusService campusService;
+    private final DepartmentService departmentService;
     private final EmailService emailService;
     private final RedirectService redirectService;
 
@@ -32,7 +33,7 @@ public class UserController {
         List<User> userList = userService.findAll();
         model.addAttribute("title", "All Users");
         model.addAttribute("users", userList);
-        return "admin/listusers";
+        return "admin/listUsers";
     }
 
     @GetMapping("/{id}")
@@ -41,8 +42,9 @@ public class UserController {
         User user = userService.findById(id).orElse(new User());
 
         model.addAttribute("user", user);
+        model.addAttribute("userCampus", user.getCampus().getName());
+        model.addAttribute("userDepartment", user.getDepartment().getName());
         model.addAttribute("userPosition", user.getPosition().getName());
-        model.addAttribute("userLocation", user.getCampus().getName());
         return "admin/user";
     }
 
@@ -50,12 +52,16 @@ public class UserController {
     public String updateUserForm(@PathVariable BigInteger id, Model model) {
         User user = userService.findById(id).orElse(new User());
         List<Position> positionList = positionService.findAll();
-        List<Campus> locationList = locationService.findAll();
+        List<Campus> campusList = campusService.findAll();
+        List<Department> departmentList = departmentService.findAll();
 
         model.addAttribute("user", user);
+        model.addAttribute("userCampus", user.getCampus().getName());
+        model.addAttribute("userDepartment", user.getDepartment().getName());
         model.addAttribute("userPosition", user.getPosition().getName());
+        model.addAttribute("campusList", campusList);
+        model.addAttribute("departmentList", departmentList);
         model.addAttribute("positionList", positionList);
-        model.addAttribute("locationList", locationList);
 
         return "admin/userEdit";
     }
@@ -77,7 +83,8 @@ public class UserController {
             user.setLastName(userModel.lastName());
             user.setContactEmail(userModel.contactEmail());
             user.setPosition(positionService.findByName(userModel.position()).orElse(null));
-            user.setCampus(locationService.findByName(userModel.campus()).orElse(null));
+            user.setCampus(campusService.findByName(userModel.campus()).orElse(null));
+            user.setDepartment(departmentService.findByName(userModel.department()).orElse(null));
             userService.save(user);
         }
 
@@ -91,11 +98,13 @@ public class UserController {
     public String newUserForm(Model model) {
         User user = new User();
         List<Position> positionList = positionService.findAll();
-        List<Campus> locationList = locationService.findAll();
+        List<Campus> campusList = campusService.findAll();
+        List<Department> departmentList = departmentService.findAll();
 
         model.addAttribute("user", user);
         model.addAttribute("positionList", positionList);
-        model.addAttribute("locationList", locationList);
+        model.addAttribute("campusList", campusList);
+        model.addAttribute("departmentList", departmentList);
         return "admin/userNew";
     }
 
@@ -113,7 +122,8 @@ public class UserController {
             user.setLastName(userModel.lastName());
             user.setContactEmail(userModel.username());
             user.setPosition(positionService.findByName(userModel.position()).orElse(null));
-            user.setCampus(locationService.findByName(userModel.campus()).orElse(null));
+            user.setCampus(campusService.findByName(userModel.campus()).orElse(null));
+            user.setDepartment(departmentService.findByName(userModel.department()).orElse(null));
 
         if (userModel.activated() == null){
             user.setPassword(userModel.password());
@@ -121,7 +131,7 @@ public class UserController {
         } else {
             newUser = userService.createUser(user);
             EmailDetails emailDetails = new EmailDetails(newUser.getContactEmail(),"",
-                    "Welcome to Lauren's Legacy Pregnancy Center", null);
+                    "Welcome to Destiny Worship Exchange", null);
             emailService.sendWelcomeMail(emailDetails, newUser.getId());
         }
 

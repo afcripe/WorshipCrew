@@ -22,7 +22,7 @@ public class PositionController {
     private final RedirectService redirectService;
 
     @GetMapping("")
-    public String getPosition(Model model, HttpSession session) {
+    public String getPositions(Model model, HttpSession session) {
         redirectService.setHistory(session, "/position");
         List<Position> positionList = positionService.findAll();
         model.addAttribute("positions", positionList);
@@ -31,7 +31,7 @@ public class PositionController {
 
     @GetMapping("/{id}")
     public String getPosition(@PathVariable BigInteger id, Model model, HttpSession session) {
-        redirectService.setHistory(session, "/position/ id");
+        redirectService.setHistory(session, "/position/id");
         Position position = positionService.findById(id).orElse(null);
         model.addAttribute("position", position);
         return "admin/position";
@@ -77,7 +77,7 @@ public class PositionController {
         }
         if (existingPosition != null) {
             session.setAttribute("msgError", "Location Name Already Exists!");
-            model.addAttribute("location", positionModel);
+            model.addAttribute("position", positionModel);
             String template = "/position/"+positionModel.getId().toString()+"/edit";
             return "redirect:"+template;
         }

@@ -28,11 +28,11 @@
 
           <div class="card-body">
 
-
             <p>Username: <span class="card-text" th:text="*{username}"/></p>
             <p>E-mail: <span class="card-text" th:text="*{contactEmail}"/></p>
+            <p>Campus: <span class="card-text" th:text="${userCampus}"/></p>
+            <p>Department: <span class="card-text" th:text="${userDepartment}"/></p>
             <p>Position: <span class="card-text" th:text="${userPosition}"/></p>
-            <p>Location: <span class="card-text" th:text="${userLocation}"/></p>
           </div>
         </div>
       </div>
@@ -42,7 +42,7 @@
           <div class="card-title alert alert-primary bg-faded">
             <button class="btn btn-sm btn-success small" style="float: right"
                     th:onclick="window.location.href='/user/[[${user.id}]]/addpermission'">Add</button>
-            <h5>Authorizations</h5>
+            <h5>Site Authorizations</h5>
           </div>
           <div class="card-body">
             <ul class="list-group list-group-flush" th:each="role : *{UserRoles}">

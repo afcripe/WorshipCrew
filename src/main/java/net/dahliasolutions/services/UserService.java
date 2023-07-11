@@ -26,8 +26,9 @@ public class UserService implements UserServiceInterface{
     private final UserRolesRepository rolesRepository;
     private final PositionRepository positionRepository;
     private final PasswordEncoder passwordEncoder;
-    private final CampusRepository locationRepository;
+    private final CampusRepository campusRepository;
     private final PersonService personService;
+    private final DepartmentService departmentService;
 
     @Override
     public User createDefaultUser(User user) {
@@ -138,9 +139,9 @@ public class UserService implements UserServiceInterface{
     }
 
     @Override
-    public void updateUserLocation(String username, String locationName) {
+    public void updateUserCampus(String username, String campusName) {
         Optional<User> user = userRepository.findByUsername(username);
-        Optional<Campus> campus = locationRepository.findByName(locationName);
+        Optional<Campus> campus = campusRepository.findByName(campusName);
         if (user.isPresent() && campus.isPresent()) {
             user.get().setCampus(campus.get());
             userRepository.save(user.get());
@@ -148,9 +149,19 @@ public class UserService implements UserServiceInterface{
     }
 
     @Override
+    public void updateUserDepartment(String username, String departmentName) {
+        Optional<User> user = userRepository.findByUsername(username);
+        Optional<Department> department = departmentService.findByName(departmentName);
+        if (user.isPresent() && department.isPresent()) {
+            user.get().setDepartment(department.get());
+            userRepository.save(user.get());
+        }
+    }
+
+    @Override
     public void updateUserLocationByLocationId(String username, BigInteger locationId) {
         Optional<User> user = userRepository.findByUsername(username);
-        Optional<Campus> campus = locationRepository.findById(locationId);
+        Optional<Campus> campus = campusRepository.findById(locationId);
         if (user.isPresent() && campus.isPresent()) {
             user.get().setCampus(campus.get());
             userRepository.save(user.get());
@@ -160,6 +171,11 @@ public class UserService implements UserServiceInterface{
     @Override
     public List<User> findAllByPosition(Position position) {
         return userRepository.findAllByPosition(position);
+    }
+
+    @Override
+    public List<User> findAllByDepartment(Department department) {
+        return userRepository.findAllByDepartment(department);
     }
 
     @Override

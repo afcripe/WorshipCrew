@@ -14,6 +14,7 @@ import java.math.BigInteger;
 @NoArgsConstructor
 @Entity
 public class Campus {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private BigInteger id;

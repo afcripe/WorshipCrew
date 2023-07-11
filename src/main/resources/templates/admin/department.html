@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<div class="container" layout:fragment="content">
+
+  <div th:replace="~{admin/moduleHeader :: header}">Header</div>
+
+
+
+  <div class="container my-3" th:object="${department}">
+
+    <div class="row">
+
+      <div class="column col-lg-4">
+
+        <div class="card">
+          <div class="card-title alert alert-primary">
+            <div style="float: right">
+              <button class="btn btn-sm btn-success small"
+                      th:onclick="window.location.href='/department/[[${department.id}]]/edit';">Edit</button>
+            </div>
+            <h5>
+              <span th:text="*{name}"/>
+            </h5>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+</html>

@@ -15,7 +15,7 @@ public class AdminController {
     private final AdminSettingsService adminSettingsService;
     private final RedirectService redirectService;
     @GetMapping("")
-    public String goHome(Model model, HttpSession session) {
+    public String goAdminHome(Model model, HttpSession session) {
         redirectService.setHistory(session, "/admin");
         model.addAttribute("adminSettings", adminSettingsService.getAdminSettings());
         return "admin/index";

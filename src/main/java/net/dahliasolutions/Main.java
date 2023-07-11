@@ -24,7 +24,7 @@ public class Main {
     @Bean
     @Scope("singleton")
     static public AppServer getAppServerSingleton(){
-        return new AppServer("https://www.legacyvolunteers.net");
+        return new AppServer("https://www.destinyworshipexchange");
     }
 
     @Bean
@@ -58,18 +58,31 @@ public class Main {
             Campus location5 = campusService.createCampus("Navarre", "Navarre", BigInteger.valueOf(5));
 
             User u = new User();
-                u.setUsername("afcripe@live.com");
+                u.setUsername("caleb@destinyworship.com");
                 u.setPassword("password");
-                u.setFirstName("Andrew");
-                u.setLastName("Cripe");
-                u.setContactEmail("afcripe@live.com");
+                u.setFirstName("Caleb");
+                u.setLastName("Lawernce");
+                u.setContactEmail("caleb@destinyworship.com");
                 u = userService.createDefaultUser(u);
             userService.addRoleToUser(u.getUsername(), "ADMIN_WRITE");
-            userService.updateUserPosition(u.getUsername(), "Administrator");
-            userService.updateUserLocation(u.getUsername(), "Destin");
+            userService.updateUserPosition(u.getUsername(), "Regional Director");
+            userService.updateUserDepartment(u.getUsername(), "Production");
+            userService.updateUserCampus(u.getUsername(), "Destin");
+
+            User u2 = new User();
+                u2.setUsername("afcripe@live.com");
+                u2.setPassword("password");
+                u2.setFirstName("Andrew");
+                u2.setLastName("Cripe");
+                u2.setContactEmail("afcripe@live.com");
+                u2 = userService.createDefaultUser(u2);
+            userService.addRoleToUser(u2.getUsername(), "ADMIN_WRITE");
+            userService.updateUserPosition(u2.getUsername(), "Production Crew");
+            userService.updateUserDepartment(u2.getUsername(), "Production");
+            userService.updateUserCampus(u2.getUsername(), "Destin");
 
             mainLocation.setManagerId(u.getId());
-            mainLocation.setManagerName("Andrew Cripe");
+            mainLocation.setManagerName("Caleb Lawrence");
             campusService.save(mainLocation);
         };
 
