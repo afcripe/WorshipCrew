@@ -24,7 +24,9 @@ public class Main {
     @Bean
     @Scope("singleton")
     static public AppServer getAppServerSingleton(){
-        return new AppServer("https://www.destinyworshipexchange");
+        return new AppServer("https://www.destinyworshipexchange.com",
+                "/Users/afcripe/var/DestinyExchange/content",
+                "/content");
     }
 
     @Bean

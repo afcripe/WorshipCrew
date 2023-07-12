@@ -21,7 +21,7 @@ public class StoreItem {
     private BigInteger id;
     private String name;
     private String description;
-    private boolean inStock;        //on hand to send to campus
+    private int count;              //number of items on hand to send to campus
     private boolean specialOrder;   //not held in stock and must be ordered
     private boolean available;      //available to order
     private int leadTime;           //in days

@@ -6,7 +6,7 @@ import net.dahliasolutions.services.AdminSettingsService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/vi/admin")
+@RequestMapping("/api/v1/admin")
 @RequiredArgsConstructor
 public class AdminAPIController {
 

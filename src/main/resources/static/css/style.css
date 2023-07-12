@@ -162,3 +162,24 @@
     color: #FF7F50;
     background-color: transparent;
 }
+
+.alert-tertiary {
+    color: #3b0896;
+    background-color: #dcccfa;
+    border-color: #ccb4f8;
+}
+.alert-tertiary .alert-link {
+    color: #06357a;
+}
+.alert-quaternary {
+    color: #932e08;
+    background-color: #fad5c8;
+    border-color: #f8c2ae;
+}
+.alert-quaternary .alert-link {
+    color: #FF7F50;
+}
+
+.upload-modal {
+    border-radius: 5px;
+}

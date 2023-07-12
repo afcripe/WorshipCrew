@@ -20,21 +20,21 @@
           document.getElementById("dpCompanyText").style.display = "block";
           document.getElementById("dpCompanyInput").style.display = "none";
           document.getElementById("textCompanyName").innerText = document.getElementById("inputCompanyName").value;
-          fetch("/api/vi/admin/update/companyName", {
+          fetch("/api/v1/admin/update/companyName", {
             method: "POST",
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({name: document.getElementById("inputCompanyName").value})
           });
         }
         if (element.id == 'chkMonthlyStatement') {
-          fetch("/api/vi/admin/update/monthlyStatements", {
+          fetch("/api/v1/admin/update/monthlyStatements", {
             method: "POST",
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({name: document.getElementById("chkMonthlyStatement").checked})
           });
         }
         if (element.id == 'chkAllowVolunteerRequests') {
-          fetch("/api/vi/admin/update/allowVolunteerRequests", {
+          fetch("/api/v1/admin/update/allowVolunteerRequests", {
             method: "POST",
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({name: document.getElementById("chkAllowVolunteerRequests").checked})
