@@ -38,6 +38,9 @@
           <li class="nav-item d-sm-none">
             <a class="nav-link" href="/wiki">Wiki</a>
           </li>
+          <li class="nav-item d-sm-none">
+            <a class="nav-link" href="/support">Support</a>
+          </li>
           <li class="nav-item d-block d-sm-none" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
                                                 or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
                                                 or #lists.contains(userRoles,'MANAGER_READ') or #lists.contains(userRoles,'MANAGER_WRITE')}">

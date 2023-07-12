@@ -60,11 +60,6 @@ public class IndexController {
         return "redirect:/user/index";
     }
 
-    @GetMapping("/support")
-    public String getSupport() {
-        return "support";
-    }
-
     @PostMapping("/passwordreset")
     public String processPasswordReset(@ModelAttribute LoginModel loginModel, HttpSession session) {
         User user = userService.findByUsername(loginModel.getUsername()).orElse(null);

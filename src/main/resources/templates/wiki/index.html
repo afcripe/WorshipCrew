@@ -4,14 +4,20 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       layout:decorate="~{layouts/defaultLayout}">
 
-<div class="container" layout:fragment="content">
+<div class="container m-0 p-0" layout:fragment="content">
 
-    <div class="row">
+    <div th:replace="~{wiki/moduleHeader :: header}">Header</div>
 
-        <h2 style="color: royalblue">Welcome to the Destiny Wiki</h2>
+    <div class="mx-2">
+
+        <div class="row mt-2">
+
+            <h1 style="color: royalblue">Welcome to the Destiny Wiki</h1>
+            <p>If it's online, it ahs to be true.</p>
+
+        </div>
 
     </div>
-
   </div>
 
 </html>

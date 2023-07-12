@@ -82,39 +82,43 @@
             <!-- Side Navigation -->
                 <div id="sideNavExpanded" class="flex-fill d-none d-sm-block px-2"
                      style="background-color: #eeeeee; min-width: 170px; max-width: 170px; width: 170px;">
-                    <div class="sidebar-header" onclick="toggleSideNav(false)">
+                    <div class="sidebar-header" onclick="toggleSideNav(false)" style="cursor: pointer">
                         <h4>Navigation</h4>
                     </div>
                     <div class="list-group" sec:authorize="isAuthenticated()">
                         <a class="list-group-item" href="/">Home</a>
-                        <a class="list-group-item list-group-subitem" href="/user">Users</a>
+<!--                        <a class="list-group-item list-group-subitem" href="/user">Users</a>-->
                         <a class="list-group-item" href="/store">Store</a>
                         <a class="list-group-item" href="/wiki">Wiki</a>
+                        <a class="list-group-item" href="/support">Support</a>
                     </div>
                 </div>
                 <div id="sideNavCollapsed" class="flex-fill d-none d-sm-block px-2"
                      style="background-color: #eeeeee; min-width: 45px; max-width: 45px; width: 45px;">
-                    <div class="sidebar-header text-center" onclick="toggleSideNav(true)">
+                    <div class="sidebar-header text-center" onclick="toggleSideNav(true)" style="cursor: pointer">
                         <h3><i class="bi bi-compass"></i></h3>
                     </div>
                     <div class="list-group" sec:authorize="isAuthenticated()">
                         <a class="list-group-item p-1" href="/">
                             <i class="bi bi-house"></i>
                         </a>
-                        <a class="list-group-item p-1" href="/user">
-                            <i class="bi bi-person"></i>
-                        </a>
+<!--                        <a class="list-group-item p-1" href="/user">-->
+<!--                            <i class="bi bi-person"></i>-->
+<!--                        </a>-->
                         <a class="list-group-item p-1" href="/store">
                             <i class="bi bi-shop-window"></i>
                         </a>
                         <a class="list-group-item p-1" href="/wiki">
                             <i class="bi bi-wikipedia"></i>
                         </a>
+                        <a class="list-group-item p-1" href="/support">
+                            <i class="bi bi-life-preserver"></i>
+                        </a>
                     </div>
                 </div>
 
             <!-- Content -->
-            <div class="flex-fill px-2 m-2" style="overflow: auto; width: 100%">
+            <div class="flex-fill px-0 m-2" style="overflow: auto; width: 100%">
                 <section layout:fragment="content">
                     <p>Replace with layout:fragment="content"</p>
                 </section>

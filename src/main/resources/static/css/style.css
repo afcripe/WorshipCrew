@@ -51,3 +51,114 @@
     padding-left: 25px;
     font-size: small;
 }
+
+.btn-tertiary {
+    color: #fff;
+    background-color: #6f42c1;
+    border-color: #6f42c1;
+}
+.btn-tertiary:hover {
+    color: #fff;
+    background-color: #6610f2;
+    border-color: #580dd0;
+}
+.btn-check:focus + .btn-tertiary, .btn-tertiary:focus {
+    color: #fff;
+    background-color: #580dd0;
+    border-color: #580dd0;
+    box-shadow: 0 0 0 0.25rem rgba(161, 49, 253, 0.5);
+}
+.btn-check:checked + .btn-tertiary, .btn-check:active + .btn-tertiary, .btn-tertiary:active, .btn-tertiary.active, .show > .btn-tertiary.dropdown-toggle {
+    color: #fff;
+    background-color: #580dd0;
+    border-color: #580dd0;
+}
+.btn-check:checked + .btn-tertiary:focus, .btn-check:active + .btn-tertiary:focus, .btn-tertiary:active:focus, .btn-tertiary.active:focus, .show > .btn-tertiary.dropdown-toggle:focus {
+    box-shadow: 0 0 0 0.25rem rgba(161, 49, 253, 0.5);
+}
+.btn-tertiary:disabled, .btn-tertiary.disabled {
+    color: #fff;
+    background-color: #6f42c1;
+    border-color: #6f42c1;
+}
+
+
+.btn-outline-tertiary {
+    color: #6f42c1;
+    border-color: #6f42c1;
+}
+.btn-outline-tertiary:hover {
+    color: #fff;
+    background-color: #6f42c1;
+    border-color: #6f42c1;
+}
+.btn-check:focus + .btn-outline-tertiary, .btn-outline-tertiary:focus {
+    box-shadow: 0 0 0 0.25rem rgba(161, 49, 253, 0.5);
+}
+.btn-check:checked + .btn-outline-tertiary, .btn-check:active + .btn-outline-tertiary, .btn-outline-tertiary:active, .btn-outline-tertiary.active, .btn-outline-tertiary.dropdown-toggle.show {
+    color: #fff;
+    background-color: #6f42c1;
+    border-color: #6f42c1;
+}
+.btn-check:checked + .btn-outline-tertiary:focus, .btn-check:active + .btn-outline-tertiary:focus, .btn-outline-tertiary:active:focus, .btn-outline-tertiary.active:focus, .btn-outline-tertiary.dropdown-toggle.show:focus {
+    box-shadow: 0 0 0 0.25rem rgba(161, 49, 253, 0.5);
+}
+.btn-outline-tertiary:disabled, .btn-outline-tertiary.disabled {
+    color: #6f42c1;
+    background-color: transparent;
+}
+
+.btn-quaternary {
+    color: #fff;
+    background-color: #FF7F50;
+    border-color: #FF7F50;
+}
+.btn-quaternary:hover {
+    color: #fff;
+    background-color: #d86b44;
+    border-color: #d86b44;
+}
+.btn-check:focus + .btn-quaternary, .btn-quaternary:focus {
+    color: #fff;
+    background-color: #df6e46;
+    border-color: #d96c44;
+    box-shadow: 0 0 0 0.25rem rgba(253, 110, 49, 0.5);
+}
+.btn-check:checked + .btn-quaternary, .btn-check:active + .btn-quaternary, .btn-quaternary:active, .btn-quaternary.active, .show > .btn-quaternary.dropdown-toggle {
+    color: #fff;
+    background-color: #d96c44;
+    border-color: #b75c3a;
+}
+.btn-check:checked + .btn-quaternary:focus, .btn-check:active + .btn-quaternary:focus, .btn-quaternary:active:focus, .btn-quaternary.active:focus, .show > .btn-quaternary.dropdown-toggle:focus {
+    box-shadow: 0 0 0 0.25rem rgba(253, 110, 49, 0.5);
+}
+.btn-quaternary:disabled, .btn-quaternary.disabled {
+    color: #fff;
+    background-color: #FF7F50;
+    border-color: #FF7F50;
+}
+
+.btn-outline-quaternary {
+    color: #FF7F50;
+    border-color: #FF7F50;
+}
+.btn-outline-quaternary:hover {
+    color: #fff;
+    background-color: #FF7F50;
+    border-color: #FF7F50;
+}
+.btn-check:focus + .btn-outline-quaternary, .btn-outline-quaternary:focus {
+    box-shadow: 0 0 0 0.25rem rgba(253, 110, 49, 0.5);
+}
+.btn-check:checked + .btn-outline-quaternary, .btn-check:active + .btn-outline-quaternary, .btn-outline-quaternary:active, .btn-outline-quaternary.active, .btn-outline-quaternary.dropdown-toggle.show {
+    color: #fff;
+    background-color: #FF7F50;
+    border-color: #FF7F50;
+}
+.btn-check:checked + .btn-outline-quaternary:focus, .btn-check:active + .btn-outline-quaternary:focus, .btn-outline-quaternary:active:focus, .btn-outline-quaternary.active:focus, .btn-outline-quaternary.dropdown-toggle.show:focus {
+    box-shadow: 0 0 0 0.25rem rgba(253, 110, 49, 0.5);
+}
+.btn-outline-quaternary:disabled, .btn-outline-quaternary.disabled {
+    color: #FF7F50;
+    background-color: transparent;
+}
