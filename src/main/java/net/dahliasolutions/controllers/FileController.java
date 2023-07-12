@@ -30,8 +30,13 @@ public class FileController {
         return storedImageService.findAll();
     }
 
+    @GetMapping("/images")
+    public List<StoredImage> getAllImages() {
+        return storedImageService.findAll();
+    }
+
     @PostMapping("/uploadimage")
-    public StoredImage getNewItem(@ModelAttribute FileUploadModel fileUploadModel, @RequestPart("imageFile") MultipartFile imageFile) {
+    public StoredImage uploadNewImage(@ModelAttribute FileUploadModel fileUploadModel, @RequestPart("imageFile") MultipartFile imageFile) {
         // ToDo - save multipart file to disk and return relative URL location
 
         // get the image save location and verify directories

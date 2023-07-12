@@ -183,3 +183,18 @@
 .upload-modal {
     border-radius: 5px;
 }
+
+.grid_image_div {
+    float: left;
+    width: 100px;
+    height: 125px;
+    padding: 2px;
+}
+.grid_image_element {
+    width: 100px;
+    height: 100px;
+    vertical-align: middle;
+}
+.grid_image_selected {
+    border: 2px solid #FF7F50;
+}
