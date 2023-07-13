@@ -23,6 +23,12 @@ public class ProfileController {
     private final AuthService authService;
     private final RedirectService redirectService;
 
+    @ModelAttribute
+    public void addAttributes(Model model) {
+        model.addAttribute("moduleTitle", "Profile");
+        model.addAttribute("moduleLink", "/profile");
+    }
+
     @GetMapping("")
     public String getUser(Model model, HttpSession session) {
         redirectService.setHistory(session, "/profile");

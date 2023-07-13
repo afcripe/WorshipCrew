@@ -26,8 +26,14 @@ public class IndexController {
     private final EmailService emailService;
     private final RedirectService redirectService;
 
+    @ModelAttribute
+    public void addAttributes(Model model) {
+        model.addAttribute("moduleTitle", "DW Exchange");
+        model.addAttribute("moduleLink", "/");
+    }
+
     @GetMapping("/")
-    public String goHome(Model model, HttpSession session) {
+    public String goHome(HttpSession session) {
         redirectService.setHistory(session, "/");
         return "index";
     }

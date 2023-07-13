@@ -1,6 +1,5 @@
 package net.dahliasolutions.controllers;
 
-import jakarta.mail.Multipart;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.*;
 import net.dahliasolutions.services.*;
@@ -19,20 +18,25 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/contentmanager")
 @RequiredArgsConstructor
-public class FileController {
+public class FileAPIController {
 
     private final StoredImageService storedImageService;
     private final RedirectService redirectService;
     private final AppServer appServer;
 
     @GetMapping("")
-    public List<StoredImage> goStoreHome() {
+    public List<StoredImage> goFindAll() {
         return storedImageService.findAll();
     }
 
     @GetMapping("/images")
     public List<StoredImage> getAllImages() {
         return storedImageService.findAll();
+    }
+
+    @GetMapping("/images/{searchTerm}")
+    public List<StoredImage> searchImages(@PathVariable String searchTerm) {
+        return storedImageService.findBySearchTerm(searchTerm);
     }
 
     @PostMapping("/uploadimage")

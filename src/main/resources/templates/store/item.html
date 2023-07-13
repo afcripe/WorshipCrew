@@ -5,28 +5,18 @@
 
 <div class="container m-0 p-0" layout:fragment="content">
 
-  <div class="container" th:object="${storeItem}">
+  <th:block th:if="${session.msg}">
+    <p th:text="${session.msg}"/>
+    <th:block th:text="${#session.removeAttribute('msg')}" />
+  </th:block>
+
+  <div class="container">
     <div class="row">
-      <div class="column col-lg-6">
+      <div class="column">
 
-        <div class="card">
-
-          <div class="card-title alert alert-quaternary">
-            <h5 th:text="*{name}"></h5>
-
-            <th:block th:if="${session.msg}">
-              <p th:text="${session.msg}"/>
-              <th:block th:text="${#session.removeAttribute('msg')}" />
-            </th:block>
-
-          </div>
-
-          <div class="card-body">
+        <div th:replace="~{components/cardStoreItemLG :: cardFragment(${storeItem})}">Card</div>
 
 
-          </div>
-
-        </div>
 
       </div>
     </div>

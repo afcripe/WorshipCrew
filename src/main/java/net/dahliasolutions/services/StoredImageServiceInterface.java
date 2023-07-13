@@ -13,6 +13,7 @@ public interface StoredImageServiceInterface {
     Optional<StoredImage> findByName(String name);
     Optional<StoredImage> findByFileLocation(String fileLocation);
     List<StoredImage> findAll();
+    List<StoredImage> findBySearchTerm(String searchTerm);
     void save(StoredImage storedImage);
     void deleteById(BigInteger id);
 

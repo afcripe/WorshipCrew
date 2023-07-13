@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+
+<div class="container m-0 p-0" th:fragment="pageFragment">
+
+  <div class="row">
+
+    <h2 class="mx-2 my-1">Destiny Worship Exchange</h2>
+    <hr/>
+
+    <div class="ml-0 mr-ml-5">
+      <p>
+        Welcome to the future! <br />
+        A place get the things you need, the help you need, and the support you need.
+      </p>
+
+      <p>There are several things to choose from when it comes to serving you. First, is the Store.</p>
+      <p><a th:href="@{/store}"><i class="bi bi-shop-window h3" style="color: #FF7F50"></i></a></p>
+
+      <p>The store is where you can place orders for equipment and supplies for your campus.
+        Each item you request will be forwarded to the appropriate person to provide you with the things
+        you need efficiently.
+      </p>
+
+      <p>Second, is the Wiki.</p>
+      <p><a th:href="@{/wiki}"><i class="bi bi-wikipedia h3" style="color: #0d6efd"></i></a></p>
+
+      <p>Here you can read up on the latest information to help you in your ministry.
+        You can post articles for your team and get general help without need to track down the best resource on your own.
+        There wil also be training materials along with Destiny approved operation guides.
+      </p>
+
+      <p>Last, we have Support.</p>
+      <p><a th:href="@{/support}"><i class="bi bi-life-preserver h3" style="color: #6f42c1"></i></a></p>
+
+      <p>We issues arise at your campus, the best way to get help is to submit a ticket. This ensures that everyone who
+        needs to know, does know. You can also keep up-to-date on the progress of your tickets and provide additional information
+        as symptoms progress. Tickets also help give pastors and team leaders an indication of the technical health of each campus.
+      </p>
+    </div>
+
+  </div>
+
+</div>
+
+</html>

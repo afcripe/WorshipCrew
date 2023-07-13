@@ -27,6 +27,12 @@ public class UserController {
     private final EmailService emailService;
     private final RedirectService redirectService;
 
+    @ModelAttribute
+    public void addAttributes(Model model) {
+        model.addAttribute("moduleTitle", "Settings");
+        model.addAttribute("moduleLink", "/admin");
+    }
+
     @GetMapping("")
     public String getUsers(Model model, HttpSession session) {
         redirectService.setHistory(session, "/user");

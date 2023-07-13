@@ -41,6 +41,11 @@ public class StoredImageService implements StoredImageServiceInterface {
     }
 
     @Override
+    public List<StoredImage> findBySearchTerm(String searchTerm) {
+        return storedImageRepository.findBySearchTerm(searchTerm);
+    }
+
+    @Override
     public void save(StoredImage storedImage) {
         storedImageRepository.save(storedImage);
     }

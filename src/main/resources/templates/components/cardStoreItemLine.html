@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+
+<div th:fragment="cardFragment(storeItem)">
+  <div class="card" th:object="${storeItem}">
+
+    <div class="row">
+      <div class="col">
+        <img th:src="@{*{image.fileLocation}}" class="store_line_image">
+      </div>
+      <div class="col">
+        <h6 th:text="*{name}"></h6>
+      </div>
+      <div class="col">
+        <p th:text="*{description}"></p>
+      </div>
+      <div class="col">
+        <p>In Stock</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</html>

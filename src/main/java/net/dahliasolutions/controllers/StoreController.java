@@ -26,6 +26,12 @@ public class StoreController {
     private final StoredImageService storedImageService;
     private final RedirectService redirectService;
 
+    @ModelAttribute
+    public void addAttributes(Model model) {
+        model.addAttribute("moduleTitle", "Store");
+        model.addAttribute("moduleLink", "/store");
+    }
+
     @GetMapping("")
     public String goStoreHome(Model model, HttpSession session) {
         redirectService.setHistory(session, "/store");
@@ -51,27 +57,53 @@ public class StoreController {
 
     @PostMapping("/create")
     public String createStoreItem(@ModelAttribute StoreItemModel storeItemModel, Model model, HttpSession session) {
+        if (storeItemModel.name().equals("")) {
+            List<User> userList = userService.findAll();
+            List<Department> departmentList = departmentService.findAll();
+            List<Position> positionList = positionService.findAll();
+
+            model.addAttribute("storeItem", storeItemModel);
+            model.addAttribute("userList", userList);
+            model.addAttribute("positionList", positionList);
+            model.addAttribute("departmentList", departmentList);
+            session.setAttribute("msgError", "Product Name is Required.");
+            return "store/itemNew";
+        }
+
         boolean specialOrder = storeItemModel.specialOrder() != null;
         boolean available = storeItemModel.available() != null;
 
         StoreItem storeItem = new StoreItem();
-            storeItem.setName(storeItemModel.name());
-            storeItem.setDescription(storeItemModel.description());
-            storeItem.setCount(storeItemModel.count());
-            storeItem.setSpecialOrder(specialOrder);
-            storeItem.setAvailable(available);
-            storeItem.setLeadTime(storeItemModel.leadTime());
+        storeItem.setName(storeItemModel.name());
+        storeItem.setDescription(storeItemModel.description());
+        storeItem.setCount(storeItemModel.count());
+        storeItem.setSpecialOrder(specialOrder);
+        storeItem.setAvailable(available);
+        storeItem.setLeadTime(storeItemModel.leadTime());
+        if (storeItemModel.department() != null) {
             storeItem.setDepartment(departmentService.findById(storeItemModel.department()).orElse(null));
+        }
+        if (storeItemModel.owner() != null) {
             storeItem.setOwner(userService.findById(storeItemModel.owner()).orElse(null));
+        }
+        if (storeItemModel.image() != null) {
             storeItem.setImage(storedImageService.findById(storeItemModel.image()).orElse(null));
+        }
 
         List<String> items = Arrays.asList(storeItemModel.position().split("\s"));
         ArrayList<Position> pl = new ArrayList<>();
-        storeItem.setPositionList(new ArrayList<>());
         for (String s : items) {
-            int i = Integer.parseInt(s);
-            Optional<Position> p = positionService.findById(BigInteger.valueOf(i));
-            if (p.isPresent()) { pl.add(p.get()); }
+            if (!s.equals("")) {
+                try {
+                    int i = Integer.parseInt(s);
+                    Optional<Position> p = positionService.findById(BigInteger.valueOf(i));
+                    if (p.isPresent()) {
+                        pl.add(p.get());
+                    }
+                } catch (Error e) {
+                    System.out.println(e);
+                }
+            }
         }
 
         storeItem.setPositionList(pl);

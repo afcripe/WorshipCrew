@@ -1,33 +1,32 @@
 <div th:fragment="header">
 
-    <nav class="navbar navbar-expand-md navbar-light bg-light w-100">
-      <div class="container-fluid">
+    <nav class="navbar navbar-expand-md navbar-light bg-light">
+      <div class="container-fluid w-100">
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarBreadcrumb" aria-controls="navbarBreadcrumb" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="collapse navbar-collapse flex-grow-1" id="navbarBreadcrumb">
+        <div class="collapse navbar-collapse flex-grow-1 mt-3 mt-md-0" id="navbarBreadcrumb">
           <ul class="navbar-nav me-auto">
             <li class="nav-item">
               <a class="nav-link" href="#">
-                <h3><i class="bi bi-life-preserver" style="color: #6f42c1"></i></h3>
+                <i class="bi bi-life-preserver h3" style="color: #6f42c1"></i>
               </a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#">
-                <h3><i class="bi bi-gear" style="color: #6f42c1"></i></h3>
+                <i class="bi bi-gear h3" style="color: #6f42c1"></i>
               </a>
             </li>
           </ul>
 
-          <form class="d-flex me-auto order-1" style="height: 30px">
+          <form class="d-flex me-auto order-1 mt-3 mt-md-0" style="height: 30px">
               <input class="form-control" type="search" placeholder="Search" aria-label="Search">
               <button class="btn btn-sm btn-outline-tertiary mx-1 px-1" type="submit">Search</button>
           </form>
 
-          <ul class="navbar-nav d-flex me-auto order-2" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
-                              or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')}">
+          <ul class="navbar-nav d-flex me-auto order-2 mt-3 mt-md-0">
             <li class="nav-item">
               <a class="btn btn-sm btn-tertiary" href="/store/new">
                 <i class="bi bi-ticket-detailed d-block d-lg-none"></i>
@@ -35,15 +34,15 @@
             </li>
           </ul>
 
-          <ul class="navbar-nav d-flex mr-1 pr-2 order-last pull-right">
+          <ul class="navbar-nav d-flex mr-1 pr-2 mt-3 mt-md-0 order-last pull-right">
             <li class="nav-item">
               <a class="nav-link" href="#">
-                <h4><i class="bi bi-card-list"></i></h4>
+                <i class="bi bi-card-list h4"></i>
               </a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#">
-                <h4><i class="bi bi-grid"></i></h4>
+                <i class="bi bi-grid h4"></i>
               </a>
             </li>
           </ul>

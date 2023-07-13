@@ -118,7 +118,7 @@
                 </div>
 
             <!-- Content -->
-            <div class="flex-fill px-0 m-2" style="overflow: auto; width: 100%">
+            <div class="flex-fill p-0 m-2" style="overflow-y: auto; overflow-x: hidden; width: 100%">
                 <section layout:fragment="content">
                     <p>Replace with layout:fragment="content"</p>
                 </section>
@@ -151,9 +151,22 @@
                 fetch("/api/v1/app/toggleSideNav/"+show);
             }
         }
+
+        // let getHeaderTitle = document.getElementById("commonHeaderTitle");
+        // console.log(getHeaderTitle.innerText);
+        // console.log(getHeaderTitle.href);
+        // debugger
     </script>
 
-    <script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        moduleHeaderTitle = /*[[${moduleTitle}]]*/ " ";
+        moduleHeaderLink = /*[[${moduleLink}]]*/ "/";
+        /*]]>*/
+        let thisPageTitle = document.getElementById("commonHeaderTitle");
+        thisPageTitle.textContent = moduleHeaderTitle;
+        thisPageTitle.setAttribute("href", moduleHeaderLink);
+
         toggleSideNav(displaySideNav);
     </script>
 

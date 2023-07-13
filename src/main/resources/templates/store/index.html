@@ -16,7 +16,7 @@
             <p>No, it's not prime day.</p>
 
             <div th:each="item : ${storeItems}">
-                <p><span th:text="${item.name}"></span> - <span th:text="${item.description}"></span></p>
+                <div th:replace="~{components/cardStoreItemLine :: cardFragment(${item})}">Card</div>
             </div>
 
         </div>

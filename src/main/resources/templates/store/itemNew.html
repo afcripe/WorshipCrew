@@ -35,7 +35,7 @@
                 }).then(data => {
                   console.log(data);
                   document.getElementById('image').value = data.id;
-                  document.getElementById('imagePath').innerText = data.fileLocation;
+                  document.getElementById('imagePath').innerText = data.name;
                   completeImageUpload();
                 });
               }
@@ -95,50 +95,55 @@
 
           <dialog id="chooseDialog" class="upload-modal">
             <template id="tmpImage">
-              <div class="grid_image_div">
-                <img src="" alt="" class="grid_image_element" width="100" height="100">
+              <div class="grid_image_div m-1">
+                <img src="" alt="" class="grid_image_element">
                 <p></p>
               </div>
             </template>
             <script>
               async function loadImages() {
                 const chooser = document.getElementById("pictureChooser");
-                const template = document.getElementById("tmpImage");
-
                 while (chooser.firstChild) {
                   chooser.removeChild(chooser.lastChild);
                 }
+                const template = document.getElementById("tmpImage");
+                let searchTerm = document.getElementById("imgSearch").value;
+                let apiURL = '/api/v1/contentmanager/images';
+                if (searchTerm !== "") {
+                  apiURL = apiURL + "/" + searchTerm;
+                }
 
-                const response = await fetch('/api/v1/contentmanager/images'
+                const response = await fetch(apiURL
                 ).then(response => {
                   return response.json();
                 }).then(data => {
                   console.log(data);
                   for (let key in data) {
                     let obj = data[key];
-                    let divID = "id-"+obj.id;
+                    let divID = "id-" + obj.id;
 
                     let clone = template.content.cloneNode(true);
                     let imgDiv = clone.querySelector("img");
-                        imgDiv.src = obj.fileLocation;
-                        imgDiv.alt = obj.name;
-                        imgDiv.setAttribute("id", divID);
-                        imgDiv.addEventListener("click", function (event) {
-                          selectImage(event.target);
-                        });
+                    imgDiv.src = obj.fileLocation;
+                    imgDiv.alt = obj.name;
+                    imgDiv.setAttribute("id", divID);
+                    imgDiv.addEventListener("click", function (event) {
+                      selectImage(event.target);
+                    });
                     let hdrDiv = clone.querySelector("p");
-                        hdrDiv.innerText = obj.name;
+                    hdrDiv.innerText = obj.name;
                     chooser.appendChild(clone);
                   }
                 });
+              }
 
-                function selectImage(element) {
-                  console.log(element);
-                  debugger
-                  const chooser = document.getElementById("pictureChooser");
-                  let imgArray = chooser.querySelectorAll("img");
+              function selectImage(element) {
+                console.log(element);
+                debugger
+                const chooser = document.getElementById("pictureChooser");
+                let imgArray = chooser.querySelectorAll("img");
 
-                  for(let key in imgArray) {
+                for(let key in imgArray) {
                     let imgNode = imgArray[key];
                         try {imgNode.classList.remove("grid_image_selected")}
                         catch (error) {console.log("not an image")}
@@ -147,16 +152,38 @@
                   let imageID = element.id.replace(/id-/g,'');
                   document.getElementById("selectedImageId").value = imageID;
                   document.getElementById("selectedImageName").value = element.alt;
-                }
               }
+
+              function dialogOK() {
+                document.getElementById('image').value = document.getElementById("selectedImageId").value;
+                document.getElementById('imagePath').innerText = document.getElementById("selectedImageName").value;
+                document.getElementById("chooseDialog").close();
+              }
+              function imageChooserKeyUp(event) {
+                if (event.key == "Enter") { dialogOK() }
+              }
+              function chooserClose() {
+                document.getElementById("chooseDialog").close();
+              }
+
             </script>
-            <h2>Choose Image</h2>
             <form method="dialog">
-              <div id="pictureChooser" class="m-2 p-2 border border-1 rounded" style="width: 410px; height: 410px; overflow-y: scroll"></div>
-              <button formmethod="dialog" type="submit">Cancel</button>
+              <div class="d-flex">
+                <label for="imgSearch" class="form-control-label h4 w-50" style="float: left">Choose Image</label>
+                <input id="imgSearch" class="form-control pr-2 w-50" type="text" onkeyup="loadImages()"
+                       placeholder="Search" aria-label="Search" style="float:right;">
+              </div>
+
+              <div id="pictureChooser" class="border border-1 rounded" onkeyup="imageChooserKeyUp()"
+                   style="width: 410px; height: 410px; overflow-x: hidden; overflow-y: scroll"></div>
               <input type="hidden" id="selectedImageId">
-              <input contenteditable="false" id="selectedImageName" type="text">
-              <button type="submit">Submit</button>
+              <input contenteditable="false" id="selectedImageName" type="hidden">
+              <div class="d-flex">
+                <button type="button" class="btn btn-sm btn-quaternary m-2 w-25"
+                        onclick="dialogOK()">OK</button>
+                <button type="button" class="btn btn-sm btn-outline-danger m-2 w-25"
+                        onclick="chooserClose()">Cancel</button>
+              </div>
             </form>
           </dialog>
 
@@ -301,7 +328,6 @@
             }
 
             function submitForm() {
-              debugger
               let theForm = document.getElementById("itemForm");
               let pList = document.getElementById("positionSelect");
 
@@ -314,6 +340,10 @@
               console.log(p);
               document.getElementById("position").value = p;
               theForm.submit();
+            }
+
+            function clearErrors() {
+
             }
           </script>
 

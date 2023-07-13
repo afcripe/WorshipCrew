@@ -1,5 +1,6 @@
 package net.dahliasolutions.models;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,12 +27,15 @@ public class StoreItem {
     private boolean available;      //available to order
     private int leadTime;           //in days
 
+    @Nullable
     @ManyToOne(fetch = FetchType.EAGER)
     private Department department;  //department to which item belongs
 
+    @Nullable
     @ManyToOne(fetch = FetchType.EAGER)
     private User owner;             //person who receives order requests
 
+    @Nullable
     @ManyToOne(fetch = FetchType.LAZY)
     private StoredImage image;
 

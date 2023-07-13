@@ -19,6 +19,12 @@ public class UserRoleController {
     private final UserRolesService rolesService;
     private final RedirectService redirectService;
 
+    @ModelAttribute
+    public void addAttributes(Model model) {
+        model.addAttribute("moduleTitle", "Settings");
+        model.addAttribute("moduleLink", "/admin");
+    }
+
     @GetMapping("")
     public String getLocations(Model model, HttpSession session) {
         redirectService.setHistory(session, "/roles");

@@ -6,6 +6,7 @@ import net.dahliasolutions.services.RedirectService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
@@ -14,6 +15,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class SupportController {
 
     private final RedirectService redirectService;
+
+    @ModelAttribute
+    public void addAttributes(Model model) {
+        model.addAttribute("moduleTitle", "Support");
+        model.addAttribute("moduleLink", "/support");
+    }
     @GetMapping("")
     public String goSupportHome(Model model, HttpSession session) {
         redirectService.setHistory(session, "/support");

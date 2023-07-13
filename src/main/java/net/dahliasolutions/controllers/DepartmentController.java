@@ -23,6 +23,12 @@ public class DepartmentController {
     private final UserService userService;
     private final RedirectService redirectService;
 
+    @ModelAttribute
+    public void addAttributes(Model model) {
+        model.addAttribute("moduleTitle", "Settings");
+        model.addAttribute("moduleLink", "/admin");
+    }
+
     @GetMapping("")
     public String getDepartments(Model model, HttpSession session) {
         redirectService.setHistory(session, "/department");

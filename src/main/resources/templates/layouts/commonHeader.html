@@ -1,4 +1,4 @@
-<div th:fragment="header" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<div th:fragment="header" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://thymeleaf.org">
 
   <script th:inline="javascript">
     function navbarClickEvents(event, element) {
@@ -16,9 +16,10 @@
       </a>
 
       <div class="navbar-nav mr-auto d-block d-sm-none">
-        <h3 style="color: lightblue">DWeXchange</h3>
+        <a id="commonHeaderTitle" class="nav-link h3" style="cursor: pointer" rhef="/">DWeXchange</a>
       </div>
-      <div class="navbar-nav d-block d-sm-none mr-2" sec:authorize="isAuthenticated()">
+
+      <div class="navbar-nav d-block d-sm-none mr-2 pull-right" sec:authorize="isAuthenticated()">
         <h4 style="color: lightskyblue;">
           <i class="bi bi-cart"></i>
         </h4>

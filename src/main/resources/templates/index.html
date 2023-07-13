@@ -10,7 +10,9 @@
 
     <div class="row">
 
-        <h2>Destiny Worship Exchange</h2>
+      <div class="col">
+        <div th:replace="~{components/home :: pageFragment}">Welcome</div>
+      </div>
 
     </div>
 
@@ -18,7 +20,7 @@
 
   <div sec:authorize="isAnonymous()">
 
-    <div th:replace="~{components/cardLogin :: cardFragment}">Card</div>
+    <div th:replace="~{components/cardLogin :: cardFragment}">Login</div>
 
   </div>
 
