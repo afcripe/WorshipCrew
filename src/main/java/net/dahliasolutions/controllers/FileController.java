@@ -56,7 +56,6 @@ public class FileController {
         try {
             InputStream inputStream = imageFile.getInputStream();
             Path filePath = uploadPath.resolve(fileName);
-            System.out.println(filePath.toAbsolutePath());
             Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e){
             System.out.println("error saving file");

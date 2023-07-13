@@ -87,7 +87,6 @@ public class SecurityConfig {
                     auth.requestMatchers("/position/**").hasAnyAuthority("ADMIN_READ", "ADMIN_WRITE", "DIRECTOR_READ", "DIRECTOR_WRITE");
                     auth.requestMatchers("/api/v1/app/removeerrormsg").permitAll();
                     auth.requestMatchers("/api/v1/app/toggleSideNav/*").permitAll();
-                    auth.requestMatchers("/api/v1/contentmanager/**").permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .formLogin().loginPage("/login").defaultSuccessUrl("/user/").successHandler((request, response, authentication) -> {

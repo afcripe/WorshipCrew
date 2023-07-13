@@ -15,6 +15,10 @@
             <h1 style="color: coral">Welcome to the Destiny Store</h1>
             <p>No, it's not prime day.</p>
 
+            <div th:each="item : ${storeItems}">
+                <p><span th:text="${item.name}"></span> - <span th:text="${item.description}"></span></p>
+            </div>
+
         </div>
 
     </div>
