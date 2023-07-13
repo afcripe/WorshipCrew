@@ -4,18 +4,26 @@
 <div th:fragment="cardFragment(storeItem)">
   <div class="card" th:object="${storeItem}">
 
-    <div class="row">
-      <div class="col">
-        <img th:src="@{*{image.fileLocation}}" class="store_line_image">
+    <script th:inline="javascript">
+      function navToItem(id) {
+        window.location.href="/store/item/"+id;
+      }
+    </script>
+
+    <div class="row mt-2" >
+      <div class="col-12 col-lg-4" style="vertical-align: center" th:onclick="navToItem([[*{id}]])">
+        <img th:src="@{*{image.fileLocation}}" class="store_line_image mr-2 align-content-center" style="float: left">
+        <h6 th:text="*{name}" class=" align-content-center"></h6>
       </div>
-      <div class="col">
-        <h6 th:text="*{name}"></h6>
+      <div class="col-12 col-lg-4" th:onclick="navToItem([[*{id}]])">
+        <p th:text="*{description}" style="overflow: clip"></p>
       </div>
-      <div class="col">
-        <p th:text="*{description}"></p>
-      </div>
-      <div class="col">
+      <div class="col-6 col-lg-2" th:onclick="navToItem([[*{id}]])">
         <p>In Stock</p>
+      </div>
+      <div class="col-6 col-lg-2">
+        <input id="[[*{id]]-counter" type="number" text="1" style="width: 55px">
+        <button type="button" class="btn btn-sm btn-outline-quaternary"><i class="bi bi-cart-plus"></i></button>
       </div>
     </div>
 

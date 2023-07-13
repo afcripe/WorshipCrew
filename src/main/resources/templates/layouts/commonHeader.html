@@ -1,13 +1,5 @@
 <div th:fragment="header" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://thymeleaf.org">
 
-  <script th:inline="javascript">
-    function navbarClickEvents(event, element) {
-      event.stopPropagation();
-      if(element.id == 'btnNew') {
-        window.location.href='/calendar/new';
-      }
-    }
-  </script>
   <nav class="navbar navbar-expand-sm navbar-dark bg-dark sticky-top justify-content-start">
     <div class="container-fluid">
 

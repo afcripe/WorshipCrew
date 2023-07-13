@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+
+<div th:fragment="cardFragment(storeItem)">
+  <div class="card my-2" th:object="${storeItem}">
+
+    <div class="card-body">
+
+        <div class="row">
+            <div class="col-4">
+                <img th:src="@{*{image.fileLocation}}" class="img-thumbnail float-left">
+            </div>
+            <div class="col-8">
+                <h3 th:text="*{name}"></h3>
+                <p th:text="*{description}"></p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-6" th:if="*{specialOrder}">
+                <span>Special Order Item</span>
+            </div>
+            <div class="col-6" th:unless="*{specialOrder}">
+                Stock: <span th:text="*{count}"></span>
+            </div>
+            <div class="col-6">
+                Lead Time: <span th:text="*{leadTime}"></span> Days
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <input id="[[*{id]]-counter" type="number" style="width: 55px">
+                <button type="button" class="btn btn-sm btn-outline-quaternary">Add to Order</button>
+            </div>
+        </div>
+    </div>
+
+  </div>
+</div>
+
+</html>
