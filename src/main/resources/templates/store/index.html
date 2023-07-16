@@ -4,71 +4,19 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       layout:decorate="~{layouts/defaultLayout}">
 
-<div class="container m-0 p-0" layout:fragment="content">
-    <template id="tmpList">
-        <div class="row mt-2" >
-            <div class="col-12 col-lg-4" style="vertical-align: center" >
-                <img class="store_line_image mr-2 align-content-center" style="float: left">
-                <h6 class=" align-content-center"></h6>
-            </div>
-            <div class="col-12 col-lg-4">
-                <p style="overflow: clip"></p>
-            </div>
-            <div class="col-6 col-lg-2">
-                <p></p>
-            </div>
-            <div class="col-6 col-lg-2">
-                <input type="number" text="1" style="width: 55px">
-                <button type="button" class="btn btn-sm btn-outline-quaternary"><i class="bi bi-cart-plus"></i></button>
-            </div>
-        </div>
-    </template>
-    <template id="cardCol">
-        <div id="columnizer" class="card-columns"></div>
-    </template>
-    <template id="tmpCard">
-        <div class="card my-2" th:object="${storeItem}">
-
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-4">
-                        <img  class="img-thumbnail float-left">
-                    </div>
-                    <div class="col-8">
-                        <h6></h6>
-                        <p></p>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-6 col-sm-4">
-                        Stock:
-                    </div>
-                    <div class="col-6 col-sm-4">
-                        Lead Time: __ Days
-                    </div>
-                    <div class="col-6 col-sm-4">
-                        <input type="number" style="width: 55px">
-                        <button type="button" class="btn btn-sm btn-outline-quaternary">Add to Order</button>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </template>
+<div class="container-fluid m-0 p-0" layout:fragment="content">
 
     <script>
         let displayType = "list";
     </script>
-
     <th:block th:if="${session.storeListGrid}">
-
         <script>
             /*<![CDATA[*/
             displayType = "[[${session.storeListGrid}]]";
             /*]]>*/
         </script>
     </th:block>
+
 
     <div th:replace="~{store/moduleHeader :: header}">Header</div>
 
@@ -77,74 +25,44 @@
         <div class="row mt-2">
 
             <h1 style="color: coral">Welcome to the Destiny Store</h1>
-            <p>No, it's not prime day.</p>
+            <p th:if="${not #lists.isEmpty(storeItems)}">No, it's not prime day.</p>
 
-            <div id="itemDisplay">
-                <div>store is empty</div>
+            <div th:if="${session.storeListGrid == 'list'}">
+            <div th:each="item : ${storeItems}">
+                <div th:replace="~{components/cardStoreItemLine :: cardFragment(${item})}">List</div>
+            </div>
+            </div>
+
+            <div th:if="${session.storeListGrid == 'grid'}">
+
+                <div class="store_grid_wrapper">
+                    <div th:each="item : ${storeItems}">
+                        <div th:replace="~{components/cardStoreItemLG :: cardFragment(${item})}">Card</div>
+                    </div>
+                </div>
+
             </div>
 
         </div>
 
     </div>
 
-    <script th:inline="javascript">
+    <script>
         fetch('/api/v1/store/display/'+displayType);
-
-        getItems();
-
-        async function getItems() {
-            const itemParent = document.getElementById("itemDisplay");
-            if (itemParent !== null) {
-                while (itemParent.firstChild) {
-                    itemParent.removeChild(itemParent.lastChild);
-                }
-            }
-
-            const template1 = document.getElementById("tmpList");
-            const template2 = document.getElementById("tmpCard");
-            const template3 = document.getElementById("columnizer");
-
-            const response = await fetch('/api/v1/store'
-            ).then(response => {
-                return response.json();
-            }).then(data => {
-                debugger
-                for (let key in data) {
-                    let obj = data[key];
-                    let counterID = "counter-" + obj.id;
-                    let clone = template1.content.cloneNode(true);
-
-                    if (displayType === "grid") {
-                        clone = template3.content.cloneNode(true);
-                        let clone2 = template2.content.cloneNode(true);
-                        let imgDiv = clone.querySelector("img");
-                            imgDiv.src = obj.image.fileLocation;
-                            imgDiv.alt = obj.image.name;
-                        let nameDiv = clone.querySelector("h6");
-                            nameDiv.innerText = obj.name;
-                        itemParent.appendChild(clone);
-
-                    }
-
-                    let imgDiv = clone.querySelector("img");
-                        imgDiv.src = obj.image.fileLocation;
-                        imgDiv.alt = obj.image.name;
-                    let nameDiv = clone.querySelector("h6");
-                        nameDiv.innerText = obj.name;
-                    itemParent.appendChild(clone);
-                }
-            });
-        }
 
         function redrawGrid() {
             displayType = 'grid';
-            fetch('/api/v1/store/display/'+displayType);
-            getItems();
+            fetch('/api/v1/store/display/'+displayType).then(response => {
+                window.location.href='/store';
+                return response.json();
+            });
         }
         function redrawList() {
             displayType = 'list';
-            fetch('/api/v1/store/display/'+displayType);
-            getItems();
+            fetch('/api/v1/store/display/'+displayType).then(response => {
+                window.location.href='/store';
+                return response.json();
+            });
         }
     </script>
   </div>

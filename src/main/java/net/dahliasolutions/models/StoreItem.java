@@ -18,7 +18,7 @@ import java.util.Collection;
 public class StoreItem {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private BigInteger id;
     private String name;
     private String description;

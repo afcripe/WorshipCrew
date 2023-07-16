@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<div class="container-fluid" layout:fragment="content">
+
+  <div th:replace="~{store/moduleHeader :: header}">Header</div>
+
+  <div class="container my-3">
+
+    <div class="row">
+
+      <div class="col-xs-1 col-md-2">
+        <h2 style="color: coral">Settings</h2>
+      </div>
+
+    </div>
+
+    <div class="row">
+
+      <div class="col-xs-1 col-md-6 col-lg-4">
+        <div class="card">
+          <div class="card-body">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item selectableItem" style="cursor: pointer;"
+                  onclick="window.location.href='/store/imageManager'">
+                Manage Uploaded Images
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+</html>

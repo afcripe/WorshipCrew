@@ -10,12 +10,12 @@
         <div class="collapse navbar-collapse flex-grow-1 mt-3 mt-md-0" id="navbarBreadcrumb">
           <ul class="navbar-nav me-auto">
             <li class="nav-item">
-              <a class="nav-link" href="#">
+              <a class="nav-link" href="/store">
                 <h3><i class="bi bi-shop-window" style="color: #FF7F50"></i></h3>
               </a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
+            <li class="nav-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')}">
+              <a class="nav-link" href="/store/settings">
                 <h3><i class="bi bi-gear" style="color: #FF7F50"></i></h3>
               </a>
             </li>

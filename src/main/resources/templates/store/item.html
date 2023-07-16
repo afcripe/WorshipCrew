@@ -3,7 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/defaultLayout}" xmlns="http://www.w3.org/1999/html">
 
-<div class="container m-0 p-0" layout:fragment="content">
+<div class="container-fluid m-0 p-0" layout:fragment="content">
 
   <div th:replace="~{store/moduleHeader :: header}">Header</div>
 
@@ -13,14 +13,72 @@
   </th:block>
 
   <div class="container">
-    <div class="row">
-      <div class="column">
+    <div class="card my-2" th:object="${storeItem}">
 
-        <div th:replace="~{components/cardStoreItemLG :: cardFragment(${storeItem})}">Card</div>
+      <div class="card-body">
 
+        <script th:inline="javascript">
+          function navToItem(id) {
+            window.location.href="/store/item/"+id;
+          }
+        </script>
 
+        <div class="row">
+          <div class="col">
+            <div style="float: right;" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
+                                      or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
+                                      or #lists.contains(userRoles,'MANAGER_READ') or #lists.contains(userRoles,'MANAGER_WRITE')}">
+              <button id="btnEdit" class="btn btn-sm btn-quaternary" type="button"
+                      th:onclick="window.location.href='/store/item/edit/[[*{id}]]';">Edit</button>
+            </div>
+            <h3 th:text="*{name}" style="float:left;"></h3>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-6">
+            <div class="store_card_image">
+              <img th:src="@{*{image.fileLocation}}" class="img card-img-top img-thumbnail">
+            </div>
+          </div>
+          <div class="col-6">
+            <p th:text="*{description}"></p>
+          </div>
+        </div>
 
+        <div class="card-section">
+          <div class="row">
+            <div class="col-4">
+              <div th:if="*{specialOrder}" style="width: 100%">
+                <span>Special Order Item</span>
+              </div>
+              <div th:unless="*{specialOrder}" style="width: 100%">
+                Stock: <span th:text="*{count}"></span>
+              </div>
+            </div>
+            <div class="col-8" style=" text-align: right">
+              <input id="[[*{id]]-counter" type="number" value="1" style="width: 55px">
+              <button type="button" class="btn btn-sm btn-outline-quaternary"><i class="bi bi-cart-plus"></i></button>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-12">
+              <div style="width: 100%">
+                Lead Time: <span th:text="*{leadTime}"></span> Days
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <div style="width: 100%">
+                Managed by: <span th:text="*{owner.firstName} + ' ' + *{owner.lastName}"></span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+
     </div>
   </div>
 </div>

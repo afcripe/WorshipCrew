@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+
+<div th:fragment="cardFragment(imageItem)">
+  <div class="card" th:object="${imageItem}" th:id="'img-' + *{id}">
+
+    <script th:inline="javascript">
+      function navToItem(location) {
+        window.open(location, '_blank');
+      }
+    </script>
+
+    <div class="row mt-2" >
+      <div class="col-12 col-lg-4" style="vertical-align: center" th:onclick="navToItem([[*{fileLocation}]])">
+        <img th:src="@{*{fileLocation}}" class="store_line_image mr-2 align-content-center" style="float: left">
+        <h6 th:text="*{name}" class=" align-content-center"></h6>
+      </div>
+      <div class="col-6 col-lg-2 order-3">
+        References: <span th:text="*{references}"></span>
+        <button id="btnDelete" class="btn btn-sm btn-outline-quaternary ml-2" type="button"
+                th:onclick="deleteImage('img-[[*{id}]]', [[*{id}]])">Delete</button>
+
+      </div>
+      <div class="col-12 col-lg-4" style="overflow-x: clip" th:onclick="navToItem([[*{fileLocation}]])">
+        <p th:text="*{description}" style="overflow: clip; max-height: 1.5em;"></p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</html>

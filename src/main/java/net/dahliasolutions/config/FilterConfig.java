@@ -16,7 +16,9 @@ public class FilterConfig extends OncePerRequestFilter {
         if (request.getSession().getAttribute("showSideNav") == null && request.getSession().getAttribute("hideSideNav") == null) {
             request.getSession().setAttribute("showSideNav", true);
         }
-
+        if (request.getSession().getAttribute("storeListGrid") == null) {
+            request.getSession().setAttribute("storeListGrid", "list");
+        }
         // Do Filtering
         filterChain.doFilter(request, response);
     }

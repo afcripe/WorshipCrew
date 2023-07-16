@@ -16,12 +16,13 @@ import java.math.BigInteger;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class StoredImage {
+public class StoredImageModel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private BigInteger id;
     private String name;
     private String description;
     private String fileLocation;
+    private int references;
 }

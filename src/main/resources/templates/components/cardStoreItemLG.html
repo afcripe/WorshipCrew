@@ -6,36 +6,57 @@
 
     <div class="card-body">
 
+        <script th:inline="javascript">
+            function navToItem(id) {
+                window.location.href="/store/item/"+id;
+            }
+        </script>
+
         <div class="row">
-            <div class="col-4">
-                <img th:src="@{*{image.fileLocation}}" class="img-thumbnail float-left">
-            </div>
-            <div class="col-8">
+            <div class="col" th:onclick="navToItem([[*{id}]])">
                 <h3 th:text="*{name}"></h3>
-                <p th:text="*{description}"></p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6" th:onclick="navToItem([[*{id}]])">
+                <div class="store_card_image">
+                    <img th:src="@{*{image.fileLocation}}" class="img card-img-top img-thumbnail">
+                </div>
+            </div>
+            <div class="col-6" th:onclick="navToItem([[*{id}]])">
+                <p th:text="*{description}" class="store_card_description"></p>
             </div>
         </div>
 
         <div class="card-section">
             <div class="row">
-                <div class="col-6 col-sm-4" th:if="*{specialOrder}">
-                    <span>Special Order Item</span>
+                <div class="col-4" th:onclick="navToItem([[*{id}]])">
+                    <div th:if="*{specialOrder}" style="width: 100%">
+                        <span>Special Order Item</span>
+                    </div>
+                    <div th:unless="*{specialOrder}" style="width: 100%">
+                        Stock: <span th:text="*{count}"></span>
+                    </div>
                 </div>
-                <div class="col-6 col-sm-4" th:unless="*{specialOrder}">
-                    Stock: <span th:text="*{count}"></span>
-                </div>
-                <div class="col-6 col-sm-4">
-                    Lead Time: <span th:text="*{leadTime}"></span> Days
-                </div>
-                <div class="col-6 col-sm-4">
-                    <input id="[[*{id]]-counter" type="number" style="width: 55px">
-                    <button type="button" class="btn btn-sm btn-outline-quaternary">Add to Order</button>
+                <div class="col-8" style=" text-align: right">
+                    <input id="[[*{id]]-counter" type="number" value="1" style="width: 55px">
+                    <button type="button" class="btn btn-sm btn-outline-quaternary"><i class="bi bi-cart-plus"></i></button>
                 </div>
             </div>
 
             <div class="row">
-                <div class="col">
-                    Managed by: <span th:text="*{owner.firstName} + ' ' + *{owner.lastName}"></span>
+                <div class="col-12" th:onclick="navToItem([[*{id}]])">
+                    <div style="width: 100%">
+                        Lead Time: <span th:text="*{leadTime}"></span> Days
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col" th:onclick="navToItem([[*{id}]])">
+                    <div style="width: 100%">
+                        Managed by: <span th:text="*{owner.firstName} + ' ' + *{owner.lastName}"></span>
+                    </div>
                 </div>
             </div>
         </div>

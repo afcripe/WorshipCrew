@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<div class="container-fluid m-0 p-0" layout:fragment="content">
+
+    <div th:replace="~{store/moduleHeader :: header}">Header</div>
+
+    <div class="mx-2">
+
+        <div class="row mt-2">
+
+            <h1 style="color: coral">Store Image Manager</h1>
+
+            <div th:each="item : ${imageList}">
+                <div th:replace="~{components/cardImageItemLine :: cardFragment(${item})}">List</div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        function deleteImage(el, id) {
+            fetch('/api/v1/store/removeimage/'+id).then(response => {
+                document.getElementById(el).remove();
+            })
+        }
+    </script>
+
+  </div>
+
+</html>

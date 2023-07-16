@@ -39,4 +39,11 @@ public class StoreAPIController {
             session.setAttribute("storeListGrid", "list");
         }
     }
+
+    @GetMapping("/removeimage/{id}")
+        public String removeStoredIamge(@PathVariable BigInteger id){
+            Optional<StoredImage> storedImage = storedImageService.findById(id);
+            storedImageService.deleteById(id);
+        return "";
+        }
 }

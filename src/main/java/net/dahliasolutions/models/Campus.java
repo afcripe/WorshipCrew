@@ -16,7 +16,7 @@ import java.math.BigInteger;
 public class Campus {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private BigInteger id;
     private String name;
     private String city;

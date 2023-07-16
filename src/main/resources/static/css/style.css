@@ -207,7 +207,32 @@
     padding: 2px;
 }
 .store_card_image {
-    width: 200px;
-    height: 200px;
-    padding: 2px;
+    max-height: 250px;
+    aspect-ratio: 1 / 1;
+    position:relative;
+    overflow:hidden;
+}
+.store_card_image img{
+    position: absolute;
+    max-width: 100%;
+    max-height: 100%;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+}
+.store_card_description {
+    max-height: 250px;
+    overflow: clip;
+}
+
+.store_grid_wrapper {
+    display: grid;
+    max-width: 1200px;
+    gap: 0.5rem;
+}
+@media (min-width: 768px) {
+    .store_grid_wrapper { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 992px) {
+    .store_grid_wrapper { grid-template-columns: repeat(3, 1fr); }
 }

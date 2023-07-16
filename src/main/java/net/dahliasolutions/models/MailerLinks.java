@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 @Entity
 public class MailerLinks {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private BigInteger id;
     private BigInteger userId;
     private String randomLinkString;
