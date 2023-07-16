@@ -34,7 +34,7 @@
 
 </head>
 
-<body class="container-fluid d-flex flex-column px-0 mb-0" style="overflow: hidden">
+<body class="container-fluid d-flex flex-column px-0 mb-0">
 
     <!--- Header --->
     <div th:replace="~{layouts/commonHeader :: header}">Header</div>
@@ -168,6 +168,12 @@
         thisPageTitle.setAttribute("href", moduleHeaderLink);
 
         toggleSideNav(displaySideNav);
+        window.addEventListener("load",function() {
+            setTimeout(function(){
+                // This hides the address bar:
+                window.scrollTo(0, 1);
+            }, 0);
+        });
     </script>
 
 </body>
