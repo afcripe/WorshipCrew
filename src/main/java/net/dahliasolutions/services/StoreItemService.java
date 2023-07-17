@@ -37,8 +37,8 @@ public class StoreItemService implements StoreItemServiceInterface {
     }
 
     @Override
-    public void save(StoreItem storedImage) {
-        storeItemRepository.save(storedImage);
+    public void save(StoreItem StoreItem) {
+        storeItemRepository.save(StoreItem);
     }
 
     @Override

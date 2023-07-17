@@ -39,6 +39,20 @@
     border-radius: 10px;
 }
 
+.to-top-arrow {
+    color: #a6d5ec;
+    position: fixed;
+    size: 34px;
+    bottom: 8px; /* Place the button at the bottom of the page */
+    left: 8px; /* Place the button 30px from the right */
+    z-index: 99; /* Make sure it does not overlap */
+    cursor: pointer;
+    opacity: 0;
+}
+.to-top-show {
+    opacity: 1;
+}
+
 .card-section {
     padding: 5px 5px 5px 5px;
     outline: 0.1em solid #a6d5ec;

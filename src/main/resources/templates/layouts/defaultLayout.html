@@ -3,98 +3,95 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Destiny Worship Exchange</title>
+        <title>Destiny Worship Exchange</title>
 
-    <meta name="description" content="Dahlia Solutions, LLC">
-    <meta name="author" content="Dahlia Solutions, LLC">
-    <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+        <meta name="description" content="Dahlia Solutions, LLC">
+        <meta name="author" content="Dahlia Solutions, LLC">
+        <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <link th:href="@{/css/style.css}" rel="stylesheet">
-    <!-- Axios
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    -->
-    <script>
-        let displaySideNav = false;
-        let forceHideSideNave = false;
-    </script>
-    <th:block th:if="${session.showSideNav}">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+        <link th:href="@{/css/style.css}" rel="stylesheet">
         <script>
-            displaySideNav = true;
+            let displaySideNav = false;
+            let forceHideSideNave = false;
         </script>
-    </th:block>
-    <script sec:authorize="isAnonymous()">
-        forceHideSideNave = true;
-    </script>
+        <th:block th:if="${session.showSideNav}">
+            <script>
+                displaySideNav = true;
+            </script>
+        </th:block>
+        <script sec:authorize="isAnonymous()">
+            forceHideSideNave = true;
+        </script>
 
-</head>
+    </head>
 
-<body class="container-fluid d-flex flex-column px-0 mb-0">
+    <body class="container-fluid d-flex flex-column px-0 mb-0">
 
-    <!--- Header --->
-    <div th:replace="~{layouts/commonHeader :: header}">Header</div>
+        <!--- Header --->
+        <div th:replace="~{layouts/commonHeader :: header}">Header</div>
 
-    <!--- message from server--->
-    <th:block th:if="${session.msgSuccess}">
-        <div id="messageSuccessDiv" class="alert-fixed" th:onclick="'javascript:clearSuccess()'">
-            <div class="alert-success alert-fixed-success align-content-center">
-                <p style="text-align: center" th:text="${session.msgSuccess}"/>
-                <script  th:inline="javascript">
-                    fetch("/api/v1/app/removesuccessmsg");
-                    setTimeout(() => {
-                        clearSuccess();
-                    }, 3000);
-                    function clearSuccess() {
-                        const box = document.getElementById('messageSuccessDiv');
-                        box.style.display = 'none';
-                    }
-                </script>
+        <!--- message from server--->
+        <th:block th:if="${session.msgSuccess}">
+            <div id="messageSuccessDiv" class="alert-fixed" th:onclick="'javascript:clearSuccess()'">
+                <div class="alert-success alert-fixed-success align-content-center">
+                    <p style="text-align: center" th:text="${session.msgSuccess}"/>
+                    <script  th:inline="javascript">
+                        fetch("/api/v1/app/removesuccessmsg");
+                        setTimeout(() => {
+                            clearSuccess();
+                        }, 3000);
+                        function clearSuccess() {
+                            const box = document.getElementById('messageSuccessDiv');
+                            box.style.display = 'none';
+                        }
+                    </script>
+                </div>
             </div>
-        </div>
-    </th:block>
-    <th:block th:if="${session.msgError}">
-        <div id="messageErrorDiv" class="alert-fixed" th:onclick="'javascript:clearError()'">
-             <div class="alert-danger align-content-center alert-fixed-danger">
-                <span th:text="${session.msgError}"/>
-                <script  th:inline="javascript">
-                    fetch("/api/v1/app/removeerrormsg");
-                    setTimeout(() => {
-                        clearError();
-                    }, 3000);
-                    function clearError() {
-                        const box = document.getElementById('messageErrorDiv');
-                        box.style.display = 'none';
-                    }
-                </script>
-             </div>
-        </div>
-    </th:block>
+        </th:block>
+        <th:block th:if="${session.msgError}">
+            <div id="messageErrorDiv" class="alert-fixed" th:onclick="'javascript:clearError()'">
+                <div class="alert-danger align-content-center alert-fixed-danger">
+                    <span th:text="${session.msgError}"/>
+                    <script  th:inline="javascript">
+                        fetch("/api/v1/app/removeerrormsg");
+                        setTimeout(() => {
+                            clearError();
+                        }, 3000);
+                        function clearError() {
+                            const box = document.getElementById('messageErrorDiv');
+                            box.style.display = 'none';
+                        }
+                    </script>
+                </div>
+            </div>
+        </th:block>
 
-    <div class="wrapper flex-grow-1 px-0">
+        <div class="wrapper flex-grow-1">
+            <div id="mainContent" class="wrapper d-flex">
 
-        <div id="mainContent" class="wrapper d-flex mb-0 pb-0 pb-sm-4" style="height: calc(100vh - 64px);">
-
-            <!-- Side Navigation -->
-                <div id="sideNavExpanded" class="flex-fill d-none d-sm-block px-2"
-                     style="background-color: #eeeeee; min-width: 170px; max-width: 170px; width: 170px;">
+                <!-- Side Navigation -->
+                <div id="sideNavExpanded" class="flex-fill px-2 pt-1 d-none d-sm-block"
+                     style="background-color: #eeeeee; min-width: 170px;
+                     max-width: 170px; width: 170px; min-height: calc(100vh - 65px);">
                     <div class="sidebar-header" onclick="toggleSideNav(false)" style="cursor: pointer">
-                        <h4>Navigation</h4>
+                        <h4>Navigation <i class="bi bi-arrow-bar-left h6"></i></h4>
                     </div>
                     <div class="list-group" sec:authorize="isAuthenticated()">
                         <a class="list-group-item" href="/">Home</a>
-<!--                        <a class="list-group-item list-group-subitem" href="/user">Users</a>-->
                         <a class="list-group-item" href="/store">Store</a>
                         <a class="list-group-item" href="/wiki">Wiki</a>
                         <a class="list-group-item" href="/support">Support</a>
                     </div>
                 </div>
-                <div id="sideNavCollapsed" class="flex-fill d-none d-sm-block px-2"
-                     style="background-color: #eeeeee; min-width: 45px; max-width: 45px; width: 45px;">
+                <div id="sideNavCollapsed" class="flex-fill px-2 pt-1 d-none d-sm-block"
+                     style="background-color: #eeeeee; min-width: 45px;
+                     max-width: 45px; width: 45px;min-height: calc(100vh - 65px);">
                     <div class="sidebar-header text-center" onclick="toggleSideNav(true)" style="cursor: pointer">
                         <h3><i class="bi bi-compass"></i></h3>
                     </div>
@@ -102,9 +99,6 @@
                         <a class="list-group-item p-1" href="/">
                             <i class="bi bi-house"></i>
                         </a>
-<!--                        <a class="list-group-item p-1" href="/user">-->
-<!--                            <i class="bi bi-person"></i>-->
-<!--                        </a>-->
                         <a class="list-group-item p-1" href="/store">
                             <i class="bi bi-shop-window"></i>
                         </a>
@@ -117,30 +111,39 @@
                     </div>
                 </div>
 
-            <!-- Content -->
-            <div class="flex-fill p-0 m-2" style="overflow-y: auto; overflow-x: hidden; width: 100%">
-                <section layout:fragment="content">
-                    <p>Replace with layout:fragment="content"</p>
-                </section>
+                <!-- Content -->
+                <div class="flex-fill p-1 pb-4 w-100">
+                    <section layout:fragment="content">
+                        <p>Replace with layout:fragment="content"</p>
+                    </section>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- fix bottom margin on mobile -->
-    <div class="px-2 mb-0 small d-block d-sm-none" style="height: 27px; position: fixed; bottom: 0; width: 100%">
+        <i id="scrollToTopBtn" class="bi bi-arrow-up-circle-fill to-top-arrow h3"></i>
 
-    </div>
-
-    <!--- Footer --->
+    <!-- fix bottom margin on mobile
+    <div class="px-2 mb-0 small d-block d-sm-none" style="height: 27px; position: fixed; bottom: 0; width: 100%"></div>
+    -->
+    <!--- Footer
     <div class="px-2 mb-0 small d-none d-sm-block"
          style="background-color: lightblue; height: 32px; position: fixed; bottom: 0; width: 100%">
         <div style="float: right;"><small>Dahlia Solutions, LLC</small></div>
         <div>Destiny Worship</div>
     </div>
+    --->
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 
     <script  th:inline="javascript">
+        /*<![CDATA[*/
+        moduleHeaderTitle = /*[[${moduleTitle}]]*/ " ";
+        moduleHeaderLink = /*[[${moduleLink}]]*/ "/";
+        /*]]>*/
+        let thisPageTitle = document.getElementById("commonHeaderTitle");
+        thisPageTitle.textContent = moduleHeaderTitle;
+        thisPageTitle.setAttribute("href", moduleHeaderLink);
+
         function toggleSideNav(show) {
             if (forceHideSideNave) {
                 document.getElementById('sideNavCollapsed').classList.add("d-sm-block");
@@ -156,25 +159,37 @@
                 fetch("/api/v1/app/toggleSideNav/"+show);
             }
         }
-    </script>
-
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        moduleHeaderTitle = /*[[${moduleTitle}]]*/ " ";
-        moduleHeaderLink = /*[[${moduleLink}]]*/ "/";
-        /*]]>*/
-        let thisPageTitle = document.getElementById("commonHeaderTitle");
-        thisPageTitle.textContent = moduleHeaderTitle;
-        thisPageTitle.setAttribute("href", moduleHeaderLink);
 
         toggleSideNav(displaySideNav);
+
         window.addEventListener("load",function() {
             setTimeout(function(){
                 // This hides the address bar:
                 window.scrollTo(0, 1);
             }, 0);
         });
+
+        let scrollToTopBtn = document.getElementById("scrollToTopBtn")
+        function scrollToTop() {
+            // Scroll to top logic
+            document.documentElement.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            })
+        }
+        function handleScroll() {
+            let scrollTotal = document.documentElement.scrollHeight - document.documentElement.clientHeight
+            if (document.documentElement.scrollTop > 50 ) {
+                // Show button
+                scrollToTopBtn.classList.add("to-top-show")
+            } else {
+                // Hide button
+                scrollToTopBtn.classList.remove("to-top-show")
+            }
+        }
+        scrollToTopBtn.addEventListener("click", scrollToTop)
+        document.addEventListener("scroll", handleScroll)
     </script>
 
-</body>
+    </body>
 </html>

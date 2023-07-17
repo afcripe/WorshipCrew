@@ -12,7 +12,7 @@ public interface StoreItemServiceInterface {
     Optional<StoreItem> findById(BigInteger id);
     Optional<StoreItem> findByName(String name);
     List<StoreItem> findAll();
-    void save(StoreItem storedImage);
+    void save(StoreItem StoreItem);
     void deleteById(BigInteger id);
 
 }
