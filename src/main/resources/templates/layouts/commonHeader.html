@@ -12,9 +12,10 @@
       </div>
 
       <div class="navbar-nav d-block d-sm-none mr-2 pull-right" sec:authorize="isAuthenticated()">
-        <h4 style="color: lightskyblue;">
-          <i class="bi bi-cart"></i>
-        </h4>
+        <a href="#" style="text-decoration: none">
+          <i class="bi bi-cart cart-icon"></i>
+          <span id="cartItemCountCollapsed" class="cart-item-count" th:text="${session.cartItemCount}"></span>
+        </a>
       </div>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -56,12 +57,11 @@
         </ul>
       </div>
 
-        <ul class="navbar-nav ml-2 order-0 d-none d-sm-block" sec:authorize="isAuthenticated()">
+        <ul class="navbar-nav ml-2 pb-2 order-0 d-none d-sm-block" style="line-height: 23px;" sec:authorize="isAuthenticated()">
           <li class="nav-item">
             <a class="nav-link mx-2" href="#" title="Cart">
-              <h4 style="color: lightskyblue;">
-                <i class="bi bi-cart"></i>
-              </h4>
+              <i class="bi bi-cart cart-icon"></i>
+              <span id="cartItemCount" class="cart-item-count" th:text="${session.cartItemCount}"></span>
             </a>
           </li>
         </ul>

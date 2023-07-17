@@ -3,6 +3,7 @@ package net.dahliasolutions.services;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.data.CartRepository;
 import net.dahliasolutions.models.Cart;
+import net.dahliasolutions.models.User;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -15,6 +16,7 @@ import java.util.Optional;
 public class CartService implements CartServiceInterface {
 
     private final CartRepository cartRepository;
+    private final UserService userService;
 
     @Override
     public Cart createCart(BigInteger userId) {
@@ -28,7 +30,18 @@ public class CartService implements CartServiceInterface {
     }
 
     @Override
+    public Cart findByUsername(String userName) {
+        Optional<User> user = userService.findByUsername(userName);
+        return cartRepository.findById(user.get().getId()).orElse(createCart(user.get().getId()));
+    }
+
+    @Override
     public Cart save(Cart cart) {
         return cartRepository.save(cart);
+    }
+
+    @Override
+    public int getItemCount(BigInteger userId) {
+        return cartRepository.findById(userId).orElse(createCart(userId)).getItemCount();
     }
 }

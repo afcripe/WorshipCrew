@@ -1,6 +1,5 @@
 package net.dahliasolutions.models;
 
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,7 +15,7 @@ import java.util.Collection;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Order {
+public class Orders {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,15 +25,13 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
-    @Nullable
     @ManyToOne(fetch = FetchType.EAGER)
     private User user;             //person who placed the order request
 
-    @Nullable
     @ManyToOne(fetch = FetchType.EAGER)
     private User manager;             //person who receives order request from user
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     private Collection<OrderItem> orderItems;
 
 }

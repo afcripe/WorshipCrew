@@ -53,6 +53,21 @@
     opacity: 1;
 }
 
+.cart-icon {
+    font-size: 1.5rem;
+    color: lightskyblue;
+}
+
+.cart-item-count {
+    margin-left: -12px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: white;
+    -webkit-text-stroke: 1px black;
+    text-shadow: -1px -1px black;
+    z-index: 99;
+}
+
 .card-section {
     padding: 5px 5px 5px 5px;
     outline: 0.1em solid #a6d5ec;

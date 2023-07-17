@@ -144,6 +144,18 @@
         thisPageTitle.textContent = moduleHeaderTitle;
         thisPageTitle.setAttribute("href", moduleHeaderLink);
 
+        let cartCountExpanded = document.getElementById("cartItemCount");
+        let cartCountCollapsed = document.getElementById("cartItemCountCollapsed");
+
+        if (cartCountExpanded != null) {
+            if (cartCountExpanded.innerText === Number(cartCountExpanded.innerText)) {
+                cartCountExpanded.innerText = "";
+            }
+            if (cartCountCollapsed.innerText === Number(cartCountCollapsed.innerText)) {
+                cartCountCollapsed.innerText = "";
+            }
+        }
+
         function toggleSideNav(show) {
             if (forceHideSideNave) {
                 document.getElementById('sideNavCollapsed').classList.add("d-sm-block");
@@ -159,8 +171,6 @@
                 fetch("/api/v1/app/toggleSideNav/"+show);
             }
         }
-
-        toggleSideNav(displaySideNav);
 
         window.addEventListener("load",function() {
             setTimeout(function(){
@@ -189,6 +199,15 @@
         }
         scrollToTopBtn.addEventListener("click", scrollToTop)
         document.addEventListener("scroll", handleScroll)
+
+        function updateCartCounter(count) {
+            if (cartCountExpanded != null) {
+                cartCountExpanded.innerText = count;
+                cartCountCollapsed.innerText = count;
+            }
+        }
+
+        toggleSideNav(displaySideNav);
     </script>
 
     </body>

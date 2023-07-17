@@ -10,6 +10,8 @@ public interface CartServiceInterface {
 
     Cart createCart(BigInteger userId);
     Cart findById(BigInteger id);
+    Cart findByUsername(String userName);
     Cart save(Cart cart);
+    int getItemCount(BigInteger userId);
 
 }

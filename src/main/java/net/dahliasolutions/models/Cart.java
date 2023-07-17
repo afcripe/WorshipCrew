@@ -1,6 +1,7 @@
 package net.dahliasolutions.models;
 
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,13 +15,15 @@ import java.util.Collection;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Transactional
 public class Cart {
 
     @Id
+    @Column(name="id")
     private BigInteger id;  // same as user id, only one cart per user
     private int itemCount;
 
-    @OneToMany
-    private Collection<OrderItem> cartItems;
+    @OneToMany(fetch = FetchType.EAGER)
+    private Collection<CartItem> cartItems;
 
 }

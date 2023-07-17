@@ -1,13 +1,13 @@
 package net.dahliasolutions.data;
 
-import net.dahliasolutions.models.Order;
+import net.dahliasolutions.models.Orders;
+import net.dahliasolutions.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Optional;
 
-public interface OrderRepository extends JpaRepository<Order, BigInteger> {
+public interface OrderRepository extends JpaRepository<Orders, BigInteger> {
 
-    List<Order> findAllByUser(BigInteger userId);
+    List<Orders> findAllByUser(User user);
 }

@@ -1,7 +1,7 @@
 package net.dahliasolutions.services;
 
-import net.dahliasolutions.models.Order;
-import net.dahliasolutions.models.StoreItem;
+import net.dahliasolutions.models.Orders;
+import net.dahliasolutions.models.User;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -9,11 +9,11 @@ import java.util.Optional;
 
 public interface OrderServiceInterface {
 
-    Order createOrder(Order order);
-    Optional<Order> findById(BigInteger id);
-    List<Order> findAll();
-    List<Order> findAllByUser();
-    void save(Order order);
+    Orders createOrder(Orders orders);
+    Optional<Orders> findById(BigInteger id);
+    List<Orders> findAll();
+    List<Orders> findAllByUser(User user);
+    void save(Orders order);
     void deleteById(BigInteger id);
 
 }

@@ -4,6 +4,8 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.*;
 import net.dahliasolutions.services.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -29,8 +31,11 @@ public class StoreController {
 
     @ModelAttribute
     public void addAttributes(Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) auth.getPrincipal();
         model.addAttribute("moduleTitle", "Store");
         model.addAttribute("moduleLink", "/store");
+        model.addAttribute("userId", user.getId());
     }
 
     @GetMapping("")
