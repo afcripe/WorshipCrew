@@ -12,8 +12,10 @@
             <p>Number of items in cart: <span id="subtitleCount" th:text="${cart.itemCount}"></span></p>
         </div>
         <div class="col-4 pt-2">
-            <button type="button" class="btn btn-sm btn-outline-quaternary">Clear Cart</button>
-            <button type="button" class="btn btn-sm btn-quaternary">Place Order</button>
+            <button type="button" class="btn btn-sm btn-outline-quaternary"
+                    th:onclick="clearCart([[${userId}]])">Clear Cart</button>
+            <button type="button" class="btn btn-sm btn-quaternary"
+                    th:onclick="placeOrder()">Place Order</button>
         </div>
     </div>
 
@@ -28,8 +30,10 @@
             <p></p>
         </div>
         <div class="col-4">
-            <button type="button" class="btn btn-sm btn-outline-quaternary">Clear Cart</button>
-            <button type="button" class="btn btn-sm btn-quaternary">Place Order</button>
+            <button type="button" class="btn btn-sm btn-outline-quaternary"
+                    th:onclick="clearCart([[${userId}]])">Clear Cart</button>
+            <button type="button" class="btn btn-sm btn-quaternary"
+                    th:onclick="placeOrder()">Place Order</button>
         </div>
     </div>
 
@@ -62,6 +66,23 @@
                     itemEl.remove();
                 }
             });
+        }
+
+        async function clearCart(userid) {
+            let formData = new FormData();
+                formData.set("id", userid);
+
+            const clearResponse = await fetch('/api/v1/cart/empty', {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                debugger
+                window.location.reload();
+            });
+        }
+
+        function placeOrder() {
+            alert("Order Placed Placeholder.");
         }
     </script>
 

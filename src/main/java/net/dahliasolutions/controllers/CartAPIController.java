@@ -111,12 +111,14 @@ public class CartAPIController {
         Cart cart = cartService.findById(integerModel.id());
         // loop through items and remove items
         for (CartItem item : cart.getCartItems()) {
-            cart.getCartItems().remove(item);
             cartItemService.deleteById(item.getId());
         }
 
+        List<CartItem> cartItemList = cartItemService.findByCart(cart);
+        cart.getCartItems().clear();
+        cart.setCartItems(cartItemList);
         cart = cartService.save(cart);
 
-        return 0;
+        return cart.getItemCount();
     }
 }

@@ -21,6 +21,24 @@
           function navToItem(id) {
             window.location.href="/store/item/"+id;
           }
+          async function addToCart(id, userid) {
+            let counterID = id+"-counter";
+            let counterEl = document.getElementById(counterID);
+            let formData = new FormData();
+            formData.set("id", id);
+            formData.set("userId", userid);
+            formData.set("count", counterEl.value);
+
+            const response = await fetch('/api/v1/cart/additem', {
+              method: 'POST',
+              body: formData
+            }).then(response => {
+              return response.json();
+            }).then(data => {
+              console.log(data);
+              updateCartCounter(data);
+            });
+          }
         </script>
 
         <div class="row">
@@ -35,13 +53,9 @@
           </div>
         </div>
         <div class="row">
-          <div class="col-6">
-            <div class="store_card_image">
-              <img th:src="@{*{image.fileLocation}}" class="img card-img-top img-thumbnail">
-            </div>
-          </div>
-          <div class="col-6">
-            <p th:text="*{description}"></p>
+          <div class="col">
+            <img th:src="@{*{image.fileLocation}}" class="store_image">
+            <span th:text="*{description}"></span>
           </div>
         </div>
 

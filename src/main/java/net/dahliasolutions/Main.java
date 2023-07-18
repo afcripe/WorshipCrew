@@ -19,21 +19,21 @@ public class Main {
         System.out.println(getAppServerSingleton().getBaseURL());
     }
 
-//    @Bean
-//    @Scope("singleton")
-//    static public AppServer getAppServerSingleton(){
-//        return new AppServer("https://www.destinyworshipexchange.com",
-//                "/var/destinyworshipexchange/content",
-//                "/content");
-//    }
-
     @Bean
     @Scope("singleton")
     static public AppServer getAppServerSingleton(){
         return new AppServer("https://www.destinyworshipexchange.com",
-                "/Users/afcripe/var/DestinyExchange/content",
+                "/var/destinyworshipexchange/content",
                 "/content");
     }
+
+//    @Bean
+//    @Scope("singleton")
+//    static public AppServer getAppServerSingleton(){
+//        return new AppServer("https://www.destinyworshipexchange.com",
+//                "/Users/afcripe/var/destinyworshipexchange/content",
+//                "/content");
+//    }
 
     @Bean
     CommandLineRunner run(UserRolesService roleService, PositionService positionService,
@@ -69,7 +69,7 @@ public class Main {
                 u.setUsername("caleb@destinyworship.com");
                 u.setPassword("password");
                 u.setFirstName("Caleb");
-                u.setLastName("Lawernce");
+                u.setLastName("Lawrence");
                 u.setContactEmail("caleb@destinyworship.com");
                 u = userService.createDefaultUser(u);
             userService.addRoleToUser(u.getUsername(), "ADMIN_WRITE");

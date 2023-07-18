@@ -246,13 +246,13 @@
                   <label for="count" class="form-label">Count</label>
                 </div>
                 <div class="col-2">
-                  <input th:value="*{count}" type="number" class="form-control-sm" id="count" name="count" style="width: 50px">
+                  <input th:value="*{count}" type="number" class="form-control-sm" id="count" name="count" style="width: 60px">
                 </div>
                 <div class="col-4">
                   <label for="leadTime" class="form-label">Lead Time in Days</label>
                 </div>
                 <div class="col-2">
-                  <input th:value="*{leadTime}" type="number" class="form-control-sm" id="leadTime" name="leadTime" style="width: 50px">
+                  <input th:value="*{leadTime}" type="number" class="form-control-sm" id="leadTime" name="leadTime" style="width: 60px">
                 </div>
               </div>
 
@@ -261,7 +261,7 @@
                   <label for="owner" class="form-label">Owner</label>
                 </div>
                 <div class="col-xs-12 col-sm-8">
-                  <select id="owner" name="owner" class="form-control-sm">
+                  <select id="owner" name="owner" class="form-control-sm w-100">
                     <option value="" disabled selected>Select Owner</option>
                     <option th:each="p : ${userList}" th:value="${p.id}"
                             th:text="${p.firstName} + ' ' + ${p.lastName}"></option>
@@ -274,7 +274,7 @@
                   <label for="department" class="form-label">Department</label>
                 </div>
                 <div class="col-xs-12 col-sm-8">
-                  <select id="department" class="form-control-sm" name="department">
+                  <select id="department" class="form-control-sm w-100" name="department">
                     <option value="" disabled selected>Select Department</option>
                     <option th:each="d : ${departmentList}" th:value="${d.id}"
                             th:text="${d.name}"></option>
@@ -288,7 +288,7 @@
                 </div>
                 <div class="col-xs-12 col-sm-8">
                   <input type="hidden" id="position" name="position">
-                  <select id="positionSelect" class="form-control-sm" name="positionSelect" multiple>
+                  <select id="positionSelect" class="form-control-sm w-100" name="positionSelect" multiple>
                     <option th:each="p : ${positionList}" th:value="${p.id}"
                             th:text="${p.name}"></option>
                   </select>
