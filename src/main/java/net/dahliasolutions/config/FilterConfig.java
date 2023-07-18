@@ -5,6 +5,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import net.dahliasolutions.models.Cart;
 import net.dahliasolutions.models.User;
 import net.dahliasolutions.services.CartService;
 import org.springframework.security.core.Authentication;
@@ -33,7 +34,8 @@ public class FilterConfig extends OncePerRequestFilter {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (!auth.getPrincipal().equals("anonymousUser")) {
             User user = (User) auth.getPrincipal();
-            request.getSession().setAttribute("cartItemCount", cartService.getItemCount(user.getId()));
+            Cart cart = cartService.findById(user.getId());
+            request.getSession().setAttribute("cartItemCount", cart.getItemCount());
         }
 
         // Do Filtering

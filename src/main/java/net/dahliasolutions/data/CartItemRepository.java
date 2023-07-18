@@ -9,5 +9,6 @@ import java.util.List;
 
 public interface CartItemRepository extends JpaRepository<CartItem, BigInteger> {
 
+    List<CartItem> findAllByCart(Cart cart);
 
 }

@@ -2,6 +2,7 @@ package net.dahliasolutions.services;
 
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.data.CartItemRepository;
+import net.dahliasolutions.models.Cart;
 import net.dahliasolutions.models.CartItem;
 import net.dahliasolutions.models.OrderItem;
 import org.springframework.stereotype.Service;
@@ -28,12 +29,17 @@ public class CartItemService implements CartItemServiceInterface {
     }
 
     @Override
-    public void save(CartItem cartItem) {
+    public List<CartItem> findByCart(Cart cart) {
+        return cartItemRepository.findAllByCart(cart);
+    }
 
+    @Override
+    public void save(CartItem cartItem) {
+        cartItemRepository.save(cartItem);
     }
 
     @Override
     public void deleteById(BigInteger id) {
-
+        cartItemRepository.deleteById(id);
     }
 }

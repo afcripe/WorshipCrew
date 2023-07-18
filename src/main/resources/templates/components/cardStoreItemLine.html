@@ -4,32 +4,6 @@
 <div th:fragment="cardFragment(storeItem)">
   <div class="card" th:object="${storeItem}">
 
-    <script th:inline="javascript">
-      function navToItem(id) {
-        window.location.href="/store/item/"+id;
-      }
-      async function addToCart(id, userid) {
-        let counterID = id+"-counter";
-        let counterEl = document.getElementById(counterID);
-        let formData = new FormData();
-          formData.set("id", id);
-          formData.set("userId", userid);
-          formData.set("count", counterEl.value);
-
-          debugger
-
-        const response = await fetch('/api/v1/cart/additem', {
-          method: 'POST',
-          body: formData
-        }).then(response => {
-          return response.json();
-        }).then(data => {
-          console.log(data);
-          updateCartCounter(data);
-        });
-      }
-    </script>
-
     <div class="row mt-2" >
       <div class="col-12 col-md-4" style="vertical-align: center" th:onclick="navToItem([[*{id}]])">
         <img th:src="@{*{image.fileLocation}}" class="store_line_image mr-2 align-content-center" style="float: left">

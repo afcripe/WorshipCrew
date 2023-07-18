@@ -6,12 +6,6 @@
 
     <div class="card-body">
 
-        <script th:inline="javascript">
-            function navToItem(id) {
-                window.location.href="/store/item/"+id;
-            }
-        </script>
-
         <div class="row">
             <div class="col" th:onclick="navToItem([[*{id}]])">
                 <h3 th:text="*{name}"></h3>
@@ -39,8 +33,10 @@
                     </div>
                 </div>
                 <div class="col-8" style=" text-align: right">
-                    <input id="[[*{id]]-counter" type="number" value="1" style="width: 55px">
-                    <button type="button" class="btn btn-sm btn-outline-quaternary"><i class="bi bi-cart-plus"></i></button>
+                    <input th:id="*{id}+'-counter'" type="number" value="1" style="width: 55px">
+                    <button type="button" class="btn btn-sm btn-outline-quaternary"
+                            th:onclick="addToCart([[*{id}]], [[${userId}]])">
+                        <i class="bi bi-cart-plus"></i></button>
                 </div>
             </div>
 

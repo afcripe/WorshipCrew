@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+
+<div th:fragment="cardFragment(cartItem)">
+  <div th:id="*{productId}+'-item'" class="card" th:object="${cartItem}">
+
+    <div class="row my-8" >
+      <div class="col-6" style="vertical-align: center" th:onclick="navToItem([[*{productId}]])">
+        <img th:src="@{*{image.fileLocation}}" class="store_line_image mr-2 align-content-center" style="float: left">
+        <h6 th:text="*{productName}" class=" align-content-center"></h6>
+      </div>
+      <div class="col-4">
+        <input th:id="*{productId}+'-counter'" type="number" th:value="*{count}" style="width: 55px">
+        <button type="button" class="btn btn-sm btn-outline-quaternary"
+                th:onclick="updateCartItem([[*{productId}]], [[${userId}]], 'updateitem')"><i class="bi bi-arrow-clockwise"></i></button>
+        <button type="button" class="btn btn-sm btn-outline-quaternary"
+                th:onclick="updateCartItem([[*{productId}]], [[${userId}]], 'removeitem')"><i class="bi bi-x-circle"></i></button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</html>

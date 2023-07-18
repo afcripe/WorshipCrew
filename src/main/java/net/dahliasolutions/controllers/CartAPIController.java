@@ -9,6 +9,7 @@ import net.dahliasolutions.services.StoreItemService;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -28,7 +29,6 @@ public class CartAPIController {
     @PostMapping("/additem")
     public int addItemToCart(@ModelAttribute CartItemModel cartItemModel) {
         Cart cart = cartService.findById(cartItemModel.userId());
-        int totalItems = 0;
         boolean itemFound = false;
         // loop through items and count them, update any found cart items
         for (CartItem item : cart.getCartItems()) {
@@ -37,82 +37,85 @@ public class CartAPIController {
                 item.setCount(item.getCount()+cartItemModel.count());
                 cartItemService.save(item);
             }
-            totalItems = totalItems+item.getCount();
         }
         // if no existing cart item found, add it
         if (!itemFound) {
             Optional<StoreItem> storeItem = storeItemService.findById(cartItemModel.id());
             if (storeItem.isPresent()) {
                 CartItem newItem = new CartItem(
-                    null,
-                    storeItem.get().getId(),
-                    storeItem.get().getName(),
-                    cartItemModel.count(),
-                    storeItem.get().isSpecialOrder(),
-                    storeItem.get().isAvailable(),
-                    storeItem.get().getLeadTime(),
-                    OrderStatus.cart,
-                    storeItem.get().getOwner(),
-                    storeItem.get().getImage()
+                        null,
+                        storeItem.get().getId(),
+                        storeItem.get().getName(),
+                        cartItemModel.count(),
+                        storeItem.get().isSpecialOrder(),
+                        storeItem.get().isAvailable(),
+                        storeItem.get().getLeadTime(),
+                        OrderStatus.cart,
+                        storeItem.get().getOwner(),
+                        storeItem.get().getImage(),
+                        cart
                 );
-                newItem = cartItemService.createCartItem(newItem);
                 cart.getCartItems().add(newItem);
             }
-            totalItems = totalItems+cartItemModel.count();
         }
 
-        cart.setItemCount(totalItems);
-        cartService.save(cart);
+        cart = cartService.save(cart);
 
-        return totalItems;
+        return cart.getItemCount();
     }
 
-    @PostMapping("/removeitem")
-    public int removeItemFromCart(@ModelAttribute CartItemModel cartItemModel) {
+    @PostMapping("/updateitem")
+    public int updateItemInCart(@ModelAttribute CartItemModel cartItemModel) {
         Cart cart = cartService.findById(cartItemModel.userId());
-        int totalItems = 0;
         // loop through items and count them, update any found cart items
         for (CartItem item : cart.getCartItems()) {
             if (item.getProductId().equals(cartItemModel.id())) {
-                if (item.getCount() > cartItemModel.count()) {
-                    item.setCount(item.getCount()-cartItemModel.count());
-                    cartItemService.save(item);
-                    totalItems = totalItems + item.getCount();
-                } else {
+                if (cartItemModel.count() == 0) {
                     cartItemService.deleteById(item.getId());
+                } else {
+                    item.setCount(cartItemModel.count());
+                    cartItemService.save(item);
                 }
-            } else {
-                totalItems = totalItems + item.getCount();
             }
         }
 
-        return totalItems;
+        List<CartItem> cartItemList = cartItemService.findByCart(cart);
+        cart.getCartItems().clear();
+        cart.setCartItems(cartItemList);
+        cart = cartService.save(cart);
+
+        return cart.getItemCount();
     }
 
-    @PostMapping("/removeitemall")
+    @PostMapping("/removeitem")
     public int removeItemFromCartAll(@ModelAttribute CartItemModel cartItemModel) {
         Cart cart = cartService.findById(cartItemModel.userId());
-        int totalItems = 0;
         // loop through items and count them, update any found cart items
         for (CartItem item : cart.getCartItems()) {
             if (item.getProductId().equals(cartItemModel.id())) {
                 cartItemService.deleteById(item.getId());
-            } else {
-                totalItems = totalItems + item.getCount();
             }
         }
 
-        return totalItems;
+        List<CartItem> cartItemList = cartItemService.findByCart(cart);
+        cart.getCartItems().clear();
+        cart.setCartItems(cartItemList);
+        cart = cartService.save(cart);
+
+        return cart.getItemCount();
     }
 
 
     @PostMapping("/empty")
-    public int emptyCart(@ModelAttribute CartItemModel cartItemModel) {
-        Cart cart = cartService.findById(cartItemModel.userId());
+    public int emptyCart(@ModelAttribute SingleBigIntegerModel integerModel) {
+        Cart cart = cartService.findById(integerModel.id());
         // loop through items and remove items
         for (CartItem item : cart.getCartItems()) {
+            cart.getCartItems().remove(item);
             cartItemService.deleteById(item.getId());
         }
+
+        cart = cartService.save(cart);
 
         return 0;
     }

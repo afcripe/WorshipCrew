@@ -12,7 +12,7 @@
       </div>
 
       <div class="navbar-nav d-block d-sm-none mr-2 pull-right" sec:authorize="isAuthenticated()">
-        <a href="#" style="text-decoration: none">
+        <a href="/cart" style="text-decoration: none">
           <i class="bi bi-cart cart-icon"></i>
           <span id="cartItemCountCollapsed" class="cart-item-count" th:text="${session.cartItemCount}"></span>
         </a>
@@ -59,7 +59,7 @@
 
         <ul class="navbar-nav ml-2 pb-2 order-0 d-none d-sm-block" style="line-height: 23px;" sec:authorize="isAuthenticated()">
           <li class="nav-item">
-            <a class="nav-link mx-2" href="#" title="Cart">
+            <a class="nav-link mx-2" href="/cart" title="Cart">
               <i class="bi bi-cart cart-icon"></i>
               <span id="cartItemCount" class="cart-item-count" th:text="${session.cartItemCount}"></span>
             </a>

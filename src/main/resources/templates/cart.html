@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<div class="container-fluid" layout:fragment="content">
+
+    <div class="row pt-4">
+        <div class="col-8">
+            <h1 style="color: coral">Welcome to the Destiny Store</h1>
+            <p>Number of items in cart: <span id="subtitleCount" th:text="${cart.itemCount}"></span></p>
+        </div>
+        <div class="col-4 pt-2">
+            <button type="button" class="btn btn-sm btn-outline-quaternary">Clear Cart</button>
+            <button type="button" class="btn btn-sm btn-quaternary">Place Order</button>
+        </div>
+    </div>
+
+    <div class="col" th:if="${not #lists.isEmpty(cart.cartItems)}" th:each="item : ${cart.cartItems}">
+      <div class="row">
+        <div th:replace="~{components/cardCartItemLine :: cardFragment(${item})}">Your cart is Empty</div>
+      </div>
+    </div>
+
+    <div class="row pt-4">
+        <div class="col-8">
+            <p></p>
+        </div>
+        <div class="col-4">
+            <button type="button" class="btn btn-sm btn-outline-quaternary">Clear Cart</button>
+            <button type="button" class="btn btn-sm btn-quaternary">Place Order</button>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        function navToItem(id) {
+            window.location.href="/store/item/"+id;
+        }
+
+        async function updateCartItem(id, userid, target) {
+            let counterID = id+"-counter";
+            let counterEl = document.getElementById(counterID);
+            let itemCount = counterEl.value
+            let formData = new FormData();
+                formData.set("id", id);
+                formData.set("userId", userid);
+                formData.set("count", itemCount);
+
+            const response = await fetch('/api/v1/cart/'+target, {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                return response.json();
+            }).then(data => {
+                console.log(data);
+                updateCartCounter(data);
+                document.getElementById('subtitleCount').innerText = data;
+                if (target === 'removeitem' || itemCount === '0') {
+                    let itemID = id+"-item";
+                    let itemEl = document.getElementById(itemID);
+                    itemEl.remove();
+                }
+            });
+        }
+    </script>
+
+</div>
+
+
+</html>

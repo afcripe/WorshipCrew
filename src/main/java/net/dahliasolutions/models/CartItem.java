@@ -1,5 +1,7 @@
 package net.dahliasolutions.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -36,5 +38,10 @@ public class CartItem {
     @Nullable
     @ManyToOne(fetch = FetchType.LAZY)
     private StoredImage image;
+
+    @JsonBackReference
+    @ManyToOne
+    @JoinColumn(name = "cartId")
+    private Cart cart;
 
 }
