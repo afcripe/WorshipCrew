@@ -11,14 +11,14 @@
     </script>
 
     <div class="row mt-2" >
-      <div class="col-6 col-lg-3" style="vertical-align: center" th:onclick="navToItem([[*{fileLocation}]])">
+      <div class="col-3" style="vertical-align: center" th:onclick="navToItem([[*{fileLocation}]])">
         <img th:src="@{*{fileLocation}}" class="store_line_image mr-2 align-content-center" style="float: left">
         <h6 th:text="*{name}" class=" align-content-center"></h6>
       </div>
-      <div class="col-12 col-lg-6" style="overflow-x: clip" th:onclick="navToItem([[*{fileLocation}]])">
+      <div class="col-6" style="overflow-x: clip" th:onclick="navToItem([[*{fileLocation}]])">
         <p th:text="*{description}" style="overflow: clip; max-height: 1.5em;"></p>
       </div>
-      <div class="col-6 col-lg-3">
+      <div class="col-3">
         References: <span th:text="*{references}"></span>
         <button id="btnDelete" class="btn btn-sm btn-outline-quaternary ml-2" type="button"
                 th:onclick="deleteImage('img-[[*{id}]]', [[*{id}]])">Delete</button>

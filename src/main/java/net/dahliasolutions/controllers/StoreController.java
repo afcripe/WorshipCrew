@@ -245,7 +245,7 @@ public class StoreController {
         List<StoreItem> storeItemList = storeItemService.findAll();
         for (StoreItem storeItem : storeItemList) {
             for (StoredImageModel img : imageList) {
-                if (storeItem.getId().equals(img.getId())) {
+                if (storeItem.getImage().getId().equals(img.getId())) {
                     img.setReferences(img.getReferences()+1);
                 }
             }

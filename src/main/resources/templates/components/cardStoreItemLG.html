@@ -12,12 +12,8 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-6" th:onclick="navToItem([[*{id}]])">
-                <div class="store_card_image">
-                    <img th:src="@{*{image.fileLocation}}" class="img card-img-top img-thumbnail">
-                </div>
-            </div>
-            <div class="col-6" th:onclick="navToItem([[*{id}]])">
+            <div class="col" th:onclick="navToItem([[*{id}]])">
+                <img th:src="@{*{image.fileLocation}}" class="store_card_image">
                 <p th:text="*{description}" class="store_card_description"></p>
             </div>
         </div>

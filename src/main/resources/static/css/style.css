@@ -228,6 +228,9 @@
 .grid_image_selected {
     border: 2px solid #FF7F50;
 }
+.grid_image_selected_primary {
+    border: 2px solid #0D6EFD;
+}
 
 
 .store_line_image {
@@ -237,13 +240,16 @@
     aspect-ratio: 1 / 1;
 }
 .store_card_image {
-    max-height: 250px;
+    width: 50%;
     aspect-ratio: 1 / 1;
-    position:relative;
-    overflow:hidden;
+    object-fit: contain;
+    float: left;
+    border: 2px solid lightgray;
+    border-radius: 5px;
+    margin: 5px;
 }
 .store_image {
-    max-height: 250px;
+    width: 100%;
     aspect-ratio: 1 / 1;
     object-fit: contain;
     float: left;
@@ -276,6 +282,7 @@
 }
 @media (min-width: 768px) {
     .store_grid_wrapper { grid-template-columns: repeat(2, 1fr); }
+    .store_image { max-width: 250px; }
 }
 @media (min-width: 992px) {
     .store_grid_wrapper { grid-template-columns: repeat(3, 1fr); }
