@@ -10,7 +10,7 @@
         <div class="collapse navbar-collapse flex-grow-1 mt-3 mt-md-0" id="navbarBreadcrumb">
           <ul class="navbar-nav me-auto">
             <li class="nav-item">
-              <a class="nav-link" href="#">
+              <a class="nav-link" href="/wiki">
                 <h3><i class="bi bi-wikipedia" style="color: #0d6efd"></i></h3>
               </a>
             </li>
@@ -29,7 +29,7 @@
           <ul class="navbar-nav d-flex me-auto order-2 mt-3 mt-md-0" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
                               or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')}">
             <li class="nav-item">
-              <a class="btn btn-sm btn-primary" href="/wiki/admin/post">
+              <a class="btn btn-sm btn-primary" href="/wiki/new">
                 <i class="bi bi-file-earmark-plus d-block d-lg-none"></i>
                 <span class="d-none d-lg-block">New Article</span></a>
             </li>

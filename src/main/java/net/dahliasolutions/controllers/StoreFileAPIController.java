@@ -9,44 +9,46 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/v1/contentmanager")
+@RequestMapping("/api/v1/contentmanager/store")
 @RequiredArgsConstructor
-public class FileAPIController {
+public class StoreFileAPIController {
 
-    private final StoredImageService storedImageService;
+    private final StoreImageService storedImageService;
     private final RedirectService redirectService;
     private final AppServer appServer;
 
     @GetMapping("")
-    public List<StoredImage> goFindAll() {
+    public List<StoreImage> goFindAll() {
         return storedImageService.findAll();
     }
 
     @GetMapping("/images")
-    public List<StoredImage> getAllImages() {
+    public List<StoreImage> getAllImages() {
         return storedImageService.findAll();
     }
 
     @GetMapping("/images/{searchTerm}")
-    public List<StoredImage> searchImages(@PathVariable String searchTerm) {
+    public List<StoreImage> searchImages(@PathVariable String searchTerm) {
         return storedImageService.findBySearchTerm(searchTerm);
     }
 
     @PostMapping("/uploadimage")
-    public StoredImage uploadNewImage(@ModelAttribute FileUploadModel fileUploadModel, @RequestPart("imageFile") MultipartFile imageFile) {
+    public StoreImage uploadNewImage(@ModelAttribute FileUploadModel fileUploadModel, @RequestPart("imageFile") MultipartFile imageFile) {
         // ToDo - save multipart file to disk and return relative URL location
 
         // get the image save location and verify directories
         String fileName = StringUtils.cleanPath(imageFile.getOriginalFilename());
-        String uploadDir = appServer.getResourceDir()+"/images";
-        String fileURL = appServer.getResourceURL()+"/images/"+fileName;
+        String uploadDir = appServer.getResourceDir()+"/store/images";
+        String fileURL = appServer.getResourceURL()+"/store/images/"+fileName;
         Path uploadPath = Paths.get(uploadDir);
         if (!Files.exists(uploadPath)) {
             try {
@@ -65,9 +67,16 @@ public class FileAPIController {
             System.out.println("error saving file");
         }
 
-        StoredImage storedImage = new StoredImage(null, fileUploadModel.fileName(), fileUploadModel.fileDescription(), fileURL);
+        StoreImage storeImage = new StoreImage(null, fileUploadModel.fileName(), fileUploadModel.fileDescription(), fileURL);
 
-        return storedImageService.createStoredImage(storedImage);
+        return storedImageService.createStoredImage(storeImage);
+    }
+
+    @GetMapping("/removeimage/{id}")
+    public String removeStoredIamge(@PathVariable BigInteger id){
+        Optional<StoreImage> storedImage = storedImageService.findById(id);
+        storedImageService.deleteById(id);
+        return "";
     }
 
 }

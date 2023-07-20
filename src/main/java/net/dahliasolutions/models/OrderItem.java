@@ -35,6 +35,6 @@ public class OrderItem {
 
     @Nullable
     @ManyToOne(fetch = FetchType.LAZY)
-    private StoredImage image;
+    private StoreImage image;
 
 }

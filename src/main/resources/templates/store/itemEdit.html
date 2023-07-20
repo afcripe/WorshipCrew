@@ -27,7 +27,7 @@
                   formData.set("fileDescription", document.getElementById('fileDescription').value)
                   formData.set("imageFile", document.getElementById('imageFile').files[0])
 
-                const response = await fetch('/api/v1/contentmanager/uploadimage', {
+                const response = await fetch('/api/v1/contentmanager/store/uploadimage', {
                   method: 'POST',
                   body: formData
                 }).then(response => {
@@ -108,7 +108,7 @@
                 }
                 const template = document.getElementById("tmpImage");
                 let searchTerm = document.getElementById("imgSearch").value;
-                let apiURL = '/api/v1/contentmanager/images';
+                let apiURL = '/api/v1/contentmanager/store/images';
                 if (searchTerm !== "") {
                   apiURL = apiURL + "/" + searchTerm;
                 }

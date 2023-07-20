@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Data
@@ -19,8 +21,17 @@ public class WikiPost {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private BigInteger id;
     private String title;
+    private String folder;
+    private LocalDateTime created;
+    private LocalDateTime lastUpdated;
+
+    @OneToOne
+    private User author;
 
     @Lob
     @Column(name = "body", columnDefinition="BLOB")
     private String body;
+
+    @ManyToMany
+    private List<WikiTag> tagsList;
 }

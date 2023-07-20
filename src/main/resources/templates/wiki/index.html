@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       layout:decorate="~{layouts/defaultLayout}">
 
 <div class="container-fluid m-0 p-0" layout:fragment="content">
@@ -14,6 +13,12 @@
 
             <h1 style="color: royalblue">Welcome to the Destiny Wiki</h1>
             <p>If it's on the Internet, it must be true.</p>
+
+            <ul th:each="wikiPost : ${wikiPostList}">
+                <li>
+                    <a th:href="@{'/wiki/post/'}+${wikiPost.id}" th:text="${wikiPost.title}"></a>
+                </li>
+            </ul>
 
         </div>
 

@@ -1,6 +1,5 @@
 package net.dahliasolutions.models;
 
-
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -15,11 +14,13 @@ import java.math.BigInteger;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PositionSelectedModel {
+public class StoreImageModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private BigInteger id;
     private String name;
-    private boolean selected;
+    private String description;
+    private String fileLocation;
+    private int references;
 }

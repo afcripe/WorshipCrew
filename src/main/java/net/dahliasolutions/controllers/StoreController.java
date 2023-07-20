@@ -10,7 +10,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.Option;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,7 +25,7 @@ public class StoreController {
     private final PositionService positionService;
     private final DepartmentService departmentService;
     private final UserService userService;
-    private final StoredImageService storedImageService;
+    private final StoreImageService storedImageService;
     private final RedirectService redirectService;
 
     @ModelAttribute
@@ -234,17 +233,17 @@ public class StoreController {
     @GetMapping("/imageManager")
     public String getImageManager(Model model, HttpSession session) {
         redirectService.setHistory(session, "/store/settings");
-        List<StoredImage> storedImageList = storedImageService.findAll();
-        List<StoredImageModel> imageList = new ArrayList<>();
-        for (StoredImage image : storedImageList) {
-            StoredImageModel imageModel = new StoredImageModel(image.getId(), image.getName(), image.getDescription(),
+        List<StoreImage> storeImageList = storedImageService.findAll();
+        List<StoreImageModel> imageList = new ArrayList<>();
+        for (StoreImage image : storeImageList) {
+            StoreImageModel imageModel = new StoreImageModel(image.getId(), image.getName(), image.getDescription(),
                     image.getFileLocation(), 0);
             imageList.add(imageModel);
         }
 
         List<StoreItem> storeItemList = storeItemService.findAll();
         for (StoreItem storeItem : storeItemList) {
-            for (StoredImageModel img : imageList) {
+            for (StoreImageModel img : imageList) {
                 if (storeItem.getImage().getId().equals(img.getId())) {
                     img.setReferences(img.getReferences()+1);
                 }

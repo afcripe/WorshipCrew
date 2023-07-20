@@ -16,7 +16,7 @@ import java.math.BigInteger;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class StoredImage {
+public class WikiImage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

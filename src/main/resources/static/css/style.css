@@ -213,6 +213,12 @@
     border-radius: 5px;
 }
 
+.tag-dialog {
+    border-radius: 5px;
+    position: fixed;
+    z-index: 98;
+}
+
 .grid_image_div {
     float: left;
     width: 100px;

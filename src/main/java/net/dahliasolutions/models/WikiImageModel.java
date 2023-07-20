@@ -1,6 +1,5 @@
 package net.dahliasolutions.models;
 
-import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -15,8 +14,7 @@ import java.math.BigInteger;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-public class StoredImageModel {
+public class WikiImageModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

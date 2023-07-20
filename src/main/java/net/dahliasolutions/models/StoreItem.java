@@ -37,7 +37,7 @@ public class StoreItem {
 
     @Nullable
     @ManyToOne(fetch = FetchType.LAZY)
-    private StoredImage image;
+    private StoreImage image;
 
     @ManyToMany(fetch = FetchType.EAGER)
     private Collection<Position> positionList;  //positions allowed to order item

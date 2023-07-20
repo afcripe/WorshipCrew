@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<div class="container-fluid m-0 p-0" layout:fragment="content">
+
+    <div th:replace="~{wiki/moduleHeader :: header}">Header</div>
+
+    <div class="mx-2">
+
+        <div class="row mt-2" th:object="${wikiPost}">
+
+            <h2 style="color: royalblue; float: left" th:text="*{title}">
+                Wiki Title
+                <a href="@{'/wiki/'}+*{id}" th:if="${author.id == userId}"> <i class="bi bi-pencil-square"></i></a>
+            </h2>
+
+            <div>
+                By: <span th:text="*{author.firstName + ' ' + author.lastName}"></span>
+                updated on: <span th:text="*{#temporals.format(lastUpdated, 'dd-MMM-yyyy HH:mm ')}" style="float: right"></span>
+            </div>
+
+            <hr />
+
+            <div th:utext="*{body}"></div>
+
+        </div>
+
+    </div>
+  </div>
+
+</html>

@@ -1,13 +1,48 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       layout:decorate="~{layouts/defaultLayout}">
 
 <div class="container-fluid m-0 p-0" layout:fragment="content">
 
     <script src="https://cdn.tiny.cloud/1/d34njokcv44llbkidi9xzg4nygezokgli9hsheb7tk7zkqxk/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 
+    <div th:replace="~{wiki/editPostHeader :: header}">Header</div>
+
+    <div class="mx-2">
+
+        <div class="row mt-2">
+
+            <form id="postEditForm" style="height: 100%" th:action="@{/wiki/admin/post}" th:object="${wikiPost}" method="post">
+                <div class="row">
+                    <div class="col">
+                        <input type="text" class="form-control-sm flex-grow" style="width: 50%" th:id="postTitle" th:text="*{title}"
+                               placeholder="Post Title" />
+                        <i id="savingIcon" class="bi bi-file-earmark-arrow-up h4" style="color: green; display: none; float: right"></i>
+                        <input type="hidden" id="authorId" th:value="*{author.id}" />
+                        <input type="hidden" id="postId" th:value="*{id}" />
+                        <input type="hidden" id="folder" th:value="*{folder}" />
+                    </div>
+                </div>
+                <dvi class="row">
+                    <div class="col">
+                        <textarea id="postBody" th:value="*{body}" style="width:100%; height: calc(100vh - 200px)"></textarea>
+                        <script>
+                            tinymce.init({
+                                selector: '#postBody',
+                                plugins: 'link lists image media code',
+                                toolbar: 'alignleft aligncenter alignright alignjustify | formatselect | bullist numlist | outdent indent | link code',
+                                toolbar_mode: 'floating',
+                                tinycomments_author: 'Post Author'
+                            });
+                        </script>
+                    </div>
+                </dvi>
+            </form>
+
+        </div>
+
+    </div>
 
     <dialog id="uploadDialog" class="upload-modal">
         <script>
@@ -25,7 +60,7 @@
                 formData.set("fileDescription", document.getElementById('fileDescription').value)
                 formData.set("imageFile", document.getElementById('imageFile').files[0])
 
-                const response = await fetch('/api/v1/contentmanager/uploadimage', {
+                const response = await fetch('/api/v1/contentmanager/wiki/uploadimage', {
                     method: 'POST',
                     body: formData
                 }).then(response => {
@@ -104,7 +139,7 @@
                 }
                 const template = document.getElementById("tmpImage");
                 let searchTerm = document.getElementById("imgSearch").value;
-                let apiURL = '/api/v1/contentmanager/images';
+                let apiURL = '/api/v1/contentmanager/wiki/images';
                 if (searchTerm !== "") {
                     apiURL = apiURL + "/" + searchTerm;
                 }
@@ -178,52 +213,247 @@
         </form>
     </dialog>
 
+    <dialog id="chooseTag" class="tag-dialog">
+        <script>
+            async function loadTags() {
+                const chooser = document.getElementById("pictureChooser");
+                while (chooser.firstChild) {
+                    chooser.removeChild(chooser.lastChild);
+                }
+                const template = document.getElementById("tmpImage");
+                let searchTerm = document.getElementById("imgSearch").value;
+                let apiURL = '/api/v1/contentmanager/images';
+                if (searchTerm !== "") {
+                    apiURL = apiURL + "/" + searchTerm;
+                }
 
-    <div th:replace="~{wiki/moduleHeader :: header}">Header</div>
+                const response = await fetch(apiURL
+                ).then(response => {
+                    return response.json();
+                }).then(data => {
+                    console.log(data);
+                    for (let key in data) {
+                        let obj = data[key];
+                        let divID = "id-" + obj.id;
 
-    <div class="mx-2">
+                        let clone = template.content.cloneNode(true);
+                        let imgDiv = clone.querySelector("img");
+                        imgDiv.src = obj.fileLocation;
+                        imgDiv.alt = obj.name;
+                        imgDiv.setAttribute("id", divID);
+                        imgDiv.addEventListener("click", function (event) {
+                            selectImage(event.target, 1);
+                        });
+                        imgDiv.addEventListener("dblclick", function (event) {
+                            selectImage(event.target, 2);
+                        });
+                        let hdrDiv = clone.querySelector("p");
+                        hdrDiv.innerText = obj.name;
+                        chooser.appendChild(clone);
+                    }
+                });
+            }
 
-        <div class="row mt-2">
+            function selectTag(element, type) {
+                const chooser = document.getElementById("tagChooser");
+                let imgArray = chooser.querySelectorAll("img");
 
-            <form id="postEditForm" style="height: 100%" th:action="@{/wiki/admin/post}" th:object="${wikiPost}" method="post">
-                <div class="row">
-                    <div class="col flex-row">
-                        <input type="text" class="form-control-sm flex-grow" style="width: 50%" th:field="*{title}" placeholder="Post Title" />
-                        <div style="float: right">
-                            <button type="button" class="btn btn-sm btn-primary"
-                                    onclick="uploadImageClick()">Upload Image</button>
-                            <button type="button" class="btn btn-sm btn-primary"
-                                    onclick="chooseImageClick()">Choose Image</button>
-                            <button type="button" class="btn btn-sm btn-primary" onclick="processPost()">Save</button>
-                        </div>
-                    </div>
-                </div>
-                <dvi class="row">
-                    <div class="col">
-                        <textarea id="body" name="body" th:field="*{body}" style="width:100%; height: calc(100vh - 200px)"></textarea>
-                        <script>
-                            tinymce.init({
-                                selector: '#body',
-                                plugins: 'link lists image media code',
-                                toolbar: 'alignleft aligncenter alignright alignjustify | formatselect | bullist numlist | outdent indent | link code',
-                                toolbar_mode: 'floating',
-                                tinycomments_author: 'Post Author'
-                            });
-                        </script>
-                    </div>
-                </dvi>
-            </form>
+                for(let key in imgArray) {
+                    let imgNode = imgArray[key];
+                    try {imgNode.classList.remove("grid_image_selected_primary")}
+                    catch (error) {console.log("not an image")}
+                }
+                element.classList.add("grid_image_selected_primary");
+                let imageFullURL = element.src;
+                let imageURL = imageFullURL.substring(websiteDomain.length, imageFullURL.length);
+                navigator.clipboard.writeText(imageURL);
+                if (type > 1) { dialogOK(); }
+            }
 
-        </div>
+            function dialogOK() {
+                document.getElementById("chooseTag").close();
+            }
 
-    </div>
+        </script>
+        <form method="dialog">
+            <div class="d-flex">
+                <label for="imgSearch" class="form-control-label h4 w-50" style="float: left">Choose Tags</label>
+            </div>
+
+            <div id="tagChooser" class="border border-1 rounded"></div>
+            <div class="d-flex">
+                <button type="button" class="btn btn-sm btn-primary m-2 w-25"
+                        onclick="dialogOK()">Done</button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog id="chooseFolder" class="tag-dialog">
+        <template id="tmpFolder">
+            <div class="m-0 p-0" style="cursor: pointer"></div>
+        </template>
+        <script>
+            async function loadFolders() {
+                const nchooser = document.getElementById("folderChooser");
+                while (nchooser.firstChild) {
+                    nchooser.removeChild(nchooser.lastChild);
+                }
+                const template = document.getElementById("tmpFolder");
+                let apiURL = '/api/v1/wiki/folders';
+
+                const response = await fetch(apiURL
+                ).then(response => {
+                    return response.json();
+                }).then(data => {
+                    console.log(data);
+                    for (let key in data) {
+                        let obj = data[key];
+
+                        let clone = template.content.cloneNode(true);
+                        let folderDiv = clone.querySelector("div");
+                            folderDiv.innerText = obj.folder;
+
+                        folderDiv.addEventListener("click", function (event) {
+                            selectFolder(event.target, 1);
+                        });
+                        folderDiv.addEventListener("dblclick", function (event) {
+                            selectFolder(event.target, 2);
+                        });
+
+                        nchooser.appendChild(clone);
+                    }
+                });
+            }
+
+            async function newFolder() {
+                const fChooser = document.getElementById("folderChooser");
+                const template = document.getElementById("tmpFolder");
+                let folderArray = fChooser.querySelectorAll("div");
+
+                for(let key in folderArray) {
+                    let folderNode = folderArray[key];
+                    try {folderNode.classList.remove("grid_image_selected_primary")}
+                    catch (error) {console.log("not an folder")}
+                }
+
+                let apiURL = '/api/v1/wiki/folder';
+                let formData = new FormData();
+                    formData.set("name", document.getElementById('folderPath').value)
+
+                const responseNewFolder = await fetch(apiURL, {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    return response.json();
+                }).then(data => {
+                    if (data.folder !== "") {
+                        let clone = template.content.cloneNode(true);
+                        let folderDiv = clone.querySelector("div");
+                            folderDiv.innerText = data.folder;
+
+                        folderDiv.addEventListener("click", function (event) {
+                            selectFolder(event.target, 1);
+                        });
+                        folderDiv.addEventListener("dblclick", function (event) {
+                            selectFolder(event.target, 2);
+                        });
+                        folderDiv.classList.add("grid_image_selected_primary");
+
+                        document.getElementById('wikiPath').value = data.folder;
+                        fChooser.appendChild(clone);
+                    }
+                });
+            }
+
+            function selectFolder(element, type) {
+                const divChooser = document.getElementById("folderChooser");
+                let folderArray = divChooser.querySelectorAll("div");
+
+                for(let key in folderArray) {
+                    let folderNode = folderArray[key];
+                    try {folderNode.classList.remove("grid_image_selected_primary")}
+                    catch (error) {console.log("not an folder")}
+                }
+                element.classList.add("grid_image_selected_primary");
+                document.getElementById("wikiPath").value = element.innerText;
+                if (type > 1) { dialogOK(); }
+            }
+
+            function folderDialogOK() {
+                document.getElementById('folder').value = document.getElementById("wikiPath").value;
+                document.getElementById("chooseFolder").close();
+            }
+
+            function folderNewPath(event, type) {
+                if (event.key == "Enter") { newFolder() }
+            }
+
+        </script>
+        <form method="dialog">
+            <div class="d-flex">
+                <label for="wikiPath" class="form-control-label h4 w-50" style="float: left">Folder Path</label>
+                <input id="wikiPath" class="form-control pr-2 w-50" type="text" th:value="${wikiPost.folder}"
+                       placeholder="New Folder" style="float: left;" onkeyup="folderNewPath()" disabled>
+            </div>
+
+            <div id="folderChooser" class="border border-1 rounded"
+                 style="width: 410px; height: 410px;"></div>
+            <div class="d-flex">
+                <input id="folderPath" class="form-control pr-2 w-50" type="text"
+                       placeholder="New Folder" style="float: left;">
+                <button type="button" class="btn btn-sm btn-primary m-2 w-25" style="float: right"
+                        onclick="newFolder()">New</button>
+                <button type="button" class="btn btn-sm btn-primary m-2 w-25" style="float: right"
+                        onclick="folderDialogOK()">OK</button>
+            </div>
+        </form>
+    </dialog>
+
+
     <script th:inline="javascript">
         /*<![CDATA[*/
         websiteDomain = /*[[${baseURL}]]*/ " ";
         /*]]>*/
 
-        function processPost() {
+        let closeOnSave = false;
+        const iconSaving = document.getElementById('savingIcon');
 
+        async function processPost() {
+            iconSaving.style.display = 'block';
+
+            let myContent = tinyMCE.activeEditor.getContent();
+
+            let formData = new FormData();
+                formData.set("id", document.getElementById('postId').value)
+                formData.set("title", document.getElementById('postTitle').value)
+                formData.set("body", myContent)
+                formData.set("folder", document.getElementById('folder').value)
+                formData.set("authorId", document.getElementById('authorId').value)
+
+            const savePost = await fetch('/api/v1/wiki/save', {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                return response.json();
+            }).then(data => {
+                console.log(data);
+                document.getElementById('postId').value = data;
+                iconSaving.style.display = 'none';
+                if (closeOnSave) {
+                    window.location.href="/wiki/post/"+data;
+                }
+            });
+        }
+        function closeEditor() {
+            closeOnSave = true;
+            processPost();
+        }
+        function manageTags() {
+            document.getElementById("chooseTag").showModal();
+        }
+        function manageFolder() {
+            document.getElementById("chooseFolder").showModal();
+            loadFolders();
         }
         function uploadImageClick() {
             document.getElementById("uploadDialog").showModal();
