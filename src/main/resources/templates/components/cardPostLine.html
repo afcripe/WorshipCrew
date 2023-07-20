@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+
+<div th:fragment="cardFragment(wikiPost)">
+  <div class="card" th:object="${wikiPost}">
+    <script>
+      function navToPost(id) {
+        window.location.href="/wiki/post/"+id;
+      }
+    </script>
+
+    <div class="row m-2" style="overflow: hidden; max-height: 30px; cursor: pointer;" th:onclick="navToPost([[*{id}]])">
+      [[*{title}]] &nbsp;&nbsp;|&nbsp;&nbsp; [[*{summary}]]
+    </div>
+
+  </div>
+</div>
+
+</html>

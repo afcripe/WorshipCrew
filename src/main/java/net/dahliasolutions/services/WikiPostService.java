@@ -41,6 +41,21 @@ public class WikiPostService implements WikiPostServiceInterface {
     }
 
     @Override
+    public List<WikiPost> findAllByFolder(String name) {
+        return wikiPostRepository.findAllByFolder(name);
+    }
+
+    @Override
+    public List<WikiPost> findRecent()  {
+        return wikiPostRepository.findFirst10OrderByLastUpdatedDesc();
+    }
+
+    @Override
+    public List<WikiPost> findAllByTagId(BigInteger id) {
+        return wikiPostRepository.findAllByTagId(id);
+    }
+
+    @Override
     public List<WikiPost> findByAuthor(BigInteger authorId) {
         return wikiPostRepository.findByAuthor(authorId);
     }

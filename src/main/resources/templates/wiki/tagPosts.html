@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<div class="container-fluid m-0 p-0" layout:fragment="content">
+
+    <div th:replace="~{wiki/moduleHeader :: header}">Header</div>
+
+    <div class="mx-2">
+
+        <div class="row mt-2">
+
+            <div class="row">
+
+                <h4 class="my-2">Folder: <span th:text="${tag.name}"></span></h4>
+
+                <div th:each="post : ${wikiPostList}">
+                    <div th:replace="~{components/cardPostLine :: cardFragment(${post})}">List</div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        function navToTag(id) {
+            window.location.href="/wiki/tag/"+id;
+        }
+    </script>
+
+  </div>
+
+</html>

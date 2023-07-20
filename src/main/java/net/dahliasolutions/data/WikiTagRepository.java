@@ -13,7 +13,7 @@ public interface WikiTagRepository extends JpaRepository<WikiTag, BigInteger> {
 
     Optional<WikiTag> findByName(String name);
 
-    @Query(value="SELECT COUNT(TAGS_LIST_ID) FROM WIKI_POST_TAGS_LIST WHERE TAGS_LIST_ID = :id", nativeQuery = true)
+    @Query(value="SELECT COUNT(TAG_LIST_ID) FROM WIKI_POST_TAG_LIST WHERE TAG_LIST_ID = :id", nativeQuery = true)
     Optional<Integer> findCountReferencesByTagId(@Param("id") BigInteger id);
 
 }

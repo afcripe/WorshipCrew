@@ -26,7 +26,7 @@ public class WikiPost {
     private LocalDateTime lastUpdated;
     private String summary;
 
-    @OneToOne
+    @ManyToOne
     private User author;
 
     @Lob

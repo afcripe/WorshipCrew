@@ -40,7 +40,7 @@ public class WikiAPIController {
             WikiPost newPost = new WikiPost();
                 newPost.setTitle(wikiPostModel.title());
                 newPost.setBody(wikiPostModel.body());
-                newPost.setFolder("/posts");
+                newPost.setFolder("/general");
                 newPost.setCreated(LocalDateTime.now());
                 newPost.setLastUpdated(LocalDateTime.now());
                 newPost.setSummary(summary);
@@ -51,6 +51,7 @@ public class WikiAPIController {
 
         wikiPost.get().setTitle(wikiPostModel.title());
         wikiPost.get().setBody(wikiPostModel.body());
+        wikiPost.get().setFolder(wikiPostModel.folder());
         wikiPost.get().setLastUpdated(LocalDateTime.now());
         wikiPost.get().setSummary(summary);
 
@@ -74,6 +75,25 @@ public class WikiAPIController {
     @GetMapping("/tags")
     public List<WikiTag> getTags() {
         return wikiTagService.findAll();
+    }
+
+    @PostMapping("/newtag")
+    public List<WikiTag> newTag(@ModelAttribute WikiTagModel wikiTagModel) {
+        Optional<WikiPost> wikiPost = wikiPostService.findById(wikiTagModel.postId());
+        if (wikiPost.isEmpty()) {
+            return null;
+        }
+
+        Optional<WikiTag> wikiTag = wikiTagService.findByName(wikiTagModel.tagName());
+        if (wikiTag.isPresent()) {
+            wikiPost.get().getTagList().add(wikiTag.get());
+        } else {
+            WikiTag newWikiTag = wikiTagService.createWikiTag(new WikiTag(null, wikiTagModel.tagName()));
+            wikiPost.get().getTagList().add(newWikiTag);
+        }
+
+        List<WikiTag> newList = wikiPostService.save(wikiPost.get()).getTagList();
+        return newList;
     }
 
     @PostMapping("/addtag")

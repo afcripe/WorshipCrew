@@ -215,7 +215,7 @@
 
     <dialog id="chooseTag" class="tag-dialog">
         <template id="tmpTag">
-            <span class="p-1 tag_primary" style="cursor: pointer"></span>
+            <span class="m-1 tag_primary" style="cursor: pointer"></span>
         </template>
         <script>
             async function loadTags() {
@@ -230,7 +230,6 @@
                 ).then(response => {
                     return response.json();
                 }).then(data => {
-                    console.log(data);
                     for (let key in data) {
                         let obj = data[key];
 
@@ -242,8 +241,8 @@
                             selectTag(event.target);
                         });
 
-                        for (let t of postTags) {
-                            if (postTags.name === obj.name) {
+                        for (let tag of postTags) {
+                            if (tag.name === obj.name) {
                                 tagSpan.classList.add("tag_selected_primary");
                             }
                         }
@@ -255,15 +254,8 @@
 
             async function newTag() {
                 const template = document.getElementById("tmpTag");
-                let tagArray = tagChooser.querySelectorAll("span");
 
-                for(let key in tagArray) {
-                    let tagNode = tagArray[key];
-                    try {tagNode.classList.remove("grid_image_selected_primary")}
-                    catch (error) {console.log("not an folder")}
-                }
-
-                let apiURL = '/api/v1/wiki/addtag';
+                let apiURL = '/api/v1/wiki/newtag';
                 let formData = new FormData();
                     formData.set("tagName", document.getElementById('newTagName').value)
                     formData.set("postId", document.getElementById('postId').value)
@@ -273,22 +265,36 @@
                     body: formData
                 }).then(response => {
                     return response.json();
+                    document.getElementById('newTagName').value = "";
                 }).then(data => {
-                    if (data.name !== "") {
+                    debugger
+                    let tagChooser = document.getElementById("tagChooser");
+                    let tagArray = tagChooser.querySelectorAll("span");
+                    let missingTag = "";
+                    postTags = data;
+                    for (let span of tagArray) {
+                        span.classList.remove("tag_selected_primary");
+                        for (let t of postTags) {
+                            missingTag = t.name;
+                            if (t.name === span.innerText) {
+                                span.classList.add("tag_selected_primary");
+                                missingTag = "";
+                            }
+                        }
+                    }
+                    //add missing tags
+                    if (missingTag !== "") {
                         let clone = template.content.cloneNode(true);
-                        let folderDiv = clone.querySelector("span");
-                        folderDiv.innerText = data.folder;
+                        let tagSpan = clone.querySelector("span");
+                        tagSpan.innerText = missingTag;
+                        tagSpan.classList.add("tag_selected_primary");
 
-                        folderDiv.addEventListener("click", function (event) {
-                            selectFolder(event.target, 1);
+                        tagSpan.addEventListener("click", function (event) {
+                            selectTag(event.target);
                         });
-                        folderDiv.addEventListener("dblclick", function (event) {
-                            selectFolder(event.target, 2);
-                        });
-                        folderDiv.classList.add("grid_image_selected_primary");
 
-                        document.getElementById('wikiPath').value = data.folder;
                         tagChooser.appendChild(clone);
+                        missingTag = "";
                     }
                 });
             }
@@ -305,7 +311,6 @@
                 }).then(response => {
                     return response.json();
                 }).then(data => {
-                    debugger
                     let tagChooser = document.getElementById("tagChooser");
                     let tagArray = tagChooser.querySelectorAll("span");
                     postTags = data;
@@ -333,7 +338,7 @@
                 document.getElementById("chooseTag").close();
             }
 
-            function newTagInput(event, type) {
+            function newTagInput(event) {
                 if (event.key == "Enter") { newTag() }
             }
 
@@ -347,9 +352,9 @@
                  style="width: 410px; height: 410px;"></div>
             <div class="d-flex">
                 <input id="newTagName" class="form-control pr-2 w-50" type="text"
-                       placeholder="New Tag" style="float: left;">
+                       placeholder="New Tag" style="float: left;" onkeyup="newTagInput(event)">
                 <button type="button" class="btn btn-sm btn-primary m-2 w-25" style="float: right"
-                        onclick="newTagInput()">New</button>
+                        onclick="newTag()">New</button>
                 <button type="button" class="btn btn-sm btn-primary m-2 w-25" style="float: right"
                         onclick="tagDialogOK()">OK</button>
             </div>
@@ -491,18 +496,20 @@
 
         async function processPost() {
             iconSaving.style.display = 'block';
-debugger
             let myContent = tinyMCE.activeEditor.getContent();
             let myTextContent = tinyMCE.activeEditor.getContent({ format: "text" });
             let mySummary = myTextContent.substring(0,255);
 
             let formData = new FormData();
-                formData.set("id", document.getElementById('postId').value)
-                formData.set("title", document.getElementById('postTitle').value)
-                formData.set("body", myContent)
-                formData.set("folder", document.getElementById('folder').value)
-                formData.set("summary", mySummary)
-                formData.set("authorId", document.getElementById('authorId').value)
+                formData.set("id", document.getElementById('postId').value);
+                formData.set("title", document.getElementById('postTitle').value);
+                formData.set("body", myContent);
+                formData.set("folder", document.getElementById('folder').value);
+                formData.set("summary", mySummary);
+                formData.set("authorId", document.getElementById('authorId').value);
+
+            let newFolder = document.getElementById('folder').value;
+            console.log(newFolder);
 
             const savePost = await fetch('/api/v1/wiki/save', {
                 method: 'POST',
@@ -510,9 +517,10 @@ debugger
             }).then(response => {
                 return response.json();
             }).then(data => {
-                console.log(data);
                 document.getElementById('postId').value = data;
                 iconSaving.style.display = 'none';
+                document.getElementById("headerTag").classList.remove("disabled");
+                document.getElementById("headerFolder").classList.remove("disabled");
                 if (closeOnSave) {
                     window.location.href="/wiki/post/"+data;
                 }
@@ -523,12 +531,20 @@ debugger
             processPost();
         }
         function manageTags() {
-            document.getElementById("chooseTag").showModal();
-            loadTags();
+            if ( document.getElementById('postId').value > 0 ) {
+                document.getElementById("chooseTag").showModal();
+                loadTags();
+            } else {
+                alert("Please save you new post before adding tags.");
+            }
         }
         function manageFolder() {
-            document.getElementById("chooseFolder").showModal();
-            loadFolders();
+            if ( document.getElementById('postId').value > 0 ) {
+                document.getElementById("chooseFolder").showModal();
+                loadFolders();
+            } else {
+                alert("Please save you new post before adding it to a folder.");
+            }
         }
         function uploadImageClick() {
             document.getElementById("uploadDialog").showModal();

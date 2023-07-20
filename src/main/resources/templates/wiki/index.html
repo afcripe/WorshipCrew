@@ -14,16 +14,55 @@
             <h1 style="color: royalblue">Welcome to the Destiny Wiki</h1>
             <p>If it's on the Internet, it must be true.</p>
 
-            <ul th:each="wikiPost : ${wikiPostList}">
-                <li>
-                    <a th:href="@{'/wiki/post/'}+${wikiPost.id}" th:text="${wikiPost.title}"></a>
-                     - <span th:text="${wikiPost.summary}"></span>
-                </li>
-            </ul>
+            <div class="row">
+
+                <div class="col-12 col-lg-9">
+
+                    <h5>Find Articles by Folders</h5>
+                    <div th:each="folder : ${folderList}" style="width: 100%">
+                        <div class="tag_primary m-1" style="display: inline-block; cursor: pointer;"
+                             th:onclick="navToFolder([[*{folder.folder}]])" th:text="${folder.folder}">List</div>
+                    </div>
+
+                    <h5>Recent Articles</h5>
+                    <div th:each="post : ${wikiPostList}">
+                        <div th:replace="~{components/cardPostLine :: cardFragment(${post})}">List</div>
+                    </div>
+
+        <!--            <div th:each="folder : ${wikiPostList}">-->
+        <!--                <h5 th:text="${folder.folder}"></h5>-->
+        <!--                <div th:each="post : ${folder.WikiPost}">-->
+        <!--                    <div th:replace="~{components/cardPostLine :: cardFragment(${post})}">List</div>-->
+        <!--                </div>-->
+        <!--            </div>-->
+
+                </div>
+
+                <div class="col-12 col-lg-3">
+                    <div class="card m-1">
+                        <div class="card-title h6">Tags</div>
+                        <div class="card-section">
+                            <div class="tag_primary m-1" style="display: inline-block; cursor: pointer;" th:onclick="navToTag([[*{tag.id}]])"
+                                 th:each="tag : *{tagList}" th:text="${tag.name + '(' + tag.count + ')'}"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
 
         </div>
 
     </div>
+
+    <script>
+        function navToTag(id) {
+            window.location.href="/wiki/tag/"+id;
+        }
+        function navToFolder(name) {
+            window.location.href="/wiki/articles"+name;
+        }
+    </script>
+
   </div>
 
 </html>

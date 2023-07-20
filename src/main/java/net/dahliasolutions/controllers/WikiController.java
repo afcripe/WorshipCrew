@@ -3,12 +3,11 @@ package net.dahliasolutions.controllers;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import net.dahliasolutions.models.AppServer;
-import net.dahliasolutions.models.User;
-import net.dahliasolutions.models.WikiPost;
-import net.dahliasolutions.models.WikiTag;
+import net.dahliasolutions.models.*;
 import net.dahliasolutions.services.RedirectService;
+import net.dahliasolutions.services.WikiFolderService;
 import net.dahliasolutions.services.WikiPostService;
+import net.dahliasolutions.services.WikiTagService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -28,6 +27,8 @@ public class WikiController {
 
     private final WikiPostService wikiPostService;
     private final RedirectService redirectService;
+    private final WikiFolderService wikiFolderService;
+    private final WikiTagService wikiTagService;
     private final AppServer appServer;
 
     @ModelAttribute
@@ -39,11 +40,83 @@ public class WikiController {
         model.addAttribute("userId", user.getId());
         model.addAttribute("baseURL",appServer.getBaseURL());
     }
+
     @GetMapping("")
-    public String goWikiHome(Model model, HttpSession session) {
+    public String getRecent(Model model, HttpSession session) {
+        redirectService.setHistory(session, "/wiki");
+        List<WikiPost> wikiPostList = wikiPostService.findRecent();
+        List<WikiFolder> folderList = wikiFolderService.findAll();
+
+        List<WikiTag> tags = wikiTagService.findAll();
+        List<WikiTagWithCount> tagList = new ArrayList<>();
+        for ( WikiTag tag : tags ) {
+            WikiTagWithCount tagCounter = new WikiTagWithCount();
+                tagCounter.setId(tag.getId());
+                tagCounter.setName(tag.getName());
+                tagCounter.setCount(wikiTagService.countReferences(tag.getId()));
+            tagList.add(tagCounter);
+        }
+
+
+        model.addAttribute("wikiPostList", wikiPostList);
+        model.addAttribute("tagList", tagList);
+        model.addAttribute("folderList", folderList);
+        return "wiki/index";
+    }
+
+    @GetMapping("/tag/{id}")
+    public String getByTags(@PathVariable BigInteger id, Model model, HttpSession session) {
+        redirectService.setHistory(session, "/wiki");
+        Optional<WikiTag> wikiTag = wikiTagService.findById(id);
+        if (wikiTag.isEmpty()) {
+            session.setAttribute("msgError", "Tag not Found.");
+            return redirectService.pathName(session, "/wiki");
+        }
+
+        List<WikiPost> wikiPostList = wikiPostService.findAllByTagId(id);
+
+
+        model.addAttribute("wikiPostList", wikiPostList);
+        model.addAttribute("tag", wikiTag.get());
+        return "wiki/tagPosts";
+    }
+
+    @GetMapping("/folder/{name}")
+    public String getByTags(@PathVariable String name, Model model, HttpSession session) {
+        redirectService.setHistory(session, "/wiki");
+        Optional<WikiFolder> wikiFolder = wikiFolderService.findByFolder(name);
+        if (wikiFolder.isEmpty()) {
+            session.setAttribute("msgError", "Folder not Found.");
+            return redirectService.pathName(session, "/wiki");
+        }
+
+        List<WikiPost> wikiPostList = wikiPostService.findAllByFolder(name);
+
+
+        model.addAttribute("wikiPostList", wikiPostList);
+        model.addAttribute("folder", wikiFolder.get());
+        return "wiki/folderPosts";
+    }
+
+    @GetMapping("/group")
+    public String getGroupedArticles(Model model, HttpSession session) {
         redirectService.setHistory(session, "/wiki");
         List<WikiPost> wikiPostList = wikiPostService.findAll();
-        model.addAttribute("wikiPostList", wikiPostList);
+        List<WikiFolder> folders = wikiFolderService.findAll();
+
+        List<GroupedWikiPostList> postList = new ArrayList<>();
+        for ( WikiFolder folder : folders ) {
+            postList.add(new GroupedWikiPostList(folder.getFolder(), new ArrayList<>()));
+        }
+        for ( WikiPost post : wikiPostList ) {
+            for ( GroupedWikiPostList dir : postList ) {
+                if (dir.getFolder().equals(post.getFolder())) {
+                    dir.getWikiPost().add(post);
+                }
+            }
+        }
+
+        model.addAttribute("wikiPostList", postList);
         return "wiki/index";
     }
 
@@ -58,17 +131,25 @@ public class WikiController {
         return "wiki/post";
     }
 
-    @GetMapping("/posts/**")
+    @GetMapping("/articles/**")
     public String addNewPost(Model model, HttpServletRequest request, HttpSession session) {
 
         String requestURL = request.getRequestURL().toString();
-        String folderFile = requestURL.split("/posts")[1];
+        String folderFile = requestURL.split("/articles")[1];
         String[] folderList = folderFile.split("/");
         String postURLName = folderList[folderList.length-1];
         String postName = postURLName.replace("-", " ");
         String folders = "";
         for ( int i=1; i<folderList.length-1; i++ ) {
             folders = folders + "/" + folderList[i];
+        }
+
+        Optional<WikiFolder> dir = wikiFolderService.findByFolder(folderFile);
+        if (dir.isPresent()){
+            List<WikiPost> wikiPostList = wikiPostService.findAllByFolder(dir.get().getFolder());
+            model.addAttribute("wikiPostList", wikiPostList);
+            model.addAttribute("folder", dir.get());
+            return "wiki/folderPosts";
         }
 
         List<WikiPost> wikiList = wikiPostService.findByTitle(postName);
