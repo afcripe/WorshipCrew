@@ -135,80 +135,81 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 
+
     <script th:inline="javascript">
-        /*<![CDATA[*/
-        moduleHeaderTitle = /*[[${moduleTitle}]]*/ " ";
-        moduleHeaderLink = /*[[${moduleLink}]]*/ "/";
-        /*]]>*/
-        let thisPageTitle = document.getElementById("commonHeaderTitle");
-        thisPageTitle.textContent = moduleHeaderTitle;
-        thisPageTitle.setAttribute("href", moduleHeaderLink);
+    /*<![CDATA[*/
+    moduleHeaderTitle = /*[[${moduleTitle}]]*/ " ";
+    moduleHeaderLink = /*[[${moduleLink}]]*/ "/";
+    /*]]>*/
+    let thisPageTitle = document.getElementById("commonHeaderTitle");
+    thisPageTitle.textContent = moduleHeaderTitle;
+    thisPageTitle.setAttribute("href", moduleHeaderLink);
 
-        let cartCountExpanded = document.getElementById("cartItemCount");
-        let cartCountCollapsed = document.getElementById("cartItemCountCollapsed");
+    let cartCountExpanded = document.getElementById("cartItemCount");
+    let cartCountCollapsed = document.getElementById("cartItemCountCollapsed");
 
-        if (cartCountExpanded != null) {
-            if (cartCountExpanded.innerText === Number(cartCountExpanded.innerText)) {
-                cartCountExpanded.innerText = "";
-            }
-            if (cartCountCollapsed.innerText === Number(cartCountCollapsed.innerText)) {
-                cartCountCollapsed.innerText = "";
-            }
+    if (cartCountExpanded != null) {
+        if (cartCountExpanded.innerText === Number(cartCountExpanded.innerText)) {
+            cartCountExpanded.innerText = "";
         }
+        if (cartCountCollapsed.innerText === Number(cartCountCollapsed.innerText)) {
+            cartCountCollapsed.innerText = "";
+        }
+    }
 
-        function toggleSideNav(show) {
-            if (forceHideSideNave) {
+    function toggleSideNav(show) {
+        if (forceHideSideNave) {
+            document.getElementById('sideNavCollapsed').classList.add("d-sm-block");
+            document.getElementById('sideNavExpanded').classList.remove("d-sm-block");
+        } else {
+            if (show) {
+                document.getElementById('sideNavExpanded').classList.add("d-sm-block");
+                document.getElementById('sideNavCollapsed').classList.remove("d-sm-block");
+            } else {
                 document.getElementById('sideNavCollapsed').classList.add("d-sm-block");
                 document.getElementById('sideNavExpanded').classList.remove("d-sm-block");
-            } else {
-                if (show) {
-                    document.getElementById('sideNavExpanded').classList.add("d-sm-block");
-                    document.getElementById('sideNavCollapsed').classList.remove("d-sm-block");
-                } else {
-                    document.getElementById('sideNavCollapsed').classList.add("d-sm-block");
-                    document.getElementById('sideNavExpanded').classList.remove("d-sm-block");
-                }
-                fetch("/api/v1/app/toggleSideNav/"+show);
             }
+            fetch("/api/v1/app/toggleSideNav/"+show);
         }
+    }
 
-        window.addEventListener("load",function() {
-            setTimeout(function(){
-                // This hides the address bar:
-                window.scrollTo(0, 1);
-            }, 0);
-        });
+    window.addEventListener("load",function() {
+        setTimeout(function(){
+            // This hides the address bar:
+            window.scrollTo(0, 1);
+        }, 0);
+    });
 
-        let scrollToTopBtn = document.getElementById("scrollToTopBtn")
-        function scrollToTop() {
-            // Scroll to top logic
-            document.documentElement.scrollTo({
-                top: 0,
-                behavior: "smooth"
-            })
+    let scrollToTopBtn = document.getElementById("scrollToTopBtn")
+    function scrollToTop() {
+        // Scroll to top logic
+        document.documentElement.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        })
+    }
+    function handleScroll() {
+        let scrollTotal = document.documentElement.scrollHeight - document.documentElement.clientHeight
+        if (document.documentElement.scrollTop > 50 ) {
+            // Show button
+            scrollToTopBtn.classList.add("to-top-show")
+        } else {
+            // Hide button
+            scrollToTopBtn.classList.remove("to-top-show")
         }
-        function handleScroll() {
-            let scrollTotal = document.documentElement.scrollHeight - document.documentElement.clientHeight
-            if (document.documentElement.scrollTop > 50 ) {
-                // Show button
-                scrollToTopBtn.classList.add("to-top-show")
-            } else {
-                // Hide button
-                scrollToTopBtn.classList.remove("to-top-show")
-            }
-        }
-        scrollToTopBtn.addEventListener("click", scrollToTop)
-        document.addEventListener("scroll", handleScroll)
+    }
+    scrollToTopBtn.addEventListener("click", scrollToTop)
+    document.addEventListener("scroll", handleScroll)
 
-        function updateCartCounter(count) {
-            if (cartCountExpanded != null) {
-                cartCountExpanded.innerText = count;
-                cartCountCollapsed.innerText = count;
-            }
+    function updateCartCounter(count) {
+        if (cartCountExpanded != null) {
+            cartCountExpanded.innerText = count;
+            cartCountCollapsed.innerText = count;
         }
+    }
 
-        toggleSideNav(displaySideNav);
-    </script>
+    toggleSideNav(displaySideNav);
+</script>
 
     </body>
 </html>

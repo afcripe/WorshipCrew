@@ -16,9 +16,9 @@
             <form id="postEditForm" style="height: 100%" th:action="@{/wiki/admin/post}" th:object="${wikiPost}" method="post">
                 <div class="row">
                     <div class="col">
-                        <input type="text" class="form-control-sm flex-grow" style="width: 50%" th:id="postTitle" th:text="*{title}"
+                        <input type="text" class="form-control-sm flex-grow" style="width: 50%" th:id="postTitle" th:value="*{title}"
                                placeholder="Post Title" />
-                        <i id="savingIcon" class="bi bi-file-earmark-arrow-up h4" style="color: green; display: none; float: right"></i>
+                        <i id="savingIcon" class="bi bi-file-earmark-arrow-up h5" style="color: green; display: none; float: right"></i>
                         <input type="hidden" id="authorId" th:value="*{author.id}" />
                         <input type="hidden" id="postId" th:value="*{id}" />
                         <input type="hidden" id="folder" th:value="*{folder}" />
@@ -26,7 +26,7 @@
                 </div>
                 <dvi class="row">
                     <div class="col">
-                        <textarea id="postBody" th:value="*{body}" style="width:100%; height: calc(100vh - 200px)"></textarea>
+                        <textarea id="postBody" th:text="*{body}" style="width:100%; height: calc(100vh - 200px)"></textarea>
                         <script>
                             tinymce.init({
                                 selector: '#postBody',
@@ -205,85 +205,153 @@
             <div id="pictureChooser" class="border border-1 rounded" onkeyup="imageChooserKeyUp()"
                  style="width: 410px; height: 410px; overflow-x: hidden; overflow-y: scroll"></div>
             <div class="d-flex">
-                <button type="button" class="btn btn-sm btn-quaternary m-2 w-25"
+                <button type="button" class="btn btn-sm btn-primary m-2 w-25"
                         onclick="dialogOK()">Copy URL</button>
-                <button type="button" class="btn btn-sm btn-outline-danger m-2 w-25"
+                <button type="button" class="btn btn-sm btn-outline-p m-2 w-25"
                         onclick="dialogOK()">Cancel</button>
             </div>
         </form>
     </dialog>
 
     <dialog id="chooseTag" class="tag-dialog">
+        <template id="tmpTag">
+            <span class="p-1 tag_primary" style="cursor: pointer"></span>
+        </template>
         <script>
             async function loadTags() {
-                const chooser = document.getElementById("pictureChooser");
-                while (chooser.firstChild) {
-                    chooser.removeChild(chooser.lastChild);
+                let tagChooser = document.getElementById("tagChooser");
+                while (tagChooser.firstChild) {
+                    tagChooser.removeChild(tagChooser.lastChild);
                 }
-                const template = document.getElementById("tmpImage");
-                let searchTerm = document.getElementById("imgSearch").value;
-                let apiURL = '/api/v1/contentmanager/images';
-                if (searchTerm !== "") {
-                    apiURL = apiURL + "/" + searchTerm;
-                }
+                const template = document.getElementById("tmpTag");
+                let apiURL = '/api/v1/wiki/tags';
 
-                const response = await fetch(apiURL
+                const responseTag = await fetch(apiURL
                 ).then(response => {
                     return response.json();
                 }).then(data => {
                     console.log(data);
                     for (let key in data) {
                         let obj = data[key];
-                        let divID = "id-" + obj.id;
 
                         let clone = template.content.cloneNode(true);
-                        let imgDiv = clone.querySelector("img");
-                        imgDiv.src = obj.fileLocation;
-                        imgDiv.alt = obj.name;
-                        imgDiv.setAttribute("id", divID);
-                        imgDiv.addEventListener("click", function (event) {
-                            selectImage(event.target, 1);
+                        let tagSpan = clone.querySelector("span");
+                            tagSpan.innerText = obj.name;
+
+                        tagSpan.addEventListener("click", function (event) {
+                            selectTag(event.target);
                         });
-                        imgDiv.addEventListener("dblclick", function (event) {
-                            selectImage(event.target, 2);
-                        });
-                        let hdrDiv = clone.querySelector("p");
-                        hdrDiv.innerText = obj.name;
-                        chooser.appendChild(clone);
+
+                        for (let t of postTags) {
+                            if (postTags.name === obj.name) {
+                                tagSpan.classList.add("tag_selected_primary");
+                            }
+                        }
+
+                        tagChooser.appendChild(clone);
                     }
                 });
             }
 
-            function selectTag(element, type) {
-                const chooser = document.getElementById("tagChooser");
-                let imgArray = chooser.querySelectorAll("img");
+            async function newTag() {
+                const template = document.getElementById("tmpTag");
+                let tagArray = tagChooser.querySelectorAll("span");
 
-                for(let key in imgArray) {
-                    let imgNode = imgArray[key];
-                    try {imgNode.classList.remove("grid_image_selected_primary")}
-                    catch (error) {console.log("not an image")}
+                for(let key in tagArray) {
+                    let tagNode = tagArray[key];
+                    try {tagNode.classList.remove("grid_image_selected_primary")}
+                    catch (error) {console.log("not an folder")}
                 }
-                element.classList.add("grid_image_selected_primary");
-                let imageFullURL = element.src;
-                let imageURL = imageFullURL.substring(websiteDomain.length, imageFullURL.length);
-                navigator.clipboard.writeText(imageURL);
-                if (type > 1) { dialogOK(); }
+
+                let apiURL = '/api/v1/wiki/addtag';
+                let formData = new FormData();
+                    formData.set("tagName", document.getElementById('newTagName').value)
+                    formData.set("postId", document.getElementById('postId').value)
+
+                const responseNewTag = await fetch(apiURL, {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    return response.json();
+                }).then(data => {
+                    if (data.name !== "") {
+                        let clone = template.content.cloneNode(true);
+                        let folderDiv = clone.querySelector("span");
+                        folderDiv.innerText = data.folder;
+
+                        folderDiv.addEventListener("click", function (event) {
+                            selectFolder(event.target, 1);
+                        });
+                        folderDiv.addEventListener("dblclick", function (event) {
+                            selectFolder(event.target, 2);
+                        });
+                        folderDiv.classList.add("grid_image_selected_primary");
+
+                        document.getElementById('wikiPath').value = data.folder;
+                        tagChooser.appendChild(clone);
+                    }
+                });
             }
 
-            function dialogOK() {
+            async function updateTags(tag, target) {
+                let apiURL = '/api/v1/wiki/'+target;
+                let formData = new FormData();
+                    formData.set("tagName", tag)
+                    formData.set("postId", document.getElementById('postId').value)
+
+                const responseNewTag = await fetch(apiURL, {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    return response.json();
+                }).then(data => {
+                    debugger
+                    let tagChooser = document.getElementById("tagChooser");
+                    let tagArray = tagChooser.querySelectorAll("span");
+                    postTags = data;
+                    for (let span of tagArray) {
+                        span.classList.remove("tag_selected_primary");
+                        for (let t of postTags) {
+                            if (t.name === span.innerText) {
+                                span.classList.add("tag_selected_primary");
+                            }
+                        }
+                    }
+                });
+            }
+
+            function selectTag(element) {
+                let present = element.classList.contains("tag_selected_primary");
+                if (present) {
+                    updateTags(element.innerText, 'removetag');
+                } else {
+                    updateTags(element.innerText, 'addtag');
+                }
+            }
+
+            function tagDialogOK() {
                 document.getElementById("chooseTag").close();
+            }
+
+            function newTagInput(event, type) {
+                if (event.key == "Enter") { newTag() }
             }
 
         </script>
         <form method="dialog">
             <div class="d-flex">
-                <label for="imgSearch" class="form-control-label h4 w-50" style="float: left">Choose Tags</label>
+                <label for="wikiPath" class="form-control-label h4 w-50" style="float: left">Tags</label>
             </div>
 
-            <div id="tagChooser" class="border border-1 rounded"></div>
+            <div id="tagChooser" class="border border-1 rounded"
+                 style="width: 410px; height: 410px;"></div>
             <div class="d-flex">
-                <button type="button" class="btn btn-sm btn-primary m-2 w-25"
-                        onclick="dialogOK()">Done</button>
+                <input id="newTagName" class="form-control pr-2 w-50" type="text"
+                       placeholder="New Tag" style="float: left;">
+                <button type="button" class="btn btn-sm btn-primary m-2 w-25" style="float: right"
+                        onclick="newTagInput()">New</button>
+                <button type="button" class="btn btn-sm btn-primary m-2 w-25" style="float: right"
+                        onclick="tagDialogOK()">OK</button>
             </div>
         </form>
     </dialog>
@@ -409,25 +477,31 @@
         </form>
     </dialog>
 
-
     <script th:inline="javascript">
         /*<![CDATA[*/
-        websiteDomain = /*[[${baseURL}]]*/ " ";
+        const websiteDomain = /*[[${baseURL}]]*/ " ";
+        let postTags = /*[[${wikiPost.tagList}]]*/ " ";
+        let postContent = /*[[${wikiPost.body}]]*/ " ";
         /*]]>*/
+
+        //tinyMCE.activeEditor.setContent(postContent);
 
         let closeOnSave = false;
         const iconSaving = document.getElementById('savingIcon');
 
         async function processPost() {
             iconSaving.style.display = 'block';
-
+debugger
             let myContent = tinyMCE.activeEditor.getContent();
+            let myTextContent = tinyMCE.activeEditor.getContent({ format: "text" });
+            let mySummary = myTextContent.substring(0,255);
 
             let formData = new FormData();
                 formData.set("id", document.getElementById('postId').value)
                 formData.set("title", document.getElementById('postTitle').value)
                 formData.set("body", myContent)
                 formData.set("folder", document.getElementById('folder').value)
+                formData.set("summary", mySummary)
                 formData.set("authorId", document.getElementById('authorId').value)
 
             const savePost = await fetch('/api/v1/wiki/save', {
@@ -450,6 +524,7 @@
         }
         function manageTags() {
             document.getElementById("chooseTag").showModal();
+            loadTags();
         }
         function manageFolder() {
             document.getElementById("chooseFolder").showModal();

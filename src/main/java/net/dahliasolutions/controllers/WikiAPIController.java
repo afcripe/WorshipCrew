@@ -25,10 +25,15 @@ public class WikiAPIController {
 
     private final WikiPostService wikiPostService;
     private final WikiFolderService wikiFolderService;
+    private final WikiTagService wikiTagService;
 
     @PostMapping("/save")
     public BigInteger postWiki(@ModelAttribute WikiPostModel wikiPostModel) {
         Optional<WikiPost> wikiPost = wikiPostService.findById(wikiPostModel.id());
+
+        // remove line breaks from summary
+        String summary = wikiPostModel.summary().replace("\r\n", " ");
+
         if (wikiPost.isEmpty()) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             User user = (User) auth.getPrincipal();
@@ -36,16 +41,18 @@ public class WikiAPIController {
                 newPost.setTitle(wikiPostModel.title());
                 newPost.setBody(wikiPostModel.body());
                 newPost.setFolder("/posts");
-        newPost.setCreated(LocalDateTime.now());
-        newPost.setLastUpdated(LocalDateTime.now());
+                newPost.setCreated(LocalDateTime.now());
+                newPost.setLastUpdated(LocalDateTime.now());
+                newPost.setSummary(summary);
                 newPost.setAuthor(user);
-                newPost.setTagsList(new ArrayList<>());
+                newPost.setTagList(new ArrayList<>());
             return wikiPostService.createWikiPost(newPost).getId();
         }
 
         wikiPost.get().setTitle(wikiPostModel.title());
         wikiPost.get().setBody(wikiPostModel.body());
         wikiPost.get().setLastUpdated(LocalDateTime.now());
+        wikiPost.get().setSummary(summary);
 
         return wikiPostService.save(wikiPost.get()).getId();
     }
@@ -62,5 +69,40 @@ public class WikiAPIController {
             return wikiFolderService.save(stringModel.name());
         }
         return wikiFolder.get();
+    }
+
+    @GetMapping("/tags")
+    public List<WikiTag> getTags() {
+        return wikiTagService.findAll();
+    }
+
+    @PostMapping("/addtag")
+    public List<WikiTag> addTag(@ModelAttribute WikiTagModel wikiTagModel) {
+        Optional<WikiPost> wikiPost = wikiPostService.findById(wikiTagModel.postId());
+        if (wikiPost.isEmpty()) {
+            return null;
+        }
+
+        Optional<WikiTag> wikiTag = wikiTagService.findByName(wikiTagModel.tagName());
+        if (wikiTag.isPresent()) {
+            wikiPost.get().getTagList().add(wikiTag.get());
+        }
+        List<WikiTag> newList = wikiPostService.save(wikiPost.get()).getTagList();
+        return newList;
+    }
+
+    @PostMapping("/removetag")
+    public List<WikiTag> removeTag(@ModelAttribute WikiTagModel wikiTagModel) {
+        Optional<WikiPost> wikiPost = wikiPostService.findById(wikiTagModel.postId());
+        if (wikiPost.isEmpty()) {
+            return null;
+        }
+
+        Optional<WikiTag> wikiTag = wikiTagService.findByName(wikiTagModel.tagName());
+        if (wikiTag.isPresent()) {
+            wikiPost.get().getTagList().remove(wikiTag.get());
+        }
+        List<WikiTag> newList = wikiPostService.save(wikiPost.get()).getTagList();
+        return newList;
     }
 }

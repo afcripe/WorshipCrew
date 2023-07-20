@@ -24,6 +24,7 @@ public class WikiPost {
     private String folder;
     private LocalDateTime created;
     private LocalDateTime lastUpdated;
+    private String summary;
 
     @OneToOne
     private User author;
@@ -33,5 +34,5 @@ public class WikiPost {
     private String body;
 
     @ManyToMany
-    private List<WikiTag> tagsList;
+    private List<WikiTag> tagList;
 }

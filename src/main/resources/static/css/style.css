@@ -239,6 +239,16 @@
 }
 
 
+.tag_primary {
+    border: 1px solid #0D6EFD;
+    border-radius: 3px;
+}
+
+.tag_selected_primary {
+    background-color: #518be0;
+}
+
+
 .store_line_image {
     max-height: 35px;
     padding: 2px;

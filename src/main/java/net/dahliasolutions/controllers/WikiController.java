@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.AppServer;
 import net.dahliasolutions.models.User;
 import net.dahliasolutions.models.WikiPost;
+import net.dahliasolutions.models.WikiTag;
 import net.dahliasolutions.services.RedirectService;
 import net.dahliasolutions.services.WikiPostService;
 import org.springframework.security.core.Authentication;
@@ -47,7 +48,7 @@ public class WikiController {
     }
 
     @GetMapping("/post/{id}")
-    public String addNewPost(@PathVariable("id") BigInteger id, Model model, HttpSession session) {
+    public String getPost(@PathVariable("id") BigInteger id, Model model, HttpSession session) {
         Optional<WikiPost> wikiPost = wikiPostService.findById(id);
         if (wikiPost.isEmpty()) {
             session.setAttribute("msgError", "Post not Found.");
@@ -89,7 +90,7 @@ public class WikiController {
 
     }
 
-    @GetMapping("/new")
+    @GetMapping("/post/new")
     public String addNewPost(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) auth.getPrincipal();
@@ -100,14 +101,15 @@ public class WikiController {
             wikiPost.setFolder("/posts");
             wikiPost.setCreated(LocalDateTime.now());
             wikiPost.setLastUpdated(LocalDateTime.now());
+            wikiPost.setSummary("");
             wikiPost.setAuthor(user);
-            wikiPost.setTagsList(new ArrayList<>());
+            wikiPost.setTagList(new ArrayList<>());
 
         model.addAttribute("wikiPost", wikiPost);
         return "wiki/editPost";
     }
 
-    @GetMapping("/edit/{id}")
+    @GetMapping("/post/edit/{id}")
     public String addEditPost(@PathVariable("id") BigInteger id, Model model, HttpSession session) {
         Optional<WikiPost> wikiPost = wikiPostService.findById(id);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

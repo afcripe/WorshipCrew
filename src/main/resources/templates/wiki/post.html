@@ -11,14 +11,18 @@
 
         <div class="row mt-2" th:object="${wikiPost}">
 
-            <h2 style="color: royalblue; float: left" th:text="*{title}">
-                Wiki Title
-                <a href="@{'/wiki/'}+*{id}" th:if="${author.id == userId}"> <i class="bi bi-pencil-square"></i></a>
+            <h2 style="color: royalblue; float: left">
+                <span th:text="*{title}">Wiki Title</span>
+                <a th:href="@{'/wiki/post/edit/'}+*{id}" th:if="*{author.id} == ${userId}"> <i class="bi bi-pencil-square h6"></i></a>
             </h2>
 
             <div>
-                By: <span th:text="*{author.firstName + ' ' + author.lastName}"></span>
-                updated on: <span th:text="*{#temporals.format(lastUpdated, 'dd-MMM-yyyy HH:mm ')}" style="float: right"></span>
+                <div style="float: left">
+                    By: <span th:text="*{author.firstName + ' ' + author.lastName}"></span>
+                </div>
+                <div style="float: right">
+                    updated on: <span th:text="*{#temporals.format(lastUpdated, 'dd-MMM-yyyy HH:mm')}"></span>
+                </div>
             </div>
 
             <hr />

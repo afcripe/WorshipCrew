@@ -7,5 +7,6 @@ public record WikiPostModel (
         String title,
         String body,
         String folder,
+        String summary,
         BigInteger authorId ) {
 }

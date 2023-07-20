@@ -1,6 +1,6 @@
 <div th:fragment="header">
 
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <nav class="navbar navbar-expand navbar-light bg-light">
     <div class="container-fluid">
       <a class="navbar-brand" href="/wiki"><i class="bi bi-wikipedia h4" style="color: #0d6efd"></i></a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarBreadcrum" aria-controls="navbarBreadcrum" aria-expanded="false" aria-label="Toggle navigation">
@@ -9,30 +9,44 @@
       <div class="collapse navbar-collapse flex-grow" id="navbarBreadcrum">
         <ul class="navbar-nav me-auto">
           <li class="nav-item">
-            <a class="mx-2 mb-2 mb-lg-0" href="#" onclick="manageTags()">
+            <a class="mx-2 mb-2 mb-lg-0" href="#" onclick="manageTags()"
+               title="Manage Article Tags">
               <i class="bi bi-tags h4" style="color: #0d6efd"></i>
             </a>
           </li>
           <li class="nav-item">
-            <a class="mx-2 mb-2 mb-lg-0" href="#" onclick="manageFolder()">
+            <a class="mx-2 mb-2 mb-lg-0" href="#" onclick="manageFolder()"
+               title="Manage Article Folder Directory">
               <i class="bi bi-folder2-open h4" style="color: #0d6efd"></i>
             </a>
           </li>
 
           <li class="nav-item">
-            <a class="btn btn-sm btn-primary mx-2 mb-2 mb-lg-0" href="#" onclick="uploadImageClick()">Upload Image</a>
+            <a class="mx-2 mb-2 mb-lg-0" href="#" onclick="uploadImageClick()"
+               title="Upload an Image and Copy URL">
+              <i class="bi bi-file-arrow-up h4" style="color: #0d6efd"></i>
+            </a>
           </li>
           <li class="nav-item">
-            <a class="btn btn-sm btn-outline-primary mx-2 mb-2 mb-lg-0" href="#" onclick="chooseImageClick()">Choose Image</a>
+            <a class="mx-2 mb-2 mb-lg-0" href="#" onclick="chooseImageClick()"
+               title="Copy URL from Image Library">
+              <i class="bi bi-file-plus h4" style="color: #0d6efd"></i>
+            </a>
           </li>
         </ul>
 
         <ul class="navbar-nav mr-auto pull-right">
           <li class="nav-item">
-            <a class="btn btn-sm btn-primary mx-2 mb-2 mb-lg-0" href="#" onclick="processPost()">Save</a>
+            <a class="mx-2 mb-2 mb-lg-0" href="#" onclick="processPost()"
+               title="Save Article">
+              <i class="bi bi-save2 h4" style="color: #0d6efd"></i>
+            </a>
           </li>
           <li class="nav-item">
-            <a class="btn btn-sm btn-primary mx-2 mb-2 mb-lg-0" href="#" onclick="closeEditor()">Save & Close</a>
+            <a class="mx-2 mb-2 mb-lg-0" href="#" onclick="closeEditor()"
+               title="Save and Close Article">
+              <i class="bi bi-box-arrow-left h4" style="color: #0d6efd"></i>
+            </a>
           </li>
         </ul>
       </div>

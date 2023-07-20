@@ -36,9 +36,15 @@ public class Main {
     }
 
     @Bean
-    CommandLineRunner run(UserRolesService roleService, PositionService positionService,
-                          UserService userService, CampusService campusService, DepartmentService departmentService) {
+    CommandLineRunner run(UserRolesService roleService, PositionService positionService, WikiTagService wikiTagService,
+                          UserService userService, CampusService campusService, DepartmentService departmentService,
+                          WikiFolderService wikiFolderService) {
         return args -> {
+
+            wikiTagService.createWikiTag(new WikiTag(null, "production"));
+            wikiTagService.createWikiTag(new WikiTag(null, "worship"));
+            wikiFolderService.save("/posts");
+
             roleService.createRole("USER_READ", "General user profile that can browse the exchange and place orders");
             roleService.createRole("USER_WRITE", "Has the ability to leave comments and update the forum");
             roleService.createRole("MANAGER_READ", "View user information for designated campus");

@@ -17,6 +17,7 @@
             <ul th:each="wikiPost : ${wikiPostList}">
                 <li>
                     <a th:href="@{'/wiki/post/'}+${wikiPost.id}" th:text="${wikiPost.title}"></a>
+                     - <span th:text="${wikiPost.summary}"></span>
                 </li>
             </ul>
 
