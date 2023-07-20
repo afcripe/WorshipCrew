@@ -1,0 +1,44 @@
+<div th:fragment="header">
+
+    <nav class="navbar navbar-expand-md navbar-light bg-light">
+      <div class="container-fluid w-100">
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarBreadcrumb" aria-controls="navbarBreadcrumb" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse flex-grow-1 mt-3 mt-md-0" id="navbarBreadcrumb">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/wiki">
+                <h3><i class="bi bi-wikipedia" style="color: #0d6efd"></i></h3>
+              </a>
+            </li>
+            <li class="nav-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')}">
+              <a class="nav-link" href="#">
+                <h3><i class="bi bi-gear" style="color: #0d6efd"></i></h3>
+              </a>
+            </li>
+          </ul>
+
+          <form class="d-flex me-auto order-1 mt-3 mt-sm-0" style="height: 30px">
+              <input class="form-control" type="search" placeholder="Search" aria-label="Search">
+              <button class="btn btn-sm btn-outline-primary mx-1 px-1" type="submit">Search</button>
+          </form>
+
+          <ul class="navbar-nav d-flex me-auto order-2 mt-3 mt-md-0" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
+                              or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')}">
+            <li class="nav-item">
+              <a class="btn btn-sm btn-primary" href="/wiki/post/new">
+                <i class="bi bi-file-earmark-plus d-block d-lg-none"></i>
+                <span class="d-none d-lg-block">New Article</span></a>
+            </li>
+          </ul>
+
+        </div>
+
+      </div>
+
+    </nav>
+
+</div>

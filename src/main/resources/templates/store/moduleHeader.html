@@ -3,51 +3,55 @@
     <nav class="navbar navbar-expand-md navbar-light bg-light" style="width: 100%">
       <div class="container-fluid">
 
+          <div class="navbar-nav mt-2 mx-2">
+            <a class="nav-link h3" href="/store">
+              <h3><i class="bi bi-shop-window" style="color: #FF7F50"></i></h3>
+            </a>
+          </div>
+          <div class="navbar-nav mt-2 mx-2" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')}">
+            <a class="nav-link h3" href="/store/settings">
+              <h3><i class="bi bi-gear" style="color: #FF7F50"></i></h3>
+            </a>
+          </div>
+          <div class="navbar-nav mx-2">
+            <a class="btn btn-sm btn-quaternary" href="/store/new">
+              <i class="bi bi-cart-plus"></i>
+            </a>
+          </div>
+
+        <div class="navbar-nav mx-2 d-block d-md-none">
+          <a class="nav-link" onclick="redrawList()">
+            <h4><i class="bi bi-card-list"></i></h4>
+          </a>
+        </div>
+        <div class="navbar-nav mx-2 d-block d-md-none">
+          <a class="nav-link" onclick="redrawGrid()">
+            <h4><i class="bi bi-grid"></i></h4>
+          </a>
+        </div>
+
+          <div class="navbar-nav mr-1 pr-2 mt-3 mt-md-0 order-last pull-right d-none d-md-block">
+            <a class="nav-link" onclick="redrawList()">
+              <h4><i class="bi bi-card-list"></i></h4>
+            </a>
+          </div>
+          <div class="navbar-nav mr-1 pr-2 mt-3 mt-md-0 order-last pull-right d-none d-md-block">
+            <a class="nav-link" onclick="redrawGrid()">
+              <h4><i class="bi bi-grid"></i></h4>
+            </a>
+          </div>
+
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarBreadcrumb" aria-controls="navbarBreadcrumb" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse flex-grow-1 mt-3 mt-md-0" id="navbarBreadcrumb">
-          <ul class="navbar-nav me-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="/store">
-                <h3><i class="bi bi-shop-window" style="color: #FF7F50"></i></h3>
-              </a>
-            </li>
-            <li class="nav-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')}">
-              <a class="nav-link" href="/store/settings">
-                <h3><i class="bi bi-gear" style="color: #FF7F50"></i></h3>
-              </a>
-            </li>
-          </ul>
+          <ul class="navbar-nav me-auto d-none d-sm-block"></ul>
 
-          <form class="d-flex me-auto pr-2 order-1 mt-3 mt-md-0" style="height: 30px">
+          <form class="d-flex me-auto pr-2 order-1 mt-3 mt-sm-0" style="height: 30px">
               <input class="form-control" type="search" placeholder="Search" aria-label="Search">
               <button class="btn btn-sm btn-outline-quaternary" type="submit">Search</button>
           </form>
-
-          <ul class="navbar-nav d-flex me-auto order-2 mt-3 mt-md-0" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
-                              or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')}">
-            <li class="nav-item">
-              <a class="btn btn-sm btn-quaternary" href="/store/new">
-                <i class="bi bi-cart-plus d-block d-lg-none"></i>
-                <span class="d-none d-lg-block">New Item</span>
-              </a>
-            </li>
-          </ul>
-
-          <ul class="navbar-nav d-flex mr-1 pr-2 mt-3 mt-md-0 order-last pull-right">
-            <li class="nav-item">
-              <a class="nav-link" onclick="redrawList()">
-                <h4><i class="bi bi-card-list"></i></h4>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" onclick="redrawGrid()">
-                <h4><i class="bi bi-grid"></i></h4>
-              </a>
-            </li>
-          </ul>
 
         </div>
 
