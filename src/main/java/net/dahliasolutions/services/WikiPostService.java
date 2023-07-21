@@ -31,8 +31,13 @@ public class WikiPostService implements WikiPostServiceInterface {
     }
 
     @Override
-    public List<WikiPost> searchFirstByTitle(String title) {
-        return wikiPostRepository.searchFirstByTitle(title);
+    public List<WikiPost> searchByTitle(String title) {
+        return wikiPostRepository.searchByTitle(title);
+    }
+
+    @Override
+    public List<WikiPost> searchAll(String searchTerm) {
+        return wikiPostRepository.searchAll(searchTerm);
     }
 
     @Override

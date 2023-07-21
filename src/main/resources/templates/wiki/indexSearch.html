@@ -18,28 +18,20 @@
 
                 <div class="col-12 col-lg-9">
 
-                    <h5 onclick="toggleFolders()">Find Articles by Folders
+                    <h5 class="mt-3" onclick="toggleFolders()">Articles Found <small>more options
                         <i id="cartFolderNavDown" class="bi bi-caret-down-fill" style="display: none"></i>
                         <i id="cartFolderNavRight" class="bi bi-caret-right-fill"></i>
-                    </h5>
-                    <div id="divFolderNav" class="folder-nav folder-nav-collapse">
-                        <div th:each="folder : ${folderList}" style="display: inline-block">
-                            <div class="tag_primary m-1" style="display: inline-block; cursor: pointer;"
-                                 th:onclick="navToFolder([[*{folder.folder}]])" th:text="${folder.folder}">List</div>
+                    </small></h5>
+
+                    <div id="divOptionsNav" class="folder-nav folder-nav-collapse">
+                        <div style="display: inline-block">
+                            <label>Search With Articles </label> <input id="chkArticles" type="checkbox" onchange="searchAll()">
                         </div>
                     </div>
 
-                    <h5 class="mt-3">Recent Articles</h5>
                     <div th:each="post : ${wikiPostList}">
                         <div th:replace="~{components/cardPostLine :: cardFragment(${post})}">List</div>
                     </div>
-
-        <!--            <div th:each="folder : ${wikiPostList}">-->
-        <!--                <h5 th:text="${folder.folder}"></h5>-->
-        <!--                <div th:each="post : ${folder.WikiPost}">-->
-        <!--                    <div th:replace="~{components/cardPostLine :: cardFragment(${post})}">List</div>-->
-        <!--                </div>-->
-        <!--            </div>-->
 
                 </div>
 
@@ -59,7 +51,11 @@
 
     </div>
 
-    <script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        let searchTerm = /*[[${searchTerm}]]*/ " ";
+        /*]]>*/
+
         function navToTag(id) {
             window.location.href="/wiki/tag/"+id;
         }
@@ -67,25 +63,39 @@
             window.location.href="/wiki/articles"+name;
         }
 
-        let folders = document.getElementById("divFolderNav");
+        let options = document.getElementById("divOptionsNav");
         let caretDown = document.getElementById("cartFolderNavDown");
         let caretRight = document.getElementById("cartFolderNavRight");
+        let articleSelect = document.getElementById("chkArticles");
+        let newSearch = document.getElementById("searchInput");
 
-        folders.classList.remove("folder-nav-collapse");
+        newSearch.value = searchTerm;
+
+        options.classList.remove("folder-nav-collapse");
         caretDown.style.display = "none";
         caretRight.style.display = "inline-block";
 
         function toggleFolders() {
-            if (folders.classList.contains("folder-nav-collapse")){
-                folders.classList.remove("folder-nav-collapse");
+            if (options.classList.contains("folder-nav-collapse")){
+                options.classList.remove("folder-nav-collapse");
                 caretDown.style.display = "none";
                 caretRight.style.display = "inline-block";
             } else {
-                folders.classList.add("folder-nav-collapse");
+                options.classList.add("folder-nav-collapse");
                 caretDown.style.display = "inline-block";
                 caretRight.style.display = "none";
             }
         }
+
+        function searchAll() {
+            if (articleSelect.checked) {
+                window.location.href = "/wiki/search/article/" + searchTerm;
+
+            } else {
+                window.location.href = "/wiki/search/title/" + searchTerm;
+            }
+        }
+
     </script>
 
   </div>

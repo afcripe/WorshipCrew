@@ -18,7 +18,10 @@ public interface WikiPostRepository extends JpaRepository<WikiPost, BigInteger> 
     List<WikiPost> findByTitle(@Param("s") String title);
 
     @Query(value="SELECT * FROM WIKI_POST WHERE UPPER(TITLE) LIKE CONCAT('%',UPPER(:s),'%')", nativeQuery = true)
-    List<WikiPost> searchFirstByTitle(@Param("s") String title);
+    List<WikiPost> searchByTitle(@Param("s") String title);
+
+    @Query(value="SELECT * FROM WIKI_POST WHERE UPPER(TITLE) LIKE CONCAT('%',UPPER(:s),'%') OR UPPER(BODY) LIKE CONCAT('%',UPPER(:s),'%')", nativeQuery = true)
+    List<WikiPost> searchAll(@Param("s") String searchTerm);
 
     @Query(value="SELECT * FROM WIKI_POST WHERE AUTHOR_ID = :id", nativeQuery = true)
     List<WikiPost> findByAuthor(@Param("id") BigInteger id);

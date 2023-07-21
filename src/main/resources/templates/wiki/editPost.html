@@ -339,11 +339,12 @@
             }
 
             function newTagInput(event) {
+                event.preventDefault()
                 if (event.key == "Enter") { newTag() }
             }
 
         </script>
-        <form method="dialog">
+        <form onsubmit="newTagInput(event)" method="dialog">
             <div class="d-flex">
                 <label for="wikiPath" class="form-control-label h4 w-50" style="float: left">Tags</label>
             </div>
@@ -434,6 +435,7 @@
 
                         document.getElementById('wikiPath').value = data.folder;
                         fChooser.appendChild(clone);
+                        document.getElementById('folderPath').value = "";
                     }
                 });
             }
@@ -457,12 +459,13 @@
                 document.getElementById("chooseFolder").close();
             }
 
-            function folderNewPath(event, type) {
+            function folderNewPath(event) {
+                event.preventDefault();
                 if (event.key == "Enter") { newFolder() }
             }
 
         </script>
-        <form method="dialog">
+        <form onsubmit="folderNewPath(event)" method="dialog">
             <div class="d-flex">
                 <label for="wikiPath" class="form-control-label h4 w-50" style="float: left">Folder Path</label>
                 <input id="wikiPath" class="form-control pr-2 w-50" type="text" th:value="${wikiPost.folder}"
@@ -473,7 +476,7 @@
                  style="width: 410px; height: 410px;"></div>
             <div class="d-flex">
                 <input id="folderPath" class="form-control pr-2 w-50" type="text"
-                       placeholder="New Folder" style="float: left;">
+                       placeholder="New Folder" style="float: left;" onkeyup="folderNewPath(event)">
                 <button type="button" class="btn btn-sm btn-primary m-2 w-25" style="float: right"
                         onclick="newFolder()">New</button>
                 <button type="button" class="btn btn-sm btn-primary m-2 w-25" style="float: right"

@@ -1,16 +1,16 @@
 <div th:fragment="header">
 
-    <nav class="navbar navbar-expand-md navbar-light bg-light" style="width: 100%">
-      <div class="container-fluid">
+    <nav class="navbar navbar-expand-md navbar-light bg-light">
+      <div class="container-fluid w-100">
 
           <div class="navbar-nav mt-2 mx-2">
             <a class="nav-link h3" href="/store">
-              <h3><i class="bi bi-shop-window" style="color: #FF7F50"></i></h3>
+              <i class="bi bi-shop-window" style="color: #FF7F50"></i>
             </a>
           </div>
           <div class="navbar-nav mt-2 mx-2" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')}">
             <a class="nav-link h3" href="/store/settings">
-              <h3><i class="bi bi-gear" style="color: #FF7F50"></i></h3>
+              <i class="bi bi-gear" style="color: #FF7F50"></i>
             </a>
           </div>
           <div class="navbar-nav mx-2">
@@ -18,17 +18,20 @@
               <i class="bi bi-cart-plus"></i>
             </a>
           </div>
+          <div class="navbar-nav mt-2 mx-2 flex-grow-1">
+              <span></span>
+          </div>
 
-        <div class="navbar-nav mx-2 d-block d-md-none">
-          <a class="nav-link" onclick="redrawList()">
-            <h4><i class="bi bi-card-list"></i></h4>
-          </a>
-        </div>
-        <div class="navbar-nav mx-2 d-block d-md-none">
-          <a class="nav-link" onclick="redrawGrid()">
-            <h4><i class="bi bi-grid"></i></h4>
-          </a>
-        </div>
+            <div class="navbar-nav mx-2 d-block d-md-none">
+              <a class="nav-link" onclick="redrawList()">
+                <h4><i class="bi bi-card-list"></i></h4>
+              </a>
+            </div>
+            <div class="navbar-nav mx-2 d-block d-md-none">
+              <a class="nav-link" onclick="redrawGrid()">
+                <h4><i class="bi bi-grid"></i></h4>
+              </a>
+            </div>
 
           <div class="navbar-nav mr-1 pr-2 mt-3 mt-md-0 order-last pull-right d-none d-md-block">
             <a class="nav-link" onclick="redrawList()">

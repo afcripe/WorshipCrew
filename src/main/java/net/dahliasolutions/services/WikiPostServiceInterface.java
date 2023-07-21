@@ -11,7 +11,8 @@ public interface WikiPostServiceInterface {
     WikiPost createWikiPost(WikiPost wikiPost);
     Optional<WikiPost> findById(BigInteger id);
     List<WikiPost> findByTitle(String title);
-    List<WikiPost> searchFirstByTitle(String title);
+    List<WikiPost> searchByTitle(String title);
+    List<WikiPost> searchAll(String searchTerm);
     List<WikiPost> findAll();
     List<WikiPost> findAllByFolder(String name);
     List<WikiPost> findRecent();

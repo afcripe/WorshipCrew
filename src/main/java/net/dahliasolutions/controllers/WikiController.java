@@ -15,6 +15,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -210,4 +212,53 @@ public class WikiController {
         return "wiki/editPost";
     }
 
+    @GetMapping("/search/title/{searchTerm}")
+    public String searchTitle(@PathVariable String searchTerm, Model model, HttpSession session) {
+        redirectService.setHistory(session, "/wiki/search/title/"+searchTerm);
+        String searcher = URLDecoder.decode(searchTerm, StandardCharsets.UTF_8);
+        List<WikiPost> wikiPostList = wikiPostService.searchByTitle(searcher);
+        List<WikiFolder> folderList = wikiFolderService.findAll();
+
+        List<WikiTag> tags = wikiTagService.findAll();
+        List<WikiTagWithCount> tagList = new ArrayList<>();
+        for ( WikiTag tag : tags ) {
+            WikiTagWithCount tagCounter = new WikiTagWithCount();
+            tagCounter.setId(tag.getId());
+            tagCounter.setName(tag.getName());
+            tagCounter.setCount(wikiTagService.countReferences(tag.getId()));
+            tagList.add(tagCounter);
+        }
+
+
+        model.addAttribute("wikiPostList", wikiPostList);
+        model.addAttribute("tagList", tagList);
+        model.addAttribute("folderList", folderList);
+        model.addAttribute("searchTerm", searchTerm);
+        return "wiki/indexSearch";
+    }
+
+    @GetMapping("/search/article/{searchTerm}")
+    public String searchArticle(@PathVariable String searchTerm, Model model, HttpSession session) {
+        redirectService.setHistory(session, "/wiki/search/title/"+searchTerm);
+        String searcher = URLDecoder.decode(searchTerm, StandardCharsets.UTF_8);
+        List<WikiPost> wikiPostList = wikiPostService.searchAll(searcher);
+        List<WikiFolder> folderList = wikiFolderService.findAll();
+
+        List<WikiTag> tags = wikiTagService.findAll();
+        List<WikiTagWithCount> tagList = new ArrayList<>();
+        for ( WikiTag tag : tags ) {
+            WikiTagWithCount tagCounter = new WikiTagWithCount();
+            tagCounter.setId(tag.getId());
+            tagCounter.setName(tag.getName());
+            tagCounter.setCount(wikiTagService.countReferences(tag.getId()));
+            tagList.add(tagCounter);
+        }
+
+
+        model.addAttribute("wikiPostList", wikiPostList);
+        model.addAttribute("tagList", tagList);
+        model.addAttribute("folderList", folderList);
+        model.addAttribute("searchTerm", searchTerm);
+        return "wiki/indexSearch";
+    }
 }
