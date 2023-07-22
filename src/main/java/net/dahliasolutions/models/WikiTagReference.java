@@ -16,12 +16,12 @@ import java.math.BigInteger;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WikiTagWithCount {
+public class WikiTagReference {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private BigInteger id;
     private String name;
-    private int count;
+    private int references;
 
 }

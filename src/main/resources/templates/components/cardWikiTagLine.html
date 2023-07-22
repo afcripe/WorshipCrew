@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+
+<div th:fragment="cardFragment(wikiTag)">
+  <div class="card" th:object="${wikiTag}" th:id="'tag-' + *{id}">
+
+    <div class="row mt-2" >
+      <div class="col-6" style="vertical-align: center">
+        <input th:id="'input-' + *{id}" type="text" th:value="*{name}" style="display: none;"
+               th:onkeyup="updateTag('tag-[[*{id}]]', [[*{id}]])">
+        <span th:id="'display-' + *{id}" th:text="*{name}" class="h6 align-content-center"></span>
+          (<span th:text="*{references}"></span>)
+      </div>
+      <div class="col-6 align-content-end" style="vertical-align: center">
+        <button id="btnEdit" class="btn btn-sm btn-primary ml-2" type="button"
+                th:onclick="editTag([[*{id}]])">Edit</button>
+        <button id="btnDelete" class="btn btn-sm btn-outline-primary ml-2" type="button"
+                th:onclick="deleteTag('tag-[[*{id}]]', [[*{id}]])">Delete</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</html>

@@ -47,7 +47,12 @@
 
     </div>
 
-    <script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        let searchTerm = /*[[${searchTerm}]]*/ " ";
+        /*]]>*/
+        document.getElementById("searchInput").value = searchTerm;
+
         fetch('/api/v1/store/display/'+displayType);
 
         function redrawGrid() {

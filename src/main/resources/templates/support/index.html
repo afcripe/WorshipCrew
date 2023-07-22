@@ -18,6 +18,15 @@
         </div>
 
     </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        let searchTerm = /*[[${searchTerm}]]*/ " ";
+        /*]]>*/
+        document.getElementById("searchInput").value = searchTerm;
+
+    </script>
+
   </div>
 
 </html>

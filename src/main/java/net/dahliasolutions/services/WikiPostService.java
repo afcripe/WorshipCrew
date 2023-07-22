@@ -3,6 +3,7 @@ package net.dahliasolutions.services;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.data.WikiPostRepository;
 import net.dahliasolutions.models.WikiPost;
+import net.dahliasolutions.models.WikiTag;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -68,6 +69,25 @@ public class WikiPostService implements WikiPostServiceInterface {
     @Override
     public WikiPost save(WikiPost wikiPost) {
         return wikiPostRepository.save(wikiPost);
+    }
+
+    @Override
+    public void mergeTags(WikiTag sourceTag, WikiTag destinationTag) {
+        List<WikiPost> postList = wikiPostRepository.findAllByTagId(sourceTag.getId());
+        for (WikiPost post : postList) {
+            post.getTagList().remove(sourceTag);
+            post.getTagList().add(destinationTag);
+        }
+        wikiPostRepository.saveAll(postList);
+    }
+
+    @Override
+    public void removeTag(WikiTag wikiTag) {
+        List<WikiPost> postList = wikiPostRepository.findAllByTagId(wikiTag.getId());
+        for (WikiPost post : postList) {
+            post.getTagList().remove(wikiTag);
+        }
+        wikiPostRepository.saveAll(postList);
     }
 
     @Override

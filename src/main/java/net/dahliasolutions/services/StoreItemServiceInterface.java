@@ -11,6 +11,7 @@ public interface StoreItemServiceInterface {
     StoreItem createStoreItem(StoreItem storeItem);
     Optional<StoreItem> findById(BigInteger id);
     Optional<StoreItem> findByName(String name);
+    List<StoreItem> searchAll(String searchTerm);
     List<StoreItem> findAll();
     void save(StoreItem StoreItem);
     void deleteById(BigInteger id);

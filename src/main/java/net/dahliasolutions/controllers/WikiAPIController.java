@@ -2,7 +2,6 @@ package net.dahliasolutions.controllers;
 
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.*;
-import net.dahliasolutions.services.UserService;
 import net.dahliasolutions.services.WikiFolderService;
 import net.dahliasolutions.services.WikiPostService;
 import net.dahliasolutions.services.WikiTagService;
@@ -122,5 +121,55 @@ public class WikiAPIController {
         }
         List<WikiTag> newList = wikiPostService.save(wikiPost.get()).getTagList();
         return newList;
+    }
+
+    @PostMapping("/tagmanager/new")
+    public WikiTagReference newTagByManager(@ModelAttribute WikiTagReference wikiTagModel) {
+        Optional<WikiTag> wikiTag = wikiTagService.findByName(wikiTagModel.getName());
+
+        if (wikiTag.isPresent()) { return null; }
+
+        WikiTag newTag = wikiTagService.createWikiTag(new WikiTag(null, wikiTagModel.getName()));
+        WikiTagReference countTag = new WikiTagReference(newTag.getId(), newTag.getName(), 0);
+        return countTag;
+    }
+
+    @PostMapping("/tagmanager/delete")
+    public WikiTagReference deleteTagByManager(@ModelAttribute WikiTagReference wikiTagModel) {
+        Optional<WikiTag> wikiTag = wikiTagService.findById(wikiTagModel.getId());
+        if (wikiTag.isEmpty()) { return null; }
+
+        wikiPostService.removeTag(wikiTag.get());
+        wikiTagService.deleteById(wikiTagModel.getId());
+
+        wikiTagModel.setReferences(0);
+        return wikiTagModel;
+    }
+
+    @PostMapping("/tagmanager/update")
+    public WikiTagReference updateTagByManager(@ModelAttribute WikiTagReference wikiTagModel) {
+        Optional<WikiTag> wikiTag = wikiTagService.findByName(wikiTagModel.getName());
+        Optional<WikiTag> updateTag = wikiTagService.findById(wikiTagModel.getId());
+        if (updateTag.isEmpty()) {
+            return null;
+        }
+
+        if (wikiTag.isPresent()) {
+            wikiPostService.mergeTags(updateTag.get(), wikiTag.get());
+            wikiTagService.deleteById(updateTag.get().getId());
+            Integer mrgCount = wikiTagService.countReferences(wikiTag.get().getId());
+            WikiTagReference mergedTagCount = new WikiTagReference();
+                mergedTagCount.setId(wikiTag.get().getId());
+                mergedTagCount.setName(wikiTag.get().getName());
+                mergedTagCount.setReferences(mrgCount);
+            return mergedTagCount;
+        }
+
+        if (updateTag.isPresent()) {
+            updateTag.get().setName(wikiTagModel.getName());
+            wikiTagService.save(updateTag.get());
+            return wikiTagModel;
+        }
+        return null;
     }
 }

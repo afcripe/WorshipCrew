@@ -1,6 +1,7 @@
 package net.dahliasolutions.services;
 
 import net.dahliasolutions.models.WikiPost;
+import net.dahliasolutions.models.WikiTag;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -19,5 +20,7 @@ public interface WikiPostServiceInterface {
     List<WikiPost> findAllByTagId(BigInteger id);
     List<WikiPost> findByAuthor(BigInteger authorId);
     WikiPost save(WikiPost wikiPost);
+    void mergeTags(WikiTag sourceTag, WikiTag destinationTag);
+    void removeTag(WikiTag wikiTag);
     void deleteById(BigInteger id);
 }

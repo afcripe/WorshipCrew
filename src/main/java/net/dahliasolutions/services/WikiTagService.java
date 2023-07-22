@@ -42,6 +42,7 @@ public class WikiTagService implements WikiTagServiceInterface{
 
     @Override
     public void deleteById(BigInteger id) {
+//        wikiTagRepository.deleteReferenceById(id);
         wikiTagRepository.deleteById(id);
     }
 

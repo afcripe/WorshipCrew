@@ -30,6 +30,11 @@ public class StoreItemService implements StoreItemServiceInterface {
         return storeItemRepository.findByName(name);
     }
 
+    @Override
+    public List<StoreItem> searchAll(String searchTerm) {
+        return storeItemRepository.searchAll(searchTerm);
+    }
+
 
     @Override
     public List<StoreItem> findAll() {

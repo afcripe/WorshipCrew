@@ -29,9 +29,21 @@
         <div class="collapse navbar-collapse mr-2 mt-3 mt-md-0" id="navbarBreadcrumb">
           <ul class="navbar-nav me-auto d-none d-sm-block"></ul>
 
-          <form class="d-flex me-auto mt-3 mt-sm-0" style="height: 30px">
-              <input class="form-control" type="search" placeholder="Search" aria-label="Search">
-              <button class="btn btn-sm btn-outline-tertiary mx-1 px-1" type="submit">Search</button>
+          <form onsubmit="searchForm()" class="d-flex me-auto mt-3 mt-sm-0" style="height: 30px">
+            <input id="searchInput" class="form-control" type="text" placeholder="Search" onkeyup="searchKeyUp(event)">
+            <button class="btn btn-sm btn-outline-tertiary mx-1 px-1" type="button" onclick="submit()">Search</button>
+            <script th:inline="javascript">
+              function searchForm() {
+                event.preventDefault();
+                window.location.href="/support/search/"+document.getElementById("searchInput").value;
+              }
+              function searchKeyUp(event) {
+                event.preventDefault();
+                if (e.key === 'Enter' || e.keyCode === 13) {
+                  searchForm();
+                }
+              }
+            </script>
           </form>
 
         </div>

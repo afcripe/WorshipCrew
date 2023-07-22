@@ -12,7 +12,7 @@
         <div class="row mt-2">
 
             <h1 style="color: royalblue">Welcome to the Destiny Wiki</h1>
-            <p>If it's on the Internet, it must be true.</p>
+            <p th:if="${not #lists.isEmpty(wikiPostList)}">If it's on the Internet, it must be true.</p>
 
             <div class="row">
 
@@ -48,7 +48,7 @@
                         <div class="card-title h6">Tags</div>
                         <div class="card-section">
                             <div class="tag_primary m-1" style="display: inline-block; cursor: pointer;" th:onclick="navToTag([[*{tag.id}]])"
-                                 th:each="tag : *{tagList}" th:text="${tag.name + '(' + tag.count + ')'}"></div>
+                                 th:each="tag : *{tagList}" th:text="${tag.name + '(' + tag.references + ')'}"></div>
                         </div>
                     </div>
                 </div>
@@ -59,7 +59,12 @@
 
     </div>
 
-    <script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        let searchTerm = /*[[${searchTerm}]]*/ " ";
+        /*]]>*/
+        document.getElementById("searchInput").value = searchTerm;
+
         function navToTag(id) {
             window.location.href="/wiki/tag/"+id;
         }

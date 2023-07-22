@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<div class="container-fluid m-0 p-0" layout:fragment="content">
+
+    <template id="tmpTag">
+        <div class="card" th:id="'tag-' + *{id}">
+
+            <div class="row mt-2" >
+                <div class="col-6" style="vertical-align: center">
+                    <span th:text="*{name}" class="h6 align-content-center"></span>
+                    (<span th:text="*{references}"></span>)
+                </div>
+                <div class="col-6 align-content-end">
+                    <button id="btnEdit" class="btn btn-sm btn-primary ml-2" type="button"
+                            th:onclick="editTag('tag-[[*{id}]]', [[*{id}]])">Edit</button>
+                    <button id="btnDelete" class="btn btn-sm btn-outline-primary ml-2" type="button"
+                            th:onclick="deleteTag('tag-[[*{id}]]', [[*{id}]])">Delete</button>
+                </div>
+            </div>
+
+        </div>
+    </template>
+
+    <div th:replace="~{wiki/moduleHeader :: header}">Header</div>
+
+    <div class="mx-2">
+
+        <div class="row mt-2">
+
+            <h3 style="color: #0d6efd">Wiki Tag Manager</h3>
+
+            <div id="tagListDisplay" th:each="item : ${tagList}">
+                <div th:replace="~{components/cardWikiTagLine :: cardFragment(${item})}">List</div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        async function deleteTag(el, id) {
+            debugger
+            let element = document.getElementById(el);
+            let tagSpanQry = element.querySelectorAll("span");
+
+            let apiURL = '/api/v1/wiki/tagmanager/delete';
+            let formData = new FormData();
+                formData.set("id", id)
+                formData.set("name", tagSpanQry[0].innerText)
+                formData.set("references", tagSpanQry[1].innerText)
+
+            const responseDeleteTag = await fetch(apiURL, {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                return response.json();
+            }).then(data => {
+                if (data !== null ) {
+                    element.remove();
+                }
+            });
+        }
+        function editTag(id) {
+            debugger
+            let inputID = "input-" + id;
+            let displayID = "display-" + id;
+            let elem1 = document.getElementById(displayID);
+            let elem2 = document.getElementById(inputID);
+            elem1.style.display = "none";
+            elem2.style.display = "inline-block";
+        }
+        async function updateTag(el, id) {
+            if (event.key !== 'Enter') {return null;}
+            debugger
+            let element = document.getElementById(el);
+            let tagSpanQry = element.querySelectorAll("span");
+
+            let apiURL = '/api/v1/wiki/tagmanager/update';
+            let formData = new FormData();
+                formData.set("id", id)
+                formData.set("name", tagSpanQry[0].innerText)
+                formData.set("references", tagSpanQry[1].innerText)
+
+            const responseUpdateTag = await fetch(apiURL, {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                return response.json();
+            }).then(data => {
+                if (data.id !== id) {
+                    element.remove();
+                    // ToDo - loop elements and update count of data.id
+                } else {
+                    tagSpanQry[0].innerText = data.name;
+                    tagSpanQry[1].innerText = data.references;
+                }
+            });
+        }
+        async function newTag() {
+            debugger
+            const template = document.getElementById("tmpTag");
+            let iptName = document.getElementById("inputName");
+
+            let apiURL = '/api/v1/wiki/tagmanager/new';
+            let formData = new FormData();
+                formData.set("name", iptName.value)
+                formData.set("references", '0')
+
+            const responseNewTag = await fetch(apiURL, {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                return response.json();
+            }).then(data => {
+                if (data !== null) {
+                    let newId = "tag-" + id;
+
+                    let clone = template.content.cloneNode(true);
+                    let tagDiv = clone.querySelector("div");
+                        tagDiv[0].id = newId;
+                    let tagSpan = clone.querySelector("span");
+                        tagSpan[0].innerText = data.name;
+                        tagSpan[1].innerText = data.references;
+
+                    let tagButton = clone.querySelector("button");
+                    tagButton[0].addEventListener("click", function (event) {
+                        selectTag(newId, id);
+                    });
+                    tagButton[1].addEventListener("click", function (event) {
+                        selectTag(newId, id);
+                    });
+
+                    document.getElementById("tagListDisplay").appendChild(clone);
+                }
+            });
+        }
+    </script>
+
+  </div>
+
+</html>

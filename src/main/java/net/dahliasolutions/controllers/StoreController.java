@@ -11,6 +11,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -253,4 +255,15 @@ public class StoreController {
         model.addAttribute("imageList", imageList);
         return "store/imageManager";
     }
+
+    @GetMapping("/search/{searchTerm}")
+    public String searchArticle(@PathVariable String searchTerm, Model model, HttpSession session) {
+        redirectService.setHistory(session, "/store/search/title/"+searchTerm);
+        String searcher = URLDecoder.decode(searchTerm, StandardCharsets.UTF_8);
+        List<StoreItem> itemList = storeItemService.searchAll(searcher);
+
+        model.addAttribute("storeItems", itemList);
+        return "store/index";
+    }
+
 }
