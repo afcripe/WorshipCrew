@@ -159,9 +159,9 @@ public class WikiAPIController {
             wikiTagService.deleteById(updateTag.get().getId());
             Integer mrgCount = wikiTagService.countReferences(wikiTag.get().getId());
             WikiTagReference mergedTagCount = new WikiTagReference();
-                mergedTagCount.setId(wikiTag.get().getId());
-                mergedTagCount.setName(wikiTag.get().getName());
-                mergedTagCount.setReferences(mrgCount);
+            mergedTagCount.setId(wikiTag.get().getId());
+            mergedTagCount.setName(wikiTag.get().getName());
+            mergedTagCount.setReferences(mrgCount);
             return mergedTagCount;
         }
 
@@ -171,5 +171,44 @@ public class WikiAPIController {
             return wikiTagModel;
         }
         return null;
+    }
+
+    @PostMapping("/foldermanager/new")
+    public WikiFolder newFolderByManager(@ModelAttribute SingleStringModel folderModel) {
+        Optional<WikiFolder> wikiFolder = wikiFolderService.findByFolder(folderModel.name());
+
+        if (wikiFolder.isPresent()) { return null; }
+
+        return wikiFolderService.save(folderModel.name());
+    }
+
+    @PostMapping("/foldermanager/delete")
+    public WikiFolder deleteFolderByManager(@ModelAttribute SingleStringModel folderModel) {
+        Optional<WikiFolder> wikiFolder = wikiFolderService.findByFolder(folderModel.name());
+        if (wikiFolder.isEmpty()) { return null; }
+
+        wikiPostService.removeFolder(wikiFolder.get());
+        wikiFolderService.deleteByFolder(wikiFolder.get());
+
+        return wikiFolder.get();
+    }
+
+    @PostMapping("/foldermanager/update")
+    public DoubleStringModel updateFolderByManager(@ModelAttribute DoubleStringModel folderModel) {
+        Optional<WikiFolder> srcFolder = wikiFolderService.findByFolder(folderModel.nameSource());
+        Optional<WikiFolder> destFolder = wikiFolderService.findByFolder(folderModel.nameDestination());
+
+        if (destFolder.isPresent()) {
+            return folderModel;
+        }
+
+        wikiPostService.updateFolder(folderModel.nameSource(), folderModel.nameDestination());
+        wikiFolderService.deleteByFolder(srcFolder.get());
+
+        wikiFolderService.save(folderModel.nameDestination());
+        DoubleStringModel updatedFolder = new DoubleStringModel(
+                folderModel.nameDestination(), folderModel.nameDestination());
+
+        return updatedFolder;
     }
 }

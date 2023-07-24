@@ -12,6 +12,6 @@ public interface WikiFolderServiceInterface {
     Optional<WikiFolder> findByFolder(String folder);
     List<WikiFolder> findAll();
     List<WikiFolder> findByFolderName(String name);
-    void deleteByFolder(String folder);
+    void deleteByFolder(WikiFolder wikiFolder);
 
 }

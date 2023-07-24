@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,9 +19,5 @@ public interface WikiFolderRepository extends JpaRepository<WikiFolder, String> 
 
     @Query(value="SELECT * FROM WIKI_FOLDER WHERE LOWER(FOLDER) LIKE CONCAT('%',LOWER(:name),'%')", nativeQuery = true)
     List<WikiFolder> findByFolderName(@Param("name") String name);
-
-    @Modifying
-    @Query(value="DELETE FROM WIKI_FOLDER WHERE FOLDER = :name", nativeQuery = true)
-    void deleteByFolder(@Param("name") String name);
 
 }

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+
+<div th:fragment="cardFragment(wikiFolder)" th:object="${wikiFolder}">
+  <div class="card assign-me">
+
+    <div class="row mt-2" >
+      <div class="col-6" style="vertical-align: center">
+        <span th:text="*{folder}" class="h6 align-content-center"></span>
+        (<span th:text="*{references}"></span>)
+      </div>
+      <div class="col-6 align-content-end" style="vertical-align: center">
+        <button id="btnEdit" class="btn btn-sm btn-primary ml-2" type="button"
+                th:onclick="editFolder([[*{folder}]])">Edit</button>
+        <button id="btnDelete" class="btn btn-sm btn-outline-primary ml-2" type="button"
+                th:onclick="deleteFolder([[*{folder}]])">Delete</button>
+      </div>
+    </div>
+
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      let elementName = /*[[*{folder}]]*/ " ";
+      /*]]>*/
+      debugger
+      let s = document.getElementsByClassName('assign-me')[0];
+      s.id = folderDivId;
+
+      let b = s.querySelector("button")
+      b[1].addEventListener("click", function () {
+        deleteFolder(folderDivId, elementName)
+      })
+    </script>
+
+  </div>
+</div>
+
+</html>

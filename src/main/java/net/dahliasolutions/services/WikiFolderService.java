@@ -37,8 +37,8 @@ public class WikiFolderService implements WikiFolderServiceInterface {
     }
 
     @Override
-    public void deleteByFolder(String name) {
-
-        wikiFolderRepository.deleteByFolder(name);
+    public void deleteByFolder(WikiFolder wikiFolder) {
+        if (wikiFolder.getFolder().equals("\"/general\"")) {return;}
+        wikiFolderRepository.delete(wikiFolder);
     }
 }

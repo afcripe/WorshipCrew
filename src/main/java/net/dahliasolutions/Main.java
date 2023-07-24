@@ -43,6 +43,7 @@ public class Main {
 //
 //            wikiTagService.createWikiTag(new WikiTag(null, "production"));
 //            wikiTagService.createWikiTag(new WikiTag(null, "worship"));
+//            wikiTagService.createWikiTag(new WikiTag(null, "audio"));
 //            wikiFolderService.save("/general");
 //
 //            roleService.createRole("USER_READ", "General user profile that can browse the exchange and place orders");

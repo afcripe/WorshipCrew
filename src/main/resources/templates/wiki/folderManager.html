@@ -6,6 +6,11 @@
 
 <div class="container-fluid m-0 p-0" layout:fragment="content">
 
+    <script>
+        let divCount = 0;
+        let folderDivId = "folder-" + divCount;
+    </script>
+
     <div th:replace="~{wiki/moduleHeader :: header}">Header</div>
 
     <div class="mx-2">
@@ -13,23 +18,27 @@
         <div class="row mt-2">
 
             <div class="h3" style="color: #0d6efd; display: inline-block">
-                <span class="h3" style="color: #0d6efd;">Wiki Tag Manager </span>
+                <span class="h3" style="color: #0d6efd;">Wiki Folder Manager </span>
                 &nbsp;&nbsp;
-                <i class="bi bi-plus-square h4" style="color: #0d6efd;" onclick="newTag()"></i>
+                <i class="bi bi-plus-square h4" style="color: #0d6efd;" onclick="newFolder()"></i>
             </div>
 
-            <div id="tagListDisplay" th:each="item : ${tagList}">
-                <div th:replace="~{components/cardWikiTagLine :: cardFragment(${item})}">List</div>
+            <div id="folderListDisplay" th:each="item : ${folderList}">
+                <script>
+                    divCount++;
+                    folderDivId = "folder-" + divCount;
+                </script>
+                <div th:replace="~{components/cardWikiFolderLine :: cardFragment(${item})}">List</div>
             </div>
 
         </div>
 
     </div>
 
-    <dialog id="newTag" class="tag-dialog">
+    <dialog id="newFolder" class="tag-dialog">
         <script>
             async function addNewTag(tag, target) {
-                let apiURL = '/api/v1/wiki/tagmanager/new';
+                let apiURL = '/api/v1/wiki/foldermanager/new';
                 let formData = new FormData();
                     formData.set("id", "0")
                     formData.set("name", document.getElementById('newTagName').value)
@@ -70,62 +79,60 @@
         </form>
     </dialog>
 
-    <dialog id="updateTag" class="tag-dialog">
+    <dialog id="updateFolder" class="tag-dialog">
         <script>
-            async function updateTag(tag, target) {
-                let apiURL = '/api/v1/wiki/tagmanager/update';
+            async function updateFolder(name) {
+                let apiURL = '/api/v1/wiki/foldermanager/update';
                 let formData = new FormData();
-                    formData.set("id", document.getElementById('editTagId').value)
-                    formData.set("name", document.getElementById('editTagName').value)
-                    formData.set("references", "0")
+                    formData.set("nameSource", document.getElementById('oldFolderName').value)
+                    formData.set("nameDestination", document.getElementById('editFolderName').value)
 
-                const responseEditTag = await fetch(apiURL, {
+                const responseEditFolder = await fetch(apiURL, {
                     method: 'POST',
                     body: formData
                 }).then(response => {
                     return response.json();
                 }).then(data => {
+                    if (data.nameSource !== data.nameDestination) {
+                        alert("Folder already exists!")
+                    }
                     window.location.reload();
                 });
             }
 
-            function editTagDialogOK() {
+            function editFolderDialogOK() {
                 document.getElementById("chooseTag").close();
             }
 
-            function editTagInput(event) {
+            function editFolderInput(event) {
                 event.preventDefault()
                 if (event.key == "Enter") { newTag() }
             }
 
         </script>
-        <form onsubmit="editTagInput(event)" method="dialog">
+        <form onsubmit="editFolderInput(event)" method="dialog">
             <div class="d-flex">
-                <label class="form-control-label h4 w-50" style="float: left">Edit Tag</label>
+                <label class="form-control-label h4 w-50" style="float: left">Edit Folder Path</label>
             </div>
             <div class="d-flex">
-                <input id="editTagId" type="hidden">
-                <input id="editTagName" class="form-control pr-2 w-50" type="text"
-                       style="float: left;" onkeyup="editTagInput(event)">
+                <input id="oldFolderName" type="hidden">
+                <input id="editFolderName" class="form-control pr-2 w-50" type="text"
+                       style="float: left;" onkeyup="editFolderInput(event)">
                 <button type="button" class="btn btn-sm btn-primary m-2 w-25" style="float: right"
-                        onclick="updateTag()">Update</button>
+                        onclick="updateFolder()">Update</button>
                 <button type="button" class="btn btn-sm btn-primary m-2 w-25" style="float: right"
-                        onclick="editTagDialogOK()">OK</button>
+                        onclick="editFolderDialogOK()">OK</button>
             </div>
         </form>
     </dialog>
 
     <script>
-        async function deleteTag(el, id) {
+        async function deleteFolder(name) {
             debugger
-            let element = document.getElementById(el);
-            let tagSpanQry = element.querySelectorAll("span");
 
-            let apiURL = '/api/v1/wiki/tagmanager/delete';
+            let apiURL = '/api/v1/wiki/foldermanager/delete';
             let formData = new FormData();
-            formData.set("id", id)
-            formData.set("name", tagSpanQry[0].innerText)
-            formData.set("references", tagSpanQry[1].innerText)
+                formData.set("name", name)
 
             const responseDeleteTag = await fetch(apiURL, {
                 method: 'POST',
@@ -139,14 +146,14 @@
             });
         }
 
-        function editTag(id, name) {
-            document.getElementById('editTagId').value = id;
-            document.getElementById('editTagName').value = name;
-            document.getElementById('updateTag').showModal();
+        function editFolder(name) {
+            document.getElementById('oldFolderName').value = name;
+            document.getElementById('editFolderName').value = name;
+            document.getElementById('updateFolder').showModal();
         }
 
-        async function newTag() {
-            document.getElementById('newTag').showModal();
+        async function newFolder() {
+            document.getElementById('newFolder').showModal();
         }
 
     </script>

@@ -2,6 +2,7 @@ package net.dahliasolutions.services;
 
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.data.WikiPostRepository;
+import net.dahliasolutions.models.WikiFolder;
 import net.dahliasolutions.models.WikiPost;
 import net.dahliasolutions.models.WikiTag;
 import org.springframework.stereotype.Service;
@@ -86,6 +87,29 @@ public class WikiPostService implements WikiPostServiceInterface {
         List<WikiPost> postList = wikiPostRepository.findAllByTagId(wikiTag.getId());
         for (WikiPost post : postList) {
             post.getTagList().remove(wikiTag);
+        }
+        wikiPostRepository.saveAll(postList);
+    }
+
+    @Override
+    public void removeFolder(WikiFolder wikiFolder) {
+        List<WikiPost> postList = wikiPostRepository.findAllByFolder(wikiFolder.getFolder());
+        for (WikiPost post : postList) {
+            post.setFolder("/general");
+        }
+        wikiPostRepository.saveAll(postList);
+    }
+
+    @Override
+    public Integer findCountReferencesByFolder(WikiFolder wikiFolder) {
+        return wikiPostRepository.findCountReferencesByFolder(wikiFolder.getFolder()).orElse(0);
+    }
+
+    @Override
+    public void updateFolder(String srcFolder, String destFolder) {
+        List<WikiPost> postList = wikiPostRepository.findAllByFolder(srcFolder);
+        for (WikiPost post : postList) {
+            post.setFolder(destFolder);
         }
         wikiPostRepository.saveAll(postList);
     }

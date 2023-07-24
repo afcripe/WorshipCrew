@@ -181,7 +181,7 @@ public class WikiController {
             wikiPost.setId(BigInteger.valueOf(0));
             wikiPost.setTitle("");
             wikiPost.setBody("");
-            wikiPost.setFolder("/posts");
+            wikiPost.setFolder("/general");
             wikiPost.setCreated(LocalDateTime.now());
             wikiPost.setLastUpdated(LocalDateTime.now());
             wikiPost.setSummary("");
@@ -231,6 +231,20 @@ public class WikiController {
 
         model.addAttribute("tagList", tagList);
         return "wiki/tagManager";
+    }
+
+    @GetMapping("/foldermanager")
+    public String getWikiFolderManager(Model model) {
+        List<WikiFolder> folderList = wikiFolderService.findAll();
+        List<WikiFolderReference> refList = new ArrayList<>();
+        for (WikiFolder folder : folderList) {
+            WikiFolderReference ref = new WikiFolderReference();
+            ref.setFolder(folder.getFolder());
+            ref.setReferences(wikiPostService.findCountReferencesByFolder(folder));
+            refList.add(ref);
+        }
+        model.addAttribute("folderList", refList);
+        return "wiki/folderManager";
     }
 
     @GetMapping("/search/{searchTerm}")

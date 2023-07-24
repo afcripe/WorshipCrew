@@ -36,4 +36,7 @@ public interface WikiPostRepository extends JpaRepository<WikiPost, BigInteger> 
     @Query(value="SELECT WIKI_POST.*, WIKI_POST_TAG_LIST.TAG_LIST_ID FROM WIKI_POST, WIKI_POST_TAG_LIST WHERE WIKI_POST.ID = WIKI_POST_TAG_LIST.WIKI_POST_ID AND TAG_LIST_ID = :id", nativeQuery = true)
     List<WikiPost> findAllByTagId(@Param("id") BigInteger id);
 
+    @Query(value="SELECT COUNT(FOLDER) FROM WIKI_POST WHERE FOLDER = :folder", nativeQuery = true)
+    Optional<Integer> findCountReferencesByFolder(@Param("folder") String folder);
+
 }

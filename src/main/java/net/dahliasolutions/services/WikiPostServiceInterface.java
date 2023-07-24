@@ -1,5 +1,6 @@
 package net.dahliasolutions.services;
 
+import net.dahliasolutions.models.WikiFolder;
 import net.dahliasolutions.models.WikiPost;
 import net.dahliasolutions.models.WikiTag;
 
@@ -22,5 +23,8 @@ public interface WikiPostServiceInterface {
     WikiPost save(WikiPost wikiPost);
     void mergeTags(WikiTag sourceTag, WikiTag destinationTag);
     void removeTag(WikiTag wikiTag);
+    void removeFolder(WikiFolder wikiFolder);
+    Integer findCountReferencesByFolder(WikiFolder wikiFolder);
+    void updateFolder(String srcFolder, String destFolder);
     void deleteById(BigInteger id);
 }
