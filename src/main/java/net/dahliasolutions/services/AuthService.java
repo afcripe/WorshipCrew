@@ -2,8 +2,9 @@ package net.dahliasolutions.services;
 
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.LoginModel;
-import net.dahliasolutions.models.User;
-import net.dahliasolutions.models.UserRoles;
+import net.dahliasolutions.models.user.User;
+import net.dahliasolutions.models.user.UserRoles;
+import net.dahliasolutions.services.user.UserService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

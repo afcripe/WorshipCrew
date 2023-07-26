@@ -1,15 +1,12 @@
 package net.dahliasolutions.config;
 
 import lombok.RequiredArgsConstructor;
-import net.dahliasolutions.models.User;
 import net.dahliasolutions.services.AdminSettingsService;
-import net.dahliasolutions.services.EmailService;
-import net.dahliasolutions.services.UserService;
+import net.dahliasolutions.services.mail.EmailService;
+import net.dahliasolutions.services.user.UserService;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-
-import java.util.List;
 
 @Configuration
 @EnableScheduling

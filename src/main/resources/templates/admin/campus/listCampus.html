@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<div class="container-fluid" layout:fragment="content">
+
+  <div th:replace="~{admin/moduleHeader :: header}">Header</div>
+
+  <div class="container my-3">
+
+    <script th:inline="javascript">
+      function navLocationTable(event, element, eventId) {
+        event.stopPropagation();
+        const path = window.location.pathname;
+
+        if(element.id == 'btnEdit') {
+          window.location.href='/campus/'+eventId;
+        } else if(element.id == 'btnNew') {
+          window.location.href='/campus/new';
+        } else if(element.id == 'btnToggleDeleted') {
+          if (path.endsWith('showhidden')) {
+            window.location.href='/campus';
+          } else {
+            window.location.href='/campus/showhidden';
+          }
+        } else if(element.id == 'btnRestore'){
+          window.location.href='/campus/'+eventId+'/restore';
+        } else {
+          window.location.href='/campus/'+eventId;
+        }
+      }
+    </script>
+
+    <div style="float: right">
+      <button class="btn btn-sm btn-success" id="btnNew"
+              th:onclick="'javascript:navLocationTable(event, this, 0)'">Add</button>
+      &nbsp;
+      <button class="btn btn-sm btn-warning" id="btnToggleDeleted"
+              th:onclick="'javascript:navLocationTable(event, this, 0)'">Toggle Deleted</button>
+    </div>
+
+    <h1>Campuses</h1>
+
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">City</th>
+        <th scope="col">Director</th>
+        <th scope="col"></th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="campus : ${campusList}" class="selectableItem" style="cursor: pointer"
+          th:onclick="'javascript:navLocationTable(event, this, '+${campus.id}+')'" id="btnEdit">
+        <th:block th:if="${campus.hidden}">
+          <td style="text-decoration: line-through; color: darkred"><span th:text="${campus.name}"/></td>
+        </th:block>
+        <th:block th:unless="${campus.hidden}">
+          <td><span th:text="${campus.name}"/></td>
+        </th:block>
+        <td><span th:text="${campus.city}"/></td>
+        <td><span th:text="${campus.directorName}"/></td>
+        <td style="text-decoration: line-through; color: darkred">
+          <th:block th:if="${campus.hidden}">
+            <button class="btn btn-sm btn-outline-success" id="btnRestore"
+                    th:onclick="'javascript:navLocationTable(event, this, '+${campus.id}+')'">Restore</button>
+          </th:block>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</html>

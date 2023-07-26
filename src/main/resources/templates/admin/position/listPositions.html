@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<div class="container-fluid" layout:fragment="content">
+
+  <div th:replace="~{admin/moduleHeader :: header}">Header</div>
+
+  <div class="container my-3">
+
+    <div style="float: right">
+      <button class="btn btn-sm btn-success"
+              th:onclick="window.location.href='/position/new';">Add</button>
+    </div>
+
+    <h1>Positions</h1>
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <th scope="col">Name</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="position : ${positions}" class="selectableItem" style="cursor: pointer"
+          th:onclick="window.location.href='/position/[[${position.id}]]/edit';">
+        <td><span th:text="${position.name}"/></td>
+      </tr>
+      </tbody>
+    </table>
+
+    <hr>
+
+    <div style="float: right">
+      <button class="btn btn-sm btn-success"
+              th:onclick="window.location.href='/permissiontemplate/new';">Add</button>
+    </div>
+    <h2>Permission Templates</h2>
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <th scope="col">Template</th>
+        <th scope="col">Position</th>
+        <th scope="col">Permissions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="temp : ${templateList}" class="selectableItem" style="cursor: pointer"
+          th:onclick="window.location.href='/permissiontemplate/edit/[[${temp.id}]]';">
+        <td><span th:text="${temp.name}"/></td>
+        <td><span th:text="${temp.position.name}"/></td>
+        <td th:each="role : ${temp.userRoles}" style="font-size: small; overflow: clip; max-width: 200px;"><span th:text="${role.name}"/></td>
+      </tr>
+      </tbody>
+    </table>
+
+  </div>
+</div>
+
+</html>

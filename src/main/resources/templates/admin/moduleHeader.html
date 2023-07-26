@@ -11,13 +11,17 @@
           <ul class="navbar-nav mr-auto">
 
             <li class="nav-item">
-              <a class="nav-link" href="/admin">Settings</a>
+              <a class="nav-link" href="/admin" >Settings</a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
+                              or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
+                              or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')
+                              or #lists.contains(userRoles,'USER_READ') or #lists.contains(userRoles,'USER_WRITE')}">
               <a class="nav-link" href="/user">Users</a>
             </li>
             <li class="nav-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
-                              or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')}">
+                              or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
+                              or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')}">
               <a class="nav-link" href="/campus">Campuses</a>
             </li>
             </li>

@@ -1,0 +1,360 @@
+package net.dahliasolutions.controllers.user;
+
+import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
+import net.dahliasolutions.models.*;
+import net.dahliasolutions.models.campus.Campus;
+import net.dahliasolutions.models.department.DepartmentCampus;
+import net.dahliasolutions.models.department.DepartmentRegional;
+import net.dahliasolutions.models.mail.EmailDetails;
+import net.dahliasolutions.models.position.PermissionTemplate;
+import net.dahliasolutions.models.position.Position;
+import net.dahliasolutions.models.user.*;
+import net.dahliasolutions.services.*;
+import net.dahliasolutions.services.campus.CampusService;
+import net.dahliasolutions.services.department.DepartmentCampusService;
+import net.dahliasolutions.services.department.DepartmentRegionalService;
+import net.dahliasolutions.services.mail.EmailService;
+import net.dahliasolutions.services.position.PermissionTemplateService;
+import net.dahliasolutions.services.position.PositionService;
+import net.dahliasolutions.services.user.UserRolesService;
+import net.dahliasolutions.services.user.UserService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+
+@Controller
+@RequestMapping("/user")
+@RequiredArgsConstructor
+public class UserController {
+
+    private final UserService userService;
+    private final UserRolesService rolesService;
+    private final PositionService positionService;
+    private final AuthService authService;
+    private final CampusService campusService;
+    private final DepartmentRegionalService departmentRegionalService;
+    private final DepartmentCampusService departmentCampusService;
+    private final PermissionTemplateService permissionTemplateService;
+    private final EmailService emailService;
+    private final RedirectService redirectService;
+
+    @ModelAttribute
+    public void addAttributes(Model model) {
+        model.addAttribute("moduleTitle", "Settings");
+        model.addAttribute("moduleLink", "/admin");
+    }
+
+    @GetMapping("")
+    public String getUsers(Model model, HttpSession session) {
+        // get persmissions
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = (User) auth.getPrincipal();
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+        boolean fullList = false;
+        for (UserRoles role : roles){
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("ADMIN_READ") ||
+                    role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")) {
+                fullList = true;
+                break;
+            }
+        }
+
+        List<User> userList = new ArrayList<>();
+        if (fullList) {
+            userList = userService.findAll();
+        } else {
+            userList = userService.findAllByCampus(currentUser.getCampus());
+        }
+
+        redirectService.setHistory(session, "/user");
+        model.addAttribute("title", "All Users");
+        model.addAttribute("users", userList);
+        return "admin/user/listUsers";
+    }
+
+    @GetMapping("/{id}")
+    public String getUser(@PathVariable BigInteger id, Model model, HttpSession session) {
+        redirectService.setHistory(session, "/user/"+id);
+        User user = userService.findById(id).orElse(new User());
+
+        model.addAttribute("user", user);
+        model.addAttribute("userCampus", user.getCampus().getName());
+        model.addAttribute("userDepartment", user.getDepartment().getName());
+        model.addAttribute("userPosition", user.getPosition().getName());
+        model.addAttribute("userPosition", user.getPosition().getName());
+        return "admin/user/user";
+    }
+
+    @GetMapping("/{id}/edit")
+    public String updateUserForm(@PathVariable BigInteger id, Model model) {
+        // get persmissions
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = (User) auth.getPrincipal();
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+        boolean fullList = false;
+        for (UserRoles role : roles){
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("ADMIN_READ") ||
+                    role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")) {
+                fullList = true;
+                break;
+            }
+        }
+
+
+        List<Campus> campusList = new ArrayList<>();
+        List<User> userList = new ArrayList<>();
+        if (fullList) {
+            campusList = campusService.findAll();
+            userList = userService.findAll();
+        } else {
+            campusList.add(currentUser.getCampus());
+            userList = userService.findAllByCampus(currentUser.getCampus());
+        }
+
+        User user = userService.findById(id).orElse(new User());
+        List<Position> positionList = positionService.findAll();
+        List<DepartmentCampus> departmentList = departmentCampusService.findAll();
+
+        model.addAttribute("user", user);
+        model.addAttribute("userCampus", user.getCampus().getName());
+        model.addAttribute("userDepartment", user.getDepartment().getName());
+        model.addAttribute("userPosition", user.getPosition().getName());
+        model.addAttribute("campusList", campusList);
+        model.addAttribute("departmentList", departmentList);
+        model.addAttribute("positionList", positionList);
+        model.addAttribute("userList", userList);
+
+        return "admin/user/userEdit";
+    }
+
+    @PostMapping("/update")
+    public String updateUserResult(@ModelAttribute UserModel userModel, Model model, HttpSession session) {
+        User user = userService.findById(userModel.id()).orElse(null);
+        User exists = userService.findByUsername(userModel.username()).orElse(new User());
+
+        if (user != null) {
+            if(!user.getId().equals(exists.getId())) {
+                if(userModel.username().equals(exists.getUsername())) {
+                    session.setAttribute("msgError", "Username Already Exists!");
+                } else {
+                    user.setUsername(userModel.username());
+                }
+            }
+            user.setFirstName(userModel.firstName());
+            user.setLastName(userModel.lastName());
+            user.setContactEmail(userModel.contactEmail());
+            user.setPosition(positionService.findByName(userModel.position()).orElse(null));
+            user.setCampus(campusService.findByName(userModel.campus()).orElse(null));
+            user.setDepartment(departmentCampusService.findByNameAndCampus(userModel.department(), user.getCampus()).orElse(null));
+            user.setDirector(userService.findById(userModel.directorId()).orElse(null));
+            userService.save(user);
+        }
+
+        model.addAttribute("user", user);
+        session.setAttribute("msgSuccess", "User successfully updated.");
+
+        return "redirect:/user/"+userModel.id().toString();
+    }
+
+    @GetMapping("/new")
+    public String newUserForm(Model model) {
+        // get persmissions
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = (User) auth.getPrincipal();
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+        boolean fullList = false;
+        for (UserRoles role : roles){
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("ADMIN_READ") ||
+                    role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")) {
+                fullList = true;
+                break;
+            }
+        }
+
+        List<Campus> campusList = new ArrayList<>();
+        List<User> userList = new ArrayList<>();
+        if (fullList) {
+            campusList = campusService.findAll();
+            userList = userService.findAll();
+        } else {
+            campusList.add(currentUser.getCampus());
+            userList = userService.findAllByCampus(currentUser.getCampus());
+        }
+
+        User user = new User();
+        List<Position> positionList = positionService.findAll();
+        List<DepartmentRegional> departmentList = departmentRegionalService.findAll();
+
+        model.addAttribute("user", user);
+        model.addAttribute("positionList", positionList);
+        model.addAttribute("campusList", campusList);
+        model.addAttribute("departmentList", departmentList);
+        model.addAttribute("userList", userList);
+        return "admin/user/userNew";
+    }
+
+    @PostMapping("/create")
+    public String createUser(@ModelAttribute UserModel userModel, Model model, HttpSession session) {
+        if(userService.verifyByUsername(userModel.username())) {
+            model.addAttribute("registerUser", userModel);
+            session.setAttribute("msgError", "Username already exists!");
+            return "admin/user/userNew";
+        }
+        User newUser;
+        User user = new User();
+            user.setUsername(userModel.username());
+            user.setFirstName(userModel.firstName());
+            user.setLastName(userModel.lastName());
+            user.setContactEmail(userModel.username());
+            user.setPosition(positionService.findByName(userModel.position()).orElse(null));
+            user.setCampus(campusService.findByName(userModel.campus()).orElse(null));
+            user.setDepartment(departmentCampusService.findByNameAndCampus(userModel.department(), user.getCampus()).orElse(null));
+            user.setDirector(userService.findById(userModel.directorId()).orElse(null));
+            user.setUserRoles(new ArrayList<>());
+
+        // set permissions
+        Optional<PermissionTemplate> template = permissionTemplateService.findFirstByPosition(user.getPosition());
+        if (template.isPresent()) {
+            for (UserRoles role : template.get().getUserRoles()) {
+                user.getUserRoles().add(role);
+            }
+        }
+
+        if (userModel.activated() == null){
+            user.setPassword(userModel.password());
+            userService.createDefaultUser(user);
+        } else {
+            userService.createUser(user);
+            EmailDetails emailDetails = new EmailDetails(user.getContactEmail(),"",
+                    "Welcome to Destiny Worship Exchange", null);
+            emailService.sendWelcomeMail(emailDetails, user.getId());
+        }
+
+        model.addAttribute("user", user);
+        session.setAttribute("msgSuccess", "User successfully added.");
+
+        return "redirect:/user/"+user.getId().toString();
+    }
+
+    @GetMapping("/{id}/removerole/{roleName}")
+    public String removeUserRole(@PathVariable BigInteger id, @PathVariable String roleName, HttpSession session) {
+        String modifiedStr = roleName.replaceAll("\"", "");
+
+        // Verify user has permission
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) auth.getPrincipal();
+        boolean isAuth = authService.isAuthorized(user.getUsername(), "ADMIN_WRITE");
+
+        if(isAuth) {
+            userService.removeRoleFromUser(id, modifiedStr);
+            session.setAttribute("msgSuccess", "Permission Removed.");
+        } else {
+            session.setAttribute("msgError", "Access Denied!");
+        }
+        return "redirect:/user/"+id.toString();
+    }
+
+    @GetMapping("/{id}/addpermission")
+    public String addUserRoleForm(@PathVariable BigInteger id, Model model, HttpSession session) {
+        User user = userService.findById(id).orElse(null);
+        if(user == null){
+            session.setAttribute("msgError", "No User Found!");
+            return "redirect:/user/"+id.toString();
+        }
+
+        List<UserRoles> roles = rolesService.findAll();
+
+        model.addAttribute("user", user);
+        model.addAttribute("rolesList", roles);
+
+        return "admin/user/userAddPermission";
+    }
+
+    @PostMapping("/addpermission")
+    public String addUserRole(@ModelAttribute UserRolesModel userRolesModel, HttpSession session) {
+        User user = userService.findById(userRolesModel.id()).orElse(null);
+        if(user == null){
+            session.setAttribute("msgError", "No User Found!");
+            return "redirect:/user/"+userRolesModel.id().toString();
+        }
+
+        // Verify user has permission
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User admin = (User) auth.getPrincipal();
+        boolean isAuth = authService.isAuthorized(admin.getUsername(), "ADMIN_WRITE");
+
+        if(isAuth) {
+            userService.addRoleToUser(user.getUsername(), userRolesModel.role());
+            session.setAttribute("msgSuccess", "Permission Added.");
+        } else {
+            session.setAttribute("msgError", "Access Denied!");
+        }
+        return "redirect:/user/"+userRolesModel.id().toString();
+    }
+
+    @GetMapping("/{id}/changepassword")
+    public String changeUserPasswordForm(@PathVariable BigInteger id, Model model, HttpSession session) {
+        User user = userService.findById(id).orElse(null);
+        if(user == null){
+            session.setAttribute("msgError", "No User Found!");
+            return "redirect:/user/"+id.toString();
+        }
+
+        model.addAttribute("user", user);
+
+        return "admin/user/userSetPassword";
+    }
+
+    @PostMapping("/changepassword")
+    public String changeUserPassword(@ModelAttribute ChangePasswordModel changePasswordModel, HttpSession session) {
+        User user = userService.findById(changePasswordModel.id()).orElse(null);
+        if(user == null){
+            session.setAttribute("msgError", "No User Found!");
+            return "redirect:/user/"+changePasswordModel.id().toString();
+        }
+
+        // Verify Admin has permission
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User admin = (User) auth.getPrincipal();
+        LoginModel loginModel = new LoginModel(admin.getUsername(), changePasswordModel.currentPassword());
+        boolean isAuth = authService.verifyAuthorizedByPassword(loginModel,"ADMIN_WRITE");
+        String pwdTemplate = "/user/"+changePasswordModel.id().toString()+"/changepassword";
+        if(!isAuth) {
+            session.setAttribute("msgError", "Access Denied!");
+            return "redirect:"+pwdTemplate;
+        } else if (!changePasswordModel.newPassword().equals(changePasswordModel.confirmPassword())) {
+            session.setAttribute("msgError", "Passwords Do Not Match!");
+            return "redirect:"+pwdTemplate;
+        } else {
+            userService.updateUserPasswordById(changePasswordModel.id(), changePasswordModel.newPassword());
+            session.setAttribute("msgSuccess", "Password Change Successful.");
+        }
+        return "redirect:/user/"+changePasswordModel.id();
+    }
+
+    @PostMapping("/{id}/sendPasswordChange")
+    public String sendPasswordChangeRequest(@PathVariable BigInteger id, HttpSession session) {
+        User user = userService.findById(id).orElse(null);
+        if(user == null){
+            session.setAttribute("msgError", "No User Found!");
+            return "redirect:/user/"+id.toString();
+        }
+
+        EmailDetails emailDetails = new EmailDetails(user.getContactEmail(),"",
+                "Password Change Request", null);
+        BrowserMessage msg = emailService.sendPasswordResetMail(emailDetails, user.getId());
+
+        session.setAttribute(msg.getMsgType(), msg.getMessage());
+
+        return "redirect:/user/"+user.getId().toString();
+    }
+}

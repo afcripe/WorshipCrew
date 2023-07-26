@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<div class="container-fluid" layout:fragment="content">
+
+  <div th:replace="~{admin/moduleHeader :: header}">Header</div>
+
+
+
+  <div class="container my-3" th:object="${campus}">
+
+    <div class="row">
+      <div class="col">
+
+        <div class="card" style="max-width: 500">
+          <div class="card-title alert alert-primary">
+            <div style="float: right">
+              <button class="btn btn-sm btn-success small"
+                      th:onclick="window.location.href='/campus/[[*{id}]]/edit';">Edit</button>
+            </div>
+            <h5>
+              <span th:text="*{name}"/>
+            </h5>
+          </div>
+
+          <div class="card-body">
+            <p>City: <span class="card-text" th:text="*{city}"/></p>
+            <p>Director: <span class="card-text" th:text="*{directorName}"/></p>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+
+        <table class="table table-striped">
+          <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Director</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="department : ${departmentList}" class="selectableItem" style="cursor: pointer"
+              th:onclick="window.location.href='/campus/[[*{id}]]/department/[[${department.id}]]';">
+            <td><span th:text="${department.name}"/></td>
+            <td><span th:text="${department.directorName}"/></td>
+          </tr>
+          </tbody>
+        </table>
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+</html>

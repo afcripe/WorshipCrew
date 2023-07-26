@@ -2,10 +2,12 @@ package net.dahliasolutions.controllers;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import net.dahliasolutions.models.*;
+import net.dahliasolutions.models.user.ChangePasswordModel;
+import net.dahliasolutions.models.user.User;
+import net.dahliasolutions.models.user.UserModel;
 import net.dahliasolutions.services.AuthService;
 import net.dahliasolutions.services.RedirectService;
-import net.dahliasolutions.services.UserService;
+import net.dahliasolutions.services.user.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;

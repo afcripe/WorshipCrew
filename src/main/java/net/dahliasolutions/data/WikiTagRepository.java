@@ -1,8 +1,7 @@
 package net.dahliasolutions.data;
 
-import net.dahliasolutions.models.WikiTag;
+import net.dahliasolutions.models.wiki.WikiTag;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 

@@ -1,6 +1,6 @@
 package net.dahliasolutions.data;
 
-import net.dahliasolutions.models.StoreImage;
+import net.dahliasolutions.models.store.StoreImage;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

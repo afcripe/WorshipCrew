@@ -64,7 +64,11 @@
 
     <div class="row">
 
-      <div class="col-xs-1 col-md-6 col-lg-4">
+      <div class="col-xs-1 col-md-6 col-lg-4"
+           th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
+              or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
+              or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')
+              or #lists.contains(userRoles,'USER_READ') or #lists.contains(userRoles,'USER_WRITE')}">
         <div class="card">
           <div class="card-body">
             <h4 class="card-title">User Management</h4>
@@ -78,29 +82,35 @@
         </div>
       </div>
 
-      <div class="col-xs-1 col-md-6 col-lg-4">
+      <div class="col-xs-1 col-md-6 col-lg-4"
+           th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
+              or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
+              or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')}">
         <div class="card">
           <div class="card-body">
-            <h4 class="card-title">Campus and Department Management</h4>
+            <h4 class="card-title">Campus Management</h4>
             <ul class="list-group list-group-flush">
               <li class="list-group-item selectableItem" style="cursor: pointer;"
                   onclick="window.location.href='/campus'">
                 List of Campuses
-              </li>
-              <li class="list-group-item selectableItem" style="cursor: pointer;"
-                  onclick="window.location.href='/department'">
-                List of Departments
               </li>
             </ul>
           </div>
         </div>
       </div>
 
-      <div class="col-xs-1 col-md-6 col-lg-4">
+      <div class="col-xs-1 col-md-6 col-lg-4"
+           th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
+              or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
+              or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')}">
         <div class="card">
           <div class="card-body">
-            <h4 class="card-title">Position and Role Management</h4>
+            <h4 class="card-title">Role Management</h4>
             <ul class="list-group list-group-flush">
+              <li class="list-group-item selectableItem" style="cursor: pointer;"
+                  onclick="window.location.href='/department'">
+                List of Departments
+              </li>
               <li class="list-group-item selectableItem" style="cursor: pointer;"
                   onclick="window.location.href='/position'">
                 List of Positions

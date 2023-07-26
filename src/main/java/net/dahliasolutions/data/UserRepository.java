@@ -1,9 +1,9 @@
 package net.dahliasolutions.data;
 
-import net.dahliasolutions.models.Campus;
-import net.dahliasolutions.models.Department;
-import net.dahliasolutions.models.Position;
-import net.dahliasolutions.models.User;
+import net.dahliasolutions.models.campus.Campus;
+import net.dahliasolutions.models.department.DepartmentCampus;
+import net.dahliasolutions.models.position.Position;
+import net.dahliasolutions.models.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -19,7 +19,7 @@ public interface UserRepository extends JpaRepository<User, BigInteger> {
     boolean existsByUsername(String username);
     List<User> findAllByPosition(Position position);
     List<User> findAllByCampus(Campus campus);
-    List<User> findAllByDepartment(Department department);
+    List<User> findAllByDepartmentCampus(DepartmentCampus department);
 
     List<User> findAllByActivated(boolean activated);
 

@@ -1,7 +1,7 @@
 package net.dahliasolutions.data;
 
-import net.dahliasolutions.models.Orders;
-import net.dahliasolutions.models.User;
+import net.dahliasolutions.models.store.Orders;
+import net.dahliasolutions.models.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.math.BigInteger;

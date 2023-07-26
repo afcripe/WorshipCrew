@@ -1,6 +1,6 @@
 package net.dahliasolutions.data;
 
-import net.dahliasolutions.models.UserRoles;
+import net.dahliasolutions.models.user.UserRoles;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.math.BigInteger;

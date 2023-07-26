@@ -82,11 +82,31 @@
                     <div class="sidebar-header" onclick="toggleSideNav(false)" style="cursor: pointer;">
                         <h4>Navigation <i class="bi bi-arrow-bar-left" style="float: right; font-size: 1.5rem"></i></h4>
                     </div>
-                    <div class="list-group" sec:authorize="isAuthenticated()">
+                    <div class="list-group pb-3" sec:authorize="isAuthenticated()">
                         <a class="list-group-item" href="/">Home</a>
                         <a class="list-group-item" href="/store">Store</a>
                         <a class="list-group-item" href="/wiki">Wiki</a>
                         <a class="list-group-item" href="/support">Support</a>
+                    </div>
+                    <div class="list-group" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
+                                                or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
+                                                or #lists.contains(userRoles,'USER_READ') or #lists.contains(userRoles,'USER_WRITE')
+                                                or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')}">
+                        <a class="list-group-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
+                                                or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
+                                                or #lists.contains(userRoles,'USER_READ') or #lists.contains(userRoles,'USER_WRITE')
+                                                or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')}"
+                           href="/user">Users</a>
+                        <a class="list-group-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
+                                                or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
+                                                or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')}"
+                           href="/campus">Campus</a>
+                        <a class="list-group-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
+                                                or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')}"
+                           href="/department">Departments</a>
+                        <a class="list-group-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
+                                                or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')}"
+                           href="/position">Positions</a>
                     </div>
                 </div>
                 <div id="sideNavCollapsed" class="flex-fill px-2 pt-1 d-none d-sm-block"
@@ -95,7 +115,7 @@
                     <div class="sidebar-header text-center" onclick="toggleSideNav(true)" style="cursor: pointer">
                         <h3><i class="bi bi-compass"></i></h3>
                     </div>
-                    <div class="list-group" sec:authorize="isAuthenticated()">
+                    <div class="list-group pb-3" sec:authorize="isAuthenticated()">
                         <a class="list-group-item p-1" href="/">
                             <i class="bi bi-house"></i>
                         </a>
@@ -107,6 +127,28 @@
                         </a>
                         <a class="list-group-item p-1" href="/support">
                             <i class="bi bi-life-preserver"></i>
+                        </a>
+                    </div>
+                    <div class="list-group pb-3" sec:authorize="isAuthenticated()">
+                        <a class="list-group-item p-1" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
+                            or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
+                            or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')
+                            or #lists.contains(userRoles,'USER_READ') or #lists.contains(userRoles,'USER_WRITE')}" href="/user">
+                            <i class="bi bi-people"></i>
+                        </a>
+                        <a class="list-group-item p-1" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
+                            or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
+                            or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')}" href="/campus">
+                            <i class="bi bi-houses"></i>
+                        </a>
+                        <a class="list-group-item p-1" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
+                            or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
+                            or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')}" href="/department">
+                            <i class="bi bi-collection"></i>
+                        </a>
+                        <a class="list-group-item p-1" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
+                            or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')}" href="/position">
+                            <i class="bi bi-person-lines-fill"></i>
                         </a>
                     </div>
                 </div>
