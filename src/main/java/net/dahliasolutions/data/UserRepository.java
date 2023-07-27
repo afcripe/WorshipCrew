@@ -18,10 +18,13 @@ public interface UserRepository extends JpaRepository<User, BigInteger> {
     Optional<User> findByUsername(String username);
     boolean existsByUsername(String username);
     List<User> findAllByPosition(Position position);
+    List<User> findAllByPositionAndDeleted(Position position, boolean deleted);
     List<User> findAllByCampus(Campus campus);
-    List<User> findAllByDepartmentCampus(DepartmentCampus department);
+    List<User> findAllByCampusAndDeleted(Campus campus, boolean deleted);
+    List<User> findAllByDepartmentCampusAndDeleted(DepartmentCampus department, boolean deleted);
 
     List<User> findAllByActivated(boolean activated);
+    List<User> findAllByDeleted(boolean deleted);
 
     @Modifying
     @Query(value="DELETE FROM USER_DETAILS_USER_ROLES WHERE USER_ID=:userId AND USER_ROLES_ID=:roleId", nativeQuery = true)

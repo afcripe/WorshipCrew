@@ -16,6 +16,7 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
         <link th:href="@{/css/style.css}" rel="stylesheet">
+        <link th:href="@{/css/dark.css}" rel="stylesheet">
         <script>
             let displaySideNav = false;
             let forceHideSideNave = false;
@@ -76,16 +77,14 @@
             <div id="mainContent" class="wrapper d-flex">
 
                 <!-- Side Navigation -->
-                <div id="sideNavExpanded" class="flex-fill px-2 pt-1 d-none d-sm-block"
-                     style="background-color: #eeeeee; min-width: 170px;
-                     max-width: 170px; width: 170px; min-height: calc(100vh - 65px);">
+                <div id="sideNavExpanded" class="flex-fill px-2 pt-1 d-none d-sm-block">
                     <div class="sidebar-header" onclick="toggleSideNav(false)" style="cursor: pointer;">
                         <h4>Navigation <i class="bi bi-arrow-bar-left" style="float: right; font-size: 1.5rem"></i></h4>
                     </div>
                     <div class="list-group pb-3" sec:authorize="isAuthenticated()">
                         <a class="list-group-item" href="/">Home</a>
                         <a class="list-group-item" href="/store">Store</a>
-                        <a class="list-group-item" href="/wiki">Wiki</a>
+                        <a class="list-group-item" href="/resource">Resource</a>
                         <a class="list-group-item" href="/support">Support</a>
                     </div>
                     <div class="list-group" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
@@ -109,9 +108,7 @@
                            href="/position">Positions</a>
                     </div>
                 </div>
-                <div id="sideNavCollapsed" class="flex-fill px-2 pt-1 d-none d-sm-block"
-                     style="background-color: #eeeeee; min-width: 45px;
-                     max-width: 45px; width: 45px;min-height: calc(100vh - 65px);">
+                <div id="sideNavCollapsed" class="flex-fill px-2 pt-1 d-none d-sm-block">
                     <div class="sidebar-header text-center" onclick="toggleSideNav(true)" style="cursor: pointer">
                         <h3><i class="bi bi-compass"></i></h3>
                     </div>
@@ -122,7 +119,7 @@
                         <a class="list-group-item p-1" href="/store">
                             <i class="bi bi-shop-window"></i>
                         </a>
-                        <a class="list-group-item p-1" href="/wiki">
+                        <a class="list-group-item p-1" href="/resource">
                             <i class="bi bi-wikipedia"></i>
                         </a>
                         <a class="list-group-item p-1" href="/support">
@@ -164,19 +161,7 @@
 
         <i id="scrollToTopBtn" class="bi bi-arrow-up-circle-fill to-top-arrow h3"></i>
 
-    <!-- fix bottom margin on mobile
-    <div class="px-2 mb-0 small d-block d-sm-none" style="height: 27px; position: fixed; bottom: 0; width: 100%"></div>
-    -->
-    <!--- Footer
-    <div class="px-2 mb-0 small d-none d-sm-block"
-         style="background-color: lightblue; height: 32px; position: fixed; bottom: 0; width: 100%">
-        <div style="float: right;"><small>Dahlia Solutions, LLC</small></div>
-        <div>Destiny Worship</div>
-    </div>
-    --->
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-
 
     <script th:inline="javascript">
     /*<![CDATA[*/
@@ -249,8 +234,18 @@
             cartCountCollapsed.innerText = count;
         }
     }
+    function setDarkMode() {
+        let pageBody = document.querySelector("body")
+        let pageNaveExp = document.getElementById("sideNavCollapsed")
+        let pageNaveCol = document.getElementById("sideNavExpanded")
+
+        pageBody.classList.add("dark");
+        pageNaveExp.classList.add("dark");
+        pageNaveCol.classList.add("dark")
+    }
 
     toggleSideNav(displaySideNav);
+    // setDarkMode();
 </script>
 
     </body>

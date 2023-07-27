@@ -23,6 +23,7 @@ public interface UserServiceInterface extends UserDetailsService {
     User save(User user);
     List<User> findAll();
     List<User> findAllByCampus(Campus campus);
+    List<User> findAllByCampusAndDeleted(Campus campus, boolean deleted);
     Optional<User> findByUsername(String username);
     void updateUserPosition(String username, String positionName);
     void updateUserCampus(String username, String campusName);
@@ -30,7 +31,7 @@ public interface UserServiceInterface extends UserDetailsService {
     void updateUserLocationByLocationId(String username, BigInteger locationId);
     List<User> findAllByPosition(Position position);
     List<User> findAllByDepartment(DepartmentCampus department);
-    List<User> findAllByLocation(Campus location);
     List<User> findAllByActivated();
+    List<User> findAllByDeleted(boolean deleted);
 
 }

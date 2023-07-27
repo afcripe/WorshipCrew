@@ -25,7 +25,7 @@
         <div class="row mt-2">
 
             <h1 style="color: coral">Welcome to the Destiny Store</h1>
-            <p th:if="${not #lists.isEmpty(storeItems)}">No, it's not prime day.</p>
+            <p th:if="${#lists.isEmpty(storeItems)}">No, it's not prime day.</p>
 
             <div th:if="${session.storeListGrid == 'list'}">
             <div th:each="item : ${storeItems}">

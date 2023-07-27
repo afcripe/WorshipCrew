@@ -12,34 +12,12 @@
         <div class="row mt-2">
 
             <h1 style="color: royalblue">Welcome to Destiny Resources</h1>
-            <p th:if="${#lists.isEmpty(wikiPostList)}">If it's on the Internet, it must be true.</p>
 
             <div class="row">
 
                 <div class="col-12 col-lg-9">
 
-                    <h5 onclick="toggleFolders()">Find Articles by Folders
-                        <i id="cartFolderNavDown" class="bi bi-caret-down-fill" style="display: none"></i>
-                        <i id="cartFolderNavRight" class="bi bi-caret-right-fill"></i>
-                    </h5>
-                    <div id="divFolderNav" class="folder-nav folder-nav-collapse">
-                        <div th:each="folder : ${folderList}" style="display: inline-block">
-                            <div class="tag_primary m-1" style="display: inline-block; cursor: pointer;"
-                                 th:onclick="navToFolder([[*{folder.folder}]])" th:text="${folder.folder}">List</div>
-                        </div>
-                    </div>
-
-                    <h5 class="mt-3">Recent Articles</h5>
-                    <div th:each="post : ${wikiPostList}">
-                        <div th:replace="~{components/cardPostLine :: cardFragment(${post})}">List</div>
-                    </div>
-
-        <!--            <div th:each="folder : ${wikiPostList}">-->
-        <!--                <h5 th:text="${folder.folder}"></h5>-->
-        <!--                <div th:each="post : ${folder.WikiPost}">-->
-        <!--                    <div th:replace="~{components/cardPostLine :: cardFragment(${post})}">List</div>-->
-        <!--                </div>-->
-        <!--            </div>-->
+                    <div th:utext="${wikiPost.body}"></div>
 
                 </div>
 

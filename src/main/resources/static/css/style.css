@@ -1,3 +1,17 @@
+#sideNavExpanded {
+    background-color: #eeeeee;
+    width: 170px;
+    min-width: 170px;
+    max-width: 170px;
+    min-height: calc(100vh - 65px);
+}
+#sideNavCollapsed {
+    background-color: #eeeeee;
+    width: 45px;
+    min-width: 45px;
+    max-width: 45px;
+    min-height: calc(100vh - 65px);
+}
 
 .selectableItem {
 

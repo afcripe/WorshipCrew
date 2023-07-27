@@ -1,0 +1,12 @@
+.dark,
+.dark {
+    background-color: #363636;
+    color: #e6e6e6;
+    border-color: #b0b0b0;
+}
+#sideNavCollapsed .dark {
+    background-color: #575757;
+}
+#sideNavExpanded .dark {
+    background-color: #575757;
+}

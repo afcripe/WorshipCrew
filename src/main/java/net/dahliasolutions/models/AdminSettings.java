@@ -18,5 +18,6 @@ public class AdminSettings {
     private BigInteger id;
     private String companyName;
     private boolean monthlyStatements;
-    private boolean allowVolunteerRequests;
+    private String wikiHome;
+    private String portalHome;
 }

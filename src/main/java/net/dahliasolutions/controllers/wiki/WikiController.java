@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.*;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.wiki.*;
+import net.dahliasolutions.services.AdminSettingsService;
 import net.dahliasolutions.services.RedirectService;
 import net.dahliasolutions.services.wiki.WikiFolderService;
 import net.dahliasolutions.services.wiki.WikiPostService;
@@ -25,7 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Controller
-@RequestMapping("/wiki")
+@RequestMapping("/resource")
 @RequiredArgsConstructor
 public class WikiController {
 
@@ -33,21 +34,40 @@ public class WikiController {
     private final RedirectService redirectService;
     private final WikiFolderService wikiFolderService;
     private final WikiTagService wikiTagService;
+    private final AdminSettingsService adminSettingsService;
     private final AppServer appServer;
 
     @ModelAttribute
     public void addAttributes(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) auth.getPrincipal();
-        model.addAttribute("moduleTitle", "Wiki");
-        model.addAttribute("moduleLink", "/wiki");
+        model.addAttribute("moduleTitle", "Resource");
+        model.addAttribute("moduleLink", "/resource");
         model.addAttribute("userId", user.getId());
         model.addAttribute("baseURL",appServer.getBaseURL());
     }
 
     @GetMapping("")
     public String getRecent(Model model, HttpSession session) {
-        redirectService.setHistory(session, "/wiki");
+        redirectService.setHistory(session, "/resource");
+        AdminSettings adminSettings = adminSettingsService.getAdminSettings();
+        if (!adminSettings.getWikiHome().equals("")) {
+
+            List<WikiTag> tags = wikiTagService.findAll();
+            List<WikiTagReference> tagList = new ArrayList<>();
+            for ( WikiTag tag : tags ) {
+                WikiTagReference tagCounter = new WikiTagReference();
+                tagCounter.setId(tag.getId());
+                tagCounter.setName(tag.getName());
+                tagCounter.setReferences(wikiTagService.countReferences(tag.getId()));
+                tagList.add(tagCounter);
+            }
+
+            model.addAttribute("wikiPost", getWikiFromPath(adminSettings.getWikiHome()));
+            model.addAttribute("tagList", tagList);
+            return "wiki/wikiHome";
+        }
+
         List<WikiPost> wikiPostList = wikiPostService.findRecent();
         List<WikiFolder> folderList = wikiFolderService.findAll();
 
@@ -70,7 +90,7 @@ public class WikiController {
 
     @GetMapping("/tag/{id}")
     public String getByTags(@PathVariable BigInteger id, Model model, HttpSession session) {
-        redirectService.setHistory(session, "/wiki");
+        redirectService.setHistory(session, "/resource");
         Optional<WikiTag> wikiTag = wikiTagService.findById(id);
         if (wikiTag.isEmpty()) {
             session.setAttribute("msgError", "Tag not Found.");
@@ -87,11 +107,11 @@ public class WikiController {
 
     @GetMapping("/folder/{name}")
     public String getByTags(@PathVariable String name, Model model, HttpSession session) {
-        redirectService.setHistory(session, "/wiki");
+        redirectService.setHistory(session, "/resource");
         Optional<WikiFolder> wikiFolder = wikiFolderService.findByFolder(name);
         if (wikiFolder.isEmpty()) {
             session.setAttribute("msgError", "Folder not Found.");
-            return redirectService.pathName(session, "/wiki");
+            return redirectService.pathName(session, "/resource");
         }
 
         List<WikiPost> wikiPostList = wikiPostService.findAllByFolder(name);
@@ -104,7 +124,7 @@ public class WikiController {
 
     @GetMapping("/group")
     public String getGroupedArticles(Model model, HttpSession session) {
-        redirectService.setHistory(session, "/wiki");
+        redirectService.setHistory(session, "/resource");
         List<WikiPost> wikiPostList = wikiPostService.findAll();
         List<WikiFolder> folders = wikiFolderService.findAll();
 
@@ -124,12 +144,12 @@ public class WikiController {
         return "wiki/index";
     }
 
-    @GetMapping("/post/{id}")
+    @GetMapping("/article/{id}")
     public String getPost(@PathVariable("id") BigInteger id, Model model, HttpSession session) {
         Optional<WikiPost> wikiPost = wikiPostService.findById(id);
         if (wikiPost.isEmpty()) {
-            session.setAttribute("msgError", "Post not Found.");
-            return redirectService.pathName(session, "/wiki");
+            session.setAttribute("msgError", "Article not Found.");
+            return redirectService.pathName(session, "/resource");
         }
         model.addAttribute("wikiPost", wikiPost.get());
         return "wiki/post";
@@ -159,7 +179,7 @@ public class WikiController {
         List<WikiPost> wikiList = wikiPostService.findByTitle(postName);
         if (wikiList.isEmpty()) {
             session.setAttribute("msgError", "Post not Found.");
-            return redirectService.pathName(session, "/wiki");
+            return redirectService.pathName(session, "/resource");
         }
         if (wikiList.size() > 1) {
             for ( WikiPost w : wikiList ) {
@@ -175,7 +195,7 @@ public class WikiController {
 
     }
 
-    @GetMapping("/post/new")
+    @GetMapping("/article/new")
     public String addNewPost(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) auth.getPrincipal();
@@ -194,7 +214,7 @@ public class WikiController {
         return "wiki/editPost";
     }
 
-    @GetMapping("/post/edit/{id}")
+    @GetMapping("/article/edit/{id}")
     public String addEditPost(@PathVariable("id") BigInteger id, Model model, HttpSession session) {
         Optional<WikiPost> wikiPost = wikiPostService.findById(id);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -202,12 +222,12 @@ public class WikiController {
 
         // if not found, redirect to new post
         if (wikiPost.isEmpty()) {
-            return "redirect:/wiki/new/post";
+            return "redirect:/resource/article/new";
         }
         // validate author
         if (!wikiPost.get().getAuthor().getId().equals(user.getId())) {
             session.setAttribute("msgError", "Edit permission denied.");
-            return redirectService.pathName(session, "/wiki");
+            return redirectService.pathName(session, "/resource");
         }
 
         model.addAttribute("wikiPost", wikiPost.get());
@@ -215,7 +235,9 @@ public class WikiController {
     }
 
     @GetMapping("/settings")
-    public String getWikiSettings() {
+    public String getWikiSettings(Model model) {
+        model.addAttribute("wikiHome", adminSettingsService.getAdminSettings().getWikiHome());
+        model.addAttribute("portalHome", adminSettingsService.getAdminSettings().getPortalHome());
         return "wiki/settings";
     }
 
@@ -251,7 +273,7 @@ public class WikiController {
 
     @GetMapping("/search/{searchTerm}")
     public String searchArticle(@PathVariable String searchTerm, Model model, HttpSession session) {
-        redirectService.setHistory(session, "/wiki/search/title/"+searchTerm);
+        redirectService.setHistory(session, "/resource/search/title/"+searchTerm);
         String searcher = URLDecoder.decode(searchTerm, StandardCharsets.UTF_8);
         List<WikiPost> wikiPostList = wikiPostService.searchAll(searcher);
         List<WikiFolder> folderList = wikiFolderService.findAll();
@@ -271,5 +293,26 @@ public class WikiController {
         model.addAttribute("folderList", folderList);
         model.addAttribute("searchTerm", searchTerm);
         return "wiki/index";
+    }
+
+    private WikiPost getWikiFromPath(String path) {
+        String[] folderList = path.split("/");
+        String postURLName = folderList[folderList.length-1];
+        String postName = postURLName.replace("-", " ");
+        String folders = "";
+        for ( int i=1; i<folderList.length-1; i++ ) {
+            folders = folders + "/" + folderList[i];
+        }
+
+        List<WikiPost> wikiList = wikiPostService.findByTitle(postName);
+        if (wikiList.size() > 1) {
+            for ( WikiPost w : wikiList ) {
+                if ( w.getFolder().equals(folders) ) {
+                    return w;
+                }
+            }
+        }
+
+        return wikiList.get(0);
     }
 }

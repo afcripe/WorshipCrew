@@ -55,7 +55,7 @@ public class UserController {
 
     @GetMapping("")
     public String getUsers(Model model, HttpSession session) {
-        // get persmissions
+        // get permissions
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = (User) auth.getPrincipal();
         Collection<UserRoles> roles = currentUser.getUserRoles();
@@ -81,16 +81,81 @@ public class UserController {
         return "admin/user/listUsers";
     }
 
+    @GetMapping("/viewdeleted")
+    public String getDeletedUsers(Model model, HttpSession session) {
+        // get permissions
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = (User) auth.getPrincipal();
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+        boolean fullList = false;
+        for (UserRoles role : roles){
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("ADMIN_READ") ||
+                    role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")) {
+                fullList = true;
+                break;
+            }
+        }
+
+        List<User> userList = new ArrayList<>();
+        if (fullList) {
+            userList = userService.findAllByDeleted(true);
+        } else {
+            userList = userService.findAllByCampusAndDeleted(currentUser.getCampus(), true);
+        }
+
+        redirectService.setHistory(session, "/user");
+        model.addAttribute("title", "All Users");
+        model.addAttribute("users", userList);
+        return "admin/user/listDeletedUsers";
+    }
+
     @GetMapping("/{id}")
     public String getUser(@PathVariable BigInteger id, Model model, HttpSession session) {
+        Optional<User> user = userService.findById(id);
+        if (user.isEmpty()) {
+            session.setAttribute("msgError", "User Not Found!");
+            return
+                    redirectService.pathName(session, "user");
+        }
         redirectService.setHistory(session, "/user/"+id);
-        User user = userService.findById(id).orElse(new User());
 
-        model.addAttribute("user", user);
-        model.addAttribute("userCampus", user.getCampus().getName());
-        model.addAttribute("userDepartment", user.getDepartment().getName());
-        model.addAttribute("userPosition", user.getPosition().getName());
-        model.addAttribute("userPosition", user.getPosition().getName());
+        boolean authResourceRead = false;
+        boolean authResourceWrite = false;
+        boolean authStoreRead = false;
+        boolean authStoreWrite = false;
+        boolean authSupportWrite = false;
+        for (UserRoles role : user.get().getUserRoles()) {
+            switch (role.getName()){
+                case "RESOURCE_READ":
+                    authResourceRead = true;
+                    break;
+                case "RESOURCE_WRITE":
+                    authResourceWrite = true;
+                    break;
+                case "STORE_READ":
+                    authStoreRead = true;
+                    break;
+                case "STORE_WRITE":
+                    authStoreWrite = true;
+                    break;
+                case "SUPPORT_WRITE":
+                    authSupportWrite = true;
+                    break;
+            }
+        }
+
+
+        model.addAttribute("user", user.get());
+        model.addAttribute("userCampus", user.get().getCampus().getName());
+        model.addAttribute("userDepartment", user.get().getDepartment().getName());
+        model.addAttribute("userPosition", user.get().getPosition().getName());
+        model.addAttribute("userPosition", user.get().getPosition().getName());
+
+        model.addAttribute("authResourceRead", authResourceRead);
+        model.addAttribute("authResourceWrite", authResourceWrite);
+        model.addAttribute("authStoreRead", authStoreRead);
+        model.addAttribute("authStoreWrite", authStoreWrite);
+        model.addAttribute("authSupportWrite", authSupportWrite);
         return "admin/user/user";
     }
 
@@ -356,5 +421,37 @@ public class UserController {
         session.setAttribute(msg.getMsgType(), msg.getMessage());
 
         return "redirect:/user/"+user.getId().toString();
+    }
+
+    @GetMapping("/{id}/delete")
+    public String deletedUser(@PathVariable BigInteger id, HttpSession session) {
+        Optional<User> user = userService.findById(id);
+        if (user.isPresent()) {
+            if (!user.get().isDeleted()) {
+                user.get().setUserRoles(new ArrayList<>());
+                user.get().setDeleted(true);
+                userService.save(user.get());
+            }
+        }
+        return redirectService.pathName(session, "user");
+    }
+
+    @GetMapping("/{id}/restore")
+    public String restoreUser(@PathVariable BigInteger id, HttpSession session) {
+        Optional<User> user = userService.findById(id);
+        if (user.isPresent()) {
+            if (user.get().isDeleted()) {
+                user.get().setDeleted(false);
+                // set permissions based on position
+                Optional<PermissionTemplate> template = permissionTemplateService.findFirstByPosition(user.get().getPosition());
+                if (template.isPresent()) {
+                    for (UserRoles role : template.get().getUserRoles()) {
+                        user.get().getUserRoles().add(role);
+                    }
+                }
+            }
+            userService.save(user.get());
+        }
+        return redirectService.pathName(session, "user");
     }
 }

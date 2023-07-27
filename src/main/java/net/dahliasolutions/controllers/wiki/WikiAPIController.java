@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.*;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.wiki.*;
+import net.dahliasolutions.services.AdminSettingsService;
 import net.dahliasolutions.services.wiki.WikiFolderService;
 import net.dahliasolutions.services.wiki.WikiPostService;
 import net.dahliasolutions.services.wiki.WikiTagService;
@@ -25,6 +26,7 @@ public class WikiAPIController {
     private final WikiPostService wikiPostService;
     private final WikiFolderService wikiFolderService;
     private final WikiTagService wikiTagService;
+    private final AdminSettingsService adminSettingsService;
 
     @PostMapping("/save")
     public BigInteger postWiki(@ModelAttribute WikiPostModel wikiPostModel) {
@@ -212,5 +214,17 @@ public class WikiAPIController {
                 folderModel.nameDestination(), folderModel.nameDestination());
 
         return updatedFolder;
+    }
+
+    @PostMapping("/updatewikihome")
+    public SingleStringModel updateWikiHome(@ModelAttribute SingleStringModel wikiHomeModel) {
+        adminSettingsService.setWikiHome(wikiHomeModel.name());
+        return wikiHomeModel;
+    }
+
+    @PostMapping("/updateportalhome")
+    public SingleStringModel updatePortalHome(@ModelAttribute SingleStringModel portalHomeModel) {
+        adminSettingsService.setPortalHome(portalHomeModel.name());
+        return portalHomeModel;
     }
 }

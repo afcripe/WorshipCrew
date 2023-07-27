@@ -33,6 +33,7 @@ public class UserService implements UserServiceInterface{
     @Override
     public User createDefaultUser(User user) {
         user.setActivated(true);
+        user.setDeleted(false);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         User newUser = userRepository.save(user);
         return newUser;
@@ -41,6 +42,7 @@ public class UserService implements UserServiceInterface{
     @Override
     public User createUser(User user) {
         user.setActivated(false);
+        user.setDeleted(false);
         user.setPassword("-UserMustChangeThisByClickingOnTheEmailedLink-");
         User newUser = userRepository.save(user);
         return newUser;
@@ -105,12 +107,17 @@ public class UserService implements UserServiceInterface{
 
     @Override
     public List<User> findAll() {
-        return userRepository.findAll();
+        return userRepository.findAllByDeleted(false);
     }
 
     @Override
     public List<User> findAllByCampus(Campus campus) {
-        return userRepository.findAllByCampus(campus);
+        return userRepository.findAllByCampusAndDeleted(campus, false);
+    }
+
+    @Override
+    public List<User> findAllByCampusAndDeleted(Campus campus, boolean deleted) {
+        return userRepository.findAllByCampusAndDeleted(campus, deleted);
     }
 
     @Override
@@ -160,22 +167,22 @@ public class UserService implements UserServiceInterface{
 
     @Override
     public List<User> findAllByPosition(Position position) {
-        return userRepository.findAllByPosition(position);
+        return userRepository.findAllByPositionAndDeleted(position, false);
     }
 
     @Override
     public List<User> findAllByDepartment(DepartmentCampus department) {
-        return userRepository.findAllByDepartmentCampus(department);
-    }
-
-    @Override
-    public List<User> findAllByLocation(Campus location) {
-        return userRepository.findAllByCampus(location);
+        return userRepository.findAllByDepartmentCampusAndDeleted(department, false);
     }
 
     @Override
     public List<User> findAllByActivated() {
         return userRepository.findAllByActivated(true);
+    }
+
+    @Override
+    public List<User> findAllByDeleted(boolean deleted) {
+        return userRepository.findAllByDeleted(deleted);
     }
 
     @Override

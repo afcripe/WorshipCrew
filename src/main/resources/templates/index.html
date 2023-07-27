@@ -10,7 +10,8 @@
 
     <div class="row">
 
-      <div class="col">
+      <div th:if="${wikiPost}" th:utext="${wikiPost.body}"></div>
+      <div th:unless="${wikiPost}" class="col">
         <div th:replace="~{components/home :: pageFragment}">Welcome</div>
       </div>
 

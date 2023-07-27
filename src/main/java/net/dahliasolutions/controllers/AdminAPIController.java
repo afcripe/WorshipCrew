@@ -20,9 +20,6 @@ public class AdminAPIController {
         if (prop.equals("monthlyStatements")) {
             adminSettingsService.setMonthlyStatements(Boolean.parseBoolean(singleStringModel.name()));
         }
-        if (prop.equals("allowVolunteerRequests")) {
-            adminSettingsService.setAllowVolunteerRequests(Boolean.parseBoolean(singleStringModel.name()));
-        }
     }
 
 }

@@ -9,11 +9,11 @@
 
   <div class="container my-3" th:object="${user}">
 
-    <div class="row">
+    <div class="row m-0 p-0">
 
-      <div class="column col-lg-4">
+      <div class="col-12 col-md-6">
 
-        <div class="card">
+        <div class="card pb-2">
           <div class="card-title alert alert-primary">
             <div style="float: right">
               <button class="btn btn-sm btn-info small"
@@ -38,32 +38,87 @@
         </div>
       </div>
 
-      <div class="column col-lg-4">
-        <div class="card">
-          <div class="card-title alert alert-primary bg-faded">
-            <button class="btn btn-sm btn-success small" style="float: right"
-                    th:onclick="window.location.href='/user/[[${user.id}]]/addpermission'">Add</button>
-            <h5>Site Authorizations</h5>
-          </div>
-          <div class="card-body">
-            <ul class="list-group list-group-flush" th:each="role : *{UserRoles}">
-              <li class="list-group-item">
-                <button class="btn btn-sm btn-danger small" style="float: right"
-                        th:onclick="window.location.href='/user/[[${user.id}]]/removerole/[[${role.name}]]'">Remove</button>
-                <span th:text="${role.name}"/>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
+      <div class="col-12 col-md-6 col-lg-4">
 
-      <div class="column col-lg-4">
-          <p>&nbsp;</p>
+          <div class="card">
+            <div class="card-title alert alert-primary bg-faded">
+              <button class="btn btn-sm btn-success small" style="float: right"
+                      th:onclick="window.location.href='/user/[[${user.id}]]/addpermission'">Add</button>
+              <h5>Permissions</h5>
+            </div>
+            <div class="card-body">
+              <input type="hidden" th:value="${user.id}" id="inputUserId">
+              <p><input type="checkbox" id="inputAuthResourceRead" checked onchange="updateAuth('RESOURCE_READ')"> View Resources</p>
+              <p><input type="checkbox" id="inputAuthResourceWrite" onchange="updateAuth('RESOURCE_WRITE')"> Create Resources</p>
+              <p><input type="checkbox" id="inputAuthStoreRead" onchange="updateAuth('STORE_READ')"> View Store</p>
+              <p><input type="checkbox" id="inputAuthStoreWrite" onchange="updateAuth('STORE_WRITE')"> Add Store Items</p>
+              <p><input type="checkbox" id="inputAuthSupportWrite" onchange="updateAuth('SUPPORT_WRITE')"> Submit Support Tickets</p>
+            </div>
+          </div>
+
+          <div class="card mt-2" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')}">
+            <div class="card-title alert alert-primary bg-faded">
+              <button class="btn btn-sm btn-success small" style="float: right"
+                      th:onclick="window.location.href='/user/[[${user.id}]]/addpermission'">Add</button>
+              <h5>User Roles <span id="authRefresh" style="display: none;" onclick="window.location.reload()"><i class="bi bi-arrow-repeat"></i></span></h5>
+            </div>
+            <div class="card-body">
+              <ul class="list-group list-group-flush" th:each="role : *{UserRoles}">
+                <li class="list-group-item">
+                  <button class="btn btn-sm btn-danger small" style="float: right"
+                          th:onclick="window.location.href='/user/[[${user.id}]]/removerole/[[${role.name}]]'">Remove</button>
+                  <span th:text="${role.name}"/>
+                </li>
+              </ul>
+            </div>
+          </div>
+
       </div>
 
     </div>
 
   </div>
+
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    let jsAuthResourceRead = /*[[${authResourceRead}]]*/ false;
+    let jsAuthResourceWrite = /*[[${authResourceWrite}]]*/ false;
+    let jsAuthStoreRead = /*[[${authStoreRead}]]*/ false;
+    let jsAuthStoreWrite = /*[[${authStoreWrite}]]*/ false;
+    let jsAuthSupportWrite = /*[[${authSupportWrite}]]*/ false;
+    /*]]>*/
+
+    document.getElementById("inputAuthResourceRead").checked = jsAuthResourceRead;
+    document.getElementById("inputAuthResourceWrite").checked = jsAuthResourceWrite;
+    document.getElementById("inputAuthStoreRead").checked = jsAuthStoreRead;
+    document.getElementById("inputAuthStoreWrite").checked = jsAuthStoreWrite;
+    document.getElementById("inputAuthSupportWrite").checked = jsAuthSupportWrite;
+
+    async function updateAuth(auth) {
+      debugger
+      let chkINPUT = document.getElementById("inputAuthResourceRead");
+      let chk = document.getElementById("inputAuthResourceRead").isChecked;
+      let chk2INPUT = document.getElementById("inputAuthResourceWrite");
+      let chk2 = document.getElementById("inputAuthResourceWrite").isChecked;
+      let userId = document.getElementById("inputUserId");
+      let formData = new FormData();
+          formData.set("name", auth)
+
+      const response = await fetch('/api/v1/user/setrole/'+userId.value, {
+        method: 'POST',
+        body: formData
+      }).then(response => {
+        return response.json();
+      }).then(data => {
+        console.log(data);
+        try {
+          document.getElementById("authRefresh").style.display = "inline-block";
+        } catch (e) { console.log("no authRefresh available") }
+        debugger;
+      });
+    }
+  </script>
+
 </div>
 
 </html>

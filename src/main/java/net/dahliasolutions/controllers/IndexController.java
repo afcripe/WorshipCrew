@@ -2,13 +2,16 @@ package net.dahliasolutions.controllers;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import net.dahliasolutions.models.AdminSettings;
 import net.dahliasolutions.models.BrowserMessage;
 import net.dahliasolutions.models.mail.EmailDetails;
 import net.dahliasolutions.models.LoginModel;
 import net.dahliasolutions.models.user.User;
+import net.dahliasolutions.models.wiki.WikiPost;
 import net.dahliasolutions.services.*;
 import net.dahliasolutions.services.mail.EmailService;
 import net.dahliasolutions.services.user.UserService;
+import net.dahliasolutions.services.wiki.WikiPostService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -18,6 +21,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("")
 @RequiredArgsConstructor
@@ -26,16 +31,22 @@ public class IndexController {
     private final UserService userService;
     private final EmailService emailService;
     private final RedirectService redirectService;
+    private final WikiPostService wikiPostService;
+    private final AdminSettingsService adminSettingsService;
 
     @ModelAttribute
     public void addAttributes(Model model) {
-        model.addAttribute("moduleTitle", "DW Exchange");
+        model.addAttribute("moduleTitle", "DWC");
         model.addAttribute("moduleLink", "/");
     }
 
     @GetMapping("/")
-    public String goHome(HttpSession session) {
+    public String getHome(Model model, HttpSession session) {
         redirectService.setHistory(session, "/");
+        AdminSettings adminSettings = adminSettingsService.getAdminSettings();
+        if (!adminSettings.getPortalHome().equals("")) {
+            model.addAttribute("wikiPost", getHomePath(adminSettings.getPortalHome()));
+        }
         return "index";
     }
 
@@ -80,6 +91,27 @@ public class IndexController {
         BrowserMessage returnMsg = emailService.sendPasswordResetMail(emailDetails, user.getId());
         session.setAttribute(returnMsg.getMsgType(), returnMsg.getMessage());
         return "redirect:/";
+    }
+
+    private WikiPost getHomePath(String path) {
+        String[] folderList = path.split("/");
+        String postURLName = folderList[folderList.length-1];
+        String postName = postURLName.replace("-", " ");
+        String folders = "";
+        for ( int i=1; i<folderList.length-1; i++ ) {
+            folders = folders + "/" + folderList[i];
+        }
+
+        List<WikiPost> wikiList = wikiPostService.findByTitle(postName);
+        if (wikiList.size() > 1) {
+            for ( WikiPost w : wikiList ) {
+                if ( w.getFolder().equals(folders) ) {
+                    return w;
+                }
+            }
+        }
+
+        return wikiList.get(0);
     }
 
 }

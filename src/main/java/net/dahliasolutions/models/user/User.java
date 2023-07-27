@@ -34,6 +34,7 @@ public class User implements UserDetails {
     private String lastName;
     private String contactEmail;
     private boolean activated;
+    private boolean deleted;
 
     @ManyToOne
     private User director;

@@ -6,5 +6,6 @@ public interface AdminSettingsServiceInterface {
     AdminSettings getAdminSettings();
     void setCompanyName(String name);
     void setMonthlyStatements(boolean bool);
-    void setAllowVolunteerRequests(boolean bool);
+    void setWikiHome(String name);
+    void setPortalHome(String name);
 }

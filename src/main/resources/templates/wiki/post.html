@@ -12,8 +12,8 @@
         <div class="row mt-2">
 
             <h2 style="color: royalblue; float: left">
-                <span th:text="*{title}">Wiki Title</span>
-                <a th:href="@{'/wiki/post/edit/'}+*{id}" th:if="*{author.id} == ${userId}"> <i class="bi bi-pencil-square h6"></i></a>
+                <span th:text="*{title}">Article Title</span>
+                <a th:href="@{'/resource/article/edit/'}+*{id}" th:if="*{author.id} == ${userId}"> <i class="bi bi-pencil-square h6"></i></a>
             </h2>
 
             <hr />
@@ -24,7 +24,6 @@
                 <div th:utext="*{body}"></div>
             </div>
             <div class="col-12 col-lg-3">
-                <h3 style="color: #0d6efd">Folder</h3>
                 <div class="card m-1">
                     <div class="card-title h6">Article Info</div>
                     <div class="card-section">
@@ -58,12 +57,12 @@
 
         let safeTitle = postTitle.replace(" ","-");
         let postLinkText = postFolder+"/"+safeTitle.toLowerCase();
-        let postLink = websiteDomain+"/wiki/articles"+postLinkText;
+        let postLink = websiteDomain+"/resource/articles"+postLinkText;
         document.getElementById("articleLinkText").innerText = postLinkText;
         document.getElementById("articleLink").href = postLink;
 
         function navToTag(id) {
-            window.location.href="/wiki/tag/"+id;
+            window.location.href="/resource/tag/"+id;
         }
     </script>
 

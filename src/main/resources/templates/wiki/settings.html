@@ -9,36 +9,94 @@
 
   <div class="container my-3">
 
-    <div class="row">
-
-      <div class="col-xs-1 col-md-2">
-        <h2 style="color: #0d6efd">Settings</h2>
-      </div>
-
+    <div class="col-xs-1 col-md-2">
+      <h2 style="color: #0d6efd">Settings</h2>
     </div>
 
-    <div class="row">
-
-      <div class="col-xs-1 col-md-6 col-lg-4">
-        <div class="card">
-          <div class="card-body">
-            <ul class="list-group list-group-flush">
-              <li class="list-group-item selectableItem" style="cursor: pointer;"
-                  onclick="window.location.href='/wiki/tagmanager'">
-                Manage Tags
-              </li>
-              <li class="list-group-item selectableItem" style="cursor: pointer;"
-                  onclick="window.location.href='/wiki/foldermanager'">
-                Manage Folders
-              </li>
-            </ul>
-          </div>
-        </div>
+    <div class="card" style="max-width: 450px">
+      <div class="card-body">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item selectableItem" style="cursor: pointer;"
+              onclick="window.location.href='/resource/tagmanager'">
+            Manage Tags
+          </li>
+          <li class="list-group-item selectableItem" style="cursor: pointer;"
+              onclick="window.location.href='/resource/foldermanager'">
+            Manage Folders
+          </li>
+        </ul>
       </div>
+    </div>
 
+    <div class="pt-4" style="max-width: 450px;">
+      <h4>Resource Home Page</h4>
+      <p>Leave blank to use default page of recent articles.</p>
+      <input id="inputWikiHome" type="text" style="width: 300px" th:value="${wikiHome}" onkeyup="inputSubmit()">
+      <button id="btnWikiHome" type="button" class="btn btn-sm btn-outline-primary" onclick="updateWikiHome()">Update</button>
+    </div>
+
+    <div class="pt-4" style="max-width: 450px;">
+      <h4>Resource Home Page</h4>
+      <p>Leave blank to use default page of recent articles.</p>
+      <input id="inputPortalHome" type="text" style="width: 300px" th:value="${portalHome}" onkeyup="inputPortalSubmit()">
+      <button id="btnPortalHome" type="button" class="btn btn-sm btn-outline-primary" onclick="updatePortalHome()">Update</button>
     </div>
 
   </div>
+
+  <script>
+    function inputSubmit(event) {
+      event.preventDefault();
+      if (event.key === 'Enter' || event.keyCode === 13) {
+        updateWikiHome();
+      }
+
+    }
+    async function updateWikiHome() {
+      let wHome = document.getElementById("inputWikiHome");
+      let bHome = document.getElementById("btnWikiHome");
+
+      bHome.disabled = true;
+
+      let theForm = new FormData();
+          theForm.set("name", wHome.value);
+      const response = await fetch("/api/v1/wiki/updatewikihome", {
+        method: 'POST',
+        body: theForm
+      }).then(response => {
+        return response.json();
+      }).then(data => {
+        debugger
+        bHome.disabled = false;
+      });
+    }
+
+    function inputPortalSubmit(event) {
+      event.preventDefault();
+      if (event.key === 'Enter' || event.keyCode === 13) {
+        updatePortalHome();
+      }
+
+    }
+    async function updatePortalHome() {
+      let pHome = document.getElementById("inputPortalHome");
+      let bPortalHome = document.getElementById("btnPortalHome");
+
+      bPortalHome.disabled = true;
+
+      let theForm = new FormData();
+        theForm.set("name", pHome.value);
+      const response = await fetch("/api/v1/wiki/updateportalhome", {
+        method: 'POST',
+        body: theForm
+      }).then(response => {
+        return response.json();
+      }).then(data => {
+        debugger
+        bPortalHome.disabled = false;
+      });
+    }
+  </script>
 
 </div>
 

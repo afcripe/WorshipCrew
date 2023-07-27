@@ -12,12 +12,12 @@
     <div class="mx-2">
 
         <div class="row mt-2">
-
-            <form id="postEditForm" style="height: 100%" th:action="@{/wiki/admin/post}" th:object="${wikiPost}" method="post">
+<!--   th:action="@{/resource/admin/post}" -->
+            <form id="postEditForm" style="height: 100%" th:object="${wikiPost}" method="post">
                 <div class="row">
                     <div class="col">
                         <input type="text" class="form-control-sm flex-grow" style="width: 50%" th:id="postTitle" th:value="*{title}"
-                               placeholder="Post Title" />
+                               placeholder="Article Title" />
                         <i id="savingIcon" class="bi bi-file-earmark-arrow-up h5" style="color: green; display: none; float: right"></i>
                         <input type="hidden" id="authorId" th:value="*{author.id}" />
                         <input type="hidden" id="postId" th:value="*{id}" />
@@ -525,7 +525,7 @@
                 document.getElementById("headerTag").classList.remove("disabled");
                 document.getElementById("headerFolder").classList.remove("disabled");
                 if (closeOnSave) {
-                    window.location.href="/wiki/post/"+data;
+                    window.location.href="/resource/article/"+data;
                 }
             });
         }
@@ -538,7 +538,7 @@
                 document.getElementById("chooseTag").showModal();
                 loadTags();
             } else {
-                alert("Please save you new post before adding tags.");
+                alert("Please save you new article before adding tags.");
             }
         }
         function manageFolder() {
@@ -546,7 +546,7 @@
                 document.getElementById("chooseFolder").showModal();
                 loadFolders();
             } else {
-                alert("Please save you new post before adding it to a folder.");
+                alert("Please save you new article before adding it to a folder.");
             }
         }
         function uploadImageClick() {

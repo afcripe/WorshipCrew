@@ -151,7 +151,7 @@ public class CampusController {
 
     @GetMapping("/{id}/delete")
     public String deleteLocation(@PathVariable BigInteger id, HttpSession session) {
-        List<User> userList = userService.findAllByLocation(campusService.findById(id).orElse(null));
+        List<User> userList = userService.findAllByCampus(campusService.findById(id).orElse(null));
         if (userList.size() > 0){
             session.setAttribute("msgError", "Users are assigned to campus!");
             return redirectService.pathName(session, "campus");

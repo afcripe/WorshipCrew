@@ -22,7 +22,8 @@ public class AdminSettingsService implements AdminSettingsServiceInterface{
                             BigInteger.valueOf(1),
                             "Destiny Worship Exchange",
                             false,
-                            true)
+                            "",
+                            "")
             );
         }
         return adminSettings;
@@ -43,10 +44,18 @@ public class AdminSettingsService implements AdminSettingsServiceInterface{
     }
 
     @Override
-    public void setAllowVolunteerRequests(boolean bool) {
+    public void setWikiHome(String name) {
         AdminSettings adminSettings = getAdminSettings();
-        adminSettings.setAllowVolunteerRequests(bool);
+        adminSettings.setWikiHome(name);
         adminSettingsRepository.save(adminSettings);
     }
+
+    @Override
+    public void setPortalHome(String name) {
+        AdminSettings adminSettings = getAdminSettings();
+        adminSettings.setPortalHome(name);
+        adminSettingsRepository.save(adminSettings);
+    }
+
 
 }

@@ -93,7 +93,7 @@
 
               <div class="row p-2">
                 <div class="col-xs-12 col-sm-4">
-                  <label for="directorId" class="form-label">Manager</label>
+                  <label for="directorId" class="form-label">Supervisor</label>
                 </div>
                 <div class="col-xs-12 col-sm-8">
                   <select id="directorId" name="directorId" class="form-control">
@@ -105,8 +105,12 @@
 
               <div class="row p-2">
                 <div class="col-xs-12">
-                  <button type="submit" class="btn btn-primary">Update</button>
-                  <button type="button" class="btn btn-warning" th:onclick="window.location.href=[[${session.redirectPath}]];">Cancel</button>
+                  <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                  <button type="button" class="btn btn-sm btn-warning" th:onclick="window.location.href=[[${session.redirectPath}]];">Cancel</button>
+                  <button type="button" class="btn btn-sm btn-outline-danger" style="float: right;" th:unless="*{deleted}"
+                          th:onclick="window.location.href='/user/'+[[*{id}]]+'/delete';">Delete</button>
+                  <button type="button" class="btn btn-sm btn-outline-success" style="float: right;"th:if="*{deleted}"
+                          th:onclick="window.location.href='/user/'+[[*{id}]]+'/restore';">Restore</button>
                 </div>
               </div>
             </form>

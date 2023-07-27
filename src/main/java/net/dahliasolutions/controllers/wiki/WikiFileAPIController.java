@@ -81,5 +81,4 @@ public class WikiFileAPIController {
         wikiImageService.deleteById(id);
         return "";
     }
-
 }
