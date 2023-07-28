@@ -5,16 +5,15 @@ import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.department.DepartmentRegional;
 import net.dahliasolutions.models.position.Position;
 import net.dahliasolutions.models.position.PositionSelectedModel;
-import net.dahliasolutions.models.store.StoreImage;
-import net.dahliasolutions.models.store.StoreImageModel;
-import net.dahliasolutions.models.store.StoreItem;
-import net.dahliasolutions.models.store.StoreItemModel;
+import net.dahliasolutions.models.store.*;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.services.*;
 import net.dahliasolutions.services.department.DepartmentRegionalService;
 import net.dahliasolutions.services.position.PositionService;
+import net.dahliasolutions.services.store.StoreCategoryService;
 import net.dahliasolutions.services.store.StoreImageService;
 import net.dahliasolutions.services.store.StoreItemService;
+import net.dahliasolutions.services.store.StoreSubCategoryService;
 import net.dahliasolutions.services.user.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,6 +40,7 @@ public class StoreController {
     private final UserService userService;
     private final StoreImageService storedImageService;
     private final RedirectService redirectService;
+    private final StoreCategoryService categoryService;
 
     @ModelAttribute
     public void addAttributes(Model model) {
@@ -95,15 +95,11 @@ public class StoreController {
         StoreItem storeItem = new StoreItem();
         storeItem.setName(storeItemModel.name());
         storeItem.setDescription(storeItemModel.description());
-        storeItem.setCount(storeItemModel.count());
         storeItem.setSpecialOrder(specialOrder);
         storeItem.setAvailable(available);
         storeItem.setLeadTime(storeItemModel.leadTime());
         if (storeItemModel.department() != null) {
-            storeItem.setDepartmentRegional(departmentService.findById(storeItemModel.department()).orElse(null));
-        }
-        if (storeItemModel.owner() != null) {
-            storeItem.setOwner(userService.findById(storeItemModel.owner()).orElse(null));
+            storeItem.setDepartment(departmentService.findById(storeItemModel.department()).orElse(null));
         }
         if (storeItemModel.image() != null) {
             storeItem.setImage(storedImageService.findById(storeItemModel.image()).orElse(null));
@@ -152,8 +148,9 @@ public class StoreController {
             return redirectService.pathName(session, "/store");
         }
 
-        List<User> userList = userService.findAll();
         List<DepartmentRegional> departmentRegionalList = departmentService.findAll();
+        List<StoreCategory> categoryList = categoryService.findAll();
+
         List<Position> allPositionList = positionService.findAll();
         List<Object> positionList = new ArrayList<>();
         for (Position p : allPositionList) {
@@ -170,9 +167,9 @@ public class StoreController {
         }
 
         model.addAttribute("storeItem", storeItem.get());
-        model.addAttribute("userList", userList);
         model.addAttribute("positionList", positionList);
         model.addAttribute("departmentList", departmentRegionalList);
+        model.addAttribute("categoryList", categoryList);
         return "store/itemEdit";
     }
 
@@ -201,15 +198,11 @@ public class StoreController {
 
         storeItem.get().setName(storeItemModel.name());
         storeItem.get().setDescription(storeItemModel.description());
-        storeItem.get().setCount(storeItemModel.count());
         storeItem.get().setSpecialOrder(specialOrder);
         storeItem.get().setAvailable(available);
         storeItem.get().setLeadTime(storeItemModel.leadTime());
         if (storeItemModel.department() != null) {
-            storeItem.get().setDepartmentRegional(departmentService.findById(storeItemModel.department()).orElse(null));
-        }
-        if (storeItemModel.owner() != null) {
-            storeItem.get().setOwner(userService.findById(storeItemModel.owner()).orElse(null));
+            storeItem.get().setDepartment(departmentService.findById(storeItemModel.department()).orElse(null));
         }
         if (storeItemModel.image() != null) {
             storeItem.get().setImage(storedImageService.findById(storeItemModel.image()).orElse(null));
@@ -240,7 +233,9 @@ public class StoreController {
     }
 
     @GetMapping("/settings")
-    public String getStoreSettings() {
+    public String getStoreSettings(Model model) {
+        List<StoreCategory> categoryList = categoryService.findAll();
+        model.addAttribute("categoryList", categoryList);
         return "store/settings";
     }
 

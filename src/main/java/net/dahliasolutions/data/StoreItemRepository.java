@@ -15,4 +15,12 @@ public interface StoreItemRepository extends JpaRepository<StoreItem, BigInteger
 
     @Query(value="SELECT * FROM STORE_ITEM WHERE UPPER(NAME) LIKE CONCAT('%',UPPER(:s),'%') OR UPPER(DESCRIPTION) LIKE CONCAT('%',UPPER(:s),'%')", nativeQuery = true)
     List<StoreItem> searchAll(@Param("s") String searchTerm);
+
+    @Query(value="SELECT COUNT(ID) FROM STORE_ITEM WHERE CATEGORY_ID=:i", nativeQuery = true)
+    Integer countByCategoryId(@Param("i") BigInteger id);
+
+    @Query(value="SELECT COUNT(ID) FROM STORE_ITEM WHERE SUB_CATEGORY_ID=:i", nativeQuery = true)
+    Integer countBySubCategoryId(@Param("i") BigInteger id);
+
+
 }

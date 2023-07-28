@@ -4,6 +4,15 @@
       layout:decorate="~{layouts/defaultLayout}">
 
 <div class="container-fluid" layout:fragment="content">
+  <template id="tmpSubCat">
+    <div class="m-1">
+      <div style="float: right;">
+        <button class="btn btn-sm btn-quaternary">Edit</button>
+        <button class="btn btn-sm btn-outline-quaternary">Delete</button>
+      </div>
+      <p style="width: 100%;">Sub-Category</p>
+    </div>
+  </template>
 
   <div th:replace="~{store/moduleHeader :: header}">Header</div>
 
@@ -19,22 +28,257 @@
 
     <div class="row">
 
-      <div class="col-xs-1 col-md-6 col-lg-4">
-        <div class="card">
-          <div class="card-body">
-            <ul class="list-group list-group-flush">
-              <li class="list-group-item selectableItem" style="cursor: pointer;"
-                  onclick="window.location.href='/store/imageManager'">
-                Manage Uploaded Images
-              </li>
-            </ul>
-          </div>
+      <div class="card" style="max-width: 400px;">
+        <div class="card-body">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item selectableItem" style="cursor: pointer;"
+                onclick="window.location.href='/store/imageManager'">
+              Manage Uploaded Images
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card" style="max-width: 450px;">
+        <div class="card-title m-4">
+          <button class="btn btn-sm btn-quaternary" style="float: right;" onclick="newCategory()">Add Category</button>
+          <h4>Categories</h4>
+        </div>
+        <div class="card-body">
+          <button id="deleteCategory" type="button" class="btn btn-sm btn-outline-quaternary"
+                  style="display: none; float: right;" onclick="deleteCat()">Delete</button>
+          <select id="categoryList" class="form-control" onchange="getSubCategories()" style="width: 200px">
+            <option th:each="c : ${categoryList}" th:value="${c.id}" th:text="${c.name}"></option>
+          </select>
+          <hr/>
+          <div id="subCategories"></div>
+          <div id="editSubCategory" class="pt-4" style="display: none;">
+            <div style="float:right;">
+              <button id="editSubSend" type="button" class="btn btn-sm btn-quaternary" onclick="updateSub()">Submit</button>
+              <button id="clearSubSend" type="button" class="btn btn-sm btn-quaternary" onclick="clearSub()">clear</button>
+            </div>
+            <input id="editSubId" type="hidden" value="0">
+            <input id="editSubName" type="text" class="form-control" style="width: 200px">
+            </div>
         </div>
       </div>
 
     </div>
 
   </div>
+
+  <dialog id="newCategoryDialog" class="upload-modal">
+    <script>
+      async function postNewCat() {
+        let formData = new FormData();
+          formData.set("name", document.getElementById('catName').value)
+
+        const response = await fetch('/api/v1/store/category/new', {
+          method: 'POST',
+          body: formData
+        }).then(response => {
+          return response.json();
+        }).then(data => {
+          console.log(data);
+          debugger
+          let opt = document.createElement('option');
+              opt.value = data.id;
+              opt.innerHTML = data.name;
+          categorySelect.appendChild(opt);
+          setCategory(data.id);
+          keyEscCat();
+        });
+      }
+      function keyNewCat(event) {
+        event.preventDefault();
+        if (event.key === "Enter" || event.keyCode === 13) {
+          postNewItem();
+        }
+        if (event.key === "Escape") {
+          keyEscCat();
+        }
+      }
+
+      function keyEscCat() {
+        document.getElementById("newCategoryDialog").close();
+      }
+
+    </script>
+    <h2>New Store item</h2>
+    <form id="formNewItem" style="width: 300px; max-width: 450px">
+      <label for="catName" class="form-label">Name</label>
+      <input class="form-control" id="catName" onkeyup="keyNewCat(event)">
+
+      <div class="pt-2">
+        <button id="btnSubmit" type="button" class="btn btn-sm btn-quaternary" onclick="postNewCat()">Add Item</button>
+        <button id="btnCancel" type="button" class="btn btn-sm btn-outline-quaternary" onclick="keyEscCat()">Cancel</button>
+      </div>
+
+    </form>
+  </dialog>
+
+  <script>
+    const categorySelect = document.getElementById("categoryList");
+    const template = document.getElementById("tmpSubCat");
+    const subCategoryDisplay = document.getElementById("subCategories");
+    const editSubCategoryDisplay = document.getElementById("editSubCategory");
+    const editSubIdDisplay = document.getElementById("editSubId");
+    const editSubNameDisplay = document.getElementById("editSubName");
+    const deleteCatDisplay = document.getElementById("deleteCategory")
+
+    function newCategory() {
+      document.getElementById("newCategoryDialog").showModal();
+    }
+
+    async function getSubCategories() {
+      while (subCategoryDisplay.firstChild) {
+        subCategoryDisplay.removeChild(subCategoryDisplay.lastChild);
+      }
+      let formData = new FormData();
+        formData.set("id", categorySelect.value)
+
+      const response = await fetch('/api/v1/store/category', {
+        method: 'POST',
+        body: formData
+      }).then(response => {
+        return response.json();
+      }).then(data => {
+        console.log(data);
+        for (let key in data) {
+          let obj = data[key];
+          let divID = "id-" + obj.id;
+
+          let clone = template.content.cloneNode(true);
+          let nameDiv = clone.querySelector("p");
+              nameDiv.innerText = obj.name;
+
+          let btnDiv = clone.querySelectorAll("button");
+              btnDiv[0].addEventListener("click", function (event) {
+            editSub(obj.id, obj.name);
+          });
+              btnDiv[1].addEventListener("click", function (event) {
+            deleteSub(obj.id, obj.name);
+          });
+
+          subCategoryDisplay.appendChild(clone);
+        }
+        debugger
+        if (data.length > 0) {
+          deleteCatDisplay.style.display = "none";
+        } else {
+          deleteCatDisplay.style.display = "block";
+        }
+        clearSub();
+      });
+    }
+
+    function clearSub() {
+      editSubCategoryDisplay.style.display = "block";
+      editSubIdDisplay.value = 0;
+      editSubNameDisplay.value = "";
+    }
+
+    function editSub(id, name) {
+      debugger
+      editSubIdDisplay.value = id;
+      editSubNameDisplay.value = name;
+    }
+
+    async function updateSub() {
+      let formData = new FormData();
+          formData.set("id", editSubIdDisplay.value)
+          formData.set("name", editSubNameDisplay.value)
+          formData.set("parentId",categorySelect.value)
+
+      const response = await fetch('/api/v1/store/subcategory/edit', {
+        method: 'POST',
+        body: formData
+      }).then(response => {
+        return response.json();
+      }).then(data => {
+        getSubCategories();
+      });
+    }
+
+    async function deleteSub(id, name) {
+      let formData = new FormData();
+          formData.set("id", editSubIdDisplay.value)
+          formData.set("name", editSubNameDisplay.value)
+
+      const response = await fetch('/api/v1/store/subcategory/count', {
+        method: 'POST',
+        body: formData
+      }).then(response => {
+        return response.json();
+      }).then(data => {
+        if (data.count > 0) {
+          alert("Cannot delete Sub-Category. There are "+data.count+" store items assigned to it.")
+        } else {
+          deleteSubCategory(id, name)
+        }
+      });
+    }
+
+    async function deleteSubCategory(id, name) {
+      let formData = new FormData();
+        formData.set("id", id)
+        formData.set("name", name)
+
+      const response = await fetch('/api/v1/store/subcategory/delete', {
+        method: 'POST',
+        body: formData
+      }).then(response => {
+        return response.json();
+      }).then(data => {
+        getSubCategories();
+      });
+    }
+
+    async function deleteCat() {
+      let formData = new FormData();
+        formData.set("id", categorySelect.value)
+
+      const response = await fetch('/api/v1/store/category/count', {
+        method: 'POST',
+        body: formData
+      }).then(response => {
+        return response.json();
+      }).then(data => {
+        if (data.count > 0) {
+          alert("Cannot delete Sub-Category. There are "+data.count+" store items assigned to it.")
+        } else {
+          deleteCategory()
+        }
+      });
+    }
+
+    async function deleteCategory() {
+      let formData = new FormData();
+        formData.set("id", categorySelect.value)
+
+      const response = await fetch('/api/v1/store/category/delete', {
+        method: 'POST',
+        body: formData
+      }).then(response => {
+        return response.json();
+      }).then(data => {
+        let i = categorySelect.selectedIndex;
+        categorySelect.removeChild(categorySelect[i]);
+        categorySelect.dispatchEvent(new Event('change'));
+      });
+    }
+
+    function setCategory(id) {
+      categorySelect.value = id;
+      categorySelect.dispatchEvent(new Event('change'));
+    }
+
+    if (categorySelect.value !== "" && categorySelect.value > 0) {
+      clearSub();
+      getSubCategories()
+    }
+
+  </script>
 
 </div>
 

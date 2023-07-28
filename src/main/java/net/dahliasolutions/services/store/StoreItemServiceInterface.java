@@ -15,5 +15,7 @@ public interface StoreItemServiceInterface {
     List<StoreItem> findAll();
     void save(StoreItem StoreItem);
     void deleteById(BigInteger id);
+    Integer countByCategory(BigInteger id);
+    Integer countBySubCategory(BigInteger id);
 
 }

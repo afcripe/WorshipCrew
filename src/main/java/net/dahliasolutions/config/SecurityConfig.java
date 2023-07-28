@@ -3,7 +3,9 @@ package net.dahliasolutions.config;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.data.UserRepository;
+import net.dahliasolutions.models.user.Profile;
 import net.dahliasolutions.models.user.User;
+import net.dahliasolutions.services.user.ProfileService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,12 +23,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.util.Optional;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
     private final UserRepository userRepository;
+    private final ProfileService profileService;
 
     @Bean
     public UserDetailsService userDetailsService() {
@@ -84,6 +89,17 @@ public class SecurityConfig {
                     User user = (User) auth.getPrincipal();
                     HttpSession session = request.getSession();
                     session.setAttribute("userDisplayName", user.getFirstName());
+                    // set Profile Info
+                    Optional<Profile> profile = profileService.findByUser(user);
+                    if (profile.isPresent()) {
+                        session.setAttribute("theme", profile.get().getTheme());
+                        session.setAttribute("sideNavigation", profile.get().getSideNavigation());
+                        session.setAttribute("storeLayout", profile.get().getStoreLayout());
+                    } else {
+                        session.setAttribute("theme", "default");
+                        session.setAttribute("sideNavigation", "expand");
+                        session.setAttribute("storeLayout", "grid");
+                    }
                     response.sendRedirect(request.getContextPath());
                 }).failureHandler((request, response, exception) -> {
                     HttpSession session = request.getSession();

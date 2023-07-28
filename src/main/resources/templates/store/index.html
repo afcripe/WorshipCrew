@@ -6,16 +6,16 @@
 
 <div class="container-fluid m-0 p-0" layout:fragment="content">
 
-    <script>
-        let displayType = "list";
-    </script>
-    <th:block th:if="${session.storeListGrid}">
-        <script>
-            /*<![CDATA[*/
-            displayType = "[[${session.storeListGrid}]]";
-            /*]]>*/
-        </script>
-    </th:block>
+<!--    <script>-->
+<!--        let displayType = "list";-->
+<!--    </script>-->
+<!--    <th:block th:if="${session.storeListGrid}">-->
+<!--        <script>-->
+<!--            /*<![CDATA[*/-->
+<!--            displayType = "[[${session.storeListGrid}]]";-->
+<!--            /*]]>*/-->
+<!--        </script>-->
+<!--    </th:block>-->
 
 
     <div th:replace="~{store/moduleHeader :: header}">Header</div>
@@ -27,20 +27,18 @@
             <h1 style="color: coral">Welcome to the Destiny Store</h1>
             <p th:if="${#lists.isEmpty(storeItems)}">No, it's not prime day.</p>
 
-            <div th:if="${session.storeListGrid == 'list'}">
-            <div th:each="item : ${storeItems}">
-                <div th:replace="~{components/cardStoreItemLine :: cardFragment(${item})}">List</div>
-            </div>
+            <div th:if="${session.storeLayout == 'list'}">
+                <div th:each="item : ${storeItems}">
+                    <div th:replace="~{components/cardStoreItemLine :: cardFragment(${item})}">List</div>
+                </div>
             </div>
 
-            <div th:if="${session.storeListGrid == 'grid'}">
-
+            <div th:if="${session.storeLayout == 'grid'}">
                 <div class="store_grid_wrapper">
                     <div th:each="item : ${storeItems}">
                         <div th:replace="~{components/cardStoreItemLG :: cardFragment(${item})}">Card</div>
                     </div>
                 </div>
-
             </div>
 
         </div>
@@ -52,23 +50,6 @@
         let searchTerm = /*[[${searchTerm}]]*/ " ";
         /*]]>*/
         document.getElementById("searchInput").value = searchTerm;
-
-        fetch('/api/v1/store/display/'+displayType);
-
-        function redrawGrid() {
-            displayType = 'grid';
-            fetch('/api/v1/store/display/'+displayType).then(response => {
-                window.location.href='/store';
-                return response.json();
-            });
-        }
-        function redrawList() {
-            displayType = 'list';
-            fetch('/api/v1/store/display/'+displayType).then(response => {
-                window.location.href='/store';
-                return response.json();
-            });
-        }
 
         function navToItem(id) {
             window.location.href="/store/item/"+id;

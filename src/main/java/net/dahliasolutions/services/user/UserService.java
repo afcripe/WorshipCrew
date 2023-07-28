@@ -29,6 +29,7 @@ public class UserService implements UserServiceInterface{
     private final PasswordEncoder passwordEncoder;
     private final CampusRepository campusRepository;
     private final DepartmentCampusRepository departmentCampusRepository;
+    private final ProfileService profileService;
 
     @Override
     public User createDefaultUser(User user) {
@@ -36,6 +37,7 @@ public class UserService implements UserServiceInterface{
         user.setDeleted(false);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         User newUser = userRepository.save(user);
+        profileService.createDefaultProfile(user);
         return newUser;
     }
 
@@ -45,6 +47,7 @@ public class UserService implements UserServiceInterface{
         user.setDeleted(false);
         user.setPassword("-UserMustChangeThisByClickingOnTheEmailedLink-");
         User newUser = userRepository.save(user);
+        profileService.createDefaultProfile(user);
         return newUser;
     }
 

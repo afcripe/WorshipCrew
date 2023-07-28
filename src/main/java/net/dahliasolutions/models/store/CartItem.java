@@ -31,9 +31,9 @@ public class CartItem {
     @Enumerated(EnumType.STRING)
     private OrderStatus itemStatus;
 
-    @Nullable
-    @ManyToOne(fetch = FetchType.EAGER)
-    private User owner;             //person who receives order requests
+//    @Nullable
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    private User owner;             //person who receives order requests
 
     @Nullable
     @ManyToOne(fetch = FetchType.LAZY)

@@ -51,7 +51,6 @@ public class CartAPIController {
                         storeItem.get().isAvailable(),
                         storeItem.get().getLeadTime(),
                         OrderStatus.cart,
-                        storeItem.get().getOwner(),
                         storeItem.get().getImage(),
                         cart
                 );

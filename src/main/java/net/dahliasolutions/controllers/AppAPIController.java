@@ -1,14 +1,22 @@
 package net.dahliasolutions.controllers;
 
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
+import net.dahliasolutions.models.user.Profile;
+import net.dahliasolutions.models.user.User;
+import net.dahliasolutions.services.user.ProfileService;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/app")
 public class AppAPIController {
+
+    private final ProfileService profileService;
 
     @GetMapping("/removeerrormsg")
     public void removeErrorMSG(HttpSession session) {
@@ -31,13 +39,13 @@ public class AppAPIController {
     }
 
     @GetMapping("/toggleSideNav/{sideNav}")
-    public void toggleSideNav(@PathVariable boolean sideNav, HttpSession session) {
-        if (sideNav) {
-            session.setAttribute("showSideNav", true);
-            session.removeAttribute("hideSideNav");
-        } else {
-            session.removeAttribute("showSideNav");
-            session.setAttribute("hideSideNav", true);
-        }
+    public void toggleSideNav(@PathVariable String sideNav, HttpSession session) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) auth.getPrincipal();
+        Optional<Profile> profile = profileService.findByUser(user);
+            profile.get().setSideNavigation(sideNav);
+        profileService.save(profile.get());
+
+        session.setAttribute("sideNavigation", sideNav);
     }
 }

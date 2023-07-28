@@ -50,4 +50,14 @@ public class StoreItemService implements StoreItemServiceInterface {
     public void deleteById(BigInteger id) {
         storeItemRepository.deleteById(id);
     }
+
+    @Override
+    public Integer countByCategory(BigInteger id) {
+        return storeItemRepository.countByCategoryId(id);
+    }
+
+    @Override
+    public Integer countBySubCategory(BigInteger id) {
+        return storeItemRepository.countBySubCategoryId(id);
+    }
 }
