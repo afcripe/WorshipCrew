@@ -11,6 +11,7 @@ import net.dahliasolutions.models.position.Position;
 
 import java.math.BigInteger;
 import java.util.Collection;
+import java.util.List;
 
 @Data
 @Builder
@@ -47,5 +48,8 @@ public class StoreItem {
 
     @ManyToMany(fetch = FetchType.EAGER)
     private Collection<Position> positionList;
+
+    @OneToMany(fetch = FetchType.EAGER)
+    private List<StoreItemOption> itemOptions;
 
 }

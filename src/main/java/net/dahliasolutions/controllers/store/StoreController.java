@@ -41,6 +41,7 @@ public class StoreController {
     private final StoreImageService storedImageService;
     private final RedirectService redirectService;
     private final StoreCategoryService categoryService;
+    private final StoreSubCategoryService subCategoryService;
 
     @ModelAttribute
     public void addAttributes(Model model) {
@@ -100,6 +101,12 @@ public class StoreController {
         storeItem.setLeadTime(storeItemModel.leadTime());
         if (storeItemModel.department() != null) {
             storeItem.setDepartment(departmentService.findById(storeItemModel.department()).orElse(null));
+        }
+        if (storeItemModel.category() != null) {
+            storeItem.setCategory(categoryService.findById(storeItemModel.category()).orElse(null));
+        }
+        if (storeItemModel.subCategory() != null) {
+            storeItem.setSubCategory(subCategoryService.findById(storeItemModel.subCategory()).orElse(null));
         }
         if (storeItemModel.image() != null) {
             storeItem.setImage(storedImageService.findById(storeItemModel.image()).orElse(null));
@@ -170,6 +177,8 @@ public class StoreController {
         model.addAttribute("positionList", positionList);
         model.addAttribute("departmentList", departmentRegionalList);
         model.addAttribute("categoryList", categoryList);
+        model.addAttribute("categoryId", storeItem.get().getCategory().getId());
+        model.addAttribute("subCategoryId", storeItem.get().getSubCategory().getId());
         return "store/itemEdit";
     }
 
@@ -179,18 +188,6 @@ public class StoreController {
         if (storeItem.isEmpty()) {
             session.setAttribute("msgError", "Item not found..");
             return redirectService.pathName(session, "/store");
-        }
-        if (storeItemModel.name().equals("")) {
-            List<User> userList = userService.findAll();
-            List<DepartmentRegional> departmentRegionalList = departmentService.findAll();
-            List<Position> positionList = positionService.findAll();
-
-            model.addAttribute("storeItem", storeItemModel);
-            model.addAttribute("userList", userList);
-            model.addAttribute("positionList", positionList);
-            model.addAttribute("departmentList", departmentRegionalList);
-            session.setAttribute("msgError", "Product Name is Required.");
-            return "/item/edit/"+storeItemModel.id();
         }
 
         boolean specialOrder = storeItemModel.specialOrder() != null;
@@ -203,6 +200,12 @@ public class StoreController {
         storeItem.get().setLeadTime(storeItemModel.leadTime());
         if (storeItemModel.department() != null) {
             storeItem.get().setDepartment(departmentService.findById(storeItemModel.department()).orElse(null));
+        }
+        if (storeItemModel.category() != null) {
+            storeItem.get().setCategory(categoryService.findById(storeItemModel.category()).orElse(null));
+        }
+        if (storeItemModel.subCategory() != null) {
+            storeItem.get().setSubCategory(subCategoryService.findById(storeItemModel.subCategory()).orElse(null));
         }
         if (storeItemModel.image() != null) {
             storeItem.get().setImage(storedImageService.findById(storeItemModel.image()).orElse(null));

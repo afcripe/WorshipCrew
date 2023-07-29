@@ -6,7 +6,7 @@
 <div class="container-fluid m-0 p-0" layout:fragment="content">
 
   <div class="container" th:object="${storeItem}">
-    <div class="row"></div>
+    <div class="row m-2">
 
         <div class="card pb-2" style="max-width: 550px;">
 
@@ -190,14 +190,13 @@
             </form>
           </dialog>
 
-          <div class="card-title alert alert-quaternary">
-            <h5>New Store Item</h5>
+          <th:block th:if="${session.msg}">
+            <p th:text="${session.msg}"/>
+            <th:block th:text="${#session.removeAttribute('msg')}" />
+          </th:block>
 
-            <th:block th:if="${session.msg}">
-              <p th:text="${session.msg}"/>
-              <th:block th:text="${#session.removeAttribute('msg')}" />
-            </th:block>
-
+          <div class="card-title">
+            <h5>Edit Store Item</h5>
           </div>
 
           <div class="card-body">
@@ -253,7 +252,7 @@
                   <label for="department" class="form-label">Department</label>
                 </div>
                 <div class="col-xs-12 col-sm-8">
-                  <select id="department" class="form-control-sm w-100" name="department">
+                  <select id="department" class="form-control w-100" name="department">
                     <th:block th:unlee="*{department}">
                       <option value="0">Select A Department</option>
                       <option th:each="d : ${departmentList}" th:value="${d.id}" th:text="${d.name}"></option>
@@ -267,15 +266,13 @@
                 </div>
               </div>
 
-
-
               <div class="row p-2">
                 <div class="col-xs-12 col-sm-4">
                   <label for="category" class="form-label">Category</label>
                 </div>
                 <div class="col-xs-12 col-sm-8">
-                  <select id="category" class="form-control-sm w-100" name="category">
-                    <th:block th:unlee="*{category}">
+                  <select id="category" class="form-control w-100" name="category" onchange="onCategoryChange()">
+                    <th:block th:unless="*{category}">
                       <option value="0">Select A Category</option>
                       <option th:each="c : ${categoryList}" th:value="${c.id}" th:text="${c.name}"></option>
                     </th:block>
@@ -292,7 +289,7 @@
                   <label for="subCategory" class="form-label">Sub-Category</label>
                 </div>
                 <div class="col-xs-12 col-sm-8">
-                  <select id="subCategory" class="form-control-sm w-100" name="subCategory">
+                  <select id="subCategory" class="form-control w-100" name="subCategory" onchange="onSubCategoryChange()">
                     <th:block th:unlee="*{subCategory}">
                       <option value="0">Select A Sub-Category</option>
                       <option th:each="c : ${subCategoryList}" th:value="${c.id}" th:text="${c.name}"></option>
@@ -304,9 +301,6 @@
                   </select>
                 </div>
               </div>
-
-
-
 
               <div class="row p-2">
                 <div class="col-xs-12 col-sm-4">
@@ -334,9 +328,13 @@
               <div class="row p-2">
                 <div class="col-xs-12 col-sm-4">
                 </div>
-                <div class="col-xs-12 col-sm-8">
+                <div class="col-xs-12 col-sm-8" th:unless="*{image}">
                   <input type="hidden" id="image" name="image" class="form-control-sm">
                   <div id="imageName"></div>
+                </div>
+                <div class="col-xs-12 col-sm-8" th:if="*{image}">
+                  <input type="hidden" id="image" name="image" class="form-control-sm" th:value="*{image.id}">
+                  <div id="imageName" th:text="*{image.name}"></div>
                 </div>
               </div>
 
@@ -350,41 +348,6 @@
 
           </div>
 
-          <script th:inline="javascript">
-            /*<![CDATA[*/
-            itemImage = /*[[${storeItem.image}]]*/ "";
-            /*]]>*/
-
-            if (itemImage !== "") {
-              document.getElementById("image").value = itemImage.id;
-              document.getElementById("imageName").value = itemImage.name;
-            }
-
-            function uploadImageClick() {
-              document.getElementById("uploadDialog").showModal();
-            }
-
-            function chooseImageClick() {
-              document.getElementById("chooseDialog").showModal();
-              loadImages();
-            }
-
-            function submitForm() {
-              let theForm = document.getElementById("itemForm");
-              let pList = document.getElementById("positionSelect");
-
-              let collection = pList.selectedOptions;
-              let p = "";
-              let i = 0;
-              for (let i = 0; i < collection.length; i++) {
-                  p = p+collection[i].value+" ";
-              }
-              console.log(p);
-              document.getElementById("position").value = p;
-              theForm.submit();
-            }
-          </script>
-
         </div>
 
         <div class="card" style="max-width: 400px">
@@ -397,8 +360,90 @@
           </div>
         </div>
 
+    </div>
   </div>
-  </div>
+
+<script th:inline="javascript">
+  /*<![CDATA[*/
+  initialSelectedCat = /*[[${storeItem.category}]]*/ "0";
+  initialSelectedSubCat = /*[[${storeItem.subCategory}]]*/ "0";
+  /*]]>*/
+
+  const categorySelect = document.getElementById("category");
+  const subCategorySelect = document.getElementById("subCategory");
+  let selectedCat = 0;
+  let selectedSubCat = 0;
+
+  if (initialSelectedSubCat !== 0) {
+    selectedSubCat = initialSelectedSubCat;
+  }
+
+  if (initialSelectedCat !== 0) {
+    selectedCat = initialSelectedCat;
+    getSubCategories();
+  }
+
+  function uploadImageClick() {
+    document.getElementById("uploadDialog").showModal();
+  }
+
+  function chooseImageClick() {
+    document.getElementById("chooseDialog").showModal();
+    loadImages();
+  }
+
+  async function getSubCategories() {
+    let formData = new FormData();
+        formData.set("id", categorySelect.value)
+
+    const response = await fetch('/api/v1/store/subcategories', {
+      method: 'POST',
+      body: formData
+    }).then(response => {
+      return response.json();
+    }).then(data => {
+      console.log(data);
+      while (subCategorySelect.firstChild) {
+        subCategorySelect.removeChild(subCategorySelect.lastChild);
+      }
+      debugger
+      for (let key in data) {
+        let obj = data[key];
+        let opt = document.createElement('option');
+        opt.value = obj.id;
+        opt.innerHTML = obj.name;
+        if(selectedSubCat === obj.id){
+          opt.selected = true;
+        }
+        subCategorySelect.appendChild(opt);
+      }
+    });
+  }
+
+  function onCategoryChange() {
+    getSubCategories()
+  }
+
+  function onSubCategoryChange() {
+    selectedSubCat = subCategorySelect.value;
+  }
+
+  function submitForm() {
+    let theForm = document.getElementById("itemForm");
+    let pList = document.getElementById("positionSelect");
+
+    let collection = pList.selectedOptions;
+    let p = "";
+    let i = 0;
+    for (let i = 0; i < collection.length; i++) {
+      p = p+collection[i].value+" ";
+    }
+    console.log(p);
+    document.getElementById("position").value = p;
+    theForm.submit();
+  }
+</script>
+
 </div>
 
 </html>

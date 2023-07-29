@@ -65,19 +65,54 @@ public class StoreAPIController {
         return category.get();
     }
 
-    @PostMapping("/category")
-    public List<StoreSubCategory> getSubCategories(@ModelAttribute SingleBigIntegerModel item) {
+    @PostMapping("/category/update")
+    public StoreCategory updateCategory(@ModelAttribute StoreCategory item) {
+        Optional<StoreCategory> category = categoryService.findById(item.getId());
+        Optional<StoreCategory> existingCategory = categoryService.findByName(item.getName());
+
+        if (existingCategory.isPresent()) {
+            return item;
+        }
+        if (category.isPresent()) {
+            category.get().setName(item.getName());
+            return categoryService.save(category.get());
+        }
+        return item;
+    }
+
+    @PostMapping("/categories")
+    public List<StoreCategory> getCategories() {
+        return categoryService.findAll();
+    }
+
+    @PostMapping("/categoru")
+    public StoreCategory getCategory(@ModelAttribute SingleBigIntegerModel item) {
         Optional<StoreCategory> category = categoryService.findById(item.id());
         if (category.isPresent()) {
-            return category.get().getSubCategoryList();
+            return category.get();
         }
-        return new ArrayList<>();
+        return new StoreCategory();
+    }
+
+    @PostMapping("/category/count")
+    public ItemCount countStoreItemCategory(@ModelAttribute StoreCategory item) {
+        Integer count = storeItemService.countByCategory(item.getId());
+        return new ItemCount("category", count);
     }
 
     @PostMapping("/category/delete")
     public SingleBigIntegerModel deleteCategory(@ModelAttribute SingleBigIntegerModel item) {
         categoryService.deleteById(item.id());
         return item;
+    }
+
+    @PostMapping("/subcategories")
+    public List<StoreSubCategory> getSubCategories(@ModelAttribute SingleBigIntegerModel item) {
+        Optional<StoreCategory> category = categoryService.findById(item.id());
+        if (category.isPresent()) {
+            return category.get().getSubCategoryList();
+        }
+        return new ArrayList<>();
     }
 
     @PostMapping("/subcategory/edit")
@@ -97,12 +132,6 @@ public class StoreAPIController {
             }
         }
         return item;
-    }
-
-    @PostMapping("/category/count")
-    public ItemCount countStoreItemCategory(@ModelAttribute StoreCategory item) {
-        Integer count = storeItemService.countByCategory(item.getId());
-        return new ItemCount("category", count);
     }
 
     @PostMapping("/subcategory/count")

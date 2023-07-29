@@ -45,21 +45,25 @@
           <h4>Categories</h4>
         </div>
         <div class="card-body">
-          <button id="deleteCategory" type="button" class="btn btn-sm btn-outline-quaternary"
-                  style="display: none; float: right;" onclick="deleteCat()">Delete</button>
-          <select id="categoryList" class="form-control" onchange="getSubCategories()" style="width: 200px">
+          <select id="categoryList" class="form-control-sm" onchange="getSubCategories()" style="width: 200px;">
             <option th:each="c : ${categoryList}" th:value="${c.id}" th:text="${c.name}"></option>
           </select>
+          <div style="display: inline-block; float: right;">
+            <button id="editCategory" type="button" class="btn btn-sm btn-quaternary"
+                    style="display: none;" onclick="editCat()">Edit</button>
+            <button id="deleteCategory" type="button" class="btn btn-sm btn-outline-quaternary pl-2"
+                    style="display: none;" onclick="deleteCat()">Delete</button>
+          </div>
           <hr/>
           <div id="subCategories"></div>
           <div id="editSubCategory" class="pt-4" style="display: none;">
-            <div style="float:right;">
-              <button id="editSubSend" type="button" class="btn btn-sm btn-quaternary" onclick="updateSub()">Submit</button>
-              <button id="clearSubSend" type="button" class="btn btn-sm btn-quaternary" onclick="clearSub()">clear</button>
-            </div>
             <input id="editSubId" type="hidden" value="0">
-            <input id="editSubName" type="text" class="form-control" style="width: 200px">
+            <input id="editSubName" type="text" class="form-control" style="width: 200px; display: inline-block;">
+            <div style="float: right; display: inline-block">
+              <button id="editSubSend" type="button" class="btn btn-sm btn-quaternary" style="display: inline-block" onclick="updateSub()">Submit</button>
+              <button id="clearSubSend" type="button" class="btn btn-sm btn-quaternary pl-2" style="display: inline-block" onclick="clearSub()">Clear</button>
             </div>
+          </div>
         </div>
       </div>
 
@@ -80,11 +84,12 @@
           return response.json();
         }).then(data => {
           console.log(data);
-          debugger
           let opt = document.createElement('option');
               opt.value = data.id;
               opt.innerHTML = data.name;
           categorySelect.appendChild(opt);
+          document.getElementById('catName').value = "";
+          editCatDisplay.style.display = "inline-block";
           setCategory(data.id);
           keyEscCat();
         });
@@ -105,13 +110,65 @@
 
     </script>
     <h2>New Store item</h2>
-    <form id="formNewItem" style="width: 300px; max-width: 450px">
+    <form id="formNewItem" onsubmit="postNewCat()" style="width: 300px; max-width: 450px">
       <label for="catName" class="form-label">Name</label>
       <input class="form-control" id="catName" onkeyup="keyNewCat(event)">
 
       <div class="pt-2">
         <button id="btnSubmit" type="button" class="btn btn-sm btn-quaternary" onclick="postNewCat()">Add Item</button>
         <button id="btnCancel" type="button" class="btn btn-sm btn-outline-quaternary" onclick="keyEscCat()">Cancel</button>
+      </div>
+
+    </form>
+  </dialog>
+
+  <dialog id="editCategoryDialog" class="upload-modal">
+    <script>
+      async function putCat() {
+        let formData = new FormData();
+        formData.set("id", categorySelect.value)
+        formData.set("name", document.getElementById('editCatName').value)
+
+        const response = await fetch('/api/v1/store/category/update', {
+          method: 'POST',
+          body: formData
+        }).then(response => {
+          return response.json();
+        }).then(data => {
+          console.log(data);
+          debugger
+          let i = categorySelect.selectedIndex;
+          let opt = categorySelect.options[i];
+              opt.innerHTML = data.name;
+
+          document.getElementById('editCatName').value = "";
+          setCategory(data.id);
+          keyEscEditCat();
+        });
+      }
+      function keyEditCat(event) {
+        event.preventDefault();
+        if (event.key === "Enter" || event.keyCode === 13) {
+          putCat();
+        }
+        if (event.key === "Escape") {
+          keyEscEditCat();
+        }
+      }
+
+      function keyEscEditCat() {
+        document.getElementById("editCategoryDialog").close();
+      }
+
+    </script>
+    <h2>New Store item</h2>
+    <form id="formEditItem" onsubmit="putCat()" style="width: 300px; max-width: 450px">
+      <label for="editCatName" class="form-label">Name</label>
+      <input class="form-control" id="editCatName" onkeyup="keyNewCat(event)">
+
+      <div class="pt-2">
+        <button id="btnEditSubmit" type="button" class="btn btn-sm btn-quaternary" onclick="putCat()">Update</button>
+        <button id="btnEditCancel" type="button" class="btn btn-sm btn-outline-quaternary" onclick="keyEscEditCat()">Cancel</button>
       </div>
 
     </form>
@@ -125,6 +182,7 @@
     const editSubIdDisplay = document.getElementById("editSubId");
     const editSubNameDisplay = document.getElementById("editSubName");
     const deleteCatDisplay = document.getElementById("deleteCategory")
+    const editCatDisplay = document.getElementById("editCategory")
 
     function newCategory() {
       document.getElementById("newCategoryDialog").showModal();
@@ -137,7 +195,7 @@
       let formData = new FormData();
         formData.set("id", categorySelect.value)
 
-      const response = await fetch('/api/v1/store/category', {
+      const response = await fetch('/api/v1/store/subcategories', {
         method: 'POST',
         body: formData
       }).then(response => {
@@ -162,12 +220,12 @@
 
           subCategoryDisplay.appendChild(clone);
         }
-        debugger
         if (data.length > 0) {
           deleteCatDisplay.style.display = "none";
         } else {
-          deleteCatDisplay.style.display = "block";
+          deleteCatDisplay.style.display = "inline-block";
         }
+        editCatDisplay.style.display = "inline-block";
         clearSub();
       });
     }
@@ -234,6 +292,13 @@
       });
     }
 
+    function editCat() {
+      let i = categorySelect.selectedIndex;
+      let opt = categorySelect.options[i];
+      document.getElementById("editCatName").value = opt.innerHTML;
+      document.getElementById("editCategoryDialog").showModal();
+    }
+
     async function deleteCat() {
       let formData = new FormData();
         formData.set("id", categorySelect.value)
@@ -266,6 +331,11 @@
         categorySelect.removeChild(categorySelect[i]);
         categorySelect.dispatchEvent(new Event('change'));
       });
+      if (categorySelect.options.length === 0) {
+        editCatDisplay.style.display = "none";
+        deleteCatDisplay.style.display = "none";
+        editSubCategoryDisplay.style.display = "none";
+      }
     }
 
     function setCategory(id) {
@@ -274,6 +344,7 @@
     }
 
     if (categorySelect.value !== "" && categorySelect.value > 0) {
+      editCatDisplay.style.display = "inline-block";
       clearSub();
       getSubCategories()
     }
