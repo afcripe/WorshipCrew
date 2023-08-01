@@ -7,7 +7,7 @@
 
     <div class="row pt-4">
         <div class="col-8">
-            <h1>Request</h1>
+            <h2>Request</h2>
         </div>
     </div>
 
@@ -16,7 +16,7 @@
     </div>
     <div class="row py-1">
         <div class="col-6">
-            Date: <span th:text="*{#temporals.format(orderDate, 'MMM-dd-yyyy')}"></span>
+            Date: <span th:text="*{#temporals.format(requestDate, 'MMM-dd-yyyy')}"></span>
         </div>
         <div class="col-6">
             Status: <span th:text="*{orderStatus}"></span>
@@ -69,8 +69,8 @@
         </div>
     </div>
 
-    <div class="row py-2" th:each="orderItem : *{orderItems}">
-        <div th:replace="~{components/cardOrderItemLine :: cardFragment(${orderItem})}">Your Order is Empty</div>
+    <div class="row py-2" th:each="item : *{requestItems}">
+        <div th:replace="~{components/cardOrderItemLine :: cardFragment(${item})}">Your Order is Empty</div>
     </div>
 
 

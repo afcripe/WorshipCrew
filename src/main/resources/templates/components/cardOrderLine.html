@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+
+<div th:fragment="cardFragment(orderRequesst)">
+  <div class="card px-1" th:object="${orderRequesst}" style="cursor: pointer" th:onclick="navToItem([[*{id}]])">
+
+    <div class="row mt-2" >
+      <div class="col-6 col-md-4" style="vertical-align: center">
+        <h6>Request ID: <span th:text="*{id}"></span></h6>
+      </div>
+
+      <div class="col-6 col-md-4" style="overflow-x: clip">
+        <span th:text="*{#temporals.format(requestDate, 'MMM-dd-yyyy')}+' | '+*{orderStatus}"></span>
+      </div>
+
+      <div class="col-6 col-md-4" style="vertical-align: center">
+        <h6>Items: <span th:text="*{itemCount}"></span></h6>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</html>

@@ -138,7 +138,7 @@ public class CartAPIController {
                         item.getImage(),
                         orderRequest
                 );
-            orderRequest.getOrderItems().add(orderItem);
+            orderRequest.getRequestItems().add(orderItem);
         }
         orderService.save(orderRequest);
 

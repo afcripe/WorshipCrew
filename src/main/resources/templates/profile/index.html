@@ -9,7 +9,7 @@
 
     <div class="row">
 
-      <div class="col-12 col-lg-6">
+      <div class="col-12 col-lg-6 pb-2">
 
         <div class="card" style="max-width: 500px;">
           <div class="card-title alert alert-primary">
@@ -57,10 +57,14 @@
         </div>
       </div>
 
-      <div class="col-12 col-lg-6">
+      <div class="col-12 col-lg-6 pb-2">
 
         <div class="card" style="max-width: 500px;">
           <div class="card-title alert alert-primary">
+            <div style="float: right">
+              <button class="btn btn-sm btn-outline-primary"
+                      th:onclick="window.location.href='/profile/orders';">All Orders</button>
+            </div>
             <h5>
               Recent Requests
             </h5>
@@ -69,7 +73,7 @@
           <div class="card-body">
             <ul class="list-group list-group-flush" th:each="order : ${orderList}">
               <li class="list-group-item selectableItem" style="cursor: pointer;"
-                  th:text="${#temporals.format(order.orderDate, 'MMM-dd-yyyy')}"
+                  th:text="${#temporals.format(order.requestDate, 'MMM-dd-yyyy')}+'  |  '+${order.orderStatus}"
                   th:onclick="window.location.href='/profile/order/[[${order.id}]]'"></li>
             </ul>
 

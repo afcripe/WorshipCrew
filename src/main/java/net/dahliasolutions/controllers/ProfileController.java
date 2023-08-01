@@ -45,7 +45,7 @@ public class ProfileController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User loggedInAuth = (User) auth.getPrincipal();
         User user = userService.findByUsername((loggedInAuth.getUsername())).orElse(new User());
-        List<OrderRequest> orderList = orderService.findAllByUser(user);
+        List<OrderRequest> orderList = orderService.findFirst5ByUser(user);
 
         model.addAttribute("user", user);
         model.addAttribute("userPosition", user.getPosition().getName());
@@ -169,7 +169,7 @@ public class ProfileController {
         User user = (User) auth.getPrincipal();
         List<OrderRequest> orderList = orderService.findAllByUser(user);
         model.addAttribute("orderList", orderList);
-        return "order/order";
+        return "profile /orderList";
     }
 
     @GetMapping("/order/{id}")
@@ -179,6 +179,6 @@ public class ProfileController {
 
         model.addAttribute("orderRequest", order.get());
         model.addAttribute("noteList", noteList);
-        return "order/order";
+        return "profile/order";
     }
 }

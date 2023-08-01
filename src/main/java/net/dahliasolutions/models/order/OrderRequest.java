@@ -23,8 +23,8 @@ public class OrderRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private BigInteger id;
-    private LocalDateTime orderDate;
-    private String orderNote;
+    private LocalDateTime requestDate;
+    private String requestNote;
     transient int itemCount;
 
     @Enumerated(EnumType.STRING)
@@ -38,7 +38,7 @@ public class OrderRequest {
 
     @JsonBackReference
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "orderRequest")
-    private List<OrderItem> orderItems;
+    private List<OrderItem> requestItems;
 
     @JsonBackReference
     @OneToMany(fetch = FetchType.EAGER)
@@ -46,7 +46,7 @@ public class OrderRequest {
 
     public int getItemCount() {
         int counter = 0;
-        for (OrderItem item : orderItems) {
+        for (OrderItem item : requestItems) {
             counter = counter+item.getCount();
         }
         return counter;

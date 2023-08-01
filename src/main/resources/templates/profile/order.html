@@ -7,7 +7,11 @@
 
     <div class="row pt-4">
         <div class="col-8">
-            <h1>Request</h1>
+            <h2>Request</h2>
+        </div>
+        <div class="col-4">
+            <button class="btn btn-outline-danger" th:onclick="cancelOrder([[${orderRequest.id}]])"
+                    th:if="${#strings.toString(orderRequest.orderStatus)} != 'Cancelled' AND ${#strings.toString(orderRequest.orderStatus)} != 'Complete'">Cancel Request</button>
         </div>
     </div>
 
@@ -16,7 +20,7 @@
     </div>
     <div class="row py-1">
         <div class="col-6">
-            Date: <span th:text="*{#temporals.format(orderDate, 'MMM-dd-yyyy')}"></span>
+            Date: <span th:text="*{#temporals.format(requestDate, 'MMM-dd-yyyy')}"></span>
         </div>
         <div class="col-6">
             Status: <span th:text="*{orderStatus}"></span>
@@ -69,8 +73,8 @@
         </div>
     </div>
 
-    <div class="row py-2" th:each="orderItem : *{orderItems}">
-        <div th:replace="~{components/cardOrderItemLine :: cardFragment(${orderItem})}">Your Order is Empty</div>
+    <div class="row py-2" th:each="item : *{requestItems}">
+        <div th:replace="~{components/cardOrderItemLine :: cardFragment(${item})}">Your Order is Empty</div>
     </div>
 
 
@@ -93,6 +97,23 @@
                 displayBtnHistoryExpand.style.display = "none";
                 displayBtnHistoryCollapse.style.display = "inline-block";
             }
+        }
+
+        async function cancelOrder(id) {
+            debugger
+            let formData = new FormData();
+                formData.set("id", id);
+
+            const response = await fetch('/api/v1/order/cancel', {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                return response.json();
+            }).then(data => {
+                console.log(data);
+                debugger
+                window.location.reload();
+            });
         }
     </script>
 

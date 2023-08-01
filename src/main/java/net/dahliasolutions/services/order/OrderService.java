@@ -5,11 +5,7 @@ import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.data.OrderItemRepository;
 import net.dahliasolutions.data.OrderRepository;
 import net.dahliasolutions.data.UserRepository;
-import net.dahliasolutions.models.SingleBigIntegerModel;
-import net.dahliasolutions.models.order.OrderItem;
-import net.dahliasolutions.models.order.OrderNote;
-import net.dahliasolutions.models.order.OrderRequest;
-import net.dahliasolutions.models.order.OrderStatus;
+import net.dahliasolutions.models.order.*;
 import net.dahliasolutions.models.store.Cart;
 import net.dahliasolutions.models.user.User;
 import org.springframework.stereotype.Service;
@@ -33,7 +29,7 @@ public class OrderService implements OrderServiceInterface {
     @Override
     public OrderRequest createOrder(Cart cart) {
         Optional<User> user = userRepository.findById(cart.getId());
-        String newNote = "New Order";
+        String newNote = "New Request";
         OrderRequest orderRequest = new OrderRequest(
                 null,
                 LocalDateTime.now(),
@@ -48,7 +44,7 @@ public class OrderService implements OrderServiceInterface {
         orderNoteService.createOrderNote(new OrderNote(
                 null,
                 orderRequest.getId(),
-                LocalDateTime.now(),
+                null,
                 newNote,
                 OrderStatus.Submitted,
                 user.get()));
@@ -59,7 +55,7 @@ public class OrderService implements OrderServiceInterface {
     public Optional<OrderRequest> findById(BigInteger id) {
         Optional<OrderRequest> orderRequest = orderRepository.findById(id);
         if (orderRequest.isPresent()) {
-            orderRequest.get().setOrderItems(orderItemRepository.findAllByOrderRequest(orderRequest.get()));
+            orderRequest.get().setRequestItems(orderItemRepository.findAllByOrderRequest(orderRequest.get()));
         }
         orderRequest.get().setItemCount(orderRequest.get().getItemCount());
         return orderRequest;
@@ -69,7 +65,7 @@ public class OrderService implements OrderServiceInterface {
     public List<OrderRequest> findAll() {
         List<OrderRequest> orderRequestList = orderRepository.findAll();
         for (OrderRequest orderRequest : orderRequestList) {
-            orderRequest.setOrderItems(orderItemRepository.findAllByOrderRequest(orderRequest));
+            orderRequest.setRequestItems(orderItemRepository.findAllByOrderRequest(orderRequest));
             orderRequest.setItemCount(orderRequest.getItemCount());
         }
         return orderRequestList;
@@ -77,17 +73,61 @@ public class OrderService implements OrderServiceInterface {
 
     @Override
     public List<OrderRequest> findAllByUser(User user) {
-        List<OrderRequest> orderRequestList = orderRepository.findAllByUser(user);
+        List<OrderRequest> orderRequestList = orderRepository.findAllByUser(user.getId());
         for (OrderRequest orderRequest : orderRequestList) {
-            orderRequest.setOrderItems(orderItemRepository.findAllByOrderRequest(orderRequest));
+            orderRequest.setRequestItems(orderItemRepository.findAllByOrderRequest(orderRequest));
             orderRequest.setItemCount(orderRequest.getItemCount());
         }
         return orderRequestList;
     }
 
     @Override
+    public List<OrderRequest> findFirst5ByUser(User user) {
+        List<OrderRequest> orderRequestList = orderRepository.findFirst5ByUserId(user.getId());
+        for (OrderRequest orderRequest : orderRequestList) {
+            orderRequest.setRequestItems(orderItemRepository.findAllByOrderRequest(orderRequest));
+            orderRequest.setItemCount(orderRequest.getItemCount());
+        }
+        return orderRequestList;
+    }
+
+    @Override
+    public List<OrderRequest> findAllBySupervisor(User user) {
+        List<OrderRequest> orderRequestList = orderRepository.findAllBySupervisorId(user.getId());
+        for (OrderRequest orderRequest : orderRequestList) {
+            orderRequest.setRequestItems(orderItemRepository.findAllByOrderRequest(orderRequest));
+            orderRequest.setItemCount(orderRequest.getItemCount());
+        }
+        return orderRequestList;
+    }
+
+    @Override
+    public List<OrderRequest> findAllBySupervisorOpenOnly(User user) {
+        List<OrderRequest> orderRequestList = orderRepository.findAllBySupervisorIdOpenOnly(user.getId());
+        for (OrderRequest orderRequest : orderRequestList) {
+            orderRequest.setRequestItems(orderItemRepository.findAllByOrderRequest(orderRequest));
+            orderRequest.setItemCount(orderRequest.getItemCount());
+        }
+        return orderRequestList;
+    }
+
+    @Override
+    public List<OrderRequest> findAllByMentionOpenOnly(User user) {
+        List<OrderSupervisor> orderSupervisorList = orderRepository.findAllMentionsBySupervisorId(user.getId());
+        List<OrderRequest> orderRequestList = new ArrayList<>();
+        for (OrderSupervisor supervisor : orderSupervisorList) {
+            OrderRequest newRequest = orderRepository.findById(supervisor.getOrderRequestId()).get();
+            if (!newRequest.getOrderStatus().equals(OrderStatus.Cancelled)
+                    && !newRequest.getOrderStatus().equals(OrderStatus.Complete)) {
+                orderRequestList.add(newRequest);
+            }
+        }
+        return orderRequestList;
+    }
+
+    @Override
     public OrderRequest save(OrderRequest orderRequest) {
-        for (OrderItem orderItem : orderRequest.getOrderItems()){
+        for (OrderItem orderItem : orderRequest.getRequestItems()){
             orderItemRepository.save(orderItem);
         }
         return orderRepository.save(orderRequest);
@@ -97,7 +137,7 @@ public class OrderService implements OrderServiceInterface {
     public void deleteById(BigInteger id) {
         Optional<OrderRequest> orderRequest = orderRepository.findById(id);
         if (orderRequest.isPresent()) {
-            for (OrderItem orderItem : orderRequest.get().getOrderItems()) {
+            for (OrderItem orderItem : orderRequest.get().getRequestItems()) {
                 orderItemRepository.delete(orderItem);
             }
         }

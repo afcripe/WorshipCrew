@@ -1,13 +1,26 @@
 package net.dahliasolutions.data;
 
 import net.dahliasolutions.models.order.OrderRequest;
+import net.dahliasolutions.models.order.OrderSupervisor;
 import net.dahliasolutions.models.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.math.BigInteger;
 import java.util.List;
 
 public interface OrderRepository extends JpaRepository<OrderRequest, BigInteger> {
 
-    List<OrderRequest> findAllByUser(User user);
+    @Query(value = "SELECT * FROM ORDER_REQUEST WHERE USER_ID = :userId ORDER BY REQUEST_DATE DESC", nativeQuery = true)
+    List<OrderRequest> findAllByUser(@Param("userId") BigInteger userId);
+    @Query(value = "SELECT * FROM ORDER_REQUEST WHERE USER_ID = :userId ORDER BY REQUEST_DATE DESC LIMIT 5", nativeQuery = true)
+    List<OrderRequest> findFirst5ByUserId(@Param("userId") BigInteger userId);
+    @Query(value = "SELECT * FROM ORDER_REQUEST WHERE SUPERVISOR_ID = :supervisorId ORDER BY REQUEST_DATE DESC", nativeQuery = true)
+    List<OrderRequest> findAllBySupervisorId(@Param("supervisorId") BigInteger supervisorId);
+    @Query(value = "SELECT * FROM ORDER_REQUEST WHERE SUPERVISOR_ID = :supervisorId AND ORDER_STATUS <> 'Cancelled' AND ORDER_STATUS <> 'Complete' ORDER BY REQUEST_DATE DESC", nativeQuery = true)
+    List<OrderRequest> findAllBySupervisorIdOpenOnly(@Param("supervisorId") BigInteger supervisorId);
+    @Query(value = "SELECT * FROM ORDER_REQUEST_SUPERVISOR_LIST WHERE SUPERVISOR_LIST_ID = :supervisorId", nativeQuery = true)
+    List<OrderSupervisor> findAllMentionsBySupervisorId(@Param("supervisorId") BigInteger supervisorId);
+
 }

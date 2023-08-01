@@ -36,12 +36,15 @@ public class OrderController {
     }
 
     @GetMapping("")
-    public String getUserOrders(Model model) {
+    public String getSupervisorOrders(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) auth.getPrincipal();
-        List<OrderRequest> orderList = orderService.findAllByUser(user);
-        model.addAttribute("orderList", orderList);
-        return "order/order";
+        List<OrderRequest> openOrderList = orderService.findAllBySupervisorOpenOnly(user);
+        List<OrderRequest> orderMentionList = orderService.findAllByMentionOpenOnly(user);
+
+        model.addAttribute("openOrderList", openOrderList);
+        model.addAttribute("orderMentionList", orderMentionList);
+        return "order/orderList";
     }
 
     @GetMapping("/{id}")
