@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<div class="container-fluid" layout:fragment="content" th:object="${orderRequest}">
+
+    <div class="row pt-4">
+        <div class="col-8">
+            <h1>Request</h1>
+        </div>
+    </div>
+
+    <div class="row py-1">
+        <h4>Request Id: <span th:text="*{id}"></span></h4>
+    </div>
+    <div class="row py-1">
+        <div class="col-6">
+            Date: <span th:text="*{#temporals.format(orderDate, 'MMM-dd-yyyy')}"></span>
+        </div>
+        <div class="col-6">
+            Status: <span th:text="*{orderStatus}"></span>
+        </div>
+    </div>
+
+    <div class="row p-2">
+        <div class="col-6">
+            <button class="btn btn-sm btn-outline-secondary" onclick="toggleHistory()" style="max-width: 150px;">
+                History <i id="btnHistoryExpand" class="bi bi-arrows-expand" style="display: inline-block"></i><i id="btnHistoryCollapse" class="bi bi-arrows-collapse" style="display: none"></i>
+            </button>
+        </div>
+        <div class="col-6">
+            Items: <span th:text="*{itemCount}"></span>
+        </div>
+    </div>
+    <div id="divHistory" class="row orderHistory py-1 mx-1">
+        <div class="card p-2">
+            <div class="row">
+                <div class="col">
+                    <strong>Date</strong>
+                </div>
+                <div class="col">
+                    <strong>Status</strong>
+                </div>
+                <div class="col">
+                    <strong>Note</strong>
+                </div>
+                <div class="col">
+                    <strong>Entered By</strong>
+                </div>
+            </div>
+
+            <div class="card-section" th:each="note : ${noteList}">
+                <div class="row">
+                    <div class="col">
+                        <span th:text="${#temporals.format(note.noteDate, 'MMM-dd-yyyy hh:mm')}"></span>
+                    </div>
+                    <div class="col">
+                        <span th:text="${note.orderStatus}"></span>
+                    </div>
+                    <div class="col">
+                        <span th:text="${note.orderNote}"></span>
+                    </div>
+                    <div class="col">
+                        <span th:text="${note.user.firstName}+' '+${note.user.lastName}"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row py-2" th:each="orderItem : *{orderItems}">
+        <div th:replace="~{components/cardOrderItemLine :: cardFragment(${orderItem})}">Your Order is Empty</div>
+    </div>
+
+
+    <script th:inline="javascript">
+        const displayDivHistory = document.getElementById("divHistory");
+        const displayBtnHistoryExpand = document.getElementById("btnHistoryExpand");
+        const displayBtnHistoryCollapse = document.getElementById("btnHistoryCollapse");
+
+
+        function navToItem(id) {
+            window.location.href="/store/item/"+id;
+        }
+        function toggleHistory(){
+            if (displayDivHistory.classList.contains("orderHistoryExpand")) {
+                displayDivHistory.classList.remove("orderHistoryExpand");
+                displayBtnHistoryExpand.style.display = "inline-block";
+                displayBtnHistoryCollapse.style.display = "none";
+            } else {
+                displayDivHistory.classList.add("orderHistoryExpand");
+                displayBtnHistoryExpand.style.display = "none";
+                displayBtnHistoryCollapse.style.display = "inline-block";
+            }
+        }
+    </script>
+
+</div>
+
+
+</html>

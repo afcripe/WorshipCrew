@@ -80,6 +80,7 @@ public class SecurityConfig {
                     auth.requestMatchers("/user/**").hasAnyAuthority("ADMIN_READ", "ADMIN_WRITE", "DIRECTOR_READ", "DIRECTOR_WRITE", "CAMPUS_WRITE", "CAMPUS_READ", "USER_READ", "USER_WRITE");
                     auth.requestMatchers("/campus/**").hasAnyAuthority("ADMIN_READ", "ADMIN_WRITE", "DIRECTOR_READ", "DIRECTOR_WRITE", "CAMPUS_WRITE", "CAMPUS_READ");
                     auth.requestMatchers("/position/**").hasAnyAuthority("ADMIN_READ", "ADMIN_WRITE", "DIRECTOR_READ", "DIRECTOR_WRITE");
+                    auth.requestMatchers("/order/**").hasAnyAuthority("ADMIN_READ", "ADMIN_WRITE", "DIRECTOR_READ", "DIRECTOR_WRITE", "CAMPUS_WRITE", "CAMPUS_READ", "REQUEST_READ", "REQUEST_WRITE");
                     auth.requestMatchers("/api/v1/app/removeerrormsg").permitAll();
                     auth.requestMatchers("/api/v1/app/toggleSideNav/*").permitAll();
                     auth.anyRequest().authenticated();

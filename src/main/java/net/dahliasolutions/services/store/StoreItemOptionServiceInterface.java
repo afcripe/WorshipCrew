@@ -11,10 +11,7 @@ import java.util.Optional;
 public interface StoreItemOptionServiceInterface {
 
     Optional<StoreItemOption> findById(BigInteger id);
-    Optional<StoreItemOption> findByName(String name);
     List<StoreItemOption> findAll();
-    List<StoreItemOption> findAllByStoreItem(StoreItem storeItem);
     StoreItemOption save(StoreItemOption option);
-    void delete(StoreItemOption option);
     void deleteById(BigInteger id);
 }

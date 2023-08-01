@@ -59,6 +59,8 @@ public class Main {
 //            roleService.createRole("RESOURCE_WRITE", "Create new resources");
 //            roleService.createRole("STORE_READ", "Browse that store and request items within assigned department");
 //            roleService.createRole("STORE_WRITE", "Create new items in the store for assigned department");
+//            roleService.createRole("REQUEST_READ", "View requests made by users");
+//            roleService.createRole("REQUEST_WRITE", "Update, assign, and fulfill user requests");
 //            roleService.createRole("SUPPORT_READ", "View support tickets");
 //            roleService.createRole("SUPPORT_WRITE", "Create support tickets");
 //            roleService.createRole("SUPPORT_AGENT", "Can be assigned support tickets");

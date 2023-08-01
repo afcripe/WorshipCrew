@@ -47,15 +47,19 @@ public class StoreController {
     public void addAttributes(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) auth.getPrincipal();
+        List<StoreCategory> categoryList = categoryService.findAll();
+
         model.addAttribute("moduleTitle", "Store");
         model.addAttribute("moduleLink", "/store");
         model.addAttribute("userId", user.getId());
+        model.addAttribute("categoryList", categoryList);
     }
 
     @GetMapping("")
     public String goStoreHome(Model model, HttpSession session) {
         redirectService.setHistory(session, "/store");
         List<StoreItem> itemList = storeItemService.findAll();
+
         model.addAttribute("storeItems", itemList);
         return "store/index";
     }
@@ -138,6 +142,7 @@ public class StoreController {
 
     @GetMapping("/item/{id}")
     public String getItem(@PathVariable("id") BigInteger id, Model model, HttpSession session) {
+        redirectService.setHistory(session, "/store/item/"+id);
         Optional<StoreItem> storeItem = storeItemService.findById(id);
         if (storeItem.isEmpty()) {
             session.setAttribute("msgError", "Item not found.");
@@ -148,6 +153,8 @@ public class StoreController {
 
     @GetMapping("/item/edit/{id}")
     public String getItemToEdit(@PathVariable BigInteger id, Model model, HttpSession session) {
+        BigInteger catId = BigInteger.valueOf(0);
+        BigInteger subCatId = BigInteger.valueOf(0);
 
         Optional<StoreItem> storeItem = storeItemService.findById(id);
         if (storeItem.isEmpty()) {
@@ -173,12 +180,27 @@ public class StoreController {
             positionList.add(selected);
         }
 
+        if (storeItem.get().getCategory() != null) {
+            try {
+                catId = storeItem.get().getCategory().getId();
+            } catch (Error e) {
+                System.out.println(e);
+            }
+        }
+        if (storeItem.get().getSubCategory() != null) {
+            try {
+                subCatId = storeItem.get().getSubCategory().getId();
+            } catch (Error e) {
+                System.out.println(e);
+            }
+        }
+
         model.addAttribute("storeItem", storeItem.get());
         model.addAttribute("positionList", positionList);
         model.addAttribute("departmentList", departmentRegionalList);
         model.addAttribute("categoryList", categoryList);
-        model.addAttribute("categoryId", storeItem.get().getCategory().getId());
-        model.addAttribute("subCategoryId", storeItem.get().getSubCategory().getId());
+        model.addAttribute("categoryId", catId);
+        model.addAttribute("subCategoryId", subCatId);
         return "store/itemEdit";
     }
 

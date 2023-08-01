@@ -32,7 +32,7 @@
                         Author:<br>
                             <span id="articleAuthor" th:text="*{author.firstName + ' ' + author.lastName}"></span><br>
                         Updated:<br>
-                            <span id="articleDate" th:text="*{#temporals.format(lastUpdated, 'dd-MMM-yyyy HH:mm')}"></span><br>
+                            <span id="articleDate" th:text="*{#temporals.format(lastUpdated, 'MMM-dd-yyyy HH:mm')}"></span><br>
                     </div>
                 </div>
 

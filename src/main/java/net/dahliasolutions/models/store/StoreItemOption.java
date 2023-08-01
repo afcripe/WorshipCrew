@@ -1,5 +1,7 @@
 package net.dahliasolutions.models.store;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,5 +21,10 @@ public class StoreItemOption {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private BigInteger id;
     private String name;
+
+    @JsonManagedReference
+    @ManyToOne
+    @JoinColumn(name = "storeItemId")
+    private StoreItem storeItem;
 
 }

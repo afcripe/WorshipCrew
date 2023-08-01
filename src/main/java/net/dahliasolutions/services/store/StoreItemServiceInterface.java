@@ -13,7 +13,7 @@ public interface StoreItemServiceInterface {
     Optional<StoreItem> findByName(String name);
     List<StoreItem> searchAll(String searchTerm);
     List<StoreItem> findAll();
-    void save(StoreItem StoreItem);
+    void save(StoreItem storeItem);
     void deleteById(BigInteger id);
     Integer countByCategory(BigInteger id);
     Integer countBySubCategory(BigInteger id);

@@ -1,5 +1,6 @@
 package net.dahliasolutions.models.store;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -49,7 +50,8 @@ public class StoreItem {
     @ManyToMany(fetch = FetchType.EAGER)
     private Collection<Position> positionList;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @JsonBackReference
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "storeItem")
     private List<StoreItemOption> itemOptions;
 
 }

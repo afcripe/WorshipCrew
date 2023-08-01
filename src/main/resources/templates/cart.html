@@ -8,21 +8,26 @@
 
     <div class="row pt-4">
         <div class="col-8">
-            <h1 style="color: coral">Welcome to the Destiny Store</h1>
+            <h1 style="color: coral">Request Cart</h1>
             <p>Number of items in cart: <span id="subtitleCount" th:text="${cart.itemCount}"></span></p>
         </div>
         <div class="col-4 pt-2">
             <button type="button" class="btn btn-sm btn-outline-quaternary"
                     th:onclick="clearCart([[${userId}]])">Clear Cart</button>
             <button type="button" class="btn btn-sm btn-quaternary"
-                    th:onclick="placeOrder()">Place Order</button>
+                    th:onclick="placeOrder([[${userId}]])">Send Request</button>
         </div>
     </div>
 
     <div class="col" th:if="${not #lists.isEmpty(cart.cartItems)}" th:each="item : ${cart.cartItems}">
       <div class="row">
-        <div th:replace="~{components/cardCartItemLine :: cardFragment(${item})}">Your cart is Empty</div>
+        <div th:replace="~{components/cardCartItemLine :: cardFragment(${item})}">Your Cart is Empty</div>
       </div>
+    </div>
+    <div class="col" th:if="${#lists.isEmpty(cart.cartItems)}">
+        <div class="row">
+            <div>Your Cart is Empty</div>
+        </div>
     </div>
 
     <div class="row pt-4">
@@ -33,7 +38,7 @@
             <button type="button" class="btn btn-sm btn-outline-quaternary"
                     th:onclick="clearCart([[${userId}]])">Clear Cart</button>
             <button type="button" class="btn btn-sm btn-quaternary"
-                    th:onclick="placeOrder()">Place Order</button>
+                    th:onclick="placeOrder([[${userId}]])">Send Request</button>
         </div>
     </div>
 
@@ -81,8 +86,20 @@
             });
         }
 
-        function placeOrder() {
-            alert("Order Placed Placeholder.");
+        async function placeOrder(userid) {
+
+            let formData = new FormData();
+                formData.set("id", userid);
+
+            const response = await fetch('/api/v1/cart/placeOrder', {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                return response.json();
+            }).then(data => {
+                console.log(data);
+                window.location.href='/order/'+data.id;
+            });
         }
     </script>
 

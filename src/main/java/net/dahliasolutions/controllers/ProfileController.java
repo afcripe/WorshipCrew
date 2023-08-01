@@ -2,11 +2,15 @@ package net.dahliasolutions.controllers;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import net.dahliasolutions.models.order.OrderNote;
+import net.dahliasolutions.models.order.OrderRequest;
 import net.dahliasolutions.models.user.ChangePasswordModel;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserModel;
 import net.dahliasolutions.services.AuthService;
 import net.dahliasolutions.services.RedirectService;
+import net.dahliasolutions.services.order.OrderNoteService;
+import net.dahliasolutions.services.order.OrderService;
 import net.dahliasolutions.services.user.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,6 +18,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigInteger;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -24,6 +30,8 @@ public class ProfileController {
     private final UserService userService;
     private final AuthService authService;
     private final RedirectService redirectService;
+    private final OrderService orderService;
+    private final OrderNoteService orderNoteService;
 
     @ModelAttribute
     public void addAttributes(Model model) {
@@ -37,9 +45,11 @@ public class ProfileController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User loggedInAuth = (User) auth.getPrincipal();
         User user = userService.findByUsername((loggedInAuth.getUsername())).orElse(new User());
+        List<OrderRequest> orderList = orderService.findAllByUser(user);
 
         model.addAttribute("user", user);
         model.addAttribute("userPosition", user.getPosition().getName());
+        model.addAttribute("orderList", orderList);
         return "profile/index";
     }
 
@@ -151,5 +161,24 @@ public class ProfileController {
             return "redirect:/login";
         }
 
+    }
+
+    @GetMapping("/orders")
+    public String getUserOrders(Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) auth.getPrincipal();
+        List<OrderRequest> orderList = orderService.findAllByUser(user);
+        model.addAttribute("orderList", orderList);
+        return "order/order";
+    }
+
+    @GetMapping("/order/{id}")
+    public String getUserOrders(@PathVariable BigInteger id, Model model) {
+        Optional<OrderRequest> order = orderService.findById(id);
+        List<OrderNote> noteList = orderNoteService.findByOrderId(id);
+
+        model.addAttribute("orderRequest", order.get());
+        model.addAttribute("noteList", noteList);
+        return "order/order";
     }
 }

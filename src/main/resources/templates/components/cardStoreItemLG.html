@@ -6,37 +6,48 @@
 
     <div class="card-body">
 
-        <div class="row">
-            <div class="col" th:onclick="navToItem([[*{id}]])">
+        <div class="row" th:onclick="navToItem([[*{id}]])" style="cursor: pointer">
+            <div class="col">
                 <h3 th:text="*{name}"></h3>
             </div>
         </div>
-        <div class="row">
-            <div class="col" th:onclick="navToItem([[*{id}]])">
-                <img th:src="@{*{image.fileLocation}}" class="store_card_image">
+        <div class="row" th:onclick="navToItem([[*{id}]])" style="cursor: pointer">
+            <div class="col">
+
+                <th:block th:if="*{image}">
+                    <img th:src="@{*{image.fileLocation}}" class="store_card_image">
+                </th:block>
+
                 <p th:text="*{description}" class="store_card_description"></p>
             </div>
         </div>
 
         <div class="card-section">
             <div class="row">
-                <div class="col-4" th:onclick="navToItem([[*{id}]])">
-                    <div th:if="*{specialOrder}" style="width: 100%">
-                        <span>Special Order Item</span>
+                <div class="col-12 my-2">
+                    <div class="form-group" style="display: flex;" th:unless="*{#lists.isEmpty(itemOptions)}">
+                        <label class="form-control-label">Option:&nbsp;&nbsp;</label>
+                        <select th:id="*{id}+'-details'" class="form-control" >
+                            <option th:each="opt : *{itemOptions}" th:value="${opt.name}" th:text="${opt.name}"></option>
+                        </select>
                     </div>
                 </div>
-                <div class="col-8" style=" text-align: right">
-                    <input th:id="*{id}+'-counter'" type="number" value="1" style="width: 55px">
-                    <button type="button" class="btn btn-sm btn-outline-quaternary"
-                            th:onclick="addToCart([[*{id}]], [[${userId}]])">
-                        <i class="bi bi-cart-plus"></i></button>
+
+                <div class="col-12 my-2">
+                    <div style="float: right">
+                        <input th:id="*{id}+'-counter'" type="number" value="1" style="width: 55px">
+                        <button type="button" class="btn btn-sm btn-outline-quaternary"
+                                th:onclick="addToCart([[*{id}]], [[${userId}]])"><i class="bi bi-cart-plus"></i></button>
+                    </div>
                 </div>
             </div>
-
             <div class="row">
-                <div class="col-12" th:onclick="navToItem([[*{id}]])">
-                    <div style="width: 100%">
-                        Lead Time: <span th:text="*{leadTime}"></span> Days
+                <div class="col-6">
+                    Lead Time: <span th:text="*{leadTime}"></span> Days
+                </div>
+                <div class="col-6 text-right">
+                    <div th:if="*{specialOrder}" style="float: right">
+                        Special Order Item
                     </div>
                 </div>
             </div>

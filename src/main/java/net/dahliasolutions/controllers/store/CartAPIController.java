@@ -2,13 +2,21 @@ package net.dahliasolutions.controllers.store;
 
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.*;
+import net.dahliasolutions.models.order.OrderItem;
+import net.dahliasolutions.models.order.OrderRequest;
+import net.dahliasolutions.models.order.OrderStatus;
 import net.dahliasolutions.models.store.*;
+import net.dahliasolutions.models.user.User;
+import net.dahliasolutions.services.order.OrderService;
 import net.dahliasolutions.services.store.CartItemService;
 import net.dahliasolutions.services.store.CartService;
 import net.dahliasolutions.services.store.StoreItemService;
+import net.dahliasolutions.services.user.UserService;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,6 +28,8 @@ public class CartAPIController {
     private final CartService cartService;
     private final CartItemService cartItemService;
     private final StoreItemService storeItemService;
+    private final OrderService orderService;
+    private final UserService userService;
 
     @GetMapping("{id}")
     public Cart getCart(@PathVariable BigInteger id) {
@@ -32,7 +42,7 @@ public class CartAPIController {
         boolean itemFound = false;
         // loop through items and count them, update any found cart items
         for (CartItem item : cart.getCartItems()) {
-            if (item.getProductId().equals(cartItemModel.id())) {
+            if (item.getProductId().equals(cartItemModel.id()) && item.getDetails().equals(cartItemModel.details())) {
                 itemFound = true;
                 item.setCount(item.getCount()+cartItemModel.count());
                 cartItemService.save(item);
@@ -46,11 +56,11 @@ public class CartAPIController {
                         null,
                         storeItem.get().getId(),
                         storeItem.get().getName(),
+                        cartItemModel.details(),
                         cartItemModel.count(),
                         storeItem.get().isSpecialOrder(),
                         storeItem.get().isAvailable(),
                         storeItem.get().getLeadTime(),
-                        OrderStatus.cart,
                         storeItem.get().getImage(),
                         cart
                 );
@@ -107,17 +117,32 @@ public class CartAPIController {
 
     @PostMapping("/empty")
     public int emptyCart(@ModelAttribute SingleBigIntegerModel integerModel) {
+        return cartService.emptyCart(integerModel.id()).getItemCount();
+    }
+
+    @PostMapping("/placeOrder")
+    public SingleBigIntegerModel placeOrder(@ModelAttribute SingleBigIntegerModel integerModel) {
         Cart cart = cartService.findById(integerModel.id());
-        // loop through items and remove items
+        OrderRequest orderRequest = orderService.createOrder(cart);
+
         for (CartItem item : cart.getCartItems()) {
-            cartItemService.deleteById(item.getId());
+                OrderItem orderItem = new OrderItem(
+                        null,
+                        item.getProductId(),
+                        item.getProductName(),
+                        item.getDetails(),
+                        item.getCount(),
+                        item.isSpecialOrder(),
+                        item.isAvailable(),
+                        item.getLeadTime(),
+                        item.getImage(),
+                        orderRequest
+                );
+            orderRequest.getOrderItems().add(orderItem);
         }
+        orderService.save(orderRequest);
 
-        List<CartItem> cartItemList = cartItemService.findByCart(cart);
-        cart.getCartItems().clear();
-        cart.setCartItems(cartItemList);
-        cart = cartService.save(cart);
-
-        return cart.getItemCount();
+        cartService.emptyCart(integerModel.id());
+        return new SingleBigIntegerModel(orderRequest.getId());
     }
 }

@@ -1,7 +1,7 @@
-package net.dahliasolutions.controllers.store;
+package net.dahliasolutions.controllers.order;
 
 import lombok.RequiredArgsConstructor;
-import net.dahliasolutions.services.store.OrderService;
+import net.dahliasolutions.services.order.OrderService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

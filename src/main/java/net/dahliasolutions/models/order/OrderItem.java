@@ -1,12 +1,13 @@
-package net.dahliasolutions.models.store;
+package net.dahliasolutions.models.order;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.dahliasolutions.models.user.User;
+import net.dahliasolutions.models.store.StoreImage;
 
 import java.math.BigInteger;
 
@@ -22,20 +23,19 @@ public class OrderItem {
     private BigInteger id;
     private BigInteger productId;
     private String productName;
+    private String details;
     private int count;              //number of items on hand to send to campus
     private boolean specialOrder;   //not held in stock and must be ordered
     private boolean available;      //available to order
-    private int leadTime;           //in days
-
-    @Enumerated(EnumType.STRING)
-    private OrderStatus itemStatus;
-
-    @Nullable
-    @ManyToOne(fetch = FetchType.EAGER)
-    private User owner;             //person who receives order requests
+    private int leadTime;
 
     @Nullable
     @ManyToOne(fetch = FetchType.LAZY)
     private StoreImage image;
+
+    @JsonManagedReference
+    @ManyToOne
+    @JoinColumn(name = "orderId")
+    private OrderRequest orderRequest;
 
 }

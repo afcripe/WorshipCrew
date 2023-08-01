@@ -1,8 +1,9 @@
-package net.dahliasolutions.services.store;
+package net.dahliasolutions.services.order;
 
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.data.OrderItemRepository;
-import net.dahliasolutions.models.store.OrderItem;
+import net.dahliasolutions.models.order.OrderItem;
+import net.dahliasolutions.models.order.OrderRequest;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -23,17 +24,12 @@ public class OrderItemService implements OrderItemServiceInterface {
 
     @Override
     public Optional<OrderItem> findById(BigInteger id) {
-        return Optional.empty();
+        return orderItemRepository.findById(id);
     }
 
     @Override
-    public List<OrderItem> findByOrderId(BigInteger orderId) {
-        return null;
-    }
-
-    @Override
-    public List<OrderItem> findByCartId(BigInteger orderId) {
-        return null;
+    public List<OrderItem> findAllByOrderRequest(OrderRequest orderRequest) {
+        return orderItemRepository.findAllByOrderRequest(orderRequest);
     }
 
     @Override

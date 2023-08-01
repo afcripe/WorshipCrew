@@ -1,4 +1,4 @@
-package net.dahliasolutions.models.store;
+package net.dahliasolutions.models.order;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,30 +9,25 @@ import net.dahliasolutions.models.user.User;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.Collection;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Orders {
+public class OrderNote {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private BigInteger id;
-    private LocalDateTime orderDate;
+    private BigInteger orderId;
+    private LocalDateTime noteDate;
+    private String orderNote;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    private User user;             //person who placed the order request
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    private User manager;             //person who receives order request from user
-
-    @OneToMany(fetch = FetchType.EAGER)
-    private Collection<OrderItem> orderItems;
+    private User user;
 
 }

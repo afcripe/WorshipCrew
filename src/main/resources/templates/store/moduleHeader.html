@@ -1,4 +1,4 @@
-<div th:fragment="header">
+<div th:fragment="header" xmlns:th="http://thymeleaf.org">
 
     <nav class="navbar navbar-expand-md navbar-light bg-light">
       <div class="container-fluid w-100">
@@ -33,12 +33,12 @@
               </a>
             </div>
 
-          <div class="navbar-nav mr-1 pr-2 mt-3 mt-md-0 order-last pull-right d-none d-md-block">
+          <div class="navbar-nav mr-1 pr-2 mt-3 mt-md-0 orderRequest-last pull-right d-none d-md-block">
             <a class="nav-link" onclick="redrawStoreLayout('list')">
               <h4><i class="bi bi-card-list"></i></h4>
             </a>
           </div>
-          <div class="navbar-nav mr-1 pr-2 mt-3 mt-md-0 order-last pull-right d-none d-md-block">
+          <div class="navbar-nav mr-1 pr-2 mt-3 mt-md-0 orderRequest-last pull-right d-none d-md-block">
             <a class="nav-link" onclick="redrawStoreLayout('grid')">
               <h4><i class="bi bi-grid"></i></h4>
             </a>
@@ -78,6 +78,25 @@
 
     </nav>
 
+    <nav class="navbar navbar-light bg-light d-md-none">
+        <div class="container-fluid w-100">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCategories" aria-controls="navbarCategories" aria-expanded="false" aria-label="Toggle navigation">
+                Categories
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCategories">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0" th:each="cat : ${categoryList}">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false" th:text="*{cat.name}"></a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown"
+                            th:unless="${#lists.isEmpty(cat.subCategoryList)}" th:each="sub : ${cat.subCategoryList}">
+                            <li><a class="dropdown-item" href="#" th:text="${sub.name}"></a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
     <dialog id="newItemDialog" class="upload-modal">
         <script>
@@ -115,13 +134,34 @@
             <input class="form-control" id="name" onkeyup="keyNewItem(event)">
 
             <div class="pt-2">
-                <button id="btnSubmit" type="button" class="btn btn-sm btn-quaternary" onclick="postNewItem()">ADd Item</button>
+                <button id="btnSubmit" type="button" class="btn btn-sm btn-quaternary" onclick="postNewItem()">Add Item</button>
                 <button id="btnCancel" type="button" class="btn btn-sm btn-outline-quaternary" onclick="keyEsc()">Cancel</button>
             </div>
 
         </form>
     </dialog>
 
+    <script th:inline="javascript">
+        async function addToCart(id, userid) {
+            let counterId = id+"-counter";
+            let detailsId = id+"-details";
+            let counterEl = document.getElementById(counterId);
+            let detailsEl = document.getElementById(detailsId);
+            let formData = new FormData();
+                formData.set("id", id);
+                formData.set("userId", userid);
+                formData.set("details", detailsEl.value)
+                formData.set("count", counterEl.value);
 
-
+            const response = await fetch('/api/v1/cart/additem', {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                return response.json();
+            }).then(data => {
+                console.log(data);
+                updateCartCounter(data);
+            });
+        }
+    </script>
 </div>

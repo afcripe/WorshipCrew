@@ -11,5 +11,6 @@ public interface CartServiceInterface {
     Cart findByUsername(String userName);
     Cart save(Cart cart);
     int getItemCount(BigInteger userId);
+    Cart emptyCart(BigInteger id);
 
 }

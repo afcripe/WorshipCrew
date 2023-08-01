@@ -6,44 +6,51 @@
 
 <div class="container-fluid m-0 p-0" layout:fragment="content">
 
-<!--    <script>-->
-<!--        let displayType = "list";-->
-<!--    </script>-->
-<!--    <th:block th:if="${session.storeListGrid}">-->
-<!--        <script>-->
-<!--            /*<![CDATA[*/-->
-<!--            displayType = "[[${session.storeListGrid}]]";-->
-<!--            /*]]>*/-->
-<!--        </script>-->
-<!--    </th:block>-->
+<div th:replace="~{store/moduleHeader :: header}">Header</div>
 
+    <div class="wrapper flex-grow-1">
+        <div id="mainContent" class="wrapper d-flex">
 
-    <div th:replace="~{store/moduleHeader :: header}">Header</div>
-
-    <div class="mx-2">
-
-        <div class="row mt-2">
-
-            <h1 style="color: coral">Welcome to the Destiny Store</h1>
-            <p th:if="${#lists.isEmpty(storeItems)}">No, it's not prime day.</p>
-
-            <div th:if="${session.storeLayout == 'list'}">
-                <div th:each="item : ${storeItems}">
-                    <div th:replace="~{components/cardStoreItemLine :: cardFragment(${item})}">List</div>
-                </div>
-            </div>
-
-            <div th:if="${session.storeLayout == 'grid'}">
-                <div class="store_grid_wrapper">
-                    <div th:each="item : ${storeItems}">
-                        <div th:replace="~{components/cardStoreItemLG :: cardFragment(${item})}">Card</div>
-                    </div>
-                </div>
-            </div>
+        <div id="storeCategoryNav" class="navbar navbar-light bg-light flex-fill px-2 pt-1 d-none d-md-block">
+            <h5 id="storeCategoryNavTitle">Categories</h5>
+            <ul class="navbar-nav pb-3" th:each="cat : ${categoryList}">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false" th:text="*{cat.name}"></a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown"
+                        th:unless="${#lists.isEmpty(cat.subCategoryList)}" th:each="sub : ${cat.subCategoryList}">
+                        <li><a class="dropdown-item" href="#" th:text="${sub.name}"></a></li>
+                    </ul>
+                </li>
+            </ul>
 
         </div>
 
-    </div>
+
+        <div class="flex-fill p-1 pb-4 w-100 mx-2">
+
+            <div class="row mt-2">
+
+                <h1 style="color: coral">Welcome to the Destiny Store</h1>
+                <p th:if="${#lists.isEmpty(storeItems)}">No, it's not prime day.</p>
+
+                <div th:if="${session.storeLayout == 'list'}">
+                    <div th:each="item : ${storeItems}">
+                        <div th:replace="~{components/cardStoreItemLine :: cardFragment(${item})}">List</div>
+                    </div>
+                </div>
+
+                <div th:if="${session.storeLayout == 'grid'}">
+                    <div class="store_grid_wrapper">
+                        <div th:each="item : ${storeItems}">
+                            <div th:replace="~{components/cardStoreItemLG :: cardFragment(${item})}">Card</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
 
     <script th:inline="javascript">
         /*<![CDATA[*/
@@ -54,26 +61,11 @@
         function navToItem(id) {
             window.location.href="/store/item/"+id;
         }
-        async function addToCart(id, userid) {
-            let counterID = id+"-counter";
-            let counterEl = document.getElementById(counterID);
-            let formData = new FormData();
-                formData.set("id", id);
-                formData.set("userId", userid);
-                formData.set("count", counterEl.value);
-
-            const response = await fetch('/api/v1/cart/additem', {
-                method: 'POST',
-                body: formData
-            }).then(response => {
-                return response.json();
-            }).then(data => {
-                console.log(data);
-                updateCartCounter(data);
-            });
-        }
     </script>
 
-  </div>
+    </div>
+</div>
+
+</div>
 
 </html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+
+<div th:fragment="cardFragment(orderItem)">
+  <div th:id="*{productId}+'-item'" class="card" th:object="${orderItem}">
+
+    <div class="row p-2" >
+      <div class="col-4" style="vertical-align: center; cursor: pointer;" th:onclick="navToItem([[*{productId}]])">
+        <img th:src="@{*{image.fileLocation}}" class="store_line_image mr-2 align-content-center" style="float: left">
+        <h6 th:text="*{productName}" class=" align-content-center"></h6>
+      </div>
+      <div class="col-4" style="vertical-align: center; cursor: pointer;" th:onclick="navToItem([[*{productId}]])">
+        <h6 th:text="*{details}" class=" align-content-center"></h6>
+      </div>
+      <div class="col-4">
+        <div style="float: right">
+          <span th:text="*{count}"></span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</html>

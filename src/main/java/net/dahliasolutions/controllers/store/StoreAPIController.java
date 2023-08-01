@@ -8,6 +8,7 @@ import net.dahliasolutions.models.store.*;
 import net.dahliasolutions.models.user.Profile;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.services.store.StoreCategoryService;
+import net.dahliasolutions.services.store.StoreItemOptionService;
 import net.dahliasolutions.services.store.StoreItemService;
 import net.dahliasolutions.services.store.StoreSubCategoryService;
 import net.dahliasolutions.services.user.ProfileService;
@@ -15,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +30,7 @@ public class StoreAPIController {
     private final ProfileService profileService;
     private final StoreCategoryService categoryService;
     private final StoreSubCategoryService subCategoryService;
+    private final StoreItemOptionService optionService;
 
     @GetMapping("")
     public List<StoreItem> goStoreHome() {
@@ -145,6 +148,47 @@ public class StoreAPIController {
         Optional<StoreSubCategory> subCategory = subCategoryService.findById(item.getId());
         if (subCategory.isPresent()) {
             subCategoryService.deleteById(item.getId());
+        }
+        return item;
+    }
+
+
+    @GetMapping("/options/{id}")
+    public List<StoreItemOption> getOptions(@PathVariable BigInteger id) {
+        Optional<StoreItem> storeItem = storeItemService.findById(id);
+        return storeItem.get().getItemOptions();
+    }
+
+    @PostMapping("/options/edit/{id}")
+    public StoreItemOption updateOption(@ModelAttribute StoreItemOption item, @PathVariable BigInteger id) {
+        Optional<StoreItemOption> option = optionService.findById(item.getId());
+
+        if (option.isPresent()) {
+            option.get().setName(item.getName());
+            return optionService.save(option.get());
+        } else {
+            Optional<StoreItem> storeItem = storeItemService.findById(id);
+            if (storeItem.isPresent()) {
+                storeItem.get().getItemOptions().add(new StoreItemOption(null, item.getName(),storeItem.get()));
+                storeItemService.save(storeItem.get());
+            }
+            return item;
+        }
+    }
+
+    @PostMapping("/options/delete/{id}")
+    public StoreItemOption deleteOption(@ModelAttribute StoreItemOption item, @PathVariable BigInteger id) {
+        Optional<StoreItem> storeItem = storeItemService.findById(id);
+
+        if (storeItem.isPresent()) {
+            for (StoreItemOption option : storeItem.get().getItemOptions()) {
+                if (option.getId().equals(item.getId())) {
+                    storeItem.get().getItemOptions().remove(option);
+                    optionService.deleteById(option.getId());
+                    break;
+                }
+            }
+            storeItemService.save(storeItem.get());
         }
         return item;
     }

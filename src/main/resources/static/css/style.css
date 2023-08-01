@@ -3,14 +3,23 @@
     width: 170px;
     min-width: 170px;
     max-width: 170px;
-    min-height: calc(100vh - 65px);
+    min-height: calc(100vh - 68px);
 }
 #sideNavCollapsed {
     background-color: #eeeeee;
     width: 45px;
     min-width: 45px;
     max-width: 45px;
-    min-height: calc(100vh - 65px);
+    min-height: calc(100vh - 68px);
+}
+#storeCategoryNavTitle {
+    color: #6c6c6c;
+}
+
+#storeCategoryNav {
+    margin-top: -5px;
+    border-radius: 5px;
+    min-height: calc(100vh - 175px);
 }
 
 .selectableItem {
@@ -326,4 +335,13 @@
 }
 .folder-nav-collapse {
     height: auto;
+}
+
+.orderHistory {
+    height: 0px;
+    display: none;
+}
+.orderHistoryExpand {
+    height: auto;
+    display: block;
 }

@@ -23,7 +23,6 @@ public class StoreItemOptionService implements StoreItemOptionServiceInterface {
 
 
     private final StoreItemOptionRepository optionRepository;
-    private final StoreItemRepository storeItemRepository;
 
 
     @Override
@@ -32,28 +31,13 @@ public class StoreItemOptionService implements StoreItemOptionServiceInterface {
     }
 
     @Override
-    public Optional<StoreItemOption> findByName(String name) {
-        return optionRepository.findByName(name);
-    }
-
-    @Override
     public List<StoreItemOption> findAll() {
         return optionRepository.findAll();
     }
 
     @Override
-    public List<StoreItemOption> findAllByStoreItem(StoreItem storeItem) {
-        return optionRepository.findAllByStoreItem(storeItem);
-    }
-
-    @Override
     public StoreItemOption save(StoreItemOption option) {
         return optionRepository.save(option);
-    }
-
-    @Override
-    public void delete(StoreItemOption option) {
-        optionRepository.delete(option);
     }
 
     @Override

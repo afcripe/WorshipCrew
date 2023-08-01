@@ -4,6 +4,15 @@
       layout:decorate="~{layouts/defaultLayout}" xmlns="http://www.w3.org/1999/html">
 
 <div class="container-fluid m-0 p-0" layout:fragment="content">
+  <template id="tmpOption">
+    <div class="m-1">
+      <div style="float: right;">
+        <button class="btn btn-sm btn-quaternary">Edit</button>
+        <button class="btn btn-sm btn-outline-quaternary">Delete</button>
+      </div>
+      <p style="width: 100%;">Sub-Category</p>
+    </div>
+  </template>
 
   <div class="container" th:object="${storeItem}">
     <div class="row m-2">
@@ -195,8 +204,12 @@
             <th:block th:text="${#session.removeAttribute('msg')}" />
           </th:block>
 
-          <div class="card-title">
-            <h5>Edit Store Item</h5>
+          <div class="card-title pt-2">
+            <h5 style="float: left">Edit Store Item</h5>
+            <div style="float: right">
+              <button type="button" class="btn btn-quaternary" onclick="submitForm()">Update</button>
+              <button type="button" class="btn btn-outline-quaternary" th:onclick="window.location.href=[[${session.redirectPath}]];">Back</button>
+            </div>
           </div>
 
           <div class="card-body">
@@ -253,7 +266,7 @@
                 </div>
                 <div class="col-xs-12 col-sm-8">
                   <select id="department" class="form-control w-100" name="department">
-                    <th:block th:unlee="*{department}">
+                    <th:block th:unless="*{department}">
                       <option value="0">Select A Department</option>
                       <option th:each="d : ${departmentList}" th:value="${d.id}" th:text="${d.name}"></option>
                     </th:block>
@@ -290,7 +303,7 @@
                 </div>
                 <div class="col-xs-12 col-sm-8">
                   <select id="subCategory" class="form-control w-100" name="subCategory" onchange="onSubCategoryChange()">
-                    <th:block th:unlee="*{subCategory}">
+                    <th:block th:unless="*{subCategory}">
                       <option value="0">Select A Sub-Category</option>
                       <option th:each="c : ${subCategoryList}" th:value="${c.id}" th:text="${c.name}"></option>
                     </th:block>
@@ -338,12 +351,6 @@
                 </div>
               </div>
 
-              <div class="row p-2">
-                <div class="col-xs-12">
-                  <button type="button" class="btn btn-primary" onclick="submitForm()">Update</button>
-                  <button type="button" class="btn btn-secondary" th:onclick="window.location.href=[[${session.redirectPath}]];">Cancel</button>
-                </div>
-              </div>
             </form>
 
           </div>
@@ -356,7 +363,16 @@
           </div>
 
           <div class="card-body">
-            <p>Add Store Item Options</p>
+            <div id="editOption" class="pt-4">
+              <input id="optionId" type="hidden" value="0">
+              <input id="optionName" type="text" class="form-control" style="width: 200px; display: inline-block;">
+              <div style="float: right; display: inline-block">
+                <button id="editOptionSend" type="button" class="btn btn-sm btn-quaternary" style="display: inline-block" onclick="updateOption()">Submit</button>
+                <button id="clearOptionSend" type="button" class="btn btn-sm btn-quaternary pl-2" style="display: inline-block" onclick="clearOption()">Clear</button>
+              </div>
+            </div>
+            <hr>
+            <div id="optionList"></div>
           </div>
         </div>
 
@@ -369,10 +385,16 @@
   initialSelectedSubCat = /*[[${storeItem.subCategory}]]*/ "0";
   /*]]>*/
 
+  const template = document.getElementById("tmpOption");
   const categorySelect = document.getElementById("category");
   const subCategorySelect = document.getElementById("subCategory");
   let selectedCat = 0;
   let selectedSubCat = 0;
+
+  const editOptionDisplay = document.getElementById("editOption");
+  const optionIdDisplay = document.getElementById("optionId");
+  const optionNameDisplay = document.getElementById("optionName");
+  const optionListDisplay = document.getElementById("optionList");
 
   if (initialSelectedSubCat !== 0) {
     selectedSubCat = initialSelectedSubCat;
@@ -382,6 +404,8 @@
     selectedCat = initialSelectedCat;
     getSubCategories();
   }
+
+  getOptions();
 
   function uploadImageClick() {
     document.getElementById("uploadDialog").showModal();
@@ -406,7 +430,6 @@
       while (subCategorySelect.firstChild) {
         subCategorySelect.removeChild(subCategorySelect.lastChild);
       }
-      debugger
       for (let key in data) {
         let obj = data[key];
         let opt = document.createElement('option');
@@ -426,6 +449,87 @@
 
   function onSubCategoryChange() {
     selectedSubCat = subCategorySelect.value;
+  }
+
+
+  function clearOption() {
+    optionIdDisplay.value = 0;
+    optionNameDisplay.value = "";
+  }
+
+  function editOption(id, name) {
+    debugger
+    optionIdDisplay.value = id;
+    optionNameDisplay.value = name;
+  }
+
+  async function updateOption() {
+    let itemId = document.getElementById("id");
+    let formData = new FormData();
+        formData.set("id", optionIdDisplay.value)
+        formData.set("name", optionNameDisplay.value)
+    debugger
+    const response = await fetch('/api/v1/store/options/edit/'+itemId.value, {
+      method: 'POST',
+      body: formData
+    }).then(response => {
+      debugger
+      return response.json();
+    }).then(data => {
+      debugger
+      getOptions();
+    });
+  }
+
+  async function getOptions() {
+    let itemId = document.getElementById("id");
+    while (optionListDisplay.firstChild) {
+      optionListDisplay.removeChild(optionListDisplay.lastChild);
+    }
+
+    const response = await fetch('/api/v1/store/options/'+itemId.value)
+    .then(response => {
+      return response.json();
+    }).then(data => {
+      console.log(data);
+      debugger
+      for (let key in data) {
+        let obj = data[key];
+        let divID = "id-" + obj.id;
+
+        let clone = template.content.cloneNode(true);
+        let nameDiv = clone.querySelector("p");
+            nameDiv.innerText = obj.name;
+
+        let btnDiv = clone.querySelectorAll("button");
+        btnDiv[0].addEventListener("click", function (event) {
+          editOption(obj.id, obj.name);
+        });
+        btnDiv[1].addEventListener("click", function (event) {
+          deleteOption(obj.id, obj.name);
+        });
+
+        optionListDisplay.appendChild(clone);
+      }
+      clearOption();
+    });
+  }
+
+  async function deleteOption(id, name) {
+    let itemId = document.getElementById("id");
+    let formData = new FormData();
+        formData.set("id", id)
+        formData.set("name", name)
+    debugger
+    const response = await fetch('/api/v1/store/options/delete/'+itemId.value, {
+      method: 'POST',
+      body: formData
+    }).then(response => {
+      return response.json();
+    }).then(data => {
+      debugger
+      getOptions();
+    });
   }
 
   function submitForm() {

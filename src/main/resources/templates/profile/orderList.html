@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<div class="container-fluid" layout:fragment="content">
+
+    <div class="row pt-4">
+        <div class="col-8">
+            <h1 style="color: coral">Orders</h1>
+        </div>
+    </div>
+
+    <div class="col" th:if="${not #lists.isEmpty(orderList)}" th:each="item : ${orderList}">
+      <div class="row">
+<!--        <div th:replace="~{components/cardCartItemLine :: cardFragment(${item})}">Your cart is Empty</div>-->
+      </div>
+    </div>
+
+
+    <script th:inline="javascript">
+        function navToItem(id) {
+            window.location.href="/store/item/"+id;
+        }
+    </script>
+
+</div>
+
+
+</html>

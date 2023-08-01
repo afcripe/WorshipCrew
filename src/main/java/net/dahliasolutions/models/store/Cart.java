@@ -1,5 +1,6 @@
 package net.dahliasolutions.models.store;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,6 +20,7 @@ public class Cart {
     private BigInteger id;  // same as user id, only one cart per user
     transient int itemCount;
 
+    @JsonBackReference
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "cart")
     private List<CartItem> cartItems;
 

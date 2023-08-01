@@ -37,7 +37,13 @@
           </li>
           <li class="nav-item d-block d-sm-none" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
                                                 or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
-                                                or #lists.contains(userRoles,'MANAGER_READ') or #lists.contains(userRoles,'MANAGER_WRITE')}">
+                                                or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')
+                                                or #lists.contains(userRoles,'REQUEST_READ') or #lists.contains(userRoles,'REQUEST_WRITE')}">
+            <a class="nav-link" href="/order">Requests</a>
+          </li>
+          <li class="nav-item d-block d-sm-none" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
+                                                or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
+                                                or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')}">
             <a class="nav-link" href="/admin">Settings</a>
           </li>
           <li class="nav-item d-block d-sm-none">
@@ -57,7 +63,7 @@
         </ul>
       </div>
 
-        <ul class="navbar-nav ml-2 pb-2 order-0 d-none d-sm-block" style="line-height: 23px;" sec:authorize="isAuthenticated()">
+        <ul class="navbar-nav ml-2 pb-2 orderRequest-0 d-none d-sm-block" style="line-height: 23px;" sec:authorize="isAuthenticated()">
           <li class="nav-item">
             <a class="nav-link mx-2" href="/cart" title="Cart">
               <i class="bi bi-cart cart-icon"></i>
@@ -67,7 +73,7 @@
         </ul>
 
         <div class="collapse navbar-collapse flex-grow-0">
-          <ul class="navbar-nav me-auto order-last" sec:authorize="isAuthenticated()">
+          <ul class="navbar-nav me-auto orderRequest-last" sec:authorize="isAuthenticated()">
             <th:block th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
                       or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
                       or #lists.contains(userRoles,'MANAGER_READ') or #lists.contains(userRoles,'MANAGER_WRITE')}">
@@ -91,7 +97,7 @@
             </li>
           </ul>
 
-          <ul class="navbar-nav me-auto order-last" sec:authorize="isAnonymous()">
+          <ul class="navbar-nav me-auto orderRequest-last" sec:authorize="isAnonymous()">
             <li class="nav-item">
               <a class="btn btn-sm btn-info mx-4 px-2" href="/login">Login</a>
             </li>

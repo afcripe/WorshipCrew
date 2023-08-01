@@ -23,7 +23,7 @@ public class CartController {
     public void addAttributes(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) auth.getPrincipal();
-        model.addAttribute("moduleTitle", "cart");
+        model.addAttribute("moduleTitle", "Cart");
         model.addAttribute("moduleLink", "/cart");
         model.addAttribute("userId", user.getId());
     }

@@ -64,4 +64,15 @@ public class CartService implements CartServiceInterface {
     public int getItemCount(BigInteger userId) {
         return cartRepository.findById(userId).orElse(createCart(userId)).getItemCount();
     }
+
+    @Override
+    public Cart emptyCart(BigInteger id) {
+        Cart cart = findById(id);
+        // loop through items and remove items
+        for (CartItem item : cart.getCartItems()) {
+            cartItemRepository.deleteById(item.getId());
+        }
+        cart.getCartItems().clear();
+        return cartRepository.save(cart);
+    }
 }
