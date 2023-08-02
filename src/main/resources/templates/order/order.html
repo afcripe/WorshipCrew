@@ -5,84 +5,241 @@
 
 <div class="container-fluid" layout:fragment="content" th:object="${orderRequest}">
 
-    <div class="row pt-4">
-        <div class="col-8">
-            <h2>Request</h2>
-        </div>
-    </div>
-
-    <div class="row py-1">
-        <h4>Request Id: <span th:text="*{id}"></span></h4>
-    </div>
-    <div class="row py-1">
-        <div class="col-6">
-            Date: <span th:text="*{#temporals.format(requestDate, 'MMM-dd-yyyy')}"></span>
-        </div>
-        <div class="col-6">
-            Status: <span th:text="*{orderStatus}"></span>
-        </div>
-    </div>
-
-    <div class="row p-2">
-        <div class="col-6">
-            <button class="btn btn-sm btn-outline-secondary" onclick="toggleHistory()" style="max-width: 150px;">
-                History <i id="btnHistoryExpand" class="bi bi-arrows-expand" style="display: inline-block"></i><i id="btnHistoryCollapse" class="bi bi-arrows-collapse" style="display: none"></i>
-            </button>
-        </div>
-        <div class="col-6">
-            Items: <span th:text="*{itemCount}"></span>
-        </div>
-    </div>
-    <div id="divHistory" class="row orderHistory py-1 mx-1">
-        <div class="card p-2">
-            <div class="row">
-                <div class="col">
-                    <strong>Date</strong>
-                </div>
-                <div class="col">
-                    <strong>Status</strong>
-                </div>
-                <div class="col">
-                    <strong>Note</strong>
-                </div>
-                <div class="col">
-                    <strong>Entered By</strong>
+            <div class="row pt-4">
+                <div class="col-8">
+                    <h2>Request</h2>
+                    <input type="hidden" id="orderId" th:value="*{id}">
                 </div>
             </div>
 
-            <div class="card-section" th:each="note : ${noteList}">
-                <div class="row">
-                    <div class="col">
-                        <span th:text="${#temporals.format(note.noteDate, 'MMM-dd-yyyy hh:mm')}"></span>
+            <div class="row pt-2 pb-4">
+                <div class="col-12 col-md-6">
+                    <h4>Request Id: <span th:text="*{id}"></span></h4>
+                </div>
+                <div class="col-12 col-md-6"
+                     th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'DIRECTOR_WRITE')
+                            or #lists.contains(userRoles,'CAMPUS_WRITE') or #lists.contains(userRoles,'REQUEST_WRITE')}">
+                    <button class="btn btn btn-primary" onclick="dialogChangeStatus()">Change Status</button>
+                    <button class="btn btn btn-primary" onclick="dialogIncludePerson()">Include Someone</button>
+                </div>
+
+            </div>
+
+    <div class="row">
+        <div class="col-12 col-md-8 pb-4">
+
+            <div class="row py-1">
+                <div class="col-6">
+                    Date: <span th:text="*{#temporals.format(requestDate, 'MMM-dd-yyyy')}"></span>
+                </div>
+                <div class="col-6">
+                    Status: <span th:text="*{orderStatus}"></span>
+                </div>
+            </div>
+
+            <div class="row p-2">
+                <div class="col-6">
+                    <button class="btn btn-sm btn-outline-secondary" onclick="toggleHistory()" style="max-width: 150px;">
+                        History <i id="btnHistoryExpand" class="bi bi-arrows-expand" style="display: inline-block"></i><i id="btnHistoryCollapse" class="bi bi-arrows-collapse" style="display: none"></i>
+                    </button>
+                </div>
+                <div class="col-6">
+                    Items: <span th:text="*{itemCount}"></span>
+                </div>
+            </div>
+            <div id="divHistory" class="row orderHistory py-1 mx-1">
+                <div class="card p-2">
+                    <div class="row">
+                        <div class="col">
+                            <strong>Date</strong>
+                        </div>
+                        <div class="col">
+                            <strong>Status</strong>
+                        </div>
+                        <div class="col">
+                            <strong>Note</strong>
+                        </div>
+                        <div class="col">
+                            <strong>Entered By</strong>
+                        </div>
                     </div>
-                    <div class="col">
-                        <span th:text="${note.orderStatus}"></span>
+
+                    <div class="card-section" th:each="note : ${noteList}">
+                        <div class="row">
+                            <div class="col">
+                                <span th:text="${#temporals.format(note.noteDate, 'MMM-dd-yyyy hh:mm')}"></span>
+                            </div>
+                            <div class="col">
+                                <span th:text="${note.orderStatus}"></span>
+                            </div>
+                            <div class="col">
+                                <span th:text="${note.orderNote}"></span>
+                            </div>
+                            <div class="col">
+                                <span th:text="${note.user.firstName}+' '+${note.user.lastName}"></span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col">
-                        <span th:text="${note.orderNote}"></span>
-                    </div>
-                    <div class="col">
-                        <span th:text="${note.user.firstName}+' '+${note.user.lastName}"></span>
-                    </div>
+                </div>
+            </div>
+
+            <div class="row py-2" th:each="item : *{requestItems}">
+                <div th:replace="~{components/cardOrderItemLine :: cardFragment(${item})}">Your Order is Empty</div>
+            </div>
+
+        </div>
+
+        <div class="col-12 col-md-4">
+            <div class="card p-2">
+                <div class="card-title">
+                    <h5>Request Sent to</h5>
+                </div>
+                <p class="p-2" th:text="*{supervisor.firstName}+' '+*{supervisor.lastName}"></p>
+
+                <div class="card-title">
+                    <h5>Included on Request</h5>
+                </div>
+                <div th:each="super : *{supervisorList}">
+                    <p class="p-2" th:text="${super.firstName}+' '+${super.lastName}"></p>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row py-2" th:each="item : *{requestItems}">
-        <div th:replace="~{components/cardOrderItemLine :: cardFragment(${item})}">Your Order is Empty</div>
-    </div>
+    <dialog id="includePersonDialog" class="upload-modal">
+        <script>
+            async function loadPeople() {
+                let dispPersonSelect = document.getElementById('personSelect');
+                while (dispPersonSelect.firstChild) {
+                    dispPersonSelect.removeChild(dispPersonSelect.lastChild);
+                }
 
+                const response = await fetch('/api/v1/order/getSupervisors')
+                    .then(response => {
+                        return response.json();
+                    }).then(data => {
+                        while (dispPersonSelect.firstChild) {
+                            dispPersonSelect.removeChild(dispPersonSelect.lastChild);
+                        }
+                        for (let key in data) {
+                            let obj = data[key];
+                            let opt = document.createElement('option');
+                                opt.value = obj.id;
+                                opt.innerHTML = obj.firstName+' '+obj.lastName;
+
+                            dispPersonSelect.appendChild(opt);
+                        }
+                    });
+            }
+            async function postInclude() {
+                let formData = new FormData();
+                formData.set("requestId", document.getElementById('orderId').value);
+                formData.set("userId", document.getElementById('personSelect').value);
+                formData.set("primary", document.getElementById('personPrimary').checked);
+
+                const response = await fetch('/api/v1/order/addsupervisor', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    return response.json();
+                }).then(data => {
+                    window.location.reload();
+                });
+            }
+            function keyIncludePerson(event) {
+                event.preventDefault();
+                if (event.key === "Enter" || event.keyCode === 13) {
+                    postInclude();
+                }
+                if (event.key === "Escape") {
+                    keyEscInclude();
+                }
+            }
+            function keyEscInclude() {
+                document.getElementById("includePersonDialog").close();
+            }
+        </script>
+        <h2>Include Someone on Request</h2>
+        <form id="formIncludePerson" onsubmit="postInclude()" style="width: 300px; max-width: 450px">
+            <label for="personSelect" class="form-label">Person</label>
+            <select class="form-control" id="personSelect" onkeyup="keyIncludePerson(event)">
+                <option></option>
+            </select>
+            <label for="personPrimary" class="form-label">Set As Primary</label>
+            <input type="checkbox" id="personPrimary">
+            <div class="pt-2">
+                <button id="btnIncludeSubmit" type="button" class="btn btn-sm btn-primary" onclick="postInclude()">Add</button>
+                <button id="btnIncludeCancel" type="button" class="btn btn-sm btn-outline-primary" onclick="keyEscInclude()">Cancel</button>
+            </div>
+
+        </form>
+    </dialog>
+    <dialog id="changeStatusDialog" class="upload-modal">
+        <script>
+            async function postStatus() {
+                let formData = new FormData();
+                formData.set("name", document.getElementById('catName').value)
+
+                const response = await fetch('/api/v1/store/category/new', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    return response.json();
+                }).then(data => {
+                    console.log(data);
+                    let opt = document.createElement('option');
+                    opt.value = data.id;
+                    opt.innerHTML = data.name;
+                    categorySelect.appendChild(opt);
+                    document.getElementById('catName').value = "";
+                    editCatDisplay.style.display = "inline-block";
+                    setCategory(data.id);
+                    keyEscCat();
+                });
+            }
+            function keyStatus(event) {
+                event.preventDefault();
+                if (event.key === "Enter" || event.keyCode === 13) {
+                    postStatus();
+                }
+                if (event.key === "Escape") {
+                    keyEscStatus();
+                }
+            }
+
+            function keyEscStatus() {
+                document.getElementById("changeStatusDialog").close();
+            }
+
+        </script>
+        <h2>Update Request Status</h2>
+        <form id="formChangeStatus" onsubmit="postStatus()" style="width: 300px; max-width: 450px">
+            <label for="status" class="form-control-label">Change Status</label>
+            <select class="form-control" id="status" onkeyup="keyStatus(event)">
+                <option></option>
+            </select>
+            <label class="form-control-label">Note</label>
+            <textarea></textarea>
+
+            <div class="pt-2">
+                <button id="btnStatusSubmit" type="button" class="btn btn-sm btn-primary" onclick="postStatus()">Add</button>
+                <button id="btnStatusCancel" type="button" class="btn btn-sm btn-outline-primary" onclick="keyEscStatus()">Cancel</button>
+            </div>
+
+        </form>
+    </dialog>
 
     <script th:inline="javascript">
         const displayDivHistory = document.getElementById("divHistory");
         const displayBtnHistoryExpand = document.getElementById("btnHistoryExpand");
         const displayBtnHistoryCollapse = document.getElementById("btnHistoryCollapse");
-
+        const displayIncludePersonDialog = document.getElementById("includePersonDialog");
+        const displayChangeStatusDialog = document.getElementById("changeStatusDialog");
 
         function navToItem(id) {
             window.location.href="/store/item/"+id;
         }
+
         function toggleHistory(){
             if (displayDivHistory.classList.contains("orderHistoryExpand")) {
                 displayDivHistory.classList.remove("orderHistoryExpand");
@@ -93,6 +250,15 @@
                 displayBtnHistoryExpand.style.display = "none";
                 displayBtnHistoryCollapse.style.display = "inline-block";
             }
+        }
+
+        function dialogIncludePerson() {
+            displayIncludePersonDialog.showModal();
+            loadPeople();
+        }
+
+        function dialogChangeStatus() {
+            displayChangeStatusDialog.showModal();
         }
     </script>
 

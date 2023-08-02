@@ -1,8 +1,7 @@
 package net.dahliasolutions.data;
 
+import jakarta.persistence.Tuple;
 import net.dahliasolutions.models.order.OrderRequest;
-import net.dahliasolutions.models.order.OrderSupervisor;
-import net.dahliasolutions.models.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,6 +20,6 @@ public interface OrderRepository extends JpaRepository<OrderRequest, BigInteger>
     @Query(value = "SELECT * FROM ORDER_REQUEST WHERE SUPERVISOR_ID = :supervisorId AND ORDER_STATUS <> 'Cancelled' AND ORDER_STATUS <> 'Complete' ORDER BY REQUEST_DATE DESC", nativeQuery = true)
     List<OrderRequest> findAllBySupervisorIdOpenOnly(@Param("supervisorId") BigInteger supervisorId);
     @Query(value = "SELECT * FROM ORDER_REQUEST_SUPERVISOR_LIST WHERE SUPERVISOR_LIST_ID = :supervisorId", nativeQuery = true)
-    List<OrderSupervisor> findAllMentionsBySupervisorId(@Param("supervisorId") BigInteger supervisorId);
+    List<Tuple> findAllMentionsBySupervisorId(@Param("supervisorId") BigInteger supervisorId);
 
 }

@@ -56,5 +56,4 @@ public class OrderController {
         model.addAttribute("noteList", noteList);
         return "order/order";
     }
-
 }

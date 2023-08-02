@@ -8,13 +8,13 @@
 
     <div class="row pt-4">
         <div class="col-8">
-            <h1 style="color: coral">Request Cart</h1>
+            <h1>Request Cart</h1>
             <p>Number of items in cart: <span id="subtitleCount" th:text="${cart.itemCount}"></span></p>
         </div>
         <div class="col-4 pt-2">
-            <button type="button" class="btn btn-sm btn-outline-quaternary"
+            <button type="button" class="btn btn-sm btn-outline-primary"
                     th:onclick="clearCart([[${userId}]])">Clear Cart</button>
-            <button type="button" class="btn btn-sm btn-quaternary"
+            <button type="button" class="btn btn-sm btn-primary"
                     th:onclick="placeOrder([[${userId}]])">Send Request</button>
         </div>
     </div>
@@ -30,21 +30,41 @@
         </div>
     </div>
 
-    <div class="row pt-4">
+    <div class="row pt-4 pb-5">
         <div class="col-8">
             <p></p>
         </div>
         <div class="col-4">
-            <button type="button" class="btn btn-sm btn-outline-quaternary"
+            <button type="button" class="btn btn-sm btn-outline-primary"
                     th:onclick="clearCart([[${userId}]])">Clear Cart</button>
-            <button type="button" class="btn btn-sm btn-quaternary"
+            <button type="button" class="btn btn-sm btn-primary"
                     th:onclick="placeOrder([[${userId}]])">Send Request</button>
+        </div>
+    </div>
+
+    <div class="row pt-5">
+        <div class="col">
+            <div style="float: right">
+                <button class="btn btn-sm btn-outline-primary"
+                        th:onclick="window.location.href='/profile/orders';">All Orders</button>
+            </div>
+            <h4>Recent Requests</h4>
+        </div>
+    </div>
+    <div class="row pt-4">
+        <div class="col" th:if="${not #lists.isEmpty(orderList)}" th:each="orderRequest : ${orderList}">
+            <div class="row">
+                <div th:replace="~{components/cardOrderLine :: cardFragment(${orderRequest})}">No Requests to Display</div>
+            </div>
         </div>
     </div>
 
     <script th:inline="javascript">
         function navToItem(id) {
             window.location.href="/store/item/"+id;
+        }
+        function navToRequest(id) {
+            window.location.href="/profile/order/"+id;
         }
 
         async function updateCartItem(id, userid, target) {

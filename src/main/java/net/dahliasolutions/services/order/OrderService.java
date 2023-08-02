@@ -8,6 +8,7 @@ import net.dahliasolutions.data.UserRepository;
 import net.dahliasolutions.models.order.*;
 import net.dahliasolutions.models.store.Cart;
 import net.dahliasolutions.models.user.User;
+import jakarta.persistence.Tuple;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -113,10 +114,12 @@ public class OrderService implements OrderServiceInterface {
 
     @Override
     public List<OrderRequest> findAllByMentionOpenOnly(User user) {
-        List<OrderSupervisor> orderSupervisorList = orderRepository.findAllMentionsBySupervisorId(user.getId());
+        List<Tuple> orderSupervisorList = orderRepository.findAllMentionsBySupervisorId(user.getId());
         List<OrderRequest> orderRequestList = new ArrayList<>();
-        for (OrderSupervisor supervisor : orderSupervisorList) {
-            OrderRequest newRequest = orderRepository.findById(supervisor.getOrderRequestId()).get();
+        for (Tuple tuple : orderSupervisorList) {
+            BigInteger orderId = new BigInteger(tuple.get(0).toString());
+            System.out.println(orderId);
+            OrderRequest newRequest = orderRepository.findById(orderId).get();
             if (!newRequest.getOrderStatus().equals(OrderStatus.Cancelled)
                     && !newRequest.getOrderStatus().equals(OrderStatus.Complete)) {
                 orderRequestList.add(newRequest);

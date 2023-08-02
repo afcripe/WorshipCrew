@@ -85,6 +85,7 @@
                     <div class="list-group" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
                                                 or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
                                                 or #lists.contains(userRoles,'USER_READ') or #lists.contains(userRoles,'USER_WRITE')
+                                                or #lists.contains(userRoles,'REQUEST_READ') or #lists.contains(userRoles,'REQUEST_WRITE')
                                                 or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')}">
                         <a class="list-group-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
                                                 or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')

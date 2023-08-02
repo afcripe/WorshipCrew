@@ -169,7 +169,7 @@ public class ProfileController {
         User user = (User) auth.getPrincipal();
         List<OrderRequest> orderList = orderService.findAllByUser(user);
         model.addAttribute("orderList", orderList);
-        return "profile /orderList";
+        return "profile/orderList";
     }
 
     @GetMapping("/order/{id}")
