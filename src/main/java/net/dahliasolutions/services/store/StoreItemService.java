@@ -5,6 +5,7 @@ import net.dahliasolutions.data.StoreItemOptionRepository;
 import net.dahliasolutions.data.StoreItemRepository;
 import net.dahliasolutions.models.store.StoreItem;
 import net.dahliasolutions.models.store.StoreItemOption;
+import net.dahliasolutions.models.store.StoreSubCategory;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -66,6 +67,12 @@ public class StoreItemService implements StoreItemServiceInterface {
 //                item.getItemOptions().add(option);
 //            }
 //        }
+        return storeItems;
+    }
+
+    @Override
+    public List<StoreItem> findBySubCategory(StoreSubCategory subCategory) {
+        List<StoreItem> storeItems = storeItemRepository.findBySubCategory(subCategory);
         return storeItems;
     }
 

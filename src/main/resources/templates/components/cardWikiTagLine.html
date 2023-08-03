@@ -12,9 +12,9 @@
           (<span th:text="*{references}"></span>)
       </div>
       <div class="col-6 align-content-end" style="vertical-align: center">
-        <button id="btnEdit" class="btn btn-sm btn-primary ml-2" type="button"
+        <button id="btnEdit" class="btn btn-sm btn-wiki ml-2" type="button"
                 th:onclick="editTag([[*{id}]], [[*{name}]])">Edit</button>
-        <button id="btnDelete" class="btn btn-sm btn-outline-primary ml-2" type="button"
+        <button id="btnDelete" class="btn btn-sm btn-outline-wiki ml-2" type="button"
                 th:onclick="deleteTag('tag-[[*{id}]]', [[*{id}]])">Delete</button>
       </div>
     </div>

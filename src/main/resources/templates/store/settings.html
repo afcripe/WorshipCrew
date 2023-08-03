@@ -7,8 +7,8 @@
   <template id="tmpSubCat">
     <div class="m-1">
       <div style="float: right;">
-        <button class="btn btn-sm btn-quaternary">Edit</button>
-        <button class="btn btn-sm btn-outline-quaternary">Delete</button>
+        <button class="btn btn-sm btn-store">Edit</button>
+        <button class="btn btn-sm btn-outline-store">Delete</button>
       </div>
       <p style="width: 100%;">Sub-Category</p>
     </div>
@@ -21,14 +21,14 @@
     <div class="row">
 
       <div class="col-xs-1 col-md-2">
-        <h2 style="color: coral">Settings</h2>
+        <h2 class="color-store">Settings</h2>
       </div>
 
     </div>
 
     <div class="row">
 
-      <div class="card" style="max-width: 400px;">
+      <div class="card" style="max-width: 450px;">
         <div class="card-body">
           <ul class="list-group list-group-flush">
             <li class="list-group-item selectableItem" style="cursor: pointer;"
@@ -36,12 +36,19 @@
               Manage Uploaded Images
             </li>
           </ul>
+
+          <div class="pt-4">
+            <h4>Store Home Page</h4>
+            <p>Leave blank to use default page of recent articles.</p>
+            <input id="inputStoreHome" type="text" style="width: 300px" th:value="${portalHome}" onkeyup="inputStoreHomeSubmit()">
+            <button id="btnStoreHome" type="button" class="btn btn-sm btn-outline-store" onclick="updateStoreHome()">Update</button>
+          </div>
         </div>
       </div>
 
       <div class="card" style="max-width: 450px;">
         <div class="card-title m-4">
-          <button class="btn btn-sm btn-quaternary" style="float: right;" onclick="newCategory()">Add Category</button>
+          <button class="btn btn-sm btn-store" style="float: right;" onclick="newCategory()">Add Category</button>
           <h4>Categories</h4>
         </div>
         <div class="card-body">
@@ -49,9 +56,9 @@
             <option th:each="c : ${categoryList}" th:value="${c.id}" th:text="${c.name}"></option>
           </select>
           <div style="display: inline-block; float: right;">
-            <button id="editCategory" type="button" class="btn btn-sm btn-quaternary"
+            <button id="editCategory" type="button" class="btn btn-sm btn-store"
                     style="display: none;" onclick="editCat()">Edit</button>
-            <button id="deleteCategory" type="button" class="btn btn-sm btn-outline-quaternary pl-2"
+            <button id="deleteCategory" type="button" class="btn btn-sm btn-outline-store pl-2"
                     style="display: none;" onclick="deleteCat()">Delete</button>
           </div>
           <hr/>
@@ -60,8 +67,8 @@
             <input id="editSubId" type="hidden" value="0">
             <input id="editSubName" type="text" class="form-control" style="width: 200px; display: inline-block;">
             <div style="float: right; display: inline-block">
-              <button id="editSubSend" type="button" class="btn btn-sm btn-quaternary" style="display: inline-block" onclick="updateSub()">Submit</button>
-              <button id="clearSubSend" type="button" class="btn btn-sm btn-quaternary pl-2" style="display: inline-block" onclick="clearSub()">Clear</button>
+              <button id="editSubSend" type="button" class="btn btn-sm btn-store" style="display: inline-block" onclick="updateSub()">Submit</button>
+              <button id="clearSubSend" type="button" class="btn btn-sm btn-store pl-2" style="display: inline-block" onclick="clearSub()">Clear</button>
             </div>
           </div>
         </div>
@@ -115,8 +122,8 @@
       <input class="form-control" id="catName" onkeyup="keyNewCat(event)">
 
       <div class="pt-2">
-        <button id="btnSubmit" type="button" class="btn btn-sm btn-quaternary" onclick="postNewCat()">Add Item</button>
-        <button id="btnCancel" type="button" class="btn btn-sm btn-outline-quaternary" onclick="keyEscCat()">Cancel</button>
+        <button id="btnSubmit" type="button" class="btn btn-sm btn-store" onclick="postNewCat()">Add Item</button>
+        <button id="btnCancel" type="button" class="btn btn-sm btn-outline-store" onclick="keyEscCat()">Cancel</button>
       </div>
 
     </form>
@@ -167,8 +174,8 @@
       <input class="form-control" id="editCatName" onkeyup="keyNewCat(event)">
 
       <div class="pt-2">
-        <button id="btnEditSubmit" type="button" class="btn btn-sm btn-quaternary" onclick="putCat()">Update</button>
-        <button id="btnEditCancel" type="button" class="btn btn-sm btn-outline-quaternary" onclick="keyEscEditCat()">Cancel</button>
+        <button id="btnEditSubmit" type="button" class="btn btn-sm btn-store" onclick="putCat()">Update</button>
+        <button id="btnEditCancel" type="button" class="btn btn-sm btn-outline-store" onclick="keyEscEditCat()">Cancel</button>
       </div>
 
     </form>
@@ -341,6 +348,32 @@
     function setCategory(id) {
       categorySelect.value = id;
       categorySelect.dispatchEvent(new Event('change'));
+    }
+
+    function inputStoreHomeSubmit(event) {
+      event.preventDefault();
+      if (event.key === 'Enter' || event.keyCode === 13) {
+        updatePortalHome();
+      }
+
+    }
+    async function updateStoreHome() {
+      let pHome = document.getElementById("inputStoreHome");
+      let bStoreHome = document.getElementById("btnStoreHome");
+
+      bStoreHome.disabled = true;
+
+      let theForm = new FormData();
+      theForm.set("name", pHome.value);
+      const response = await fetch("/api/v1/wiki/updatesitehome", {
+        method: 'POST',
+        body: theForm
+      }).then(response => {
+        return response.json();
+      }).then(data => {
+        debugger
+        bStoreHome.disabled = false;
+      });
     }
 
     if (categorySelect.value !== "" && categorySelect.value > 0) {

@@ -4,18 +4,8 @@
       <div class="container-fluid w-100">
 
         <div class="navbar-nav mt-2 mx-2">
-          <a class="nav-link h3" href="/resource">
-            <i class="bi bi-wikipedia color-wiki"></i>
-          </a>
-        </div>
-        <div class="navbar-nav mt-2 mx-2" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')}">
-          <a class="nav-link h3" href="/resource/settings">
-            <i class="bi bi-gear color-wiki"></i>
-          </a>
-        </div>
-        <div class="navbar-nav mx-2">
-          <a class="btn btn-sm btn-wiki" href="/resource/article/new">
-            <i class="bi bi-file-earmark-plus"></i>
+          <a class="nav-link h3" href="/order">
+            <i class="bi bi-cart4"></i>
           </a>
         </div>
         <div class="navbar-nav mt-2 mx-2 flex-grow-1">
@@ -39,7 +29,7 @@
                 }
                 function searchKeyUp(event) {
                   event.preventDefault();
-                  if (event.key === 'Enter' || event.keyCode === 13) {
+                  if (e.key === 'Enter' || e.keyCode === 13) {
                     searchForm();
                   }
                 }

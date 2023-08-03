@@ -17,10 +17,10 @@
 
         <div class="row mt-2">
 
-            <div class="h3" style="color: #0d6efd; display: inline-block">
-                <span class="h3" style="color: #0d6efd;">Resource Folder Manager </span>
+            <div class="h3 color-wiki" style="display: inline-block">
+                <span class="h3 color-wiki">Resource Folder Manager </span>
                 &nbsp;&nbsp;
-                <i class="bi bi-plus-square h4" style="color: #0d6efd;" onclick="newFolder()"></i>
+                <i class="bi bi-plus-square h4 color-wiki" onclick="newFolder()"></i>
             </div>
 
             <div id="folderListDisplay" th:each="item : ${folderList}">
@@ -71,9 +71,9 @@
             <div class="d-flex">
                 <input id="newTagName" class="form-control pr-2 w-50" type="text"
                        placeholder="New Tag" style="float: left;" onkeyup="newTagInput(event)">
-                <button type="button" class="btn btn-sm btn-primary m-2 w-25" style="float: right"
+                <button type="button" class="btn btn-sm btn-wiki m-2 w-25" style="float: right"
                         onclick="addNewTag()">Add</button>
-                <button type="button" class="btn btn-sm btn-primary m-2 w-25" style="float: right"
+                <button type="button" class="btn btn-sm btn-wiki m-2 w-25" style="float: right"
                         onclick="newTagDialogOK()">OK</button>
             </div>
         </form>
@@ -118,9 +118,9 @@
                 <input id="oldFolderName" type="hidden">
                 <input id="editFolderName" class="form-control pr-2 w-50" type="text"
                        style="float: left;" onkeyup="editFolderInput(event)">
-                <button type="button" class="btn btn-sm btn-primary m-2 w-25" style="float: right"
+                <button type="button" class="btn btn-sm btn-wiki m-2 w-25" style="float: right"
                         onclick="updateFolder()">Update</button>
-                <button type="button" class="btn btn-sm btn-primary m-2 w-25" style="float: right"
+                <button type="button" class="btn btn-sm btn-wiki m-2 w-25" style="float: right"
                         onclick="editFolderDialogOK()">OK</button>
             </div>
         </form>

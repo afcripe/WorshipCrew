@@ -64,6 +64,28 @@ public class StoreController {
         return "store/index";
     }
 
+
+    @GetMapping("/{category}")
+    public String goStoreHome(@PathVariable String category, Model model, HttpSession session) {
+        redirectService.setHistory(session, "/store");
+        String selectCategory = "";
+        String selectSubCategory = "";
+
+        Optional<StoreSubCategory> subCategory = subCategoryService.findByName(category);
+
+        List<StoreItem> itemList = new ArrayList<>();
+        if (subCategory.isPresent()) {
+            itemList = storeItemService.findBySubCategory(subCategory.get());
+            selectSubCategory = subCategory.get().getName();
+            selectCategory = subCategory.get().getStoreCategory().getName();
+        }
+
+        model.addAttribute("storeItems", itemList);
+        model.addAttribute("selectedCategory", selectCategory);
+        model.addAttribute("selectedSubCategory", selectSubCategory);
+        return "store/index";
+    }
+
     @GetMapping("/new")
     public String getNewItem(Model model) {
 
@@ -295,6 +317,7 @@ public class StoreController {
         List<StoreItem> itemList = storeItemService.searchAll(searcher);
 
         model.addAttribute("storeItems", itemList);
+        model.addAttribute("searchTerm", searcher);
         return "store/index";
     }
 

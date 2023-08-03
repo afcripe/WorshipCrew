@@ -5,16 +5,16 @@
 
         <div class="navbar-nav mt-2 mx-2">
           <a class="nav-link h3" href="#">
-            <i class="bi bi-life-preserver h3" style="color: #6f42c1"></i>
+            <i class="bi bi-life-preserver h3 color-support"></i>
           </a>
         </div>
         <div class="navbar-nav mt-2 mx-2" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')}">
           <a class="nav-link h3" href="#">
-            <i class="bi bi-gear h3" style="color: #6f42c1"></i>
+            <i class="bi bi-gear h3 color-support"></i>
           </a>
         </div>
         <div class="navbar-nav mx-2">
-          <a class="btn btn-sm btn-tertiary" href="/store/new">
+          <a class="btn btn-sm btn-support" href="/support/new">
             <i class="bi bi-ticket-detailed"></i>
           </a>
         </div>
@@ -31,7 +31,7 @@
 
           <form onsubmit="searchForm()" class="d-flex me-auto mt-3 mt-sm-0" style="height: 30px">
             <input id="searchInput" class="form-control" type="text" placeholder="Search" onkeyup="searchKeyUp(event)">
-            <button class="btn btn-sm btn-outline-tertiary mx-1 px-1" type="button" onclick="submit()">Search</button>
+            <button class="btn btn-sm btn-outline-wiki mx-1 px-1" type="button" onclick="submit()">Search</button>
             <script th:inline="javascript">
               function searchForm() {
                 event.preventDefault();

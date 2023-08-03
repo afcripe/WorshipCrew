@@ -29,7 +29,7 @@
             <div style="float: right;" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
                                       or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
                                       or #lists.contains(userRoles,'MANAGER_READ') or #lists.contains(userRoles,'MANAGER_WRITE')}">
-              <button id="btnEdit" class="btn btn-sm btn-quaternary" type="button"
+              <button id="btnEdit" class="btn btn-sm btn-store" type="button"
                       th:onclick="window.location.href='/store/item/edit/[[*{id}]]';">Edit</button>
             </div>
             <h3 th:text="*{name}" style="float:left;"></h3>
@@ -60,7 +60,7 @@
             <div class="col-12 col-md-6 my-2">
               <div style="float: right">
                 <input th:id="*{id}+'-counter'" type="number" value="1" style="width: 55px">
-                <button type="button" class="btn btn-sm btn-outline-quaternary"
+                <button type="button" class="btn btn-sm btn-outline-store"
                         th:onclick="addToCart([[*{id}]], [[${userId}]])"><i class="bi bi-cart-plus"></i></button>
               </div>
             </div>

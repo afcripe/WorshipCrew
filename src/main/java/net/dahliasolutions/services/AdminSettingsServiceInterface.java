@@ -8,4 +8,5 @@ public interface AdminSettingsServiceInterface {
     void setMonthlyStatements(boolean bool);
     void setWikiHome(String name);
     void setPortalHome(String name);
+    void setStoreHome(String name);
 }

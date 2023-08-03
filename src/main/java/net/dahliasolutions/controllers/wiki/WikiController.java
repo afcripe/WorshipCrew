@@ -291,7 +291,7 @@ public class WikiController {
         model.addAttribute("wikiPostList", wikiPostList);
         model.addAttribute("tagList", tagList);
         model.addAttribute("folderList", folderList);
-        model.addAttribute("searchTerm", searchTerm);
+        model.addAttribute("searchTerm", searcher);
         return "wiki/index";
     }
 

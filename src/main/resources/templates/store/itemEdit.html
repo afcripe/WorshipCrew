@@ -7,8 +7,8 @@
   <template id="tmpOption">
     <div class="m-1">
       <div style="float: right;">
-        <button class="btn btn-sm btn-quaternary">Edit</button>
-        <button class="btn btn-sm btn-outline-quaternary">Delete</button>
+        <button class="btn btn-sm btn-store">Edit</button>
+        <button class="btn btn-sm btn-outline-store">Delete</button>
       </div>
       <p style="width: 100%;">Sub-Category</p>
     </div>
@@ -92,8 +92,8 @@
 
                 <div class="row p-2">
                   <div class="col">
-                    <button id="btnUploadSubmit" type="button" class="btn btn-sm btn-quaternary" onclick="doUploadImage()">Submit</button>
-                    <button id="btnUploadCancel" formmethod="dialog" type="submit" class="btn btn-sm btn-outline-quaternary">Cancel</button>
+                    <button id="btnUploadSubmit" type="button" class="btn btn-sm btn-store" onclick="doUploadImage()">Submit</button>
+                    <button id="btnUploadCancel" formmethod="dialog" type="submit" class="btn btn-sm btn-outline-store">Cancel</button>
                   </div>
                 </div>
 
@@ -191,7 +191,7 @@
               <input type="hidden" id="selectedImageId">
               <input contenteditable="false" id="selectedImageName" type="hidden">
               <div class="d-flex">
-                <button type="button" class="btn btn-sm btn-quaternary m-2 w-25"
+                <button type="button" class="btn btn-sm btn-store m-2 w-25"
                         onclick="dialogOK()">OK</button>
                 <button type="button" class="btn btn-sm btn-outline-danger m-2 w-25"
                         onclick="chooserClose()">Cancel</button>
@@ -207,8 +207,8 @@
           <div class="card-title pt-2">
             <h5 style="float: left">Edit Store Item</h5>
             <div style="float: right">
-              <button type="button" class="btn btn-quaternary" onclick="submitForm()">Update</button>
-              <button type="button" class="btn btn-outline-quaternary" th:onclick="window.location.href=[[${session.redirectPath}]];">Back</button>
+              <button type="button" class="btn btn-store" onclick="submitForm()">Update</button>
+              <button type="button" class="btn btn-outline-store" th:onclick="window.location.href=[[${session.redirectPath}]];">Back</button>
             </div>
           </div>
 
@@ -333,8 +333,8 @@
                   <label for="image" class="form-label">Image</label>
                 </div>
                 <div class="col-xs-12 col-sm-8 px-2">
-                  <button type="button" class="btn btn-sm btn-quaternary" onclick="uploadImageClick()">Upload Image</button>
-                  <button type="button" class="btn btn-sm btn-outline-quaternary" th:onclick="chooseImageClick()">Choose Existing</button>
+                  <button type="button" class="btn btn-sm btn-store" onclick="uploadImageClick()">Upload Image</button>
+                  <button type="button" class="btn btn-sm btn-outline-store" th:onclick="chooseImageClick()">Choose Existing</button>
                 </div>
               </div>
 
@@ -367,8 +367,8 @@
               <input id="optionId" type="hidden" value="0">
               <input id="optionName" type="text" class="form-control" style="width: 200px; display: inline-block;">
               <div style="float: right; display: inline-block">
-                <button id="editOptionSend" type="button" class="btn btn-sm btn-quaternary" style="display: inline-block" onclick="updateOption()">Submit</button>
-                <button id="clearOptionSend" type="button" class="btn btn-sm btn-quaternary pl-2" style="display: inline-block" onclick="clearOption()">Clear</button>
+                <button id="editOptionSend" type="button" class="btn btn-sm btn-store" style="display: inline-block" onclick="updateOption()">Submit</button>
+                <button id="clearOptionSend" type="button" class="btn btn-sm btn-store pl-2" style="display: inline-block" onclick="clearOption()">Clear</button>
               </div>
             </div>
             <hr>

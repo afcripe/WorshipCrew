@@ -1,6 +1,7 @@
 package net.dahliasolutions.data;
 
 import net.dahliasolutions.models.store.StoreItem;
+import net.dahliasolutions.models.store.StoreSubCategory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,6 +16,11 @@ public interface StoreItemRepository extends JpaRepository<StoreItem, BigInteger
 
     @Query(value="SELECT * FROM STORE_ITEM WHERE UPPER(NAME) LIKE CONCAT('%',UPPER(:s),'%') OR UPPER(DESCRIPTION) LIKE CONCAT('%',UPPER(:s),'%')", nativeQuery = true)
     List<StoreItem> searchAll(@Param("s") String searchTerm);
+
+    List<StoreItem> findBySubCategory(StoreSubCategory subCategory);
+
+//    @Query(value="SELECT * FROM STORE_ITEM WHERE CATEGORY_ID=:i", nativeQuery = true)
+//    List(StoreItem) (@Param("i") BigInteger id);
 
     @Query(value="SELECT COUNT(ID) FROM STORE_ITEM WHERE CATEGORY_ID=:i", nativeQuery = true)
     Integer countByCategoryId(@Param("i") BigInteger id);

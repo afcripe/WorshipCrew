@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://thymeleaf.org">
 
 <div th:fragment="cardFragment(orderRequesst)">
-  <div class="card px-1" th:object="${orderRequesst}" style="cursor: pointer" th:onclick="navToRequest([[*{id}]])">
+  <div class="card px-1 selectableItem" th:object="${orderRequesst}" th:onclick="navToRequest([[*{id}]])">
 
     <div class="row mt-2" >
       <div class="col-3" style="vertical-align: center">

@@ -3,16 +3,18 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/defaultLayout}">
 
-<div class="container-fluid" layout:fragment="content" th:object="${orderRequest}">
+<div class="container-fluid m-0 p-0" layout:fragment="content" th:object="${orderRequest}">
 
-            <div class="row pt-4">
+    <div th:replace="~{order/moduleHeader :: header}">Header</div>
+
+            <div class="row pt-4 py-2">
                 <div class="col-8">
                     <h2>Request</h2>
                     <input type="hidden" id="orderId" th:value="*{id}">
                 </div>
             </div>
 
-            <div class="row pt-2 pb-4">
+            <div class="row pt-2 pb-4 py-2">
                 <div class="col-12 col-md-6">
                     <h4>Request Id: <span th:text="*{id}"></span></h4>
                 </div>
@@ -25,7 +27,7 @@
 
             </div>
 
-    <div class="row">
+    <div class="row py-2">
         <div class="col-12 col-md-8 pb-4">
 
             <div class="row py-1">
@@ -91,7 +93,7 @@
         </div>
 
         <div class="col-12 col-md-4">
-            <div class="card p-2">
+            <div class="card p-2 gradient-right">
                 <div class="card-title">
                     <h5>Request Sent to</h5>
                 </div>

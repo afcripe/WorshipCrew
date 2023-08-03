@@ -12,7 +12,7 @@
 
         <div class="row mt-2">
 
-            <h1 style="color: coral">Store Image Manager</h1>
+            <h1 class="color-store">Store Image Manager</h1>
 
             <div th:each="item : ${imageList}">
                 <div th:replace="~{components/cardImageItemLine :: cardFragment(${item})}">List</div>

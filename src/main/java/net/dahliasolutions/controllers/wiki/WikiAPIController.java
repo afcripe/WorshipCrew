@@ -227,4 +227,10 @@ public class WikiAPIController {
         adminSettingsService.setPortalHome(portalHomeModel.name());
         return portalHomeModel;
     }
+
+    @PostMapping("/updatesitehome")
+    public SingleStringModel updateStoreHome(@ModelAttribute SingleStringModel portalHomeModel) {
+        adminSettingsService.setStoreHome(portalHomeModel.name());
+        return portalHomeModel;
+    }
 }

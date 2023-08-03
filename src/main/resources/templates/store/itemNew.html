@@ -84,8 +84,8 @@
 
                 <div class="row p-2">
                   <div class="col">
-                    <button id="btnUploadSubmit" type="button" class="btn btn-sm btn-quaternary" onclick="doUploadImage()">Submit</button>
-                    <button id="btnUploadCancel" formmethod="dialog" type="submit" class="btn btn-sm btn-outline-quaternary">Cancel</button>
+                    <button id="btnUploadSubmit" type="button" class="btn btn-sm btn-store" onclick="doUploadImage()">Submit</button>
+                    <button id="btnUploadCancel" formmethod="dialog" type="submit" class="btn btn-sm btn-outline-store">Cancel</button>
                   </div>
                 </div>
 
@@ -183,7 +183,7 @@
               <input type="hidden" id="selectedImageId">
               <input contenteditable="false" id="selectedImageName" type="hidden">
               <div class="d-flex">
-                <button type="button" class="btn btn-sm btn-quaternary m-2 w-25"
+                <button type="button" class="btn btn-sm btn-store m-2 w-25"
                         onclick="dialogOK()">OK</button>
                 <button type="button" class="btn btn-sm btn-outline-danger m-2 w-25"
                         onclick="chooserClose()">Cancel</button>
@@ -191,7 +191,7 @@
             </form>
           </dialog>
 
-          <div class="card-title alert alert-quaternary">
+          <div class="card-title alert alert-store">
             <h5>New Store Item</h5>
 
             <th:block th:if="${session.msg}">
@@ -299,8 +299,8 @@
                 <div class="col-xs-0 col-sm-4">
                 </div>
                 <div class="col-xs-12 col-sm-8 px-2">
-                  <button type="button" class="btn btn-sm btn-quaternary" onclick="uploadImageClick()">Upload Image</button>
-                  <button type="button" class="btn btn-sm btn-outline-quaternary" th:onclick="chooseImageClick()">Choose Existing</button>
+                  <button type="button" class="btn btn-sm btn-store" onclick="uploadImageClick()">Upload Image</button>
+                  <button type="button" class="btn btn-sm btn-outline-store" th:onclick="chooseImageClick()">Choose Existing</button>
                 </div>
               </div>
 

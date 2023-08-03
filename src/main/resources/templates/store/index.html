@@ -12,14 +12,15 @@
         <div id="mainContent" class="wrapper d-flex">
 
         <div id="storeCategoryNav" class="navbar navbar-light bg-light flex-fill px-2 pt-1 d-none d-md-block">
-            <h5 id="storeCategoryNavTitle">Categories</h5>
+            <h5 id="storeCategoryNavTitle" onclick="clearCategory()" style="cursor: pointer">Categories</h5>
             <ul class="navbar-nav pb-3" th:each="cat : ${categoryList}">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                       data-bs-toggle="dropdown" aria-expanded="false" th:text="*{cat.name}"></a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown"
+                <li class="nav-item dropdown" th:id="*{cat.name}">
+                    <a class="nav-link dropdown-toggle" href="#" th:onclick="selectCategory([[*{cat.name}]])"
+                       th:id="*{cat.name}+'dropdown'" role="button"
+                       data-bs-toggle="dropdown" th:text="*{cat.name}"></a>
+                    <ul class="dropdown-menu storeCategoryNav-dropdown-menu" th:aria-labelledby="*{cat.name}+'dropdown'"
                         th:unless="${#lists.isEmpty(cat.subCategoryList)}" th:each="sub : ${cat.subCategoryList}">
-                        <li><a class="dropdown-item" href="#" th:text="${sub.name}"></a></li>
+                        <li><a class="dropdown-item" th:href="'/store/'+${sub.name}" th:text="${sub.name}"></a></li>
                     </ul>
                 </li>
             </ul>
@@ -31,7 +32,7 @@
 
             <div class="row mt-2">
 
-                <h1 style="color: coral">Welcome to the Destiny Store</h1>
+                <h1 class="color-store">Welcome to the Destiny Store</h1>
                 <p th:if="${#lists.isEmpty(storeItems)}">No, it's not prime day.</p>
 
                 <div th:if="${session.storeLayout == 'list'}">
@@ -54,9 +55,42 @@
 
     <script th:inline="javascript">
         /*<![CDATA[*/
-        let searchTerm = /*[[${searchTerm}]]*/ " ";
+        let searchTerm = /*[[${searchTerm}]]*/ "";
+        let selectedCategory = /*[[${selectedCategory}]]*/ "";
+        let selectedSubCategory = /*[[${selectedSubCategory}]]*/ "";
         /*]]>*/
-        document.getElementById("searchInput").value = searchTerm;
+
+        document.getElementById("searchStoreInput").value = searchTerm;
+        const dropdownNav = document.getElementById("storeCategoryNav");
+
+        // close categoryNavs
+        closeAllCategories()
+
+        function closeAllCategories() {
+            let dropdowns = dropdownNav.querySelectorAll('.dropdown');
+            dropdowns.forEach(function(el){
+                let dropdownMenuEl = el.querySelector('.dropdown-menu');
+                el.setAttribute('aria-expanded', 'false');
+                dropdownMenuEl.classList.remove('show');
+            })
+            openSelectedCategory();
+        }
+        function openSelectedCategory() {
+            if (selectedCategory != null) {
+                let dropdownEl = document.getElementById(selectedCategory);
+                let dropdownMenuEl = dropdownEl.querySelector('.dropdown-menu');
+                dropdownEl.setAttribute('aria-expanded', 'true');
+                dropdownMenuEl.classList.add('show');
+            }
+        }
+        function selectCategory(name) {
+            debugger
+            selectedCategory = name;
+            closeAllCategories();
+        }
+        function clearCategory() {
+            window.location.href="/store";
+        }
 
         function navToItem(id) {
             window.location.href="/store/item/"+id;

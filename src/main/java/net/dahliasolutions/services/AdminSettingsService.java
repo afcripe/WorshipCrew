@@ -23,6 +23,7 @@ public class AdminSettingsService implements AdminSettingsServiceInterface{
                             "Destiny Worship Exchange",
                             false,
                             "",
+                            "",
                             "")
             );
         }
@@ -54,6 +55,13 @@ public class AdminSettingsService implements AdminSettingsServiceInterface{
     public void setPortalHome(String name) {
         AdminSettings adminSettings = getAdminSettings();
         adminSettings.setPortalHome(name);
+        adminSettingsRepository.save(adminSettings);
+    }
+
+    @Override
+    public void setStoreHome(String name) {
+        AdminSettings adminSettings = getAdminSettings();
+        adminSettings.setStoreHome(name);
         adminSettingsRepository.save(adminSettings);
     }
 

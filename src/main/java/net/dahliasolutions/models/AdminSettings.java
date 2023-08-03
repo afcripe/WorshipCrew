@@ -20,4 +20,5 @@ public class AdminSettings {
     private boolean monthlyStatements;
     private String wikiHome;
     private String portalHome;
+    private String storeHome;
 }

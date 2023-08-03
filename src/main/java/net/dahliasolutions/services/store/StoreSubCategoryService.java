@@ -30,6 +30,11 @@ public class StoreSubCategoryService implements StoreSubCategoryServiceInterface
     }
 
     @Override
+    public Optional<StoreSubCategory> findByName(String name) {
+        return subCategoryRepository.findByName(name);
+    }
+
+    @Override
     public StoreSubCategory save(StoreSubCategory subCategory) {
         return subCategoryRepository.save(subCategory);
     }
