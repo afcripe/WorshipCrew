@@ -43,9 +43,25 @@ public class AppAPIController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) auth.getPrincipal();
         Optional<Profile> profile = profileService.findByUser(user);
-            profile.get().setSideNavigation(sideNav);
+        profile.get().setSideNavigation(sideNav);
         profileService.save(profile.get());
 
         session.setAttribute("sideNavigation", sideNav);
+    }
+
+    @GetMapping("/toggletheme")
+    public void toggleSideNav(HttpSession session) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) auth.getPrincipal();
+        Optional<Profile> profile = profileService.findByUser(user);
+        if (profile.get().getTheme().equals("default")) {
+            profile.get().setTheme("dark");
+        } else {
+            profile.get().setTheme("default");
+
+        }
+        profileService.save(profile.get());
+
+        session.setAttribute("theme", profile.get().getTheme());
     }
 }

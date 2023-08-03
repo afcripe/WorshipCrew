@@ -2,11 +2,15 @@ package net.dahliasolutions.controllers.store;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import net.dahliasolutions.models.AdminSettings;
 import net.dahliasolutions.models.department.DepartmentRegional;
 import net.dahliasolutions.models.position.Position;
 import net.dahliasolutions.models.position.PositionSelectedModel;
 import net.dahliasolutions.models.store.*;
 import net.dahliasolutions.models.user.User;
+import net.dahliasolutions.models.wiki.WikiPost;
+import net.dahliasolutions.models.wiki.WikiTag;
+import net.dahliasolutions.models.wiki.WikiTagReference;
 import net.dahliasolutions.services.*;
 import net.dahliasolutions.services.department.DepartmentRegionalService;
 import net.dahliasolutions.services.position.PositionService;
@@ -15,6 +19,7 @@ import net.dahliasolutions.services.store.StoreImageService;
 import net.dahliasolutions.services.store.StoreItemService;
 import net.dahliasolutions.services.store.StoreSubCategoryService;
 import net.dahliasolutions.services.user.UserService;
+import net.dahliasolutions.services.wiki.WikiPostService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -42,7 +47,8 @@ public class StoreController {
     private final RedirectService redirectService;
     private final StoreCategoryService categoryService;
     private final StoreSubCategoryService subCategoryService;
-
+    private final AdminSettingsService adminSettingsService;
+    private final WikiPostService wikiPostService;
     @ModelAttribute
     public void addAttributes(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -58,6 +64,12 @@ public class StoreController {
     @GetMapping("")
     public String goStoreHome(Model model, HttpSession session) {
         redirectService.setHistory(session, "/store");
+        AdminSettings adminSettings = adminSettingsService.getAdminSettings();
+        if (!adminSettings.getStoreHome().equals("")) {
+            model.addAttribute("wikiPost", getStoreHomeFromPath(adminSettings.getStoreHome()));
+            return "store/storeHome";
+        }
+
         List<StoreItem> itemList = storeItemService.findAll();
 
         model.addAttribute("storeItems", itemList);
@@ -66,7 +78,7 @@ public class StoreController {
 
 
     @GetMapping("/{category}")
-    public String goStoreHome(@PathVariable String category, Model model, HttpSession session) {
+    public String goStoreCategory(@PathVariable String category, Model model, HttpSession session) {
         redirectService.setHistory(session, "/store");
         String selectCategory = "";
         String selectSubCategory = "";
@@ -283,6 +295,7 @@ public class StoreController {
     public String getStoreSettings(Model model) {
         List<StoreCategory> categoryList = categoryService.findAll();
         model.addAttribute("categoryList", categoryList);
+        model.addAttribute("storeHome", adminSettingsService.getAdminSettings().getStoreHome());
         return "store/settings";
     }
 
@@ -319,6 +332,29 @@ public class StoreController {
         model.addAttribute("storeItems", itemList);
         model.addAttribute("searchTerm", searcher);
         return "store/index";
+    }
+
+    private WikiPost getStoreHomeFromPath(String path) {
+        String folderFile = path.split("/articles")[1];
+
+        String[] folderList = path.split("/");
+        String postURLName = folderList[folderList.length-1];
+        String postName = postURLName.replace("-", " ");
+        String folders = "";
+        for ( int i=1; i<folderList.length-1; i++ ) {
+            folders = folders + "/" + folderList[i];
+        }
+
+        List<WikiPost> wikiList = wikiPostService.findByTitle(postName);
+        if (wikiList.size() > 1) {
+            for ( WikiPost w : wikiList ) {
+                if ( w.getFolder().equals(folders) ) {
+                    return w;
+                }
+            }
+        }
+
+        return wikiList.get(0);
     }
 
 }

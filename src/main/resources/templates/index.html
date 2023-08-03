@@ -21,9 +21,31 @@
 
   <div sec:authorize="isAnonymous()">
 
-    <div th:replace="~{components/cardLogin :: cardFragment}">Login</div>
+<!--    <iframe width="560" height="315" src="https://www.youtube.com/embed/hoKc9k0sbG4?controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>-->
+
+    <iframe id="landingVideo" src="https://www.youtube.com/embed/hoKc9k0sbG4?controls=0&autoplay=1&mute=1"></iframe>
+
+    <div id="loginCard" class="login">
+      <div th:replace="~{components/cardLogin :: cardFragment}">Login</div>
+    </div>
 
   </div>
+
+    <script>
+        const logiCd = document.getElementById('loginCard');
+        function showLogin() {
+            debugger
+            if (logiCd.classList.contains('showLogin')) {
+                logiCd.classList.remove('showLogin');
+            } else {
+                logiCd.classList.add('showLogin');
+            }
+        }
+
+        if (window.location.pathname === "/login") {
+            logiCd.classList.add('showLogin');
+        }
+    </script>
 
 </div>
 

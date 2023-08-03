@@ -24,7 +24,7 @@
                 <div th:utext="*{body}"></div>
             </div>
             <div class="col-12 col-lg-3">
-                <div class="card m-1">
+                <div class="card m-1 gradient-right">
                     <div class="card-title h6">Article Info</div>
                     <div class="card-section">
                         Article Location: <a id="articleLink" href="#"><i class="bi bi-box-arrow-up-right"></i></a><br>
@@ -56,8 +56,8 @@
         /*]]>*/
 
         let safeTitle = postTitle.replace(" ","-");
-        let postLinkText = postFolder+"/"+safeTitle.toLowerCase();
-        let postLink = websiteDomain+"/resource/articles"+postLinkText;
+        let postLinkText = "/resource/articles"+postFolder+"/"+safeTitle.toLowerCase();
+        let postLink = websiteDomain+postLinkText;
         document.getElementById("articleLinkText").innerText = postLinkText;
         document.getElementById("articleLink").href = postLink;
 

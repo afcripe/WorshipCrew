@@ -30,66 +30,73 @@
     <div class="row py-2">
         <div class="col-12 col-md-8 pb-4">
 
-            <div class="row py-1">
-                <div class="col-6">
-                    Date: <span th:text="*{#temporals.format(requestDate, 'MMM-dd-yyyy')}"></span>
-                </div>
-                <div class="col-6">
-                    Status: <span th:text="*{orderStatus}"></span>
-                    <input type="hidden" id="orderStatus" th:value="*{orderStatus}">
-                </div>
-            </div>
-
-            <div class="row p-2">
-                <div class="col-6">
-                    <button class="btn btn-sm btn-outline-secondary" onclick="toggleHistory()" style="max-width: 150px;">
-                        History <i id="btnHistoryExpand" class="bi bi-arrows-expand" style="display: inline-block"></i><i id="btnHistoryCollapse" class="bi bi-arrows-collapse" style="display: none"></i>
-                    </button>
-                </div>
-                <div class="col-6">
-                    Items: <span th:text="*{itemCount}"></span>
-                </div>
-            </div>
-            <div id="divHistory" class="row orderHistory py-1 mx-1">
-                <div class="card p-2">
-                    <div class="row">
-                        <div class="col">
-                            <strong>Date</strong>
-                        </div>
-                        <div class="col">
-                            <strong>Status</strong>
-                        </div>
-                        <div class="col">
-                            <strong>Note</strong>
-                        </div>
-                        <div class="col">
-                            <strong>Entered By</strong>
-                        </div>
+            <div class="card">
+                <div class="row py-1">
+                    <div class="col">
+                        <h6>Requested By: <span th:text="*{user.firstName} + ' ' + *{user.lastName}"></span></h6>
                     </div>
+                </div>
 
-                    <div class="card-section" th:each="note : ${noteList}">
+                <div class="row py-1">
+                    <div class="col-6">
+                        Date: <span th:text="*{#temporals.format(requestDate, 'MMM-dd-yyyy')}"></span>
+                    </div>
+                    <div class="col-6">
+                        Status: <span th:text="*{orderStatus}"></span>
+                        <input type="hidden" id="orderStatus" th:value="*{orderStatus}">
+                    </div>
+                </div>
+
+                <div class="row p-2">
+                    <div class="col-6">
+                        <button class="btn btn-sm btn-outline-secondary" onclick="toggleHistory()" style="max-width: 150px;">
+                            History <i id="btnHistoryExpand" class="bi bi-arrows-expand" style="display: inline-block"></i><i id="btnHistoryCollapse" class="bi bi-arrows-collapse" style="display: none"></i>
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        Items: <span th:text="*{itemCount}"></span>
+                    </div>
+                </div>
+                <div id="divHistory" class="row orderHistory py-1 mx-1">
+                    <div class="card p-2">
                         <div class="row">
                             <div class="col">
-                                <span th:text="${#temporals.format(note.noteDate, 'MMM-dd-yyyy hh:mm')}"></span>
+                                <strong>Date</strong>
                             </div>
                             <div class="col">
-                                <span th:text="${note.orderStatus}"></span>
+                                <strong>Status</strong>
                             </div>
                             <div class="col">
-                                <span th:text="${note.orderNote}"></span>
+                                <strong>Note</strong>
                             </div>
                             <div class="col">
-                                <span th:text="${note.user.firstName}+' '+${note.user.lastName}"></span>
+                                <strong>Entered By</strong>
+                            </div>
+                        </div>
+
+                        <div class="card-section" th:each="note : ${noteList}">
+                            <div class="row">
+                                <div class="col">
+                                    <span th:text="${#temporals.format(note.noteDate, 'MMM-dd-yyyy hh:mm')}"></span>
+                                </div>
+                                <div class="col">
+                                    <span th:text="${note.orderStatus}"></span>
+                                </div>
+                                <div class="col">
+                                    <span th:text="${note.orderNote}"></span>
+                                </div>
+                                <div class="col">
+                                    <span th:text="${note.user.firstName}+' '+${note.user.lastName}"></span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="row py-2" th:each="item : *{requestItems}">
-                <div th:replace="~{components/cardOrderItemLine :: cardFragment(${item})}">Your Order is Empty</div>
+                <div class="row py-2" th:each="item : *{requestItems}">
+                    <div th:replace="~{components/cardOrderItemLine :: cardFragment(${item})}">Your Order is Empty</div>
+                </div>
             </div>
-
         </div>
 
         <div class="col-12 col-md-4">

@@ -296,6 +296,8 @@ public class WikiController {
     }
 
     private WikiPost getWikiFromPath(String path) {
+        String folderFile = path.split("/articles")[1];
+
         String[] folderList = path.split("/");
         String postURLName = folderList[folderList.length-1];
         String postName = postURLName.replace("-", " ");

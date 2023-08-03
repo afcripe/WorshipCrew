@@ -208,7 +208,7 @@
 
     function updateSideNavDisplay() {
         if (forceHideSideNave) {
-            document.getElementById('sideNavCollapsed').classList.add("d-sm-block");
+            document.getElementById('sideNavCollapsed').classList.remove("d-sm-block");
             document.getElementById('sideNavExpanded').classList.remove("d-sm-block");
         } else {
             switch (pageSideNavigation) {
@@ -265,18 +265,35 @@
             cartCountCollapsed.innerText = count;
         }
     }
-    function setDarkMode() {
+    function setSiteTheme() {
         let pageBody = document.querySelector("body")
         let pageNaveExp = document.getElementById("sideNavCollapsed")
         let pageNaveCol = document.getElementById("sideNavExpanded")
 
-        pageBody.classList.add("dark");
-        pageNaveExp.classList.add("dark");
-        pageNaveCol.classList.add("dark")
+        if (profileTheme === 'dark') {
+            pageBody.classList.add("dark");
+            pageNaveExp.classList.add("dark");
+            pageNaveCol.classList.add("dark")
+        } else {
+            try {
+                pageBody.classList.remove("dark");
+                pageNaveExp.classList.remove("dark");
+                pageNaveCol.classList.remove("dark")
+            } catch (e) {
+                console.log("dark mode is not enabled")
+            }
+        }
+    }
+    async function toggleTheme() {
+        fetch('/api/v1/app/toggletheme')
+        .then(response => {
+                window.location.reload();
+            }
+        );
     }
 
     updateSideNavDisplay();
-    // setDarkMode();
+    setSiteTheme();
 </script>
 
     </body>
