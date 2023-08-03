@@ -2,6 +2,7 @@ package net.dahliasolutions.controllers.order;
 
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.AddSupervisorModel;
+import net.dahliasolutions.models.ChangeStatusModel;
 import net.dahliasolutions.models.SingleBigIntegerModel;
 import net.dahliasolutions.models.order.OrderNote;
 import net.dahliasolutions.models.order.OrderRequest;
@@ -16,10 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1/order")
@@ -58,7 +56,13 @@ public class OrderAPIController {
         return integerModel;
     }
 
-    @GetMapping("/getSupervisors")
+    @GetMapping("/getstatusoptions")
+    public List<OrderStatus> getStatusOptions(){
+        List<OrderStatus> statuses = new ArrayList<OrderStatus>(Arrays.asList(OrderStatus.values()));
+        return new ArrayList<OrderStatus>(Arrays.asList(OrderStatus.values()));
+    }
+
+    @GetMapping("/getupervisors")
     public List<User> getSupervisors(){
         Collection<UserRoles> roles = getSupervisorCollection();
         boolean addUser = false;
@@ -74,6 +78,26 @@ public class OrderAPIController {
             }
         }
         return userList;
+    }
+
+    @PostMapping("/changestatus")
+    public ChangeStatusModel updateRequestStatus(@ModelAttribute ChangeStatusModel statusModel) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) auth.getPrincipal();
+        Optional<OrderRequest> orderRequest = orderService.findById(statusModel.requestId());
+        if (orderRequest.isPresent()) {
+            orderRequest.get().setOrderStatus(OrderStatus.valueOf(statusModel.requestStatus()));
+            orderRequest.get().setRequestNote(statusModel.RequestNote());
+            orderService.save(orderRequest.get());
+            orderNoteService.createOrderNote(new OrderNote(
+                    null,
+                    orderRequest.get().getId(),
+                    null,
+                    statusModel.RequestNote(),
+                    OrderStatus.valueOf(statusModel.requestStatus()),
+                    user));
+        }
+        return statusModel;
     }
 
     @PostMapping("/addsupervisor")
@@ -122,6 +146,8 @@ public class OrderAPIController {
         }
             return supervisorModel;
     }
+
+
 
     private Collection<UserRoles> getSupervisorCollection() {
         Collection<UserRoles> roles = new ArrayList<>();

@@ -34,6 +34,7 @@
                 </div>
                 <div class="col-6">
                     Status: <span th:text="*{orderStatus}"></span>
+                    <input type="hidden" id="orderStatus" th:value="*{orderStatus}">
                 </div>
             </div>
 
@@ -110,11 +111,8 @@
         <script>
             async function loadPeople() {
                 let dispPersonSelect = document.getElementById('personSelect');
-                while (dispPersonSelect.firstChild) {
-                    dispPersonSelect.removeChild(dispPersonSelect.lastChild);
-                }
 
-                const response = await fetch('/api/v1/order/getSupervisors')
+                const response = await fetch('/api/v1/order/getsupervisors')
                     .then(response => {
                         return response.json();
                     }).then(data => {
@@ -176,25 +174,47 @@
     </dialog>
     <dialog id="changeStatusDialog" class="upload-modal">
         <script>
-            async function postStatus() {
-                let formData = new FormData();
-                formData.set("name", document.getElementById('catName').value)
+            async function loadStatusOptions() {
+                let dispStatusSelect = document.getElementById('statusSelect');
+                let dispOrderStatus = document.getElementById('orderStatus');
+                let dispStatusNote = document.getElementById('statusNote');
+                    dispStatusNote.value = "";
 
-                const response = await fetch('/api/v1/store/category/new', {
+                const response = await fetch('/api/v1/order/getstatusoptions')
+                    .then(response => {
+                        return response.json();
+                    }).then(data => {
+                        while (dispStatusSelect.firstChild) {
+                            dispStatusSelect.removeChild(dispStatusSelect.lastChild);
+                        }
+                        debugger
+                        for (let key in data) {
+                            let opt = document.createElement('option');
+                            opt.value = data[key];
+                            opt.innerHTML = data[key];
+                            if (dispOrderStatus.value === data[key]) {
+                                opt.selected = true;
+                            }
+                            dispStatusSelect.appendChild(opt);
+                        }
+                    });
+            }
+            async function postStatus() {
+                let dispStatusSelect = document.getElementById('statusSelect');
+                let dispStatusNote = document.getElementById('statusNote');
+                debugger
+                let formData = new FormData();
+                    formData.set("requestId", document.getElementById('orderId').value);
+                    formData.set("requestStatus", dispStatusSelect.value);
+                    formData.set("RequestNote", dispStatusNote.value);
+
+                const response = await fetch('/api/v1/order/changestatus', {
                     method: 'POST',
                     body: formData
                 }).then(response => {
                     return response.json();
                 }).then(data => {
-                    console.log(data);
-                    let opt = document.createElement('option');
-                    opt.value = data.id;
-                    opt.innerHTML = data.name;
-                    categorySelect.appendChild(opt);
-                    document.getElementById('catName').value = "";
-                    editCatDisplay.style.display = "inline-block";
-                    setCategory(data.id);
-                    keyEscCat();
+                    window.location.reload();
                 });
             }
             function keyStatus(event) {
@@ -206,20 +226,18 @@
                     keyEscStatus();
                 }
             }
-
             function keyEscStatus() {
                 document.getElementById("changeStatusDialog").close();
             }
-
         </script>
         <h2>Update Request Status</h2>
         <form id="formChangeStatus" onsubmit="postStatus()" style="width: 300px; max-width: 450px">
-            <label for="status" class="form-control-label">Change Status</label>
-            <select class="form-control" id="status" onkeyup="keyStatus(event)">
+            <label for="statusSelect" class="form-control-label">Change Status</label>
+            <select class="form-control py-1" id="statusSelect" onkeyup="keyStatus(event)">
                 <option></option>
             </select>
             <label class="form-control-label">Note</label>
-            <textarea></textarea>
+            <textarea id="statusNote" class="form-control w-100"></textarea>
 
             <div class="pt-2">
                 <button id="btnStatusSubmit" type="button" class="btn btn-sm btn-primary" onclick="postStatus()">Add</button>
@@ -259,6 +277,7 @@
 
         function dialogChangeStatus() {
             displayChangeStatusDialog.showModal();
+            loadStatusOptions();
         }
     </script>
 
