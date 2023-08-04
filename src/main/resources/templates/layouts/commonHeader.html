@@ -1,4 +1,5 @@
-<div th:fragment="header" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://thymeleaf.org">
+<div th:fragment="header" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://thymeleaf.org"
+     xmlns="http://www.w3.org/1999/html">
 
   <nav class="navbar navbar-expand-sm navbar-dark bg-dark sticky-top justify-content-start">
     <div class="container-fluid">
@@ -90,9 +91,13 @@
               <a class="nav-link btn btn-sm btn-outline-info dropdown-toggle ml-2 mr-4 pl-2 pr-5" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <span th:if="${session.containsKey('userDisplayName')}" th:text="${session.userDisplayName}" style="color: white;">User</span><span th:unless="${session.containsKey('userDisplayName')}" style="color: white";>User</span>
               </a>
-              <ul class="dropdown-menu dropdown-menu-left" aria-labelledby="profileDropdown">
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
                 <li><a class="dropdown-item" href="/profile">Profile</a></li>
-                <li><a class="dropdown-item" href="#" onclick="toggleTheme()">Theme</a></li>
+                <li><a class="dropdown-item" href="#" onclick="toggleTheme()">
+                  <span th:if="${session.theme} eq 'dark'">Light Theme</span>
+                  <span th:unless="${session.theme} eq 'dark'">Dark Theme</span>
+                </a></li>
+
                 <li class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="/logout">Logout</a></li>
               </ul>

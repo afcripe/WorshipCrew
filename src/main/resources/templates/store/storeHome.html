@@ -11,7 +11,7 @@
     <div class="wrapper flex-grow-1">
         <div id="mainContent" class="wrapper d-flex">
 
-        <div id="storeCategoryNav" class="navbar navbar-light bg-light flex-fill px-2 pt-1 d-none d-md-block">
+        <div id="storeCategoryNav" class="navbar navbar-light bg-light flex-fill px-2 pt-1 d-none d-md-block store-category-nav">
             <h5 id="storeCategoryNavTitle" onclick="clearCategory()" style="cursor: pointer">Categories</h5>
             <ul class="navbar-nav pb-3" th:each="cat : ${categoryList}">
                 <li class="nav-item dropdown" th:id="*{cat.name}">

@@ -12,7 +12,7 @@
         <div id="mainContent" class="wrapper d-flex">
 
         <div id="storeCategoryNav" class="navbar navbar-light bg-light flex-fill px-2 pt-1 d-none d-md-block">
-            <h5 id="storeCategoryNavTitle" onclick="clearCategory()" style="cursor: pointer">Categories</h5>
+            <h5 id="storeCategoryNavTitle" onclick="clearCategory()">Categories</h5>
             <ul class="navbar-nav pb-3" th:each="cat : ${categoryList}">
                 <li class="nav-item dropdown" th:id="*{cat.name}">
                     <a class="nav-link dropdown-toggle" href="#" th:onclick="selectCategory([[*{cat.name}]])"
@@ -20,7 +20,7 @@
                        data-bs-toggle="dropdown" th:text="*{cat.name}"></a>
                     <ul class="dropdown-menu storeCategoryNav-dropdown-menu" th:aria-labelledby="*{cat.name}+'dropdown'"
                         th:unless="${#lists.isEmpty(cat.subCategoryList)}" th:each="sub : ${cat.subCategoryList}">
-                        <li><a class="dropdown-item" th:href="'/store/'+${sub.name}" th:text="${sub.name}"></a></li>
+                        <li><a class="nav-link dropdown-item category-link" th:href="'/store/'+${sub.name}" th:text="${sub.name}"></a></li>
                     </ul>
                 </li>
             </ul>

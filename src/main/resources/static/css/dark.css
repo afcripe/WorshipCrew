@@ -1,12 +1,41 @@
+
+:root {
+    --dws-body-color-dark: #e6e6e6;
+    --dws-body-bg-dark: #363636;
+    --dws-border-color-dark: #b0b0b0;
+
+    --dws-side-nav-bg-dark: #575757;
+    --dws-side-nav-item-bg-dark: #838383;
+
+    --dws-dropdown-hover-dark: #838383;
+}
+
+
 .dark,
 .dark {
-    background-color: #363636;
-    color: #e6e6e6;
-    border-color: #b0b0b0;
+    background-color: var(--dws-body-bg-dark);
+    color: var(--dws-body-color-dark);
+    border-color: var(--dws-border-color-dark);
 }
-#sideNavCollapsed .dark {
-    background-color: #575757;
+.dark .side-nav-collapsed {
+    background-color: var(--dws-side-nav-bg-dark);
+    color: var(--dws-body-color-dark);
 }
-#sideNavExpanded .dark {
-    background-color: #575757;
+.dark .side-nav-expanded {
+    background-color: var(--dws-side-nav-bg-dark);
+    color: var(--dws-body-color-dark);
+}
+.dark .dropdown-menu {
+    background-color: var(--dws-side-nav-bg-dark);
+    color: var(--dws-body-color-dark);
+}
+
+.dark .dropdown-item {
+    background-color: var(--dws-side-nav-bg-dark);
+    color: var(--dws-body-color-dark);
+}
+.dark .dropdown-item .hover {
+    background-color: var(--dws-dropdown-hover-dark);
+    color: var(--dws-body-color-dark);
+    border-color: var(--dws-border-color-dark);
 }
