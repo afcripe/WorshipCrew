@@ -1,30 +1,32 @@
 
 :root {
-    --dws-color: #369fcc;
-    --dws-highlight: #dcf1fd;
-    --dws-gradient: #c8d6e1;
+    --dwc-color: #369fcc;
+    --dwc-highlight: #dcf1fd;
+    --dwc-gradient: #c8d6e1;
     
-    --dws-wiki: #0d6efd;
-    --dws-wiki-focus: #0b5ed7;
-    --dws-wiki-active: #0a58ca;
-    --dws-wiki-disable: #0d6efd;
-    --dws-wiki-selected: #518be0;
+    --dwc-wiki: #0d6efd;
+    --dwc-wiki-focus: #0b5ed7;
+    --dwc-wiki-active: #0a58ca;
+    --dwc-wiki-disable: #0d6efd;
+    --dwc-wiki-selected: #518be0;
 
-    --dws-store: #FF7F50;
-    --dws-store-focus: #d26841;
-    --dws-store-active: #a85234;
-    --dws-store-disable: #f87b4c;
-    --dws-store-selected: #f88e67;
+    --dwc-store: #FF7F50;
+    --dwc-store-focus: #d26841;
+    --dwc-store-active: #a85234;
+    --dwc-store-disable: #f87b4c;
+    --dwc-store-selected: #f88e67;
 
-    --dws-support: #6f42c1;
-    --dws-support-focus: #6115de;
-    --dws-support-active: #550ec7;
-    --dws-support-disable: #7948d5;
-    --dws-support-selected: #835acc;
+    --dwc-support: #6f42c1;
+    --dwc-support-focus: #6115de;
+    --dwc-support-active: #550ec7;
+    --dwc-support-disable: #7948d5;
+    --dwc-support-selected: #835acc;
 
-    --dws-body-color: #212529;
-    --dws-body-bg: #fff;
-    --dws-side-nav-bg: #eeeeee;
+    --dwc-body-color: #212529;
+    --dwc-body-bg: #fff;
+    --dwc-side-nav-bg: #eeeeee;
+    --dwc-page-nav: #606060;
+    --dwc-login-color: #daeeff;
 }
 
 #landingVideo {
@@ -48,14 +50,14 @@
     background: transparent;
 }
 .login-card {
-    color: #daeeff;
+    color: var(--dwc-login-color);
     max-width: 450px;
     border: #0dcaf0 solid 1px;
     border-radius: 5px;
     background-color: rgba(255, 255, 255, 0.25);
 }
 .login-card .form-control {
-    color: #daeeff;
+    color: var(--dwc-login-color);
     background-color: rgba(0,0,0,0.5);
 }
 .showLogin {
@@ -63,45 +65,56 @@
 }
 
 .side-nav-expanded {
-    background-color: var(--dws-side-nav-bg);
+    background-color: var(--dwc-side-nav-bg);
     width: 170px;
     min-width: 170px;
     max-width: 170px;
     min-height: calc(100vh - 68px);
 }
 .side-nav-collapsed {
-    background-color: var(--dws-side-nav-bg);
+    background-color: var(--dwc-side-nav-bg);
     width: 45px;
     min-width: 45px;
     max-width: 45px;
     min-height: calc(100vh - 68px);
 }
-
-#storeCategoryNavTitle {
-    color: #6c6c6c;
-}
-
-#storeCategoryNav {
-    margin-top: -5px;
+.category-nav {
     border-radius: 5px;
-    min-height: calc(100vh - 175px);
+    min-height: calc(100vh - 150px);
 }
-.storeCategoryNav-dropdown-menu {
-    color: #6c6c6c;
+.category-nav-title {
+    color: var(--dwc-page-nav);
+}
+.category-dropdown-menu {
     background-color: transparent;
     border: none;
 }
+.dropdown-item {
+    color: black;
+}
+.dropdown-item:active {
+    color: black;
+    background: transparent;
+}
 
+/**/
+.nav-item a {
+    color: var(--dwc-page-nav) !important;
+}
+.nav-mod-header-link {
+    color: var(--dwc-page-nav);
+}
+/**/
 
 .selectableItem {
     cursor: pointer;
 }
 .selectableItem:hover {
-    background-color: var(--dws-highlight);
+    background-color: var(--dwc-highlight);
 }
 
 .gradient-right {
-    background-image: linear-gradient(to right, var(--dws-body-bg) , var(--dws-gradient));
+    background-image: linear-gradient(to right, var(--dwc-body-bg) , var(--dwc-gradient));
 }
 
 .alert-fixed {
@@ -182,191 +195,191 @@
 
 
 .color-wiki {
-    color: var(--dws-wiki);
+    color: var(--dwc-wiki);
 }
 
 .btn-wiki {
     color: #fff;
-    background-color: var(--dws-wiki);
-    border-color:  var(--dws-wiki);
+    background-color: var(--dwc-wiki);
+    border-color:  var(--dwc-wiki);
 }
 .btn-wiki:hover {
     color: #fff;
-    background-color: var(--dws-wiki-focus);
-    border-color: var(--dws-wiki-active);
+    background-color: var(--dwc-wiki-focus);
+    border-color: var(--dwc-wiki-active);
 }
 .btn-check:focus + .btn-wiki, .btn-wiki:focus {
     color: #fff;
-    background-color: var(--dws-wiki-focus);
-    border-color: var(--dws-wiki-active);
-    box-shadow: 0 0 0 0.25rem  rgba(var(--dws-wiki), 0.5);
+    background-color: var(--dwc-wiki-focus);
+    border-color: var(--dwc-wiki-active);
+    box-shadow: 0 0 0 0.25rem  rgba(var(--dwc-wiki), 0.5);
 }
 .btn-check:checked + .btn-wiki, .btn-check:active + .btn-wiki, .btn-wiki:active, .btn-wiki.active, .show > .btn-wiki.dropdown-toggle {
     color: #fff;
-    background-color: var(--dws-wiki-active);
-    border-color: var(--dws-wiki-focus);
+    background-color: var(--dwc-wiki-active);
+    border-color: var(--dwc-wiki-focus);
 }
 .btn-check:checked + .btn-wiki:focus, .btn-check:active + .btn-wiki:focus, .btn-wiki:active:focus, .btn-wiki.active:focus, .show > .btn-wiki.dropdown-toggle:focus {
-    box-shadow: 0 0 0 0.25rem rgba(var(--dws-wiki), 0.5);
+    box-shadow: 0 0 0 0.25rem rgba(var(--dwc-wiki), 0.5);
 }
 .btn-wiki:disabled, .btn-wiki.disabled {
     color: #fff;
-    background-color: var(--dws-wiki-active);
-    border-color: var(--dws-wiki-active);
+    background-color: var(--dwc-wiki-active);
+    border-color: var(--dwc-wiki-active);
 }
 
 
-.btn-outline-store {
-    color: var(--dws-wiki-active);
-    border-color: var(--dws-wiki-active);
+.btn-outline-wiki {
+    color: var(--dwc-wiki-active);
+    border-color: var(--dwc-wiki-active);
 }
-.btn-outline-store:hover {
+.btn-outline-wiki:hover {
     color: #fff;
-    background-color: var(--dws-wiki-active);
-    border-color: var(--dws-wiki-active);
+    background-color: var(--dwc-wiki-active);
+    border-color: var(--dwc-wiki-active);
 }
-.btn-check:focus + .btn-outline-store, .btn-outline-store:focus {
-    box-shadow: 0 0 0 0.25rem rgba(var(--dws-wiki-active), 0.5);
+.btn-check:focus + .btn-outline-wiki, .btn-outline-wiki:focus {
+    box-shadow: 0 0 0 0.25rem rgba(var(--dwc-wiki-active), 0.5);
 }
-.btn-check:checked + .btn-outline-store, .btn-check:active + .btn-outline-store, .btn-outline-store:active, .btn-outline-store.active, .btn-outline-store.dropdown-toggle.show {
+.btn-check:checked + .btn-outline-wiki, .btn-check:active + .btn-outline-wiki, .btn-outline-wiki:active, .btn-outline-wiki.active, .btn-outline-wiki.dropdown-toggle.show {
     color: #fff;
-    background-color: var(--dws-wiki-active);
-    border-color: var(--dws-wiki-active);
+    background-color: var(--dwc-wiki-active);
+    border-color: var(--dwc-wiki-active);
 }
-.btn-check:checked + .btn-outline-store:focus, .btn-check:active + .btn-outline-store:focus, .btn-outline-store:active:focus, .btn-outline-store.active:focus, .btn-outline-store.dropdown-toggle.show:focus {
-    box-shadow: 0 0 0 0.25rem rgba(var(--dws-wiki-active), 0.5);
+.btn-check:checked + .btn-outline-wiki:focus, .btn-check:active + .btn-outline-wiki:focus, .btn-outline-wiki:active:focus, .btn-outline-wiki.active:focus, .btn-outline-wiki.dropdown-toggle.show:focus {
+    box-shadow: 0 0 0 0.25rem rgba(var(--dwc-wiki-active), 0.5);
 }
-.btn-outline-store:disabled, .btn-outline-store.disabled {
-    color: var(--dws-wiki-active);
+.btn-outline-wiki:disabled, .btn-outline-wiki.disabled {
+    color: var(--dwc-wiki-active);
     background-color: transparent;
 }
 
 .tag_primary {
-    border: 1px solid var(--dws-wiki);
+    border: 1px solid var(--dwc-wiki);
     border-radius: 3px;
 }
 
 .tag_selected_primary {
-    background-color: var(--dws-wiki-selected);
+    background-color: var(--dwc-wiki-selected);
 }
 
 
 .color-support {
-    color: var(--dws-support);
+    color: var(--dwc-support);
 }
 
 .btn-support {
     color: #fff;
-    background-color: var(--dws-support);
-    border-color: var(--dws-support);
+    background-color: var(--dwc-support);
+    border-color: var(--dwc-support);
 }
 .btn-support:hover {
     color: #fff;
-    background-color: var(--dws-support-focus);
-    border-color: var(--dws-support-active);
+    background-color: var(--dwc-support-focus);
+    border-color: var(--dwc-support-active);
 }
 .btn-check:focus + .btn-support, .btn-support:focus {
     color: #fff;
-    background-color: var(--dws-support-focus);
-    border-color: var(--dws-support-active);
-    box-shadow: 0 0 0 0.25rem rgba(var(--dws-support), 0.5);
+    background-color: var(--dwc-support-focus);
+    border-color: var(--dwc-support-active);
+    box-shadow: 0 0 0 0.25rem rgba(var(--dwc-support), 0.5);
 }
 .btn-check:checked + .btn-support, .btn-check:active + .btn-support, .btn-support:active, .btn-support.active, .show > .btn-support.dropdown-toggle {
     color: #fff;
-    background-color: var(--dws-support-active);
-    border-color: var(--dws-support-focus);
+    background-color: var(--dwc-support-active);
+    border-color: var(--dwc-support-focus);
 }
 .btn-check:checked + .btn-support:focus, .btn-check:active + .btn-support:focus, .btn-support:active:focus, .btn-support.active:focus, .show > .btn-support.dropdown-toggle:focus {
-    box-shadow: 0 0 0 0.25rem rgba(var(--dws-support), 0.5);
+    box-shadow: 0 0 0 0.25rem rgba(var(--dwc-support), 0.5);
 }
 .btn-support:disabled, .btn-support.disabled {
     color: #fff;
-    background-color: var(--dws-support-disable);
-    border-color: var(--dws-support-disable);
+    background-color: var(--dwc-support-disable);
+    border-color: var(--dwc-support-disable);
 }
 
 
 .btn-outline-support {
-    color: var(--dws-support);
-    border-color: var(--dws-support);
+    color: var(--dwc-support);
+    border-color: var(--dwc-support);
 }
 .btn-outline-support:hover {
     color: #fff;
-    background-color: var(--dws-support);
-    border-color: var(--dws-support);
+    background-color: var(--dwc-support);
+    border-color: var(--dwc-support);
 }
 .btn-check:focus + .btn-outline-support, .btn-outline-support:focus {
-    box-shadow: 0 0 0 0.25rem rgba(var(--dws-support), 0.5);
+    box-shadow: 0 0 0 0.25rem rgba(var(--dwc-support), 0.5);
 }
 .btn-check:checked + .btn-outline-support, .btn-check:active + .btn-outline-support, .btn-outline-support:active, .btn-outline-support.active, .btn-outline-support.dropdown-toggle.show {
     color: #fff;
-    background-color: var(--dws-support);
-    border-color: var(--dws-support);
+    background-color: var(--dwc-support);
+    border-color: var(--dwc-support);
 }
 .btn-check:checked + .btn-outline-support:focus, .btn-check:active + .btn-outline-support:focus, .btn-outline-support:active:focus, .btn-outline-support.active:focus, .btn-outline-support.dropdown-toggle.show:focus {
-    box-shadow: 0 0 0 0.25rem rgba(var(--dws-support), 0.5);
+    box-shadow: 0 0 0 0.25rem rgba(var(--dwc-support), 0.5);
 }
 .btn-outline-support:disabled, .btn-outline-support.disabled {
-    color: var(--dws-support);
+    color: var(--dwc-support);
     background-color: transparent;
 }
 
 .color-store {
-    color: var(--dws-store);
+    color: var(--dwc-store);
 }
 
 .btn-store {
     color: #fff;
-    background-color: var(--dws-store);
-    border-color: var(--dws-store);
+    background-color: var(--dwc-store);
+    border-color: var(--dwc-store);
 }
 .btn-store:hover {
     color: #fff;
-    background-color: var(--dws-store-focus);
-    border-color: var(--dws-store-active);
+    background-color: var(--dwc-store-focus);
+    border-color: var(--dwc-store-active);
 }
 .btn-check:focus + .btn-store, .btn-store:focus {
     color: #fff;
-    background-color: var(--dws-store-focus);
-    border-color: var(--dws-store-active);
-    box-shadow: 0 0 0 0.25rem rgba(var(--dws-store), 0.5);
+    background-color: var(--dwc-store-focus);
+    border-color: var(--dwc-store-active);
+    box-shadow: 0 0 0 0.25rem rgba(var(--dwc-store), 0.5);
 }
 .btn-check:checked + .btn-store, .btn-check:active + .btn-store, .btn-store:active, .btn-store.active, .show > .btn-store.dropdown-toggle {
     color: #fff;
-    background-color: var(--dws-store-active);
-    border-color: var(--dws-store-focus);
+    background-color: var(--dwc-store-active);
+    border-color: var(--dwc-store-focus);
 }
 .btn-check:checked + .btn-store:focus, .btn-check:active + .btn-store:focus, .btn-store:active:focus, .btn-store.active:focus, .show > .btn-store.dropdown-toggle:focus {
-    box-shadow: 0 0 0 0.25rem rgba(var(--dws-store), 0.5);
+    box-shadow: 0 0 0 0.25rem rgba(var(--dwc-store), 0.5);
 }
 .btn-store:disabled, .btn-store.disabled {
     color: #fff;
-    background-color: var(--dws-store-disable);
-    border-color: var(--dws-store-disable);
+    background-color: var(--dwc-store-disable);
+    border-color: var(--dwc-store-disable);
 }
 
 .btn-outline-store {
-    color: var(--dws-store);
-    border-color: var(--dws-store);
+    color: var(--dwc-store);
+    border-color: var(--dwc-store);
 }
 .btn-outline-store:hover {
     color: #fff;
-    background-color: var(--dws-store);
-    border-color: var(--dws-store);
+    background-color: var(--dwc-store);
+    border-color: var(--dwc-store);
 }
 .btn-check:focus + .btn-outline-store, .btn-outline-store:focus {
-    box-shadow: 0 0 0 0.25rem rgba(var(--dws-store), 0.5);
+    box-shadow: 0 0 0 0.25rem rgba(var(--dwc-store), 0.5);
 }
 .btn-check:checked + .btn-outline-store, .btn-check:active + .btn-outline-store, .btn-outline-store:active, .btn-outline-store.active, .btn-outline-store.dropdown-toggle.show {
     color: #fff;
-    background-color: var(--dws-store);
-    border-color: var(--dws-store);
+    background-color: var(--dwc-store);
+    border-color: var(--dwc-store);
 }
 .btn-check:checked + .btn-outline-store:focus, .btn-check:active + .btn-outline-store:focus, .btn-outline-store:active:focus, .btn-outline-store.active:focus, .btn-outline-store.dropdown-toggle.show:focus {
-    box-shadow: 0 0 0 0.25rem rgba(var(--dws-store) 0.5);
+    box-shadow: 0 0 0 0.25rem rgba(var(--dwc-store) 0.5);
 }
 .btn-outline-store:disabled, .btn-outline-store.disabled {
-    color: var(--dws-store);
+    color: var(--dwc-store);
     background-color: transparent;
 }
 
@@ -410,10 +423,10 @@
     object-fit: contain;
 }
 .grid_image_selected {
-    border: 2px solid var(--dws-store);
+    border: 2px solid var(--dwc-store);
 }
 .grid_image_selected_primary {
-    border: 2px solid var(--dws-wiki);
+    border: 2px solid var(--dwc-wiki);
 }
 
 .store_line_image {
@@ -490,66 +503,10 @@
     display: block;
 }
 
-/* Toggle Switch */
-/* The switch - the box around the slider */
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
+.card {
+    background: transparent;
 }
 
-/* Hide default HTML checkbox */
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-/* The slider */
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    -webkit-transition: .4s;
-    transition: .4s;
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 16px;
-    width: 16px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    -webkit-transition: .4s;
-    transition: .4s;
-}
-
-input:checked + .slider {
-    background-color: #2196F3;
-}
-
-input:focus + .slider {
-    box-shadow: 0 0 1px #2196F3;
-}
-
-input:checked + .slider:before {
-    -webkit-transform: translateX(26px);
-    -ms-transform: translateX(26px);
-    transform: translateX(26px);
-}
-
-/* Rounded sliders */
-.slider.round {
-    border-radius: 34px;
-}
-
-.slider.round:before {
-    border-radius: 50%;
+.nav-login a{
+    color: var(--dwc-login-color) !important;
 }

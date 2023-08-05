@@ -31,36 +31,40 @@
       <div class="collapse navbar-collapse flex-grow-1" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-0 ml-2" sec:authorize="isAuthenticated()">
           <li class="nav-item d-sm-none">
-            <a class="nav-link" href="/">Home</a>
+            <a class="nav-link" style="color: #eeeeee !important;" href="/">Home</a>
           </li>
           <li class="nav-item d-sm-none">
-            <a class="nav-link" href="/store">Store</a>
+            <a class="nav-link" style="color: #eeeeee !important;" href="/store">Store</a>
           </li>
           <li class="nav-item d-sm-none">
-            <a class="nav-link" href="/resource">Resource</a>
+            <a class="nav-link" style="color: #eeeeee !important;" href="/resource">Resource</a>
           </li>
           <li class="nav-item d-sm-none">
-            <a class="nav-link" href="/support">Support</a>
+            <a class="nav-link" style="color: #eeeeee !important;" href="/support">Support</a>
           </li>
           <li class="nav-item d-block d-sm-none" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
                                                 or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
                                                 or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')
                                                 or #lists.contains(userRoles,'REQUEST_READ') or #lists.contains(userRoles,'REQUEST_WRITE')}">
-            <a class="nav-link" href="/order">Requests</a>
+            <a class="nav-link" style="color: #eeeeee !important;" href="/order">Requests</a>
           </li>
           <li class="nav-item d-block d-sm-none" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
                                                 or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
                                                 or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')}">
-            <a class="nav-link" href="/admin">Settings</a>
+            <a class="nav-link" style="color: #eeeeee !important;" href="/admin">Settings</a>
           </li>
           <li class="nav-item d-block d-sm-none">
-            <div class="dropdown-divider"></div>
+            <div class="dropdown-divider" style="color: #9d9d9d !important;"></div>
           </li>
           <li class="nav-item d-block d-sm-none">
-            <a class="nav-link" href="/profile">Profile</a>
+            <a class="nav-link" style="color: #eeeeee !important;" href="/profile">Profile</a>
           </li>
           <li class="nav-item d-block d-sm-none">
-            <a class="nav-link" href="/logout">Logout</a>
+            <a class="nav-link" style="color: #eeeeee !important;" href="#" onclick="toggleTheme()" th:if="${session.theme} eq 'dark'">Light Theme</a>
+            <a class="nav-link" style="color: #eeeeee !important;" href="#" onclick="toggleTheme()" th:unless="${session.theme} eq 'dark'">Dark Theme</a>
+          </li>
+          <li class="nav-item d-block d-sm-none">
+            <a class="nav-link" style="color: #eeeeee !important;" href="#" onclick="toggleTheme()">Logout</a>
           </li>
         </ul>
       </div>
@@ -91,21 +95,21 @@
               <a class="nav-link btn btn-sm btn-outline-info dropdown-toggle ml-2 mr-4 pl-2 pr-5" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <span th:if="${session.containsKey('userDisplayName')}" th:text="${session.userDisplayName}" style="color: white;">User</span><span th:unless="${session.containsKey('userDisplayName')}" style="color: white";>User</span>
               </a>
-              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                <li><a class="dropdown-item" href="/profile">Profile</a></li>
-                <li><a class="dropdown-item" href="#" onclick="toggleTheme()">
+              <ul class="dropdown-menu dropdown-menu-end dwc-dropdown-menu" aria-labelledby="profileDropdown">
+                <li><a class="dropdown-item dwc-dropdown-item" href="/profile">Profile</a></li>
+                <li><a class="dropdown-item dwc-dropdown-item" href="#" onclick="toggleTheme()">
                   <span th:if="${session.theme} eq 'dark'">Light Theme</span>
                   <span th:unless="${session.theme} eq 'dark'">Dark Theme</span>
                 </a></li>
 
                 <li class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                <li><a class="dropdown-item dwc-dropdown-item" href="/logout">Logout</a></li>
               </ul>
             </li>
           </ul>
 
           <ul class="navbar-nav me-auto orderRequest-last" sec:authorize="isAnonymous()">
-            <li class="nav-item">
+            <li class="nav-item nav-login">
               <a class="btn btn-sm btn-info mx-4 pl-2 pr-5" href="#" onclick="showLogin()">Login</a>
             </li>
           </ul>

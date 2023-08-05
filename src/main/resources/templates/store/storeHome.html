@@ -11,21 +11,22 @@
     <div class="wrapper flex-grow-1">
         <div id="mainContent" class="wrapper d-flex">
 
-        <div id="storeCategoryNav" class="navbar navbar-light bg-light flex-fill px-2 pt-1 d-none d-md-block store-category-nav">
-            <h5 id="storeCategoryNavTitle" onclick="clearCategory()" style="cursor: pointer">Categories</h5>
-            <ul class="navbar-nav pb-3" th:each="cat : ${categoryList}">
-                <li class="nav-item dropdown" th:id="*{cat.name}">
-                    <a class="nav-link dropdown-toggle" href="#" th:onclick="selectCategory([[*{cat.name}]])"
-                       th:id="*{cat.name}+'dropdown'" role="button"
-                       data-bs-toggle="dropdown" th:text="*{cat.name}"></a>
-                    <ul class="dropdown-menu storeCategoryNav-dropdown-menu" th:aria-labelledby="*{cat.name}+'dropdown'"
-                        th:unless="${#lists.isEmpty(cat.subCategoryList)}" th:each="sub : ${cat.subCategoryList}">
-                        <li><a class="dropdown-item" th:href="'/store/'+${sub.name}" th:text="${sub.name}"></a></li>
-                    </ul>
-                </li>
-            </ul>
-
-        </div>
+            <div id="storeCategoryNav" class="navbar navbar-light bg-light flex-fill px-2 pt-1 d-none d-md-block category-nav">
+                <h5 id="storeCategoryNavTitle" class="store-category-nav-title" onclick="clearCategory()">Categories</h5>
+                <ul class="navbar-nav pb-3" th:each="cat : ${categoryList}">
+                    <li class="nav-item dropdown" th:id="*{cat.name}">
+                        <a class="nav-link dropdown-toggle" href="#" th:onclick="selectCategory([[*{cat.name}]])"
+                           th:id="*{cat.name}+'dropdown'" role="button"
+                           data-bs-toggle="dropdown" th:text="*{cat.name}"></a>
+                        <ul class="dropdown-menu category-dropdown-menu" th:aria-labelledby="*{cat.name}+'dropdown'"
+                            th:unless="${#lists.isEmpty(cat.subCategoryList)}" th:each="sub : ${cat.subCategoryList}">
+                            <li>
+                                <a class="dropdown-item" th:href="'/store/'+${sub.name}" th:text="${sub.name}"></a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
 
 
         <div class="flex-fill p-1 pb-4 w-100 mx-2">

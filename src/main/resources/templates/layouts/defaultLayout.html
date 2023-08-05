@@ -266,19 +266,33 @@
         }
     }
     function setSiteTheme() {
-        let pageBody = document.querySelector("body")
-        let pageNaveExp = document.getElementById("sideNavCollapsed")
-        let pageNaveCol = document.getElementById("sideNavExpanded")
+        let pageBody = document.querySelector("body");
+        let pageNaveExp = document.getElementById("sideNavCollapsed");
+        let pageNaveCol = document.getElementById("sideNavExpanded");
+        let modHeader = document.getElementById("moduleHeader");
+        let storeCatNav = document.getElementById("storeCategoryNav");
 
         if (profileTheme === 'dark') {
+            try {
+                modHeader.classList.remove("bg-light");
+                storeCatNav.classList.remove("bg-light");
+                storeCatNav.classList.add("bg-dark");
+                modHeader.classList.add("bg-dark");
+            } catch (e) {
+                console.log("dark mode is not enabled")
+            }
             pageBody.classList.add("dark");
             pageNaveExp.classList.add("dark");
-            pageNaveCol.classList.add("dark")
+            pageNaveCol.classList.add("dark");
         } else {
             try {
                 pageBody.classList.remove("dark");
                 pageNaveExp.classList.remove("dark");
                 pageNaveCol.classList.remove("dark")
+                modHeader.classList.remove("bg-dark");
+                storeCatNav.classList.remove("bg-dark");
+                modHeader.classList.add("bg-light");
+                storeCatNav.classList.add("bg-light");
             } catch (e) {
                 console.log("dark mode is not enabled")
             }
