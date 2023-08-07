@@ -82,6 +82,12 @@
     border-radius: 5px;
     min-height: calc(100vh - 150px);
 }
+.moduleTitle {
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--dwc-body-color);
+
+}
 .category-nav-title {
     color: var(--dwc-page-nav);
 }

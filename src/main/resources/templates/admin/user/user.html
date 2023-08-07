@@ -30,10 +30,10 @@
 
             <p>Username: <span class="card-text" th:text="*{username}"/></p>
             <p>E-mail: <span class="card-text" th:text="*{contactEmail}"/></p>
-            <p>Campus: <span class="card-text" th:text="*{campus.name}"/></p>
-            <p>Department: <span class="card-text" th:text="*{department.name}"/></p>
-            <p>Position: <span class="card-text" th:text="*{position.name}"/></p>
-            <p>Supervisor: <span class="card-text" th:text="*{director.firstName + ' ' + director.lastName}"/></p>
+            <p>Campus: <span class="card-text" th:if="*{campus}" th:text="*{campus.name}"/></p>
+            <p>Department: <span class="card-text" th:if="*{department}" th:text="*{department.name}"/></p>
+            <p>Position: <span class="card-text" th:if="*{position}" th:text="*{position.name}"/></p>
+            <p>Supervisor: <span class="card-text" th:if="*{director}" th:text="*{director.firstName + ' ' + director.lastName}"/></p>
           </div>
         </div>
       </div>

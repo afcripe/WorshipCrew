@@ -77,19 +77,20 @@ public class StoreController {
     }
 
 
-    @GetMapping("/{category}")
-    public String goStoreCategory(@PathVariable String category, Model model, HttpSession session) {
-        redirectService.setHistory(session, "/store");
+    @GetMapping("/{category}/{subCategory}")
+    public String goStoreCategory(@PathVariable String category, @PathVariable String subCategory, Model model, HttpSession session) {
+        redirectService.setHistory(session, "/store/"+category+"/"+subCategory);
         String selectCategory = "";
         String selectSubCategory = "";
 
-        Optional<StoreSubCategory> subCategory = subCategoryService.findByName(category);
+        Optional<StoreCategory> storeCategory = categoryService.findByName(category);
+        Optional<StoreSubCategory> storeSubCategory = subCategoryService.findByNameAndCategoryId(subCategory, storeCategory.get().getId());
 
         List<StoreItem> itemList = new ArrayList<>();
-        if (subCategory.isPresent()) {
-            itemList = storeItemService.findBySubCategory(subCategory.get());
-            selectSubCategory = subCategory.get().getName();
-            selectCategory = subCategory.get().getStoreCategory().getName();
+        if (storeSubCategory.isPresent()) {
+            itemList = storeItemService.findBySubCategory(storeSubCategory.get());
+            selectSubCategory = storeSubCategory.get().getName();
+            selectCategory = storeCategory.get().getName();
         }
 
         model.addAttribute("storeItems", itemList);

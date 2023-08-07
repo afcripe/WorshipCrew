@@ -25,6 +25,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.swing.text.html.Option;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -68,15 +69,17 @@ public class UserController {
             }
         }
 
+        String title = "All Users";
         List<User> userList = new ArrayList<>();
         if (fullList) {
             userList = userService.findAll();
         } else {
             userList = userService.findAllByCampus(currentUser.getCampus());
+            title = "Campus Users";
         }
 
         redirectService.setHistory(session, "/user");
-        model.addAttribute("title", "All Users");
+        model.addAttribute("title", title);
         model.addAttribute("users", userList);
         return "admin/user/listUsers";
     }
@@ -114,8 +117,7 @@ public class UserController {
         Optional<User> user = userService.findById(id);
         if (user.isEmpty()) {
             session.setAttribute("msgError", "User Not Found!");
-            return
-                    redirectService.pathName(session, "user");
+            return redirectService.pathName(session, "user");
         }
         redirectService.setHistory(session, "/user/"+id);
 
@@ -160,7 +162,14 @@ public class UserController {
     }
 
     @GetMapping("/{id}/edit")
-    public String updateUserForm(@PathVariable BigInteger id, Model model) {
+    public String updateUserForm(@PathVariable BigInteger id, Model model, HttpSession session) {
+
+        Optional<User> user = userService.findById(id);
+        if (user.isEmpty()) {
+            session.setAttribute("msgError", "User Not Found!");
+            return redirectService.pathName(session, "user");
+        }
+
         // get persmissions
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = (User) auth.getPrincipal();
@@ -174,25 +183,31 @@ public class UserController {
             }
         }
 
+        if (user.get().getPosition().getLevel() < currentUser.getPosition().getLevel()) {
+            session.setAttribute("msgError", "Permission to Edit User Denied!");
+            return redirectService.pathName(session, "user");
+        }
+
 
         List<Campus> campusList = new ArrayList<>();
         List<User> userList = new ArrayList<>();
+        List<Position> positionList = new ArrayList<>();
         if (fullList) {
             campusList = campusService.findAll();
             userList = userService.findAll();
+            positionList = positionService.findAll();
         } else {
             campusList.add(currentUser.getCampus());
             userList = userService.findAllByCampus(currentUser.getCampus());
+            positionList = positionService.findAllByLevelGreaterThan(currentUser.getPosition().getLevel());
         }
 
-        User user = userService.findById(id).orElse(new User());
-        List<Position> positionList = positionService.findAll();
-        List<DepartmentCampus> departmentList = departmentCampusService.findAll();
+        List<DepartmentRegional> departmentList = departmentRegionalService.findAll();
 
-        model.addAttribute("user", user);
-        model.addAttribute("userCampus", user.getCampus().getName());
-        model.addAttribute("userDepartment", user.getDepartment().getName());
-        model.addAttribute("userPosition", user.getPosition().getName());
+        model.addAttribute("user", user.get());
+        model.addAttribute("userCampus", user.get().getCampus().getName());
+        model.addAttribute("userDepartment", user.get().getDepartment().getName());
+        model.addAttribute("userPosition", user.get().getPosition().getName());
         model.addAttribute("campusList", campusList);
         model.addAttribute("departmentList", departmentList);
         model.addAttribute("positionList", positionList);
@@ -203,26 +218,45 @@ public class UserController {
 
     @PostMapping("/update")
     public String updateUserResult(@ModelAttribute UserModel userModel, Model model, HttpSession session) {
-        User user = userService.findById(userModel.id()).orElse(null);
-        User exists = userService.findByUsername(userModel.username()).orElse(new User());
+        Optional<User> user = userService.findById(userModel.id());
+        Optional<User> exists = userService.findByUsername(userModel.username());
 
-        if (user != null) {
-            if(!user.getId().equals(exists.getId())) {
-                if(userModel.username().equals(exists.getUsername())) {
-                    session.setAttribute("msgError", "Username Already Exists!");
-                } else {
-                    user.setUsername(userModel.username());
+        if (user.isEmpty()) {
+            session.setAttribute("msgError", "User Not Found!");
+            return redirectService.pathName(session, "user");
+        }
+        if (exists.isPresent() && !exists.get().getId().equals(userModel.id())) {
+            session.setAttribute("msgError", "Username Already Exists!");
+            return redirectService.pathName(session, "user");
+        }
+
+        boolean updatePermissions = false;
+        if (!user.get().getPosition().getName().equals(positionService.findByName(userModel.position()).get().getName())) {
+            updatePermissions = true;
+        }
+
+        user.get().setUsername(userModel.username());
+
+        user.get().setFirstName(userModel.firstName());
+        user.get().setLastName(userModel.lastName());
+        user.get().setContactEmail(userModel.contactEmail());
+        user.get().setPosition(positionService.findByName(userModel.position()).orElse(null));
+        user.get().setCampus(campusService.findByName(userModel.campus()).orElse(null));
+        user.get().setDepartment(departmentCampusService.findByNameAndCampus(userModel.department(), user.get().getCampus()).orElse(null));
+        user.get().setDirector(userService.findById(userModel.directorId()).orElse(null));
+        userService.save(user.get());
+
+        // set permissions
+        if (updatePermissions) {
+            user.get().setUserRoles(new ArrayList<>());
+            Optional<PermissionTemplate> template = permissionTemplateService.findFirstByPosition(user.get().getPosition());
+            if (template.isPresent()) {
+                for (UserRoles role : template.get().getUserRoles()) {
+                    user.get().getUserRoles().add(role);
                 }
             }
-            user.setFirstName(userModel.firstName());
-            user.setLastName(userModel.lastName());
-            user.setContactEmail(userModel.contactEmail());
-            user.setPosition(positionService.findByName(userModel.position()).orElse(null));
-            user.setCampus(campusService.findByName(userModel.campus()).orElse(null));
-            user.setDepartment(departmentCampusService.findByNameAndCampus(userModel.department(), user.getCampus()).orElse(null));
-            user.setDirector(userService.findById(userModel.directorId()).orElse(null));
-            userService.save(user);
         }
+
 
         model.addAttribute("user", user);
         session.setAttribute("msgSuccess", "User successfully updated.");
@@ -247,16 +281,18 @@ public class UserController {
 
         List<Campus> campusList = new ArrayList<>();
         List<User> userList = new ArrayList<>();
+        List<Position> positionList = new ArrayList<>();
         if (fullList) {
             campusList = campusService.findAll();
             userList = userService.findAll();
+            positionList = positionService.findAll();
         } else {
             campusList.add(currentUser.getCampus());
             userList = userService.findAllByCampus(currentUser.getCampus());
+            positionList = positionService.findAllByLevelGreaterThan(currentUser.getPosition().getLevel());
         }
 
         User user = new User();
-        List<Position> positionList = positionService.findAll();
         List<DepartmentRegional> departmentList = departmentRegionalService.findAll();
 
         model.addAttribute("user", user);

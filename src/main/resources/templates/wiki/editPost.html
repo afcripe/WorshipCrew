@@ -12,10 +12,9 @@
     <div class="mx-2">
 
         <div class="row mt-2">
-<!--   th:action="@{/resource/admin/post}" -->
             <form id="postEditForm" style="height: 100%" th:object="${wikiPost}" method="post">
                 <div class="row">
-                    <div class="col">
+                    <div class="col pb-1">
                         <input type="text" class="form-control-sm flex-grow" style="width: 50%" th:id="postTitle" th:value="*{title}"
                                placeholder="Article Title" />
                         <i id="savingIcon" class="bi bi-file-earmark-arrow-up h5" style="color: green; display: none; float: right"></i>

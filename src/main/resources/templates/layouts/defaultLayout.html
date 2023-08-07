@@ -183,6 +183,11 @@
     let thisPageTitle = document.getElementById("commonHeaderTitle");
         thisPageTitle.textContent = moduleHeaderTitle;
         thisPageTitle.setAttribute("href", moduleHeaderLink);
+    let thisModuleTitle = document.getElementById("moduleHeaderTitle");
+    if (thisModuleTitle != null) {
+        thisModuleTitle.textContent = moduleHeaderTitle;
+        thisModuleTitle.setAttribute("href", moduleHeaderLink);
+    }
 
     let cartCountExpanded = document.getElementById("cartItemCount");
     let cartCountCollapsed = document.getElementById("cartItemCountCollapsed");
@@ -271,6 +276,7 @@
         let pageNaveCol = document.getElementById("sideNavExpanded");
         let modHeader = document.getElementById("moduleHeader");
         let storeCatNav = document.getElementById("storeCategoryNav");
+        let tables = document.querySelectorAll("table");
 
         if (profileTheme === 'dark') {
             try {
@@ -284,6 +290,10 @@
             pageBody.classList.add("dark");
             pageNaveExp.classList.add("dark");
             pageNaveCol.classList.add("dark");
+            for (let t in tables) {
+                let tNode = tables[t];
+                    tNode.classList.add("table-dark");
+            }
         } else {
             try {
                 pageBody.classList.remove("dark");
@@ -295,6 +305,14 @@
                 storeCatNav.classList.add("bg-light");
             } catch (e) {
                 console.log("dark mode is not enabled")
+            }
+            for (let t in tables) {
+                let tNode = tables[t];
+                try {
+                    tNode.classList.remove("table-dark");
+                } catch (e) {
+                    console.log("no tables found with dark mode")
+                }
             }
         }
     }

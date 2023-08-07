@@ -5,10 +5,14 @@ import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.user.Profile;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.services.user.ProfileService;
+import net.dahliasolutions.services.user.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -17,6 +21,7 @@ import java.util.Optional;
 public class AppAPIController {
 
     private final ProfileService profileService;
+    private final UserService userService;
 
     @GetMapping("/removeerrormsg")
     public void removeErrorMSG(HttpSession session) {
@@ -64,4 +69,5 @@ public class AppAPIController {
 
         session.setAttribute("theme", profile.get().getTheme());
     }
+
 }

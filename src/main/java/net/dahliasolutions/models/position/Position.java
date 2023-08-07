@@ -22,6 +22,7 @@ public class Position {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private BigInteger id;
+    private int level;
     private String name;
     private BigInteger directorId;
     private String directorName;

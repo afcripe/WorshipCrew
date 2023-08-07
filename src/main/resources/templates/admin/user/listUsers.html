@@ -18,7 +18,33 @@
 
     <h1 th:text="${title}"></h1>
 
-    <table class="table table-striped">
+    <table class="table table-striped d-block d-md-none">
+      <thead>
+      <tr>
+        <th scope="col">User</th>
+        <th scope="col">Campus</th>
+        <th scope="col">Dep / Pos</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="user : ${users}" class="selectableItem" style="cursor: pointer"
+          th:onclick="window.location.href='/user/[[${user.id}]]';">
+        <td>
+          <span th:text="*{user.username}"></span><br>
+          <span th:text="*{user.firstName}"></span><span th:text="*{user.lastName}"></span>
+        </td>
+        <td>
+          <span th:if="*{user.campus}" th:text="*{user.campus.name}"></span><br>
+        </td>
+        <td>
+          <span th:if="*{user.position}" th:text="${user.position.name}"/><br>
+          <span th:if="*{user.department}" th:text="${user.department.name}"/>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <table class="table table-striped d-none d-md-block">
       <thead>
       <tr>
         <th scope="col">Username</th>
@@ -31,14 +57,15 @@
       <tbody>
       <tr th:each="user : ${users}" class="selectableItem" style="cursor: pointer"
           th:onclick="window.location.href='/user/[[${user.id}]]';">
-        <td th:text="${user.username}"></td>
-        <td><span th:text="${user.firstName}"/> <span th:text="${user.lastName}"/></td>
-        <td><span th:text="${user.campus.name}"/></td>
-        <td><span th:text="${user.department.name}"/></td>
-        <td><span th:text="${user.position.name}"/></td>
+        <td th:text="*{user.username}"></td>
+        <td><span th:text="*{user.firstName}"></span><span th:text="*{user.lastName}"></span></td>
+        <td><span th:if="*{user.campus}" th:text="*{user.campus.name}"></span></td>
+        <td><span th:if="*{user.department}" th:text="${user.department.name}"/></td>
+        <td><span th:if="*{user.position}" th:text="${user.position.name}"/></td>
       </tr>
       </tbody>
     </table>
+
   </div>
 </div>
 

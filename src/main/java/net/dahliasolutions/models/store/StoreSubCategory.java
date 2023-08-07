@@ -1,6 +1,6 @@
 package net.dahliasolutions.models.store;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,10 +20,6 @@ public class StoreSubCategory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private BigInteger id;
     private String name;
-
-    @JsonBackReference
-    @ManyToOne
-    @JoinColumn(name = "categoryId")
-    private StoreCategory storeCategory;
+    private BigInteger categoryId;
 
 }

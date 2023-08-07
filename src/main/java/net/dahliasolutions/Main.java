@@ -2,6 +2,7 @@ package net.dahliasolutions;
 
 import net.dahliasolutions.models.*;
 import net.dahliasolutions.models.campus.Campus;
+import net.dahliasolutions.models.position.Position;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.wiki.WikiTag;
 import net.dahliasolutions.services.campus.CampusService;
@@ -18,6 +19,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 
 import java.math.BigInteger;
+import java.util.Optional;
 
 //import java.math.BigInteger;
 
@@ -81,10 +83,16 @@ public class Main {
 //            Campus location4 = campusService.createCampus("PCB", "Panama City Beach", BigInteger.valueOf(4));
 //            Campus location5 = campusService.createCampus("Navarre", "Navarre", BigInteger.valueOf(5));
 //
-//            positionService.createPosition("Volunteer");
+//            Position regionalDirector = positionService.createPosition("Regional Director");
+//                regionalDirector.setLevel(1);
+//                positionService.save(regionalDirector);
+//            Position director = positionService.createPosition("Director");
+//                director.setLevel(2);
+//                positionService.save(director);
+//            positionService.save(director);
 //            positionService.createPosition("Leader");
-//            positionService.createPosition("Director");
-//            positionService.createPosition("Regional Director");
+//            positionService.createPosition("Volunteer");
+//
 //
 //            departmentRegionalService.createDepartment("Worship");
 //            departmentRegionalService.createDepartment("Production");
@@ -96,6 +104,8 @@ public class Main {
 //                u.setLastName("Lawrence");
 //                u.setContactEmail("caleb@destinyworship.com");
 //                u = userService.createDefaultUser(u);
+//            u.setDirector(u);
+//            userService.save(u);
 //            userService.addRoleToUser(u.getUsername(), "ADMIN_WRITE");
 //            userService.updateUserPosition(u.getUsername(), "Regional Director");
 //            userService.updateUserCampus(u.getUsername(), "Destin");

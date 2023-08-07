@@ -31,17 +31,29 @@ public class StoreCategoryService implements StoreCategoryServiceInterface {
 
     @Override
     public Optional<StoreCategory> findById(BigInteger id) {
-        return categoryRepository.findById(id);
+        Optional<StoreCategory> category = categoryRepository.findById(id);
+        if (category.isPresent()) {
+            category.get().setSubCategoryList(subCategoryRepository.findAllByCategoryId(category.get().getId()));
+        }
+        return category;
     }
 
     @Override
     public Optional<StoreCategory> findByName(String name) {
-        return categoryRepository.findByName(name);
+        Optional<StoreCategory> category = categoryRepository.findByName(name);
+        if (category.isPresent()) {
+            category.get().setSubCategoryList(subCategoryRepository.findAllByCategoryId(category.get().getId()));
+        }
+        return category;
     }
 
     @Override
     public List<StoreCategory> findAll() {
-        return categoryRepository.findAll();
+        List<StoreCategory> categoryList = categoryRepository.findAll();
+        for (StoreCategory category : categoryList) {
+            category.setSubCategoryList(subCategoryRepository.findAllByCategoryId(category.getId()));
+        }
+        return categoryList;
     }
 
     @Override

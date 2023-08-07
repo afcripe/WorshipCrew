@@ -26,6 +26,14 @@
     background-color: var(--dwc-side-nav-bg-dark);
     color: var(--dwc-body-color-dark);
 }
+.dark .list-group-item {
+    background-color: var(--dwc-side-nav-bg-dark);
+    color: var(--dwc-body-color-dark);
+}
+
+.dark .moduleTitle {
+    color: var(--dwc-body-color-dark);
+}
 
 .dark .dwc-dropdown-menu {
     background-color: var(--dwc-side-nav-bg-dark);

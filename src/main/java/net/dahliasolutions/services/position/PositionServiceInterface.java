@@ -11,7 +11,10 @@ public interface PositionServiceInterface {
     Optional<Position> findById(BigInteger id);
     Optional<Position> findByName(String positionName);
     List<Position> findAll();
+    List<Position> findAllByLevelGreaterThan(int level);
+    Optional<Position> findFirst1OrderByLevelDesc();
     Position createPosition(String name);
+    Position save(Position position);
     void updatePosition(Position position);
     void deletePositionById(BigInteger id);
     List<Position> findAllByDirectorId(BigInteger id);

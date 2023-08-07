@@ -67,15 +67,15 @@ public class PositionController {
 
     @PostMapping("/create")
     public String createPosition(@ModelAttribute Position positionModel, Model model, HttpSession session ) {
-        Position position = positionService.findByName(positionModel.getName()).orElse(null);
-        if(position != null) {
+        Optional<Position> position = positionService.findByName(positionModel.getName());
+        if(position.isPresent() && !position.get().getId().equals(positionModel.getId())) {
             session.setAttribute("msgError", "Position Name Already Exists!");
             model.addAttribute("position", positionModel);
             return "admin/position/positionNew";
         }
 
         positionService.updatePosition(new Position(
-                null, positionModel.getName(), positionModel.getDirectorId(), ""
+                null,positionModel.getLevel(), positionModel.getName(), positionModel.getDirectorId(), ""
         ));
 
         session.setAttribute("msgSuccess", "Position Successfully Added.");
@@ -84,23 +84,23 @@ public class PositionController {
 
     @GetMapping("/{id}/edit")
     public String editPosition(@PathVariable BigInteger id, Model model) {
-        Position position = positionService.findById(id).orElse(null);
-        if(position == null) {
+        Optional<Position> position = positionService.findById(id);
+        if(position.isEmpty()) {
             return "redirect:/position";
         }
-        model.addAttribute("position", position);
+        model.addAttribute("position", position.get());
         return "admin/position/positionEdit";
     }
 
     @PostMapping("/update")
     public String updatePosition(@ModelAttribute Position positionModel, Model model, HttpSession session) {
-        Position position = positionService.findById(positionModel.getId()).orElse(null);
-        Position existingPosition = positionService.findByName(positionModel.getName()).orElse(null);
-        if (position == null) {
+        Optional<Position> position = positionService.findById(positionModel.getId());
+        Optional<Position> existingPosition = positionService.findByName(positionModel.getName());
+        if (position.isEmpty()) {
             session.setAttribute("msgError", "Position Not Found!");
             return "redirect:/position";
         }
-        if (existingPosition != null) {
+        if (existingPosition.isPresent() && !existingPosition.get().getId().equals(position.get().getId())) {
             session.setAttribute("msgError", "Position Name Already Exists!");
             model.addAttribute("position", positionModel);
             String template = "/position/"+positionModel.getId().toString()+"/edit";

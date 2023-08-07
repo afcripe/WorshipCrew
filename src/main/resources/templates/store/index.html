@@ -19,10 +19,12 @@
                        th:id="*{cat.name}+'dropdown'" role="button"
                        data-bs-toggle="dropdown" th:text="*{cat.name}"></a>
                     <ul class="dropdown-menu category-dropdown-menu" th:aria-labelledby="*{cat.name}+'dropdown'"
-                        th:unless="${#lists.isEmpty(cat.subCategoryList)}" th:each="sub : ${cat.subCategoryList}">
+                        th:unless="${#lists.isEmpty(cat.subCategoryList)}">
+                        <th:block th:each="sub : ${cat.subCategoryList}">
                         <li>
-                            <a class="dropdown-item" th:href="'/store/'+${sub.name}" th:text="${sub.name}"></a>
+                            <a class="dropdown-item" th:href="'/store/'+${cat.name}+'/'+${sub.name}" th:text="${sub.name}"></a>
                         </li>
+                        </th:block>
                     </ul>
                 </li>
             </ul>
@@ -33,7 +35,6 @@
 
             <div class="row mt-2">
 
-                <h1 class="color-store">Welcome to the Destiny Store</h1>
                 <p th:if="${#lists.isEmpty(storeItems)}">No, it's not prime day.</p>
 
                 <div th:if="${session.storeLayout == 'list'}">

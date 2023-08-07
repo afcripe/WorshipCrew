@@ -83,6 +83,7 @@ public class SecurityConfig {
                     auth.requestMatchers("/order/**").hasAnyAuthority("ADMIN_READ", "ADMIN_WRITE", "DIRECTOR_READ", "DIRECTOR_WRITE", "CAMPUS_WRITE", "CAMPUS_READ", "REQUEST_READ", "REQUEST_WRITE");
                     auth.requestMatchers("/api/v1/app/removeerrormsg").permitAll();
                     auth.requestMatchers("/api/v1/app/toggleSideNav/*").permitAll();
+                    auth.requestMatchers("/api/v1/app/users").permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .formLogin().loginPage("/login").defaultSuccessUrl("/user/").successHandler((request, response, authentication) -> {

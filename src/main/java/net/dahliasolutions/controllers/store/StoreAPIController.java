@@ -129,7 +129,7 @@ public class StoreAPIController {
             return item;
         } else {
             if (category.isPresent()) {
-                StoreSubCategory newSub = new StoreSubCategory(null, item.name(), category.get());
+                StoreSubCategory newSub = new StoreSubCategory(null, item.name(), category.get().getId());
                 category.get().getSubCategoryList().add(subCategoryService.save(newSub));
                 categoryService.save(category.get());
             }

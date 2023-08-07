@@ -38,8 +38,28 @@ public class PositionService implements PositionServiceInterface {
     }
 
     @Override
+    public List<Position> findAllByLevelGreaterThan(int level) {
+        return positionRepository.findAllByLevelGreaterThanOrLevelEquals(level);
+    }
+
+    @Override
+    public Optional<Position> findFirst1OrderByLevelDesc() {
+        return positionRepository.findFirst1OrderByLevelDesc();
+    }
+
+    @Override
     public Position createPosition(String name) {
-        Position position = new Position(null, name, null, "");
+        Optional<Position> greatestPosition = positionRepository.findFirst1OrderByLevelDesc();
+        int lastLevel = 0;
+        if (greatestPosition.isPresent()) {
+            lastLevel = greatestPosition.get().getLevel()+1;
+        }
+        Position position = new Position(null,lastLevel, name, null, "");
+        return positionRepository.save(position);
+    }
+
+    @Override
+    public Position save(Position position) {
         return positionRepository.save(position);
     }
 
