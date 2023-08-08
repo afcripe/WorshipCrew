@@ -5,10 +5,13 @@ import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.data.OrderItemRepository;
 import net.dahliasolutions.data.OrderRepository;
 import net.dahliasolutions.data.UserRepository;
+import net.dahliasolutions.models.BrowserMessage;
+import net.dahliasolutions.models.mail.EmailDetails;
 import net.dahliasolutions.models.order.*;
 import net.dahliasolutions.models.store.Cart;
 import net.dahliasolutions.models.user.User;
 import jakarta.persistence.Tuple;
+import net.dahliasolutions.services.mail.EmailService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -49,6 +52,7 @@ public class OrderService implements OrderServiceInterface {
                 newNote,
                 OrderStatus.Submitted,
                 user.get()));
+
         return orderRequest;
     }
 

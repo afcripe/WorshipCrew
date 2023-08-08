@@ -2,11 +2,13 @@ package net.dahliasolutions.controllers.store;
 
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.*;
+import net.dahliasolutions.models.mail.EmailDetails;
 import net.dahliasolutions.models.order.OrderItem;
 import net.dahliasolutions.models.order.OrderRequest;
 import net.dahliasolutions.models.order.OrderStatus;
 import net.dahliasolutions.models.store.*;
 import net.dahliasolutions.models.user.User;
+import net.dahliasolutions.services.mail.EmailService;
 import net.dahliasolutions.services.order.OrderService;
 import net.dahliasolutions.services.store.CartItemService;
 import net.dahliasolutions.services.store.CartService;
@@ -30,6 +32,7 @@ public class CartAPIController {
     private final StoreItemService storeItemService;
     private final OrderService orderService;
     private final UserService userService;
+    private final EmailService emailService;
 
     @GetMapping("{id}")
     public Cart getCart(@PathVariable BigInteger id) {
@@ -123,6 +126,7 @@ public class CartAPIController {
     @PostMapping("/placeOrder")
     public SingleBigIntegerModel placeOrder(@ModelAttribute SingleBigIntegerModel integerModel) {
         Cart cart = cartService.findById(integerModel.id());
+        Optional<User> user = userService.findById(cart.getId());
         OrderRequest orderRequest = orderService.createOrder(cart);
 
         for (CartItem item : cart.getCartItems()) {
@@ -141,6 +145,14 @@ public class CartAPIController {
             orderRequest.getRequestItems().add(orderItem);
         }
         orderService.save(orderRequest);
+
+        EmailDetails emailDetailsUser =
+                new EmailDetails(user.get().getContactEmail(),"Your Request", "", null );
+        BrowserMessage returnMsg = emailService.sendUserRequest(emailDetailsUser, orderRequest);
+
+        EmailDetails emailDetailsSupervisor =
+                new EmailDetails(orderRequest.getSupervisor().getContactEmail(),"A New Request", "", null );
+        BrowserMessage returnMsg2 = emailService.sendSupervisorRequest(emailDetailsSupervisor, orderRequest, orderRequest.getSupervisor().getId());
 
         cartService.emptyCart(integerModel.id());
         return new SingleBigIntegerModel(orderRequest.getId());

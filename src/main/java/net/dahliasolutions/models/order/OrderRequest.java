@@ -51,4 +51,15 @@ public class OrderRequest {
         }
         return counter;
     }
+
+    @Override
+    public String toString() {
+        return "OrderRequest{" +
+                "id=" + id +
+                ", requestDate=" + requestDate +
+                ", requestNote='" + requestNote + '\'' +
+                ", itemCount=" + itemCount +
+                ", orderStatus=" + orderStatus +
+                '}';
+    }
 }

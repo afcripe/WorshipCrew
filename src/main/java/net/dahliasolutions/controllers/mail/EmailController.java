@@ -52,6 +52,8 @@ public class EmailController {
             case "setPassword":
             case "resetPassword":
                 return "mailer/setPassword";
+            case "ackRequest":
+                return "mailer/setPassword";
             default:
                 model.addAttribute("errorMessage", "Link not Valid!");
                 return "error";

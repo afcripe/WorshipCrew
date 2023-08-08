@@ -10,8 +10,9 @@
             <h2>Request</h2>
         </div>
         <div class="col-4">
-            <button class="btn btn-outline-danger" th:onclick="cancelOrder([[${orderRequest.id}]])"
+            <button class="btn btn-outline-danger" th:onclick="cancelOrder([[${orderRequest.id}]])" id="btnCancel"
                     th:if="${#strings.toString(orderRequest.orderStatus)} != 'Cancelled' AND ${#strings.toString(orderRequest.orderStatus)} != 'Complete'">Cancel Request</button>
+            <progress id="prgCancel" style="width: 100%; display: none"></progress>
         </div>
     </div>
 
@@ -82,7 +83,8 @@
         const displayDivHistory = document.getElementById("divHistory");
         const displayBtnHistoryExpand = document.getElementById("btnHistoryExpand");
         const displayBtnHistoryCollapse = document.getElementById("btnHistoryCollapse");
-
+        const displayBtnCancel = document.getElementById("btnCancel");
+        const displayPrgCancel = document.getElementById("prgCancel");
 
         function navToItem(id) {
             window.location.href="/store/item/"+id;
@@ -100,7 +102,9 @@
         }
 
         async function cancelOrder(id) {
-            debugger
+            displayBtnCancel.setAttribute("disabled", "disabled");
+            displayPrgCancel.style.display = "block";
+
             let formData = new FormData();
                 formData.set("id", id);
 

@@ -7,15 +7,11 @@
 <div class="container-fluid" layout:fragment="content">
 
     <div class="row pt-4">
-        <div class="col-8">
+        <div class="col">
+            <button type="button" class="btn btn-sm btn-outline-primary" style="float: right;" id="btnClear"
+                                 th:onclick="clearCart([[${userId}]])" th:unless="${#lists.isEmpty(cart.cartItems)}">Clear Cart</button>
             <h1>Request Cart</h1>
             <p>Number of items in cart: <span id="subtitleCount" th:text="${cart.itemCount}"></span></p>
-        </div>
-        <div class="col-4 pt-2">
-            <button type="button" class="btn btn-sm btn-outline-primary"
-                    th:onclick="clearCart([[${userId}]])">Clear Cart</button>
-            <button type="button" class="btn btn-sm btn-primary"
-                    th:onclick="placeOrder([[${userId}]])">Send Request</button>
         </div>
     </div>
 
@@ -30,19 +26,21 @@
         </div>
     </div>
 
-    <div class="row pt-4 pb-5">
-        <div class="col-8">
-            <p></p>
+    <div class="row pt-4" th:unless="${#lists.isEmpty(cart.cartItems)}">
+        <div class="col-8 text-right">
+            I agree to the terms and conditions of DWC.
+            <input id="chkTerms" type="checkbox" onchange="changeTermsAgreement()">
         </div>
         <div class="col-4">
-            <button type="button" class="btn btn-sm btn-outline-primary"
-                    th:onclick="clearCart([[${userId}]])">Clear Cart</button>
-            <button type="button" class="btn btn-sm btn-primary"
+            <button type="button" class="btn btn-sm btn-primary" style="float: right;" id="btnSend" disabled
                     th:onclick="placeOrder([[${userId}]])">Send Request</button>
         </div>
     </div>
+    <div class="row pt-0 pb-5">
+        <progress id="prgRequest" style="display: none;"></progress>
+    </div>
 
-    <div class="row pt-5">
+    <div class="row py-5">
         <div class="col">
             <div style="float: right">
                 <button class="btn btn-sm btn-outline-primary"
@@ -51,15 +49,18 @@
             <h4>Recent Requests</h4>
         </div>
     </div>
-    <div class="row pt-4">
-        <div class="col" th:if="${not #lists.isEmpty(orderList)}" th:each="orderRequest : ${orderList}">
-            <div class="row">
-                <div th:replace="~{components/cardOrderLine :: cardFragment(${orderRequest})}">No Requests to Display</div>
-            </div>
+    <div class="row" th:if="${not #lists.isEmpty(orderList)}" th:each="orderRequest : ${orderList}">
+        <div class="row">
+            <div th:replace="~{components/cardOrderLine :: cardFragment(${orderRequest})}">No Requests to Display</div>
         </div>
     </div>
 
     <script th:inline="javascript">
+        const elCheckTerms = document.getElementById("chkTerms");
+        const elButtonSend = document.getElementById("btnSend");
+        const elButtonClear = document.getElementById("btnClear");
+        const elProgressRequest = document.getElementById("prgRequest");
+
         function navToItem(id) {
             window.location.href="/store/item/"+id;
         }
@@ -106,7 +107,20 @@
             });
         }
 
+        function changeTermsAgreement() {
+            elButtonSend.setAttribute("disabled", "disabled");
+
+            if (elCheckTerms.checked) {
+                elButtonSend.removeAttribute("disabled");
+
+            }
+        }
+
         async function placeOrder(userid) {
+            elButtonSend.setAttribute("disabled", "disabled");
+            elButtonClear.setAttribute("disabled", "disabled");
+            elProgressRequest.style.display = "block";
+
             let formData = new FormData();
                 formData.set("id", userid);
 

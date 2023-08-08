@@ -2,13 +2,16 @@ package net.dahliasolutions.controllers.order;
 
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.AddSupervisorModel;
+import net.dahliasolutions.models.BrowserMessage;
 import net.dahliasolutions.models.ChangeStatusModel;
 import net.dahliasolutions.models.SingleBigIntegerModel;
+import net.dahliasolutions.models.mail.EmailDetails;
 import net.dahliasolutions.models.order.OrderNote;
 import net.dahliasolutions.models.order.OrderRequest;
 import net.dahliasolutions.models.order.OrderStatus;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
+import net.dahliasolutions.services.mail.EmailService;
 import net.dahliasolutions.services.order.OrderNoteService;
 import net.dahliasolutions.services.order.OrderService;
 import net.dahliasolutions.services.user.UserRolesService;
@@ -28,6 +31,7 @@ public class OrderAPIController {
     private final OrderNoteService orderNoteService;
     private final UserService userService;
     private final UserRolesService rolesService;
+    private final EmailService emailService;
 
     @GetMapping("")
     public String getOrders(){ return null; }
@@ -40,19 +44,28 @@ public class OrderAPIController {
 
         if (orderRequest.isPresent()) {
             if (!orderRequest.get().getOrderStatus().equals("Cancelled") || !orderRequest.get().getOrderStatus().equals("Complete")) {
-                OrderNote orderNote = orderNoteService.createOrderNote(new OrderNote(
+                OrderNote orderNote = new OrderNote(
                         null,
                         orderRequest.get().getId(),
                         null,
                         "User Cancelled Order",
                         OrderStatus.Cancelled,
-                        user));
+                        user);
+                orderNote = orderNoteService.createOrderNote(orderNote);
                 orderRequest.get().setOrderStatus(orderNote.getOrderStatus());
                 orderRequest.get().setRequestNote(orderNote.getOrderNote());
                 orderService.save(orderRequest.get());
+
+                EmailDetails emailDetailsUser =
+                        new EmailDetails(orderRequest.get().getSupervisor().getContactEmail(),"Request Cancelled", "", null );
+                BrowserMessage returnMsg = emailService.sendUserRequest(emailDetailsUser, orderRequest.get());
+
+                EmailDetails emailDetailsSupervisor =
+                        new EmailDetails(orderRequest.get().getSupervisor().getContactEmail(),"A Request Has Been Cancelled", "", null );
+                BrowserMessage returnMsg2 = emailService.sendUserRequest(emailDetailsSupervisor, orderRequest.get());
             }
         }
-        System.out.println(integerModel.id());
+
         return integerModel;
     }
 
@@ -97,6 +110,11 @@ public class OrderAPIController {
                     OrderStatus.valueOf(statusModel.requestStatus()),
                     user));
         }
+
+        EmailDetails emailDetailsUser =
+                new EmailDetails(user.getContactEmail(),"Your Request Has Been Updated", "", null );
+        BrowserMessage returnMsg = emailService.sendUserRequest(emailDetailsUser, orderRequest.get());
+
         return statusModel;
     }
 

@@ -7,6 +7,7 @@ import net.dahliasolutions.data.MailerLinksRepository;
 import net.dahliasolutions.models.*;
 import net.dahliasolutions.models.mail.EmailDetails;
 import net.dahliasolutions.models.mail.MailerLinks;
+import net.dahliasolutions.models.order.OrderRequest;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.services.AuthService;
 import net.dahliasolutions.services.user.UserService;
@@ -23,6 +24,7 @@ import java.io.File;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service@RequiredArgsConstructor
 public class EmailService implements EmailServiceInterface{
@@ -76,37 +78,6 @@ public class EmailService implements EmailServiceInterface{
             return "Error while Sending Mail";
         }
 
-    }
-
-    @Override
-    public BrowserMessage sendRequestMail(EmailDetails emailDetails, BigInteger id) {
-        String linkString = authService.randomStringGenerator(30, true, true);
-
-        Context context = new Context();
-                context.setVariable("baseURL", appServer.getBaseURL());
-                context.setVariable("mailerLink", appServer.getBaseURL()+"/mailer/"+linkString);
-
-        MimeMessage message = javaMailSender.createMimeMessage();
-
-        try {
-            message.setFrom(new InternetAddress(sender));
-            message.setRecipients(MimeMessage.RecipientType.TO, emailDetails.getRecipient());
-            message.setSubject(emailDetails.getSubject());
-            // Set the email's content to be the HTML template
-            message.setContent(templateEngine.process("mailer/mailScheduleRequest", context), "text/html; charset=utf-8");
-
-            javaMailSender.send(message);
-
-            MailerLinks mLink = new MailerLinks(
-                    null, id, linkString,
-                    LocalDateTime.now().plusDays(14),
-                    false, "acceptReject");
-            mailerLinksRepository.save(mLink);
-
-            return new BrowserMessage("msgSuccess", "E-mail sent.");
-        } catch (Exception e) {
-            return new BrowserMessage("msgError", e.getMessage());
-        }
     }
 
     @Override
@@ -173,11 +144,71 @@ public class EmailService implements EmailServiceInterface{
     }
 
     @Override
+    public BrowserMessage sendUserRequest(EmailDetails emailDetails, OrderRequest orderRequest) {
+        // set template variables
+        Context context = new Context();
+        context.setVariable("baseURL", appServer.getBaseURL());
+        context.setVariable("orderRequest", orderRequest);
+        context.setVariable("emailSubject", emailDetails.getSubject());
+
+        // create mail message
+        MimeMessage message = javaMailSender.createMimeMessage();
+
+        try {
+            message.setFrom(new InternetAddress(sender));
+            message.setRecipients(MimeMessage.RecipientType.TO, orderRequest.getUser().getContactEmail());
+            message.setSubject(emailDetails.getSubject());
+            // Set the email's content to be the HTML template
+            message.setContent(templateEngine.process("mailer/mailUserRequest", context), "text/html; charset=utf-8");
+
+            javaMailSender.send(message);
+            return new BrowserMessage("msgSuccess", "E-mail sent.");
+        } catch (Exception e) {
+            return new BrowserMessage("msgError", e.getMessage());
+        }
+    }
+
+    @Override
+    public BrowserMessage sendSupervisorRequest(EmailDetails emailDetails, OrderRequest orderRequest, BigInteger id) {
+        String linkString = authService.randomStringGenerator(30, true, true);
+
+        // set template variables
+        Context context = new Context();
+        context.setVariable("baseURL", appServer.getBaseURL());
+        context.setVariable("orderRequest", orderRequest);
+        context.setVariable("emailSubject", emailDetails.getSubject());
+        context.setVariable("webLink", appServer.getBaseURL()+"/mailer/"+linkString);
+
+        // create mail message
+        MimeMessage message = javaMailSender.createMimeMessage();
+
+        try {
+            message.setFrom(new InternetAddress(sender));
+            message.setRecipients(MimeMessage.RecipientType.TO, orderRequest.getUser().getContactEmail());
+            message.setSubject(emailDetails.getSubject());
+            // Set the email's content to be the HTML template
+            message.setContent(templateEngine.process("mailer/mailSupervisorRequest", context), "text/html; charset=utf-8");
+
+            javaMailSender.send(message);
+
+            MailerLinks mLink = new MailerLinks(
+                    null, id, linkString,
+                    LocalDateTime.now().plusDays(5),
+                    false, "ackRequest");
+            mailerLinksRepository.save(mLink);
+
+            return new BrowserMessage("msgSuccess", "E-mail sent.");
+        } catch (Exception e) {
+            return new BrowserMessage("msgError", e.getMessage());
+        }
+    }
+
+    @Override
     public void sendStatement(User user) {
 
         // set template variables
         Context context = new Context();
-            context.setVariable("baseURL", appServer.getBaseURL());
+        context.setVariable("baseURL", appServer.getBaseURL());
 
         // create mail message
         MimeMessage message = javaMailSender.createMimeMessage();

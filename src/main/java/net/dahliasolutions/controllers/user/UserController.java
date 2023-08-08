@@ -183,7 +183,7 @@ public class UserController {
             }
         }
 
-        if (user.get().getPosition().getLevel() < currentUser.getPosition().getLevel()) {
+        if (!fullList && user.get().getPosition().getLevel() < currentUser.getPosition().getLevel()) {
             session.setAttribute("msgError", "Permission to Edit User Denied!");
             return redirectService.pathName(session, "user");
         }

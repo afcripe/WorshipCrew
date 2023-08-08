@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.order.OrderNote;
 import net.dahliasolutions.models.order.OrderRequest;
 import net.dahliasolutions.models.user.User;
+import net.dahliasolutions.services.mail.EmailService;
 import net.dahliasolutions.services.order.OrderService;
 import net.dahliasolutions.services.order.OrderNoteService;
 import net.dahliasolutions.services.order.OrderItemService;
+import net.dahliasolutions.services.user.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -27,7 +29,6 @@ public class OrderController {
 
     private final OrderService orderService;
     private final OrderNoteService orderNoteService;
-    private final OrderItemService orderItemService;
 
     @ModelAttribute
     public void addAttributes(Model model) {
