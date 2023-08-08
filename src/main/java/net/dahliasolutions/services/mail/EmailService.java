@@ -88,6 +88,7 @@ public class EmailService implements EmailServiceInterface{
         context.setVariable("userDetails", userService.findById(id).orElse(null));
         context.setVariable("baseURL", appServer.getBaseURL());
         context.setVariable("welcomeLink", appServer.getBaseURL()+"/mailer/"+linkString);
+        context.setVariable("emailSubject", emailDetails.getSubject());
 
         MimeMessage message = javaMailSender.createMimeMessage();
 
@@ -119,6 +120,7 @@ public class EmailService implements EmailServiceInterface{
         Context context = new Context();
         context.setVariable("baseURL", appServer.getBaseURL());
         context.setVariable("resetLink", appServer.getBaseURL()+"/mailer/"+linkString);
+        context.setVariable("emailSubject", emailDetails.getSubject());
 
         MimeMessage message = javaMailSender.createMimeMessage();
 

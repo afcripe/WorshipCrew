@@ -18,7 +18,8 @@
 
     <h1 th:text="${title}"></h1>
 
-    <table class="table table-striped d-block d-md-none">
+<div class="row d-block d-md-none">
+    <table class="table table-striped">
       <thead>
       <tr>
         <th scope="col">User</th>
@@ -43,8 +44,9 @@
       </tr>
       </tbody>
     </table>
-
-    <table class="table table-striped d-none d-md-block">
+</div>
+<div class="row d-none d-md-block">
+    <table class="table table-striped">
       <thead>
       <tr>
         <th scope="col">Username</th>
@@ -65,7 +67,7 @@
       </tr>
       </tbody>
     </table>
-
+</div>
   </div>
 </div>
 

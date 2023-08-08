@@ -52,7 +52,11 @@
           th:onclick="window.location.href='/permissiontemplate/edit/[[${temp.id}]]';">
         <td><span th:text="${temp.name}"/></td>
         <td><span th:text="${temp.position.name}"/></td>
-        <td th:each="role : ${temp.userRoles}" style="font-size: small; overflow: clip; max-width: 200px;"><span th:text="${role.name}"/></td>
+        <td>
+          <div th:each="role : ${temp.userRoles}" style="font-size: small; display: inline-block">
+            <span th:text="${role.name}"></span> |
+          </div>
+        </td>
       </tr>
       </tbody>
     </table>

@@ -4,7 +4,7 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       layout:decorate="~{layouts/defaultLayout}">
 
-<div class="container-fluid" layout:fragment="content">
+<div class="container-fluid px-2 px-md-4" layout:fragment="content">
 
     <div class="row pt-4">
         <div class="col">
@@ -15,12 +15,12 @@
         </div>
     </div>
 
-    <div class="col" th:if="${not #lists.isEmpty(cart.cartItems)}" th:each="item : ${cart.cartItems}">
+    <div th:if="${not #lists.isEmpty(cart.cartItems)}" th:each="item : ${cart.cartItems}">
       <div class="row">
         <div th:replace="~{components/cardCartItemLine :: cardFragment(${item})}">Your Cart is Empty</div>
       </div>
     </div>
-    <div class="col" th:if="${#lists.isEmpty(cart.cartItems)}">
+    <div th:if="${#lists.isEmpty(cart.cartItems)}">
         <div class="row">
             <div>Your Cart is Empty</div>
         </div>
@@ -49,7 +49,7 @@
             <h4>Recent Requests</h4>
         </div>
     </div>
-    <div class="row" th:if="${not #lists.isEmpty(orderList)}" th:each="orderRequest : ${orderList}">
+    <div th:if="${not #lists.isEmpty(orderList)}" th:each="orderRequest : ${orderList}">
         <div class="row">
             <div th:replace="~{components/cardOrderLine :: cardFragment(${orderRequest})}">No Requests to Display</div>
         </div>
