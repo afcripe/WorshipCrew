@@ -177,6 +177,7 @@ public class ProfileController {
         Optional<OrderRequest> order = orderService.findById(id);
         List<OrderNote> noteList = orderNoteService.findByOrderId(id);
 
+        model.addAttribute("editable", false);
         model.addAttribute("orderRequest", order.get());
         model.addAttribute("noteList", noteList);
         return "profile/order";

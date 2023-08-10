@@ -3,15 +3,15 @@ package net.dahliasolutions.models.order;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import net.dahliasolutions.models.department.DepartmentRegional;
 import net.dahliasolutions.models.store.StoreImage;
+import net.dahliasolutions.models.user.User;
 
 import java.math.BigInteger;
 
-@Data
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -28,6 +28,15 @@ public class OrderItem {
     private boolean specialOrder;   //not held in stock and must be ordered
     private boolean available;      //available to order
     private int leadTime;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    private DepartmentRegional department;
+
+    @Enumerated(EnumType.STRING)
+    private OrderStatus itemStatus;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    private User supervisor;
 
     @Nullable
     @ManyToOne(fetch = FetchType.LAZY)

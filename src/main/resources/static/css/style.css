@@ -24,6 +24,7 @@
 
     --dwc-body-color: #212529;
     --dwc-body-bg: #fff;
+    --dwc-border-color: #bebebe;
     --dwc-side-nav-bg: #eeeeee;
     --dwc-page-nav: #606060;
     --dwc-login-color: #daeeff;
@@ -388,6 +389,14 @@
     color: var(--dwc-store);
     background-color: transparent;
 }
+.caret-right {
+     transition: transform 1s;
+}
+.caret-right-open {
+    transform: rotate(90deg);
+    -webkit-transform:rotate(90deg);
+    -moz-transform:rotate(90deg);
+}
 
 .alert-support {
     color: #3b0896;
@@ -446,7 +455,7 @@
     aspect-ratio: 1 / 1;
     object-fit: contain;
     float: left;
-    border: 2px solid lightgray;
+    border: 2px solid var(--dwc-border-color);
     border-radius: 5px;
     margin: 5px;
 }
@@ -455,7 +464,7 @@
     aspect-ratio: 1 / 1;
     object-fit: contain;
     float: left;
-    border: 2px solid lightgray;
+    border: 2px solid var(--dwc-border-color);
     border-radius: 5px;
     margin: 5px;
 }
@@ -515,4 +524,44 @@
 
 .nav-login a{
     color: var(--dwc-login-color) !important;
+}
+
+/* Autocomplete Order Search */
+.autocomplete {
+    position: relative;
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+}
+
+.autocomplete-items {
+    position: absolute;
+    border: 1px solid var(--dwc-border-color);
+    border-bottom: none;
+    border-top: none;
+    border-radius: 5px;
+    z-index: 99;
+    /*position the autocomplete items to be the same width as the container:*/
+    top: 100%;
+    left: 0;
+    right: 0;
+}
+
+.autocomplete-items div {
+    padding: 10px;
+    cursor: pointer;
+    background-color: var(--dwc-body-bg);
+    border-bottom: 1px solid var(--dwc-border-color);
+    border-radius: 5px;
+}
+
+/*when hovering an item:*/
+.autocomplete-items div:hover {
+    background-color: var(--dwc-body-bg);
+}
+
+/*when navigating through the items using the arrow keys:*/
+.autocomplete-active {
+    background-color: var(--dwc-wiki-focus) !important;
+    color: var(--dwc-body-bg);
 }

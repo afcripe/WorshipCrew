@@ -63,6 +63,7 @@ public class Main {
 //            roleService.createRole("STORE_WRITE", "Create new items in the store for assigned department");
 //            roleService.createRole("REQUEST_READ", "View requests made by users");
 //            roleService.createRole("REQUEST_WRITE", "Update, assign, and fulfill user requests");
+//            roleService.createRole("REQUEST_SUPERVISOR", "Full access to user requests");
 //            roleService.createRole("SUPPORT_READ", "View support tickets");
 //            roleService.createRole("SUPPORT_WRITE", "Create support tickets");
 //            roleService.createRole("SUPPORT_AGENT", "Can be assigned support tickets");
@@ -71,9 +72,8 @@ public class Main {
 //            roleService.createRole("USER_WRITE", "Create and edite users for assigned campus");
 //            roleService.createRole("CAMPUS_READ", "View all information for assigned campus");
 //            roleService.createRole("CAMPUS_WRITE", "Edite information for assigned campus");
-//            roleService.createRole("DIRECTOR_READ", "View all information regionally");
-//            roleService.createRole("DIRECTOR_WRITE", "Edit all information regionally");
-//            roleService.createRole("ADMIN_READ", "Can view all site information");
+//            roleService.createRole("DIRECTOR_READ", "View all information regionally for assigned department");
+//            roleService.createRole("DIRECTOR_WRITE", "Edit all information regionally for assigned department, and manage positions");
 //            roleService.createRole("ADMIN_WRITE", "Has full access");
 //
 //            Campus mainLocation = campusService.createCampus("Destin", "Destin", BigInteger.valueOf(0));

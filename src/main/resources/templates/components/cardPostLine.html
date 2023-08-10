@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://thymeleaf.org">
 
 <div th:fragment="cardFragment(wikiPost)">
-  <div class="card" th:object="${wikiPost}">
+  <div class="card selectableItem" th:object="${wikiPost}">
     <script>
       function navToPost(id) {
         window.location.href="/resource/article/"+id;

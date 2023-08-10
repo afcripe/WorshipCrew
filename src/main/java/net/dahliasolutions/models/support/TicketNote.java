@@ -1,6 +1,5 @@
-package net.dahliasolutions.models.order;
+package net.dahliasolutions.models.support;
 
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
 import net.dahliasolutions.models.user.User;
@@ -14,22 +13,22 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class OrderNote {
+public class TicketNote {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private BigInteger id;
-    private BigInteger orderId;
     private LocalDateTime noteDate;
-    private String orderNote;
 
-    @Nullable
-    private BigInteger orderItemId;
-
-    @Enumerated(EnumType.STRING)
-    private OrderStatus orderStatus;
+    @Lob
+    @Column(name = "detail", columnDefinition="BLOB")
+    private String detail;
 
     @ManyToOne(fetch = FetchType.EAGER)
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "ticketId")
+    private Ticket ticket;
 
 }

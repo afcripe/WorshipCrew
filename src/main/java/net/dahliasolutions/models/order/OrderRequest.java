@@ -2,18 +2,15 @@ package net.dahliasolutions.models.order;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import net.dahliasolutions.models.store.CartItem;
+import lombok.*;
 import net.dahliasolutions.models.user.User;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -41,7 +38,7 @@ public class OrderRequest {
     private List<OrderItem> requestItems;
 
     @JsonBackReference
-    @OneToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<User> supervisorList;
 
     public int getItemCount() {

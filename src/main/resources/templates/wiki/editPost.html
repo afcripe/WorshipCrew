@@ -17,10 +17,19 @@
                     <div class="col pb-1">
                         <input type="text" class="form-control-sm flex-grow" style="width: 50%" th:id="postTitle" th:value="*{title}"
                                placeholder="Article Title" />
+                        <span> Summary </span>
+                        <i id="summaryIconRight" class="bi bi-caret-right h5 color-wiki" onclick="toggleSummary()"></i>
+                        <i id="summaryIconDown" class="bi bi-caret-down h5 color-wiki" style="display: none" onclick="toggleSummary()"></i>
                         <i id="savingIcon" class="bi bi-file-earmark-arrow-up h5" style="color: green; display: none; float: right"></i>
                         <input type="hidden" id="authorId" th:value="*{author.id}" />
                         <input type="hidden" id="postId" th:value="*{id}" />
                         <input type="hidden" id="folder" th:value="*{folder}" />
+                    </div>
+                </div>
+                <div id="summaryRow" class="row" style="display: none">
+                    <div class="col pb-1">
+                        <input type="text" class="form-control-sm flex-grow" style="width: 100%" th:id="postSummary"
+                               placeholder="Article Summary"  th:value="*{summary}"/>
                     </div>
                 </div>
                 <dvi class="row">
@@ -78,7 +87,6 @@
                 // close dialog
                 document.getElementById("uploadDialog").close();
             }
-
         </script>
         <h2>Upload Image</h2>
         <div class="flex-column">
@@ -122,7 +130,6 @@
             </form>
         </div>
     </dialog>
-
     <dialog id="chooseDialog" class="upload-modal">
         <template id="tmpImage">
             <div class="grid_image_div m-1">
@@ -211,7 +218,6 @@
             </div>
         </form>
     </dialog>
-
     <dialog id="chooseTag" class="tag-dialog">
         <template id="tmpTag">
             <span class="m-1 tag_primary" style="cursor: pointer"></span>
@@ -360,7 +366,6 @@
             </div>
         </form>
     </dialog>
-
     <dialog id="chooseFolder" class="tag-dialog">
         <template id="tmpFolder">
             <div class="m-0 p-0" style="cursor: pointer"></div>
@@ -495,12 +500,32 @@
 
         let closeOnSave = false;
         const iconSaving = document.getElementById('savingIcon');
+        const iconSummaryRight = document.getElementById("summaryIconRight");
+        const iconSummaryDown = document.getElementById("summaryIconDown");
+        const rowSummary = document.getElementById("summaryRow");
+        const inputSummary = document.getElementById("postSummary");
+
+        function toggleSummary() {
+            debugger
+            if (iconSummaryRight.style.display === "none") {
+                iconSummaryRight.style.display = "inline-block";
+                iconSummaryDown.style.display = "none";
+                rowSummary.style.display = "none";
+            } else {
+                iconSummaryRight.style.display = "none";
+                iconSummaryDown.style.display = "inline-block";
+                rowSummary.style.display = "block";
+            }
+        }
 
         async function processPost() {
             iconSaving.style.display = 'block';
             let myContent = tinyMCE.activeEditor.getContent();
             let myTextContent = tinyMCE.activeEditor.getContent({ format: "text" });
-            let mySummary = myTextContent.substring(0,255);
+            let mySummary = inputSummary.value;
+            if (inputSummary.value === "") {
+                mySummary = myTextContent.substring(0,255);
+            }
 
             let formData = new FormData();
                 formData.set("id", document.getElementById('postId').value);

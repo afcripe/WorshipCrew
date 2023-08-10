@@ -28,6 +28,24 @@
         </div>
     </div>
 
+    <div id="dpReasonTxt" class="row py-1">
+        <span>
+            Reason and Notes:
+            <button id="btnEdit" class="btn btn-sm btn-primary"
+                    th:if="${#strings.toString(orderRequest.orderStatus)} != 'Cancelled' AND ${#strings.toString(orderRequest.orderStatus)} != 'Complete'" onclick="navUpdateReason(this)">Change</button>
+        </span>
+        <br>
+        <strong><span id="textReason" th:text="*{requestNote}"></span></strong>
+    </div>
+    <div id="dpReasonInput" style="display: none">
+        <span>
+            Reason and Notes:
+            <button id="btnSave" class="btn btn-sm btn-primary" onclick="navUpdateReason(this)">Save</button>
+        </span>
+        <input id="requestId" type="hidden" th:value="*{id}">
+        <input id="inputReason" style="width: 100%" type="text">
+    </div>
+
     <div class="row p-2">
         <div class="col-6">
             <button class="btn btn-sm btn-outline-secondary" onclick="toggleHistory()" style="max-width: 150px;">
@@ -35,7 +53,7 @@
             </button>
         </div>
         <div class="col-6">
-            Items: <span th:text="*{itemCount}"></span>
+            Totals Items: <span th:text="*{itemCount}"></span>
         </div>
     </div>
     <div id="divHistory" class="row orderHistory py-1 mx-1">
@@ -86,6 +104,12 @@
         const displayBtnCancel = document.getElementById("btnCancel");
         const displayPrgCancel = document.getElementById("prgCancel");
 
+        const displayReasonTxt = document.getElementById("dpReasonTxt");
+        const displayReasonInput = document.getElementById("dpReasonInput");
+        const displayInputReason = document.getElementById("inputReason");
+        const displayTextReason = document.getElementById("textReason");
+        const inputId = document.getElementById("requestId");
+
         function navToItem(id) {
             window.location.href="/store/item/"+id;
         }
@@ -98,6 +122,34 @@
                 displayDivHistory.classList.add("orderHistoryExpand");
                 displayBtnHistoryExpand.style.display = "none";
                 displayBtnHistoryCollapse.style.display = "inline-block";
+            }
+        }
+
+        function navUpdateReason(element) {
+            if(element.id == 'btnEdit') {
+                displayReasonTxt.style.display = "none";
+                displayReasonInput.style.display = "block";
+                displayInputReason.value = displayTextReason.innerText;
+            }
+            if(element.id == 'btnSave') {
+                displayReasonTxt.style.display = "block";
+                displayReasonInput.style.display = "none";
+                displayTextReason.innerText = displayInputReason.value;
+
+                let formData = new FormData();
+                    formData.set("id", inputId.value);
+                    formData.set("name", displayInputReason.value);
+
+                fetch("/api/v1/order/updateReason", {
+                    method: "POST",
+                    body: formData
+                }).then(response => {
+                    return response.json();
+                }).then(data => {
+                    if (data.id === 0) {
+                        window.location.reload()
+                    }
+                });
             }
         }
 

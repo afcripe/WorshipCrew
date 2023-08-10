@@ -20,6 +20,7 @@ public interface UserServiceInterface extends UserDetailsService {
     void addRoleToUser(String username ,String roleName);
     void removeRoleFromUser(BigInteger id ,String roleName);
     Optional<User> findById(BigInteger id);
+    List<User> searchAllByFullName(String searchTerm);
     User save(User user);
     List<User> findAll();
     List<User> findAllByCampus(Campus campus);

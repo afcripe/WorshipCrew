@@ -10,7 +10,20 @@
 
     <div class="row pt-5 py-2">
         <div class="col">
-            <h4>Items to Fulfill</h4>
+            <h4>Requests Placed by <span th:text="${searchedUser}"></span></h4>
+        </div>
+    </div>
+    <div class="row pt-2 pb-5 py-2">
+        <div class="col" th:if="${not #lists.isEmpty(orderList)}" th:each="order : ${orderList}">
+            <div class="row">
+                <div th:replace="~{components/cardOrderLine :: cardFragment(${order})}">No Requests to Display</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row pt-5 py-2">
+        <div class="col">
+            <h4>Items for <span th:text="${searchedUser}"></span> Fulfill</h4>
         </div>
     </div>
     <div class="row pt-2 pb-5 py-2">
@@ -23,7 +36,7 @@
 
     <div class="row pt-5 py-2">
         <div class="col">
-            <h4>Requests Sent to You</h4>
+            <h4>Requests Sent to <span th:text="${searchedUser}"></span></h4>
         </div>
     </div>
     <div class="row pt-2 pb-5 py-2">
@@ -36,7 +49,7 @@
 
     <div class="row pt-5 py-2">
         <div class="col">
-            <h4>Requests You've been Included on</h4>
+            <h4>Requests <span th:text="${searchedUser}"></span> has been Included on</h4>
         </div>
     </div>
     <div class="row pt-5 pb-5 py-2">

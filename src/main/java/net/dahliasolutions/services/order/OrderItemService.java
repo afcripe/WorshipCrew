@@ -4,9 +4,12 @@ import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.data.OrderItemRepository;
 import net.dahliasolutions.models.order.OrderItem;
 import net.dahliasolutions.models.order.OrderRequest;
+import net.dahliasolutions.models.order.OrderStatus;
+import net.dahliasolutions.models.user.User;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,6 +33,23 @@ public class OrderItemService implements OrderItemServiceInterface {
     @Override
     public List<OrderItem> findAllByOrderRequest(OrderRequest orderRequest) {
         return orderItemRepository.findAllByOrderRequest(orderRequest);
+    }
+
+    @Override
+    public List<OrderItem> findAllBySupervisor(User user) {
+        return orderItemRepository.findAllBySupervisor(user);
+    }
+
+    @Override
+    public List<OrderItem> findAllBySupervisorOpenOnly(User user) {
+        List<OrderItem> itemList = orderItemRepository.findAllBySupervisor(user);
+        List<OrderItem> returnItems = new ArrayList<>();
+        for (OrderItem item : itemList) {
+            if (!item.getItemStatus().equals(OrderStatus.Complete) && !item.getItemStatus().equals(OrderStatus.Cancelled)) {
+                returnItems.add(item);
+            }
+        }
+        return returnItems;
     }
 
     @Override

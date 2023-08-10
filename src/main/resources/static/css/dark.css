@@ -18,6 +18,18 @@
     color: var(--dwc-body-color-dark);
     border-color: var(--dwc-border-color-dark);
 }
+.dark input {
+    background-color: var(--dwc-dropdown-hover-dark);
+    color: var(--dwc-body-color-dark) !important;
+}
+.dark select {
+    background-color: var(--dwc-dropdown-hover-dark);
+    color: var(--dwc-body-color-dark);
+}
+.dark textarea {
+    background-color: var(--dwc-dropdown-hover-dark);
+    color: var(--dwc-body-color-dark);
+}
 .dark .side-nav-collapsed {
     background-color: var(--dwc-side-nav-bg-dark);
     color: var(--dwc-body-color-dark);
@@ -94,4 +106,27 @@
 }
 .dark .form-control {
     background-color: var(--dwc-dropdown-hover-dark);
+}
+
+
+.dark .store_card_image {
+    border: 2px solid var(--dwc-border-color);
+}
+.dark .store_image {
+    border: 2px solid var(--dwc-border-color);
+}
+
+
+.dark .autocomplete-items {
+    border: 1px solid var(--dwc-border-color-dark);
+}
+
+.dark .autocomplete-items div {
+    background-color: var(--dwc-body-bg-dark);
+    border-bottom: 1px solid var(--dwc-border-color-dark);
+}
+
+/*when hovering an item:*/
+.dark .autocomplete-items div:hover {
+    background-color: var(--dwc-body-bg-dark);
 }

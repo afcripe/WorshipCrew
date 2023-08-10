@@ -43,7 +43,6 @@ public class StoreItem {
     @ManyToOne
     private StoreSubCategory subCategory;
 
-    @Nullable
     @ManyToOne(fetch = FetchType.EAGER)
     private DepartmentRegional department;
 

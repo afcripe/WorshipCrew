@@ -11,34 +11,46 @@
             <button type="button" class="btn btn-sm btn-outline-primary" style="float: right;" id="btnClear"
                                  th:onclick="clearCart([[${userId}]])" th:unless="${#lists.isEmpty(cart.cartItems)}">Clear Cart</button>
             <h1>Request Cart</h1>
+        </div>
+    </div>
+
+    <div class="card w-100 px-2 pb-5">
+        <div class="row py-1">
             <p>Number of items in cart: <span id="subtitleCount" th:text="${cart.itemCount}"></span></p>
         </div>
+        <div th:if="${not #lists.isEmpty(cart.cartItems)}" th:each="item : ${cart.cartItems}">
+            <div class="row py-1">
+                <div th:replace="~{components/cardCartItemLine :: cardFragment(${item})}">Your Cart is Empty</div>
+            </div>
+            <div class="row py-1">
+                <div class="form-group">
+                    <label for="requestNote">Reason and Notes: * </label>
+                    <input type="text" id="requestNote" class="w-100" maxlength="255">
+                </div>
+            </div>
+        </div>
+        <div th:if="${#lists.isEmpty(cart.cartItems)}">
+            <div class="row">
+                <div>Your Cart is Empty</div>
+            </div>
+        </div>
+
+        <div class="row pt-1" th:unless="${#lists.isEmpty(cart.cartItems)}">
+            <div class="col-10 text-right">
+                I acknowledge that I am accountable for the validity of this request and have provided an appropriate reason.
+                <input id="chkTerms" type="checkbox" onchange="changeTermsAgreement()">
+            </div>
+            <div class="col-2">
+                <button type="button" class="btn btn-sm btn-primary" style="float: right;" id="btnSend" disabled
+                        th:onclick="placeOrder([[${userId}]])">Send Request</button>
+            </div>
+        </div>
+        <div class="row py-0 text-center">
+            <progress id="prgRequest" class="w-75 mx-4" style="display: none;"></progress>
+        </div>
     </div>
 
-    <div th:if="${not #lists.isEmpty(cart.cartItems)}" th:each="item : ${cart.cartItems}">
-      <div class="row">
-        <div th:replace="~{components/cardCartItemLine :: cardFragment(${item})}">Your Cart is Empty</div>
-      </div>
-    </div>
-    <div th:if="${#lists.isEmpty(cart.cartItems)}">
-        <div class="row">
-            <div>Your Cart is Empty</div>
-        </div>
-    </div>
 
-    <div class="row pt-4" th:unless="${#lists.isEmpty(cart.cartItems)}">
-        <div class="col-8 text-right">
-            I agree to the terms and conditions of DWC.
-            <input id="chkTerms" type="checkbox" onchange="changeTermsAgreement()">
-        </div>
-        <div class="col-4">
-            <button type="button" class="btn btn-sm btn-primary" style="float: right;" id="btnSend" disabled
-                    th:onclick="placeOrder([[${userId}]])">Send Request</button>
-        </div>
-    </div>
-    <div class="row pt-0 pb-5">
-        <progress id="prgRequest" style="display: none;"></progress>
-    </div>
 
     <div class="row py-5">
         <div class="col">
@@ -60,6 +72,7 @@
         const elButtonSend = document.getElementById("btnSend");
         const elButtonClear = document.getElementById("btnClear");
         const elProgressRequest = document.getElementById("prgRequest");
+        const elRequestNote = document.getElementById("requestNote");
 
         function navToItem(id) {
             window.location.href="/store/item/"+id;
@@ -117,12 +130,18 @@
         }
 
         async function placeOrder(userid) {
+            if (elRequestNote.value === "") {
+                elRequestNote.focus();
+                return;
+            }
+
             elButtonSend.setAttribute("disabled", "disabled");
             elButtonClear.setAttribute("disabled", "disabled");
             elProgressRequest.style.display = "block";
 
             let formData = new FormData();
                 formData.set("id", userid);
+                formData.set("requestNote", elRequestNote.value);
 
             const response = await fetch('/api/v1/cart/placeOrder', {
                 method: 'POST',
@@ -131,7 +150,7 @@
                 return response.json();
             }).then(data => {
                 console.log(data);
-                window.location.href='/order/'+data.id;
+                window.location.href='/profile/order/'+data.id;
             });
         }
     </script>

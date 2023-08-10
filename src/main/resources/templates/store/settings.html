@@ -104,7 +104,7 @@
       function keyNewCat(event) {
         event.preventDefault();
         if (event.key === "Enter" || event.keyCode === 13) {
-          postNewItem();
+          postNewCat();
         }
         if (event.key === "Escape") {
           keyEscCat();
@@ -168,10 +168,10 @@
       }
 
     </script>
-    <h2>New Store item</h2>
+    <h2>Edit Category</h2>
     <form id="formEditItem" onsubmit="putCat()" style="width: 300px; max-width: 450px">
       <label for="editCatName" class="form-label">Name</label>
-      <input class="form-control" id="editCatName" onkeyup="keyNewCat(event)">
+      <input class="form-control" id="editCatName" onkeyup="keyEditCat(event)">
 
       <div class="pt-2">
         <button id="btnEditSubmit" type="button" class="btn btn-sm btn-store" onclick="putCat()">Update</button>

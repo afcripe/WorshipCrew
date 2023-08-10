@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+
+<div th:fragment="cardFragment(orderItem)">
+  <div class="card p-2 selectableItem" th:onclick="navToOrder([[*{orderRequest.id}]])" th:object="${orderItem}">
+
+    <div class="row" >
+      <div class="col-12 col-md-4">
+        <img th:src="@{*{image.fileLocation}}" class="store_line_image mr-2" style="float: left">
+        <h6 th:text="*{productName}"></h6>
+      </div>
+      <div class="col-12 col-md-6">
+        <h6 th:text="*{details}"></h6>
+      </div>
+      <div class="col-12 col-md-2">
+        <div>
+          <strong>items: <span th:text="*{count}"></span></strong>
+        </div>
+      </div>
+    </div>
+    <div class="row" >
+      <div class="col-12 col-md-4">
+      </div>
+      <div class="col-12 col-md-6">
+        Request ID: <span th:text="*{orderRequest.id}"></span>
+      </div>
+      <div class="col-12 col-md-2">
+        <div>
+          Status: <span th:text="*{itemStatus}"></span>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function navToOrder(id) {
+        window.location.href="/order/"+id;
+      }
+    </script>
+
+  </div>
+</div>
+
+</html>

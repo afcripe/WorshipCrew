@@ -54,6 +54,7 @@
         <tr>
             <th>Product</th>
             <th>Details</th>
+            <th>Status</th>
             <th>Count</th>
         </tr>
         </thead>
@@ -64,6 +65,9 @@
             </td>
             <td>
                 <span th:text="${item.details}"></span>
+            </td>
+            <td>
+                <span th:text="${item.itemStatus}"></span>
             </td>
             <td>
                 <span th:text="${item.count}"></span>

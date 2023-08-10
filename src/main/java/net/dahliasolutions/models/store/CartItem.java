@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.dahliasolutions.models.department.DepartmentRegional;
 import net.dahliasolutions.models.order.OrderStatus;
 
 import java.math.BigInteger;
@@ -28,6 +29,9 @@ public class CartItem {
     private boolean specialOrder;   //not held in stock and must be ordered
     private boolean available;      //available to order
     private int leadTime;           //person who receives order requests
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    private DepartmentRegional department;
 
     @Nullable
     @ManyToOne(fetch = FetchType.LAZY)

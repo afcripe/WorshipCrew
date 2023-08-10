@@ -20,6 +20,7 @@ public interface OrderServiceInterface {
     List<OrderRequest> findAllBySupervisor(User user);
     List<OrderRequest> findAllBySupervisorOpenOnly(User user);
     List<OrderRequest> findAllByMentionOpenOnly(User user);
+    List<OrderRequest> searchAllById(BigInteger searchTerm);
     OrderRequest save(OrderRequest orderRequest);
     void deleteById(BigInteger id);
 

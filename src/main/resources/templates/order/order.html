@@ -18,17 +18,17 @@
                 <div class="col-12 col-md-6">
                     <h4>Request Id: <span th:text="*{id}"></span></h4>
                 </div>
-                <div class="col-12 col-md-6"
-                     th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'DIRECTOR_WRITE')
-                            or #lists.contains(userRoles,'CAMPUS_WRITE') or #lists.contains(userRoles,'REQUEST_WRITE')}">
-                    <button class="btn btn btn-primary" onclick="dialogChangeStatus()">Change Status</button>
-                    <button class="btn btn btn-primary" onclick="dialogIncludePerson()">Include Someone</button>
+                <div class="col-12 col-md-6 text-right" th:if="${editable}">
+                    <th:block th:if="${editable}">
+                        <button class="btn btn-sm btn-primary" onclick="dialogChangeStatus()">Status / Note</button>
+                        <button class="btn btn-sm btn-primary" onclick="dialogIncludePerson()">Include Someone</button>
+                    </th:block>
                 </div>
 
             </div>
 
     <div class="row py-2">
-        <div class="col-12 col-md-8 pb-4">
+        <div class="col-12 col-lg-8 pb-4">
 
             <div class="card">
                 <div class="row py-1">
@@ -47,6 +47,13 @@
                     </div>
                 </div>
 
+                <div class="row py-1">
+                    <div class="col-12">
+                        Reason and Notes:
+                        <strong><span th:text="*{requestNote}"></span></strong>
+                    </div>
+                </div>
+
                 <div class="row p-2">
                     <div class="col-6">
                         <button class="btn btn-sm btn-outline-secondary" onclick="toggleHistory()" style="max-width: 150px;">
@@ -54,7 +61,7 @@
                         </button>
                     </div>
                     <div class="col-6">
-                        Items: <span th:text="*{itemCount}"></span>
+                        Total Items: <span th:text="*{itemCount}"></span>
                     </div>
                 </div>
                 <div id="divHistory" class="row orderHistory py-1 mx-1">
@@ -94,15 +101,15 @@
                 </div>
 
                 <div class="row py-2" th:each="item : *{requestItems}">
-                    <div th:replace="~{components/cardOrderItemLine :: cardFragment(${item})}">Your Order is Empty</div>
+                    <div th:replace="~{components/cardOrderItemLine :: cardFragment(${item})}">Request is Empty</div>
                 </div>
             </div>
         </div>
 
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-lg-4">
             <div class="card p-2 gradient-right">
                 <div class="card-title">
-                    <h5>Request Sent to</h5>
+                    <h5>Request Assigned to:</h5>
                 </div>
                 <p class="p-2" th:text="*{supervisor.firstName}+' '+*{supervisor.lastName}"></p>
 
@@ -110,7 +117,10 @@
                     <h5>Included on Request</h5>
                 </div>
                 <div th:each="super : *{supervisorList}">
-                    <p class="p-2" th:text="${super.firstName}+' '+${super.lastName}"></p>
+                    <p th:id="'super-'+${super.id}" class="p-2">
+                        <span th:text="${super.firstName}+' '+${super.lastName}"></span>
+                        <i class="bi bi-x" style="color: red" th:onclick="removeSuper([[${super.id}]])" th:if="${editable}"></i>
+                    </p>
                 </div>
             </div>
         </div>
@@ -120,11 +130,12 @@
         <script>
             async function loadPeople() {
                 let dispPersonSelect = document.getElementById('personSelect');
-
+                debugger
                 const response = await fetch('/api/v1/order/getsupervisors')
                     .then(response => {
                         return response.json();
                     }).then(data => {
+                        debugger
                         while (dispPersonSelect.firstChild) {
                             dispPersonSelect.removeChild(dispPersonSelect.lastChild);
                         }
@@ -139,6 +150,7 @@
                     });
             }
             async function postInclude() {
+                document.getElementById("btnIncludeSubmit").setAttribute("disabled", "disabled");
                 let formData = new FormData();
                 formData.set("requestId", document.getElementById('orderId').value);
                 formData.set("userId", document.getElementById('personSelect').value);
@@ -163,6 +175,7 @@
                 }
             }
             function keyEscInclude() {
+                document.getElementById("btnIncludeSubmit").removeAttribute("disabled");
                 document.getElementById("includePersonDialog").close();
             }
         </script>
@@ -209,6 +222,7 @@
                     });
             }
             async function postStatus() {
+                document.getElementById("btnStatusSubmit").setAttribute("disabled", "disabled");
                 let dispStatusSelect = document.getElementById('statusSelect');
                 let dispStatusNote = document.getElementById('statusNote');
                 debugger
@@ -236,6 +250,7 @@
                 }
             }
             function keyEscStatus() {
+                document.getElementById("btnStatusSubmit").removeAttribute("disabled");
                 document.getElementById("changeStatusDialog").close();
             }
         </script>
@@ -249,8 +264,145 @@
             <textarea id="statusNote" class="form-control w-100"></textarea>
 
             <div class="pt-2">
-                <button id="btnStatusSubmit" type="button" class="btn btn-sm btn-primary" onclick="postStatus()">Add</button>
+                <button id="btnStatusSubmit" type="button" class="btn btn-sm btn-primary" onclick="postStatus()">Update</button>
                 <button id="btnStatusCancel" type="button" class="btn btn-sm btn-outline-primary" onclick="keyEscStatus()">Cancel</button>
+            </div>
+
+        </form>
+    </dialog>
+    <dialog id="assignPersonDialog" class="upload-modal">
+        <script>
+            async function loadSupers(superId) {
+                let dispPersonSelect = document.getElementById('superSelect');
+
+                const response = await fetch('/api/v1/order/getsupervisors')
+                    .then(response => {
+                        return response.json();
+                    }).then(data => {
+                        while (dispPersonSelect.firstChild) {
+                            dispPersonSelect.removeChild(dispPersonSelect.lastChild);
+                        }
+                        for (let key in data) {
+                            let obj = data[key];
+                            let opt = document.createElement('option');
+                            opt.value = obj.id;
+                            opt.innerHTML = obj.firstName+' '+obj.lastName;
+                            if (obj.id === superId) {
+                                opt.selected = true;
+                            }
+                            dispPersonSelect.appendChild(opt);
+                        }
+                    });
+            }
+            async function postSupers() {
+                document.getElementById("btnSuperSubmit").setAttribute("disabled", "disabled");
+                let formData = new FormData();
+                    formData.set("requestId", document.getElementById('orderId').value);
+                    formData.set("userId", document.getElementById('superSelect').value);
+                    formData.set("primary", "false");
+
+                const response = await fetch('/api/v1/order/changeitemsupervisor', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    return response.json();
+                }).then(data => {
+                    window.location.reload();
+                });
+            }
+            function keySuper(event) {
+                event.preventDefault();
+                if (event.key === "Enter" || event.keyCode === 13) {
+                    postSupers();
+                }
+                if (event.key === "Escape") {
+                    keyEscSuper();
+                }
+            }
+            function keyEscSuper() {
+                document.getElementById("btnSuperSubmit").removeAttribute("disabled");
+                document.getElementById("assignPersonDialog").close();
+            }
+        </script>
+        <h2>Include Someone on Request</h2>
+        <form id="formIncludeSuper" onsubmit="postSupers()" style="width: 300px; max-width: 450px">
+            <label for="superSelect" class="form-label">Assign</label>
+            <select class="form-control" id="superSelect" onkeyup="keySuper(event)">
+                <option></option>
+            </select>
+            <div class="pt-2">
+                <button id="btnSuperSubmit" type="button" class="btn btn-sm btn-primary" onclick="postSupers()">Update</button>
+                <button id="btnSuperCancel" type="button" class="btn btn-sm btn-outline-primary" onclick="keyEscSuper()">Cancel</button>
+            </div>
+        </form>
+    </dialog>
+    <dialog id="changeItemStatusDialog" class="upload-modal">
+        <script>
+            async function loadItemStatusOptions(itemId, currentStatus) {
+                let dispStatusSelect = document.getElementById('statusItemSelect');
+                document.getElementById("itemStatusId").value = itemId;
+
+                const response = await fetch('/api/v1/order/getstatusoptions')
+                    .then(response => {
+                        return response.json();
+                    }).then(data => {
+                        while (dispStatusSelect.firstChild) {
+                            dispStatusSelect.removeChild(dispStatusSelect.lastChild);
+                        }
+                        debugger
+                        for (let key in data) {
+                            let opt = document.createElement('option');
+                            opt.value = data[key];
+                            opt.innerHTML = data[key];
+                            if (currentStatus === data[key]) {
+                                opt.selected = true;
+                            }
+                            dispStatusSelect.appendChild(opt);
+                        }
+                    });
+            }
+            async function postItemStatus() {
+                document.getElementById("btnSuperSubmit").setAttribute("disabled", "disabled");
+                let dispItemStatusSelect = document.getElementById('statusItemSelect');
+                debugger
+                let formData = new FormData();
+                formData.set("requestId", document.getElementById("itemStatusId").value);
+                formData.set("requestStatus", dispItemStatusSelect.value);
+                formData.set("RequestNote", "");
+
+                const response = await fetch('/api/v1/order/changeitemstatus', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    return response.json();
+                }).then(data => {
+                    window.location.reload();
+                });
+            }
+            function keyItemStatus(event) {
+                event.preventDefault();
+                if (event.key === "Enter" || event.keyCode === 13) {
+                    postItemStatus();
+                }
+                if (event.key === "Escape") {
+                    keyEscItemStatus();
+                }
+            }
+            function keyEscItemStatus() {
+                document.getElementById("btnSuperSubmit").removeAttribute("disabled");
+                document.getElementById("changeItemStatusDialog").close();
+            }
+        </script>
+        <h2>Update Request Status</h2>
+        <form id="formChangeItemStatus" onsubmit="postItemStatus()" style="width: 300px; max-width: 450px">
+            <label for="statusItemSelect" class="form-control-label">Change Status</label>
+            <select class="form-control py-1" id="statusItemSelect" onkeyup="keyItemStatus(event)">
+                <option></option>
+            </select>
+            <input type="hidden" id="itemStatusId">
+            <div class="pt-2">
+                <button id="btnItemStatusSubmit" type="button" class="btn btn-sm btn-primary" onclick="postItemStatus()">Update</button>
+                <button id="btnItemStatusCancel" type="button" class="btn btn-sm btn-outline-primary" onclick="keyEscItemStatus()">Cancel</button>
             </div>
 
         </form>
@@ -262,6 +414,8 @@
         const displayBtnHistoryCollapse = document.getElementById("btnHistoryCollapse");
         const displayIncludePersonDialog = document.getElementById("includePersonDialog");
         const displayChangeStatusDialog = document.getElementById("changeStatusDialog");
+        const displayAssignPersonDialog = document.getElementById("assignPersonDialog");
+        const displayItemStatusDialog = document.getElementById("changeItemStatusDialog");
 
         function navToItem(id) {
             window.location.href="/store/item/"+id;
@@ -279,14 +433,44 @@
             }
         }
 
+        async function removeSuper(superId) {
+            let formData = new FormData();
+            formData.set("requestId", document.getElementById('orderId').value);
+            formData.set("userId", superId);
+            formData.set("primary", "false");
+
+            const response = await fetch('/api/v1/order/removesupervisor', {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                return response.json();
+            }).then(data => {
+                if (data.requestId === 0) {
+                    window.location.reload();
+                } else {
+                    let elId = "super-" + superId;
+                    document.getElementById(elId).remove();
+                }
+            });
+        }
+
         function dialogIncludePerson() {
             displayIncludePersonDialog.showModal();
             loadPeople();
         }
 
+        function dialogAssignPerson(superId) {
+            displayAssignPersonDialog.showModal();
+            loadSupers(superId);
+        }
+
         function dialogChangeStatus() {
             displayChangeStatusDialog.showModal();
             loadStatusOptions();
+        }
+        function dialogChangeItemStatus(itemId, currentStatus) {
+            displayItemStatusDialog.showModal();
+            loadItemStatusOptions(itemId, currentStatus)
         }
     </script>
 

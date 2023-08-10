@@ -41,39 +41,21 @@
 
 <!-- Header -->
 <a th:href="${baseURL}" style="text-decoration: none;">
-<div class="card-header">
-    <h2 class="card-header-text">
-        <img th:src="${baseURL}+'/img/favicon.png'" alt="Exchange Logo" width="32" class="float-left" />
-        &nbsp;Destiny Worship Crew
-    </h2>
-</div>
+    <div class="card-header">
+        <h2 class="card-header-text">
+            <img th:src="${baseURL}+'/img/favicon.png'" alt="Exchange Logo" width="32" class="float-left" />
+            &nbsp;Destiny Worship Crew
+        </h2>
+    </div>
 
 </a>
-<h4 th:text="${emailSubject}">Order Request</h4>
+<h4 class="float-left" th:text="${emailSubject}">Order Request</h4>
+<a class="float-right btnAcknowledge"
+        th:href="${webLink}+'?eventId='+${id}+'&action=acknowledgeItem'">Acknowledge</a>
 
 <!-- Content -->
 
-<div class="card" th:object="${orderRequest}">
-    <div>
-        <div class="emphasis float-left">Requested By: <span th:text="*{user.firstName} + ' ' + *{user.lastName}"></span></div>
-        <div class="float-right">Date: <span class="emphasis" th:text="*{#temporals.format(requestDate, 'MMM-dd-yyyy')}"></span></div>
-    </div>
-
-    <br><br>
-
-    <div>
-        <div class="float-left">Status: <span class="emphasis" th:text="*{orderStatus}"></span></div>
-    </div>
-
-    <br><br>
-
-    <div>
-        <div class="float-left">Total Items: <span class="emphasis" th:text="*{itemCount}"></span></div>
-        <a class="float-right btnAcknowledge"
-                th:href="${webLink}+'?eventId='+${id}+'&action=acknowledgeRequest'">Acknowledge</a>
-    </div>
-
-    <br><br>
+<div class="card" th:object="${requestItem}">
 
     <table class="table">
         <thead>
@@ -84,19 +66,19 @@
             <th>Count</th>
         </tr>
         </thead>
-        <tbody th:each="item : *{requestItems}">
+        <tbody>
         <tr>
             <td>
-                <span th:text="${item.productName}"></span>
+                <span th:text="*{productName}"></span>
             </td>
             <td>
-                <span th:text="${item.details}"></span>
+                <span th:text="*{details}"></span>
             </td>
             <td>
-                <span th:text="${item.itemStatus}"></span>
+                <span th:text="*{itemStatus}"></span>
             </td>
             <td>
-                <span th:text="${item.count}"></span>
+                <span th:text="*{count}"></span>
             </td>
         </tr>
         </tbody>

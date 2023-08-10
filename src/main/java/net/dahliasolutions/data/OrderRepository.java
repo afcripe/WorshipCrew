@@ -21,5 +21,8 @@ public interface OrderRepository extends JpaRepository<OrderRequest, BigInteger>
     List<OrderRequest> findAllBySupervisorIdOpenOnly(@Param("supervisorId") BigInteger supervisorId);
     @Query(value = "SELECT * FROM ORDER_REQUEST_SUPERVISOR_LIST WHERE SUPERVISOR_LIST_ID = :supervisorId", nativeQuery = true)
     List<Tuple> findAllMentionsBySupervisorId(@Param("supervisorId") BigInteger supervisorId);
+    @Query(value = "SELECT * FROM ORDER_REQUEST WHERE ID / POWER(10, LENGTH(ID) - LENGTH(:searchTerm)) = :searchTerm", nativeQuery = true)
+
+    List<OrderRequest> searchAllById(@Param("searchTerm") BigInteger searchTerm);
 
 }

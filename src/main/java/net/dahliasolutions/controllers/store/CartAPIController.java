@@ -64,6 +64,7 @@ public class CartAPIController {
                         storeItem.get().isSpecialOrder(),
                         storeItem.get().isAvailable(),
                         storeItem.get().getLeadTime(),
+                        storeItem.get().getDepartment(),
                         storeItem.get().getImage(),
                         cart
                 );
@@ -117,17 +118,26 @@ public class CartAPIController {
         return cart.getItemCount();
     }
 
-
     @PostMapping("/empty")
     public int emptyCart(@ModelAttribute SingleBigIntegerModel integerModel) {
         return cartService.emptyCart(integerModel.id()).getItemCount();
     }
 
     @PostMapping("/placeOrder")
-    public SingleBigIntegerModel placeOrder(@ModelAttribute SingleBigIntegerModel integerModel) {
+    public SingleBigIntegerModel placeOrder(@ModelAttribute SingleBigIntegerModel integerModel,
+                                            @ModelAttribute SingleStringModel stringModel) {
         Cart cart = cartService.findById(integerModel.id());
         Optional<User> user = userService.findById(cart.getId());
+
+        String reasonForRequest = "None Given";
+        if (stringModel.name() != null) {
+            if (!stringModel.name().equals("")) {
+                reasonForRequest = stringModel.name();
+            }
+        }
+        // create order
         OrderRequest orderRequest = orderService.createOrder(cart);
+        orderRequest.setRequestNote(reasonForRequest);
 
         for (CartItem item : cart.getCartItems()) {
                 OrderItem orderItem = new OrderItem(
@@ -139,6 +149,9 @@ public class CartAPIController {
                         item.isSpecialOrder(),
                         item.isAvailable(),
                         item.getLeadTime(),
+                        item.getDepartment(),
+                        orderRequest.getOrderStatus(),
+                        orderRequest.getSupervisor(),
                         item.getImage(),
                         orderRequest
                 );

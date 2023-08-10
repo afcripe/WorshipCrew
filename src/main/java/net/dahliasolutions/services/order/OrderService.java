@@ -50,6 +50,7 @@ public class OrderService implements OrderServiceInterface {
                 orderRequest.getId(),
                 null,
                 newNote,
+                null,
                 OrderStatus.Submitted,
                 user.get()));
 
@@ -130,6 +131,11 @@ public class OrderService implements OrderServiceInterface {
             }
         }
         return orderRequestList;
+    }
+
+    @Override
+    public List<OrderRequest> searchAllById(BigInteger searchTerm) {
+        return orderRepository.searchAllById(searchTerm);
     }
 
     @Override

@@ -104,6 +104,11 @@ public class UserService implements UserServiceInterface{
     }
 
     @Override
+    public List<User> searchAllByFullName(String searchTerm) {
+        return userRepository.searchAllByFullName(searchTerm);
+    }
+
+    @Override
     public User save(User user) {
         return userRepository.save(user);
     }

@@ -7,6 +7,7 @@ import net.dahliasolutions.data.MailerLinksRepository;
 import net.dahliasolutions.models.*;
 import net.dahliasolutions.models.mail.EmailDetails;
 import net.dahliasolutions.models.mail.MailerLinks;
+import net.dahliasolutions.models.order.OrderItem;
 import net.dahliasolutions.models.order.OrderRequest;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.services.AuthService;
@@ -158,7 +159,7 @@ public class EmailService implements EmailServiceInterface{
 
         try {
             message.setFrom(new InternetAddress(sender));
-            message.setRecipients(MimeMessage.RecipientType.TO, orderRequest.getUser().getContactEmail());
+            message.setRecipients(MimeMessage.RecipientType.TO, emailDetails.getRecipient());
             message.setSubject(emailDetails.getSubject());
             // Set the email's content to be the HTML template
             message.setContent(templateEngine.process("mailer/mailUserRequest", context), "text/html; charset=utf-8");
@@ -186,7 +187,7 @@ public class EmailService implements EmailServiceInterface{
 
         try {
             message.setFrom(new InternetAddress(sender));
-            message.setRecipients(MimeMessage.RecipientType.TO, orderRequest.getUser().getContactEmail());
+            message.setRecipients(MimeMessage.RecipientType.TO, emailDetails.getRecipient());
             message.setSubject(emailDetails.getSubject());
             // Set the email's content to be the HTML template
             message.setContent(templateEngine.process("mailer/mailSupervisorRequest", context), "text/html; charset=utf-8");
@@ -196,7 +197,42 @@ public class EmailService implements EmailServiceInterface{
             MailerLinks mLink = new MailerLinks(
                     null, id, linkString,
                     LocalDateTime.now().plusDays(5),
-                    false, "ackRequest");
+                    false, "acknowledge");
+            mailerLinksRepository.save(mLink);
+
+            return new BrowserMessage("msgSuccess", "E-mail sent.");
+        } catch (Exception e) {
+            return new BrowserMessage("msgError", e.getMessage());
+        }
+    }
+
+    @Override
+    public BrowserMessage sendSupervisorItemRequest(EmailDetails emailDetails, OrderItem orderItem, BigInteger id) {
+        String linkString = authService.randomStringGenerator(30, true, true);
+
+        // set template variables
+        Context context = new Context();
+        context.setVariable("baseURL", appServer.getBaseURL());
+        context.setVariable("requestItem", orderItem);
+        context.setVariable("emailSubject", emailDetails.getSubject());
+        context.setVariable("webLink", appServer.getBaseURL()+"/mailer/"+linkString);
+
+        // create mail message
+        MimeMessage message = javaMailSender.createMimeMessage();
+
+        try {
+            message.setFrom(new InternetAddress(sender));
+            message.setRecipients(MimeMessage.RecipientType.TO, emailDetails.getRecipient());
+            message.setSubject(emailDetails.getSubject());
+            // Set the email's content to be the HTML template
+            message.setContent(templateEngine.process("mailer/mailItemRequest", context), "text/html; charset=utf-8");
+
+            javaMailSender.send(message);
+
+            MailerLinks mLink = new MailerLinks(
+                    null, id, linkString,
+                    LocalDateTime.now().plusDays(5),
+                    false, "acknowledge");
             mailerLinksRepository.save(mLink);
 
             return new BrowserMessage("msgSuccess", "E-mail sent.");

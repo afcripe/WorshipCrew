@@ -78,33 +78,27 @@
                     </div>
                     <div class="list-group pb-3" sec:authorize="isAuthenticated()">
                         <a class="list-group-item" href="/">Home</a>
-                        <a class="list-group-item" href="/store">Store</a>
-                        <a class="list-group-item" href="/resource">Resource</a>
-                        <a class="list-group-item" href="/support">Support</a>
+                        <a class="list-group-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')
+                            or #lists.contains(userRoles,'STORE_READ') or #lists.contains(userRoles,'STORE_WRITE')}" href="/store">Store</a>
+                        <a class="list-group-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')
+                            or #lists.contains(userRoles,'RESOURCE_READ') or #lists.contains(userRoles,'RESOURCE_WRITE')}" href="/resource">Resource</a>
+                        <a class="list-group-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')
+                            or #lists.contains(userRoles,'SUPPORT_READ') or #lists.contains(userRoles,'SUPPORT_WRITE')
+                            or #lists.contains(userRoles,'SUPPORT_AGENT') or #lists.contains(userRoles,'SUPPORT_SUPERVISOR')}" href="/support">Support</a>
                     </div>
-                    <div class="list-group" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
-                                                or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
-                                                or #lists.contains(userRoles,'USER_READ') or #lists.contains(userRoles,'USER_WRITE')
-                                                or #lists.contains(userRoles,'REQUEST_READ') or #lists.contains(userRoles,'REQUEST_WRITE')
-                                                or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')}">
-                        <a class="list-group-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
-                                                or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
-                                                or #lists.contains(userRoles,'REQUEST_READ') or #lists.contains(userRoles,'REQUEST_WRITE')
-                                                or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')}"
-                           href="/order">Requests</a>
-                        <a class="list-group-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
-                                                or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
-                                                or #lists.contains(userRoles,'USER_READ') or #lists.contains(userRoles,'USER_WRITE')
-                                                or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')}"
+                    <div class="list-group" sec:authorize="isAuthenticated()">
+                        <a class="list-group-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'REQUEST_SUPERVISOR')
+                                                    or #lists.contains(userRoles,'REQUEST_READ') or #lists.contains(userRoles,'REQUEST_WRITE')}" href="/order">Requests</a>
+                        <a class="list-group-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')
+                                                    or #lists.contains(userRoles,'USER_READ') or #lists.contains(userRoles,'USER_WRITE')}"
                            href="/user">Users</a>
-                        <a class="list-group-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
-                                                or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
-                                                or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')}"
+                        <a class="list-group-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')
+                                                    or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')}"
                            href="/campus">Campus</a>
-                        <a class="list-group-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
+                        <a class="list-group-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')
                                                 or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')}"
                            href="/department">Departments</a>
-                        <a class="list-group-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
+                        <a class="list-group-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')
                                                 or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')}"
                            href="/position">Positions</a>
                     </div>
@@ -117,40 +111,38 @@
                         <a class="list-group-item p-1" href="/">
                             <i class="bi bi-house"></i>
                         </a>
-                        <a class="list-group-item p-1" href="/store">
+                        <a class="list-group-item p-1" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')
+                            or #lists.contains(userRoles,'STORE_READ') or #lists.contains(userRoles,'STORE_WRITE')}" href="/store">
                             <i class="bi bi-shop-window"></i>
                         </a>
-                        <a class="list-group-item p-1" href="/resource">
+                        <a class="list-group-item p-1" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')
+                            or #lists.contains(userRoles,'RESOURCE_READ') or #lists.contains(userRoles,'RESOURCE_WRITE')}" href="/resource">
                             <i class="bi bi-wikipedia"></i>
                         </a>
-                        <a class="list-group-item p-1" href="/support">
+                        <a class="list-group-item p-1" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')
+                            or #lists.contains(userRoles,'SUPPORT_READ') or #lists.contains(userRoles,'SUPPORT_WRITE')
+                            or #lists.contains(userRoles,'SUPPORT_AGENT') or #lists.contains(userRoles,'SUPPORT_SUPERVISOR')}" href="/support">
                             <i class="bi bi-life-preserver"></i>
                         </a>
                     </div>
                     <div class="list-group pb-3" sec:authorize="isAuthenticated()">
-                        <a class="list-group-item p-1" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
-                            or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
-                            or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')
-                            or #lists.contains(userRoles,'REQUEST_READ') or #lists.contains(userRoles,'REQUEST_WRITE')}" href="/order">
+                        <a class="list-group-item p-1" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'REQUEST_SUPERVISOR')
+                                                    or #lists.contains(userRoles,'REQUEST_READ') or #lists.contains(userRoles,'REQUEST_WRITE')}" href="/order">
                             <i class="bi bi-cart4"></i>
                         </a>
-                        <a class="list-group-item p-1" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
-                            or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
-                            or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')
+                        <a class="list-group-item p-1" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')
                             or #lists.contains(userRoles,'USER_READ') or #lists.contains(userRoles,'USER_WRITE')}" href="/user">
                             <i class="bi bi-people"></i>
                         </a>
-                        <a class="list-group-item p-1" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
-                            or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
+                        <a class="list-group-item p-1" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')
                             or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')}" href="/campus">
                             <i class="bi bi-houses"></i>
                         </a>
-                        <a class="list-group-item p-1" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
-                            or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
-                            or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')}" href="/department">
+                        <a class="list-group-item p-1" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')
+                            or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')}" href="/department">
                             <i class="bi bi-collection"></i>
                         </a>
-                        <a class="list-group-item p-1" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
+                        <a class="list-group-item p-1" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')
                             or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')}" href="/position">
                             <i class="bi bi-person-lines-fill"></i>
                         </a>
@@ -281,9 +273,11 @@
         if (profileTheme === 'dark') {
             try {
                 modHeader.classList.remove("bg-light");
-                storeCatNav.classList.remove("bg-light");
-                storeCatNav.classList.add("bg-dark");
                 modHeader.classList.add("bg-dark");
+                if (storeCatNav != null) {
+                    storeCatNav.classList.remove("bg-light");
+                    storeCatNav.classList.add("bg-dark");
+                }
             } catch (e) {
                 console.log("dark mode is not enabled")
             }
@@ -300,9 +294,11 @@
                 pageNaveExp.classList.remove("dark");
                 pageNaveCol.classList.remove("dark")
                 modHeader.classList.remove("bg-dark");
-                storeCatNav.classList.remove("bg-dark");
                 modHeader.classList.add("bg-light");
-                storeCatNav.classList.add("bg-light");
+                if (storeCatNav != null) {
+                    storeCatNav.classList.remove("bg-dark");
+                    storeCatNav.classList.add("bg-light");
+                }
             } catch (e) {
                 console.log("dark mode is not enabled")
             }

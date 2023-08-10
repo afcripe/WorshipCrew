@@ -2,6 +2,7 @@ package net.dahliasolutions.services.mail;
 
 import net.dahliasolutions.models.BrowserMessage;
 import net.dahliasolutions.models.mail.EmailDetails;
+import net.dahliasolutions.models.order.OrderItem;
 import net.dahliasolutions.models.order.OrderRequest;
 import net.dahliasolutions.models.user.User;
 
@@ -15,5 +16,6 @@ public interface EmailServiceInterface {
     BrowserMessage sendPasswordResetMail(EmailDetails emailDetails, BigInteger id);
     BrowserMessage sendUserRequest(EmailDetails emailDetails, OrderRequest orderRequest);
     BrowserMessage sendSupervisorRequest(EmailDetails emailDetails, OrderRequest orderRequest, BigInteger id);
+    BrowserMessage sendSupervisorItemRequest(EmailDetails emailDetails, OrderItem orderItem, BigInteger id);
     void sendStatement(User user);
 }
