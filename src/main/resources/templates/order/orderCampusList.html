@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<div class="container-fluid m-0 py-0 px-2" layout:fragment="content">
+
+    <div th:replace="~{order/moduleHeader :: header}">Header</div>
+
+    <div th:replace="~{order/moduleFilterDate :: filterDate}">Filter</div>
+
+    <div th:each="campus : ${campusItemList}">
+        <div class="row pt-5 py-2">
+            <div class="col">
+                <h4>
+                    <a th:href="'/order/campus/'+*{campus.campus.name}" style="text-decoration: none">
+                        <span th:text="*{campus.campus.name}" style="text-decoration: none"></span>
+                        (<span th:text="*{#lists.size(campus.requestList)}" style="text-decoration: none"></span>)
+                    </a>
+                    <i th:id="*{campus.campus.name}+'CaretRight'" class="bi bi-caret-right" th:onclick="toggleCampus([[*{campus.campus.name}]])"></i>
+                    <i th:id="*{campus.campus.name}+'CaretDown'" class="bi bi-caret-down" style="display: none" th:onclick="toggleCampus([[*{campus.campus.name}]])"></i>
+                </h4>
+            </div>
+        </div>
+        <div th:id="*{campus.campus.name}" class="row pt-2 pb-0 py-2" style="display: none">
+            <div class="col" th:each="request : ${campus.requestList}">
+              <div class="row">
+                <div th:replace="~{components/cardOrderLine :: cardFragment(${request})}">No Requests to Display</div>
+              </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script th:inline="javascript">
+        function navToRequest(id) {
+            window.location.href="/order/"+id;
+        }
+
+        function toggleCampus(campus) {
+            let divCampus = document.getElementById(campus);
+            let divCampusCaretRight = document.getElementById(campus+'CaretRight');
+            let divCampusCaretDown = document.getElementById(campus+'CaretDown');
+
+            if (divCampus.style.display === 'none') {
+                divCampus.style.display = 'block';
+                divCampusCaretRight.style.display = 'none';
+                divCampusCaretDown.style.display = 'inline-block';
+            } else {
+                divCampus.style.display = 'none';
+                divCampusCaretRight.style.display = 'inline-block';
+                divCampusCaretDown.style.display = 'none';
+            }
+        }
+    </script>
+
+</div>
+
+
+</html>

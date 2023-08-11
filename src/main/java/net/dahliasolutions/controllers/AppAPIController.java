@@ -43,6 +43,16 @@ public class AppAPIController {
         }
     }
 
+    @GetMapping("/datefilter/{name}")
+    public int setDateFilter(@PathVariable String name, HttpSession session) {
+        try {
+            session.setAttribute("dateFilter", name);
+        } catch (Exception e) {
+            System.out.println("Attributenot added.");
+        }
+        return 1;
+    }
+
     @GetMapping("/toggleSideNav/{sideNav}")
     public void toggleSideNav(@PathVariable String sideNav, HttpSession session) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

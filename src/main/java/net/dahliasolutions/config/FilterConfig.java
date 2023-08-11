@@ -37,6 +37,12 @@ public class FilterConfig extends OncePerRequestFilter {
             Cart cart = cartService.findById(user.getId());
             request.getSession().setAttribute("cartItemCount", cart.getItemCount());
         }
+        if(request.getSession().getAttribute("dateFilter") == null){
+            request.getSession().setAttribute("dateFilter", "3M");
+        }
+        if(request.getSession().getAttribute("cycle") == null){
+            request.getSession().setAttribute("cycle", "0");
+        }
 
         // Do Filtering
         filterChain.doFilter(request, response);

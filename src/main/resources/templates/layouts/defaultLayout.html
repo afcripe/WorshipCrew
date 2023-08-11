@@ -170,6 +170,9 @@
     profileTheme = /*[[${session.theme}]]*/ "default";
     profileSideNavigation = /*[[${session.sideNavigation}]]*/ "expand";
     profileStoreLayout = /*[[${session.storeLayout}]]*/ "grid";
+
+    dateStart = /*[[${startDate}]]*/ "";
+    dateEnd = /*[[${endDate}]]*/ "";
     /*]]>*/
 
     let thisPageTitle = document.getElementById("commonHeaderTitle");
@@ -286,7 +289,11 @@
             pageNaveCol.classList.add("dark");
             for (let t in tables) {
                 let tNode = tables[t];
+                try {
                     tNode.classList.add("table-dark");
+                } catch (e) {
+                    // no table
+                }
             }
         } else {
             try {
@@ -320,8 +327,10 @@
         );
     }
 
+
     updateSideNavDisplay();
     setSiteTheme();
+
 </script>
 
     </body>

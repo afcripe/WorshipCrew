@@ -565,3 +565,46 @@
     background-color: var(--dwc-wiki-focus) !important;
     color: var(--dwc-body-bg);
 }
+
+/* Filter Nav Styles */
+.filter-nav {
+    border: 1px solid var(--dwc-border-color);
+    border-radius: 5px;
+    font-size: medium;
+    display: flex;
+    vertical-align: middle;
+    padding-top: 10px;
+    position: relative;
+}
+.filter-nav-date {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding: 3px;
+    color: var(--dwc-body-color);
+    font-size: 0.75rem;
+}
+.filter-title {
+    font-weight: bold;
+    padding: 5px 0 0 5px;
+}
+.filter-nav-links {
+    display: inline-flex;
+    list-style: none;
+}
+.filter-nav-links li {
+    color: var(--dwc-body-color);
+    border-radius: 5px;
+    text-decoration: none;
+    padding: 5px;
+    cursor: pointer;
+}
+.filter-nav-links a {
+    text-decoration: none;
+}
+.filter-nav-links li:hover {
+    background-color: var(--dwc-wiki-selected);
+}
+.filter-nav-links .current {
+    border: 1px solid var(--dwc-wiki-selected);
+}

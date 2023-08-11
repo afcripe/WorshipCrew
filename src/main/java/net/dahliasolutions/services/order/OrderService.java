@@ -6,6 +6,7 @@ import net.dahliasolutions.data.OrderItemRepository;
 import net.dahliasolutions.data.OrderRepository;
 import net.dahliasolutions.data.UserRepository;
 import net.dahliasolutions.models.BrowserMessage;
+import net.dahliasolutions.models.campus.Campus;
 import net.dahliasolutions.models.mail.EmailDetails;
 import net.dahliasolutions.models.order.*;
 import net.dahliasolutions.models.store.Cart;
@@ -39,6 +40,7 @@ public class OrderService implements OrderServiceInterface {
                 LocalDateTime.now(),
                 newNote,
                 0,
+                user.get().getCampus(),
                 OrderStatus.Submitted,
                 user.get(),
                 user.get().getDirector(),
@@ -85,6 +87,16 @@ public class OrderService implements OrderServiceInterface {
             orderRequest.setItemCount(orderRequest.getItemCount());
         }
         return orderRequestList;
+    }
+
+    @Override
+    public List<OrderRequest> findAllByCampus(Campus campus) {
+        return orderRepository.findAllByCampus(campus);
+    }
+
+    @Override
+    public List<OrderRequest> findAllByCampusAndCycle(BigInteger campusId, LocalDateTime startDate, LocalDateTime endDate) {
+        return orderRepository.findAllByCampusAndCycle(campusId, startDate, endDate);
     }
 
     @Override

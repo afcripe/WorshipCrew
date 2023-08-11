@@ -1,0 +1,59 @@
+<div th:fragment="filterDate">
+
+    <div class="filter-nav d-flex d-md-none">
+        <span class="filter-title d-flex d-sm-none">::</span>
+        <span class="filter-title d-none d-sm-flex">Date Filter:</span>
+        <ul class="filter-nav-links">
+            <li th:classappend="${session.dateFilter} == '1M' ? 'current' : ''" th:onclick="updateDateFilter('1M')">1 M</li>
+            <li th:classappend="${session.dateFilter} == '3M' ? 'current' : ''" th:onclick="updateDateFilter('3M')">3 M</li>
+            <li th:classappend="${session.dateFilter} == '6M' ? 'current' : ''" th:onclick="updateDateFilter('6M')">6 M</li>
+            <li th:classappend="${session.dateFilter} == '1Y' ? 'current' : ''" th:onclick="updateDateFilter('1Y')">1 Y</li>
+            <li th:classappend="${session.dateFilter} == '2Y' ? 'current' : ''" th:onclick="updateDateFilter('2Y')">2 Y</li>
+            <li th:classappend="${session.dateFilter} == '5Y' ? 'current' : ''" th:onclick="updateDateFilter('5Y')">5 Y</li>
+        </ul>
+        <div style="display: flex; flex-grow: 1;"></div>
+        <ul class="filter-nav-links">
+            <li th:onclick="updateCycle('left')"><i class="bi bi-caret-left-fill"></i></li>
+            <li th:onclick="updateCycle('now')" th:text="${session.cycle}">Current</li>
+            <li th:onclick="updateCycle('right')"><i class="bi bi-caret-right-fill"></i></li>
+        </ul>
+    </div>
+
+    <div class="filter-nav d-none d-md-flex">
+        <span class="filter-title">Date Filter:</span>
+        <ul class="filter-nav-links">
+            <li th:classappend="${session.dateFilter} == '1M' ? 'current' : ''" th:onclick="updateDateFilter('1M')">1 Month</li>
+            <li th:classappend="${session.dateFilter} == '3M' ? 'current' : ''" th:onclick="updateDateFilter('3M')">3 Months</li>
+            <li th:classappend="${session.dateFilter} == '6M' ? 'current' : ''" th:onclick="updateDateFilter('6M')">6 Months</li>
+            <li th:classappend="${session.dateFilter} == '1Y' ? 'current' : ''" th:onclick="updateDateFilter('1Y')">1 Year</li>
+            <li th:classappend="${session.dateFilter} == '2Y' ? 'current' : ''" th:onclick="updateDateFilter('2Y')">2 Years</li>
+            <li th:classappend="${session.dateFilter} == '5Y' ? 'current' : ''" th:onclick="updateDateFilter('5Y')">5 Years</li>
+        </ul>
+        <div style="display: flex; flex-grow: 1;"></div>
+        <ul class="filter-nav-links">
+            <li th:onclick="updateCycle('left')"><i class="bi bi-caret-left-fill"></i></li>
+            <li th:onclick="updateCycle('now')" th:text="${session.cycle}">Current</li>
+            <li th:onclick="updateCycle('right')"><i class="bi bi-caret-right-fill"></i></li>
+        </ul>
+
+        <div id="cycleDates" class="filter-nav-date" th:if="${startDate != null}">
+            <span id="cycleStartDate" th:text="${#temporals.format(startDate,'MM-dd-yyyy')}"></span> -
+            <span id="cycleEndDate" th:text="${#temporals.format(endDate,'MM-dd-yyyy')}"></span>
+        </div>
+    </div>
+
+
+    <script>
+        async function updateDateFilter(str) {
+            const response = await fetch('/api/v1/app/datefilter/'+str, {
+                method: 'GET'
+            }).then(response => {
+                window.location.href=window.location.pathname;
+            });
+        }
+        async function updateCycle(str) {
+            window.location.href=window.location.pathname+'?cycle='+str;
+        }
+    </script>
+
+</div>

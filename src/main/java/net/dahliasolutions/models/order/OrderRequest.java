@@ -3,6 +3,8 @@ package net.dahliasolutions.models.order;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
+import net.dahliasolutions.models.campus.Campus;
+import net.dahliasolutions.models.department.DepartmentRegional;
 import net.dahliasolutions.models.user.User;
 
 import java.math.BigInteger;
@@ -23,6 +25,9 @@ public class OrderRequest {
     private LocalDateTime requestDate;
     private String requestNote;
     transient int itemCount;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Campus campus;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;

@@ -1,15 +1,23 @@
 package net.dahliasolutions.data;
 
 import jakarta.persistence.Tuple;
+import net.dahliasolutions.models.campus.Campus;
 import net.dahliasolutions.models.order.OrderRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface OrderRepository extends JpaRepository<OrderRequest, BigInteger> {
+
+    List<OrderRequest> findAllByCampus(Campus campus);
+    List<OrderRequest> findAllByCampusOrderByRequestDateDesc(Campus campus);
+
+    @Query(value = "SELECT * FROM ORDER_REQUEST WHERE CAMPUS_ID = :campusId AND REQUEST_DATE BETWEEN :start AND :end ORDER BY REQUEST_DATE DESC", nativeQuery = true)
+    List<OrderRequest> findAllByCampusAndCycle(@Param("campusId") BigInteger campusId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
     @Query(value = "SELECT * FROM ORDER_REQUEST WHERE USER_ID = :userId ORDER BY REQUEST_DATE DESC", nativeQuery = true)
     List<OrderRequest> findAllByUser(@Param("userId") BigInteger userId);

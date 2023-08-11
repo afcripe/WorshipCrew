@@ -130,3 +130,12 @@
 .dark .autocomplete-items div:hover {
     background-color: var(--dwc-body-bg-dark);
 }
+
+.dark .filter-nav-links li {
+    color: var(--dwc-body-color-dark);
+    border-radius: 5px;
+    text-decoration: none;
+}
+.dark .filter-nav-date {
+    color: var(--dwc-body-color-dark);
+}

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<div class="container-fluid m-0 py-0 px-2" layout:fragment="content">
+
+    <div th:replace="~{order/moduleHeader :: header}">Header</div>
+
+    <div th:replace="~{order/moduleFilterDate :: filterDate}">Filter</div>
+
+
+    <div th:each="department : ${departmentItemList}">
+        <div class="row pt-5 py-2">
+            <div class="col">
+                <h4>
+                    <a th:href="'/order/department/'+*{department.department.name}" style="text-decoration: none">
+                        <span th:text="*{department.department.name}" style="text-decoration: none"></span>
+                        (<span th:text="*{#lists.size(department.orderItemList)}" style="text-decoration: none"></span>)
+                    </a>
+                    <i th:id="*{department.department.name}+'CaretRight'" class="bi bi-caret-right" th:onclick="toggleDepartment([[*{department.department.name}]])"></i>
+                    <i th:id="*{department.department.name}+'CaretDown'" class="bi bi-caret-down" style="display: none" th:onclick="toggleDepartment([[*{department.department.name}]])"></i>
+                </h4>
+            </div>
+        </div>
+        <div th:id="*{department.department.name}" class="row pt-2 pb-0 py-2" style="display: none">
+            <div class="col" th:each="orderItem : *{department.orderItemList}">
+                <div class="row">
+                    <div th:replace="~{components/cardOrderItemLineSummary :: cardFragment(${orderItem})}">No Items</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script th:inline="javascript">
+        function navToRequest(id) {
+            window.location.href="/order/"+id;
+        }
+        function toggleDepartment(department) {
+            let divDepartment = document.getElementById(department);
+            let divDepartmentCaretRight = document.getElementById(department + 'CaretRight');
+            let divDepartmentCaretDown = document.getElementById(department + 'CaretDown');
+
+            if (divDepartment.style.display === 'none') {
+                divDepartment.style.display = 'block';
+                divDepartmentCaretRight.style.display = 'none';
+                divDepartmentCaretDown.style.display = 'inline-block';
+            } else {
+                divDepartment.style.display = 'none';
+                divDepartmentCaretRight.style.display = 'inline-block';
+                divDepartmentCaretDown.style.display = 'none';
+            }
+        }
+    </script>
+
+</div>
+
+
+</html>

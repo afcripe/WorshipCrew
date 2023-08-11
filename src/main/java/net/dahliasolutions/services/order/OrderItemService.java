@@ -2,6 +2,7 @@ package net.dahliasolutions.services.order;
 
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.data.OrderItemRepository;
+import net.dahliasolutions.models.department.DepartmentRegional;
 import net.dahliasolutions.models.order.OrderItem;
 import net.dahliasolutions.models.order.OrderRequest;
 import net.dahliasolutions.models.order.OrderStatus;
@@ -38,6 +39,11 @@ public class OrderItemService implements OrderItemServiceInterface {
     @Override
     public List<OrderItem> findAllBySupervisor(User user) {
         return orderItemRepository.findAllBySupervisor(user);
+    }
+
+    @Override
+    public List<OrderItem> findAllByDepartment(DepartmentRegional department) {
+        return orderItemRepository.findAllByDepartment(department);
     }
 
     @Override
