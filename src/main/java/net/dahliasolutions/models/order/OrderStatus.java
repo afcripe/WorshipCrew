@@ -9,5 +9,5 @@ public enum OrderStatus {
     Denied,
     Cancelled,
     Backorder,
-    Complete;
+    Complete
 }

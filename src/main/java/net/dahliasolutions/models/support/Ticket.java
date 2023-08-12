@@ -23,7 +23,15 @@ public class Ticket {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private BigInteger id;
     private LocalDateTime ticketDate;
+    private LocalDateTime ticketDue;
     private String ticketDetail;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    private TicketPriority priority;
+
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    private SLA sla;
 
     @Enumerated(EnumType.STRING)
     private TicketStatus ticketStatus;
@@ -47,9 +55,6 @@ public class Ticket {
     @JsonBackReference
     @OneToMany(fetch = FetchType.EAGER)
     private List<User> agentList;
-
-    @OneToMany(fetch = FetchType.LAZY)
-    private List<TicketImage> images;
 
     @Override
     public String toString() {

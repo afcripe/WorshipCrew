@@ -35,9 +35,12 @@
 
                 <div class="col-12 my-2">
                     <div style="float: right">
-                        <input th:id="*{id}+'-counter'" type="number" value="1" style="width: 55px">
-                        <button type="button" class="btn btn-sm btn-outline-store"
+                        <input th:id="*{id}+'-counter'" type="number" value="1" th:if="*{available}" style="width: 55px">
+                        <input th:id="*{id}+'-counter'" type="number" value="1" th:unless="*{available}" disabled style="width: 55px">
+                        <button type="button" class="btn btn-sm btn-outline-store" th:if="*{available}"
                                 th:onclick="addToCart([[*{id}]], [[${userId}]])"><i class="bi bi-cart-plus"></i></button>
+                        <button type="button" class="btn btn-sm btn-outline-store" th:unless="*{available}"
+                                th:onclick="addToCart([[*{id}]], [[${userId}]])" disabled><i class="bi bi-cart-plus"></i></button>
                     </div>
                 </div>
             </div>
@@ -46,8 +49,11 @@
                     Lead Time: <span th:text="*{leadTime}"></span> Days
                 </div>
                 <div class="col-6 text-right">
-                    <div th:if="*{specialOrder}" style="float: right">
-                        Special Order Item
+                    <div th:if="*{available}" style="float: right">
+                        <span th:if="*{specialOrder}">Special Order Item</span>
+                    </div>
+                    <div th:unless="*{available}" style="float: right">
+                        <span>Unavailable</span>
                     </div>
                 </div>
             </div>

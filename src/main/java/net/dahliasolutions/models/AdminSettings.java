@@ -2,13 +2,12 @@ package net.dahliasolutions.models;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigInteger;
 
-@Data
+@Getter
+@Setter
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,4 +20,6 @@ public class AdminSettings {
     private String wikiHome;
     private String portalHome;
     private String storeHome;
+    private boolean restrictStorePosition;
+    private boolean restrictStoreDepartment;
 }

@@ -6,6 +6,7 @@ import net.dahliasolutions.models.user.User;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -19,13 +20,23 @@ public class TicketNote {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private BigInteger id;
     private LocalDateTime noteDate;
+    private boolean notePublic;
+
+    @Enumerated(EnumType.STRING)
+    private TicketStatus ticketStatus;
 
     @Lob
     @Column(name = "detail", columnDefinition="BLOB")
     private String detail;
 
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<TicketImage> images;
+
     @ManyToOne(fetch = FetchType.EAGER)
     private User user;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    private User agent;
 
     @ManyToOne
     @JoinColumn(name = "ticketId")

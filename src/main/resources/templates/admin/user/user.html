@@ -95,11 +95,6 @@
     document.getElementById("inputAuthSupportWrite").checked = jsAuthSupportWrite;
 
     async function updateAuth(auth) {
-      debugger
-      let chkINPUT = document.getElementById("inputAuthResourceRead");
-      let chk = document.getElementById("inputAuthResourceRead").isChecked;
-      let chk2INPUT = document.getElementById("inputAuthResourceWrite");
-      let chk2 = document.getElementById("inputAuthResourceWrite").isChecked;
       let userId = document.getElementById("inputUserId");
       let formData = new FormData();
           formData.set("name", auth)

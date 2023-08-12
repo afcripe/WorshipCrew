@@ -2,11 +2,16 @@ package net.dahliasolutions.controllers.store;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import net.dahliasolutions.models.AdminSettings;
 import net.dahliasolutions.models.SingleBigIntegerModel;
 import net.dahliasolutions.models.SingleStringModel;
+import net.dahliasolutions.models.order.OrderItem;
+import net.dahliasolutions.models.order.OrderRequest;
 import net.dahliasolutions.models.store.*;
 import net.dahliasolutions.models.user.Profile;
 import net.dahliasolutions.models.user.User;
+import net.dahliasolutions.models.user.UserRoles;
+import net.dahliasolutions.services.AdminSettingsService;
 import net.dahliasolutions.services.store.StoreCategoryService;
 import net.dahliasolutions.services.store.StoreItemOptionService;
 import net.dahliasolutions.services.store.StoreItemService;
@@ -18,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,6 +37,7 @@ public class StoreAPIController {
     private final StoreCategoryService categoryService;
     private final StoreSubCategoryService subCategoryService;
     private final StoreItemOptionService optionService;
+    private final AdminSettingsService adminSettingsService;
 
     @GetMapping("")
     public List<StoreItem> goStoreHome() {
@@ -57,6 +64,26 @@ public class StoreAPIController {
         } else {
             session.setAttribute("storeLayout", "list");
         }
+    }
+
+    @PostMapping("/setrestriction")
+    public String setUserRole(@ModelAttribute SingleStringModel restriction) {
+        // check permissions
+        if (allowByAdmin()) {
+            AdminSettings adminSettings = adminSettingsService.getAdminSettings();
+            switch (restriction.name()) {
+                case "restrictStorePosition":
+                    adminSettingsService.setRestrictStorePosition(!adminSettings.isRestrictStorePosition());
+                    break;
+                case "restrictStoreDepartment":
+                    adminSettingsService.setRestrictStoreDepartment(!adminSettings.isRestrictStoreDepartment());
+                    break;
+            }
+            return "true";
+        }
+
+
+        return "false";
     }
 
     @PostMapping("/category/new")
@@ -193,4 +220,17 @@ public class StoreAPIController {
         return item;
     }
 
+    /*  Determine Edit Permissions */
+    private boolean allowByAdmin(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) auth.getPrincipal();
+        Collection<UserRoles> roles = user.getUserRoles();
+
+        for (UserRoles role : roles){
+            if (role.getName().equals("ADMIN_WRITE")) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

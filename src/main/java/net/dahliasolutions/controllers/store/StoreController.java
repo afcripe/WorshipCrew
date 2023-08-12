@@ -8,6 +8,7 @@ import net.dahliasolutions.models.position.Position;
 import net.dahliasolutions.models.position.PositionSelectedModel;
 import net.dahliasolutions.models.store.*;
 import net.dahliasolutions.models.user.User;
+import net.dahliasolutions.models.user.UserRoles;
 import net.dahliasolutions.models.wiki.WikiPost;
 import net.dahliasolutions.models.wiki.WikiTag;
 import net.dahliasolutions.models.wiki.WikiTagReference;
@@ -29,10 +30,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigInteger;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 @RequestMapping("/store")
@@ -69,8 +67,24 @@ public class StoreController {
             model.addAttribute("wikiPost", getStoreHomeFromPath(adminSettings.getStoreHome()));
             return "store/storeHome";
         }
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) auth.getPrincipal();
+        DepartmentRegional department = departmentService.findByName(user.getDepartment().getName()).get();
 
-        List<StoreItem> itemList = storeItemService.findAll();
+        List<StoreItem> itemList;
+        if (allowByAdmin()) {
+            itemList = storeItemService.findAll();
+        } else {
+            if (adminSettings.isRestrictStorePosition() && adminSettings.isRestrictStoreDepartment()) {
+                itemList = storeItemService.findAllByAvailableAndPositionListContainsAndDepartment(user.getPosition(), department.getId());
+            } else if (adminSettings.isRestrictStorePosition()) {
+                itemList = storeItemService.findAllByAvailableAndPositionListContains(user.getPosition());
+            } else if (adminSettings.isRestrictStoreDepartment()) {
+                itemList = storeItemService.findAllByAvailableAndDepartment(department.getId());
+            } else {
+                itemList = storeItemService.findAllByAvailable();
+            }
+        }
 
         model.addAttribute("storeItems", itemList);
         return "store/index";
@@ -297,6 +311,8 @@ public class StoreController {
         List<StoreCategory> categoryList = categoryService.findAll();
         model.addAttribute("categoryList", categoryList);
         model.addAttribute("storeHome", adminSettingsService.getAdminSettings().getStoreHome());
+        model.addAttribute("restrictPosition", adminSettingsService.getAdminSettings().isRestrictStorePosition());
+        model.addAttribute("restrictDepartment", adminSettingsService.getAdminSettings().isRestrictStoreDepartment());
         return "store/settings";
     }
 
@@ -356,6 +372,20 @@ public class StoreController {
         }
 
         return wikiList.get(0);
+    }
+
+    /*  Determine Edit Permissions */
+    private boolean allowByAdmin(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) auth.getPrincipal();
+        Collection<UserRoles> roles = user.getUserRoles();
+
+        for (UserRoles role : roles){
+            if (role.getName().equals("ADMIN_WRITE")) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

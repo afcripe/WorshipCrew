@@ -1,8 +1,13 @@
 package net.dahliasolutions.services.store;
 
+import jakarta.persistence.Tuple;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.data.StoreItemOptionRepository;
 import net.dahliasolutions.data.StoreItemRepository;
+import net.dahliasolutions.models.department.DepartmentRegional;
+import net.dahliasolutions.models.order.OrderRequest;
+import net.dahliasolutions.models.order.OrderStatus;
+import net.dahliasolutions.models.position.Position;
 import net.dahliasolutions.models.store.StoreItem;
 import net.dahliasolutions.models.store.StoreItemOption;
 import net.dahliasolutions.models.store.StoreSubCategory;
@@ -68,6 +73,48 @@ public class StoreItemService implements StoreItemServiceInterface {
 //            }
 //        }
         return storeItems;
+    }
+
+    @Override
+    public List<StoreItem> findAllByAvailable() {
+        return storeItemRepository.findAllByAvailable();
+    }
+
+    @Override
+    public List<StoreItem> findAllByAvailableAndPositionListContains(Position position) {
+        // get list of item IDs with position
+        List<Tuple> positionList = storeItemRepository.findAllByPosition(position.getId());
+
+        List<StoreItem> storePositionList = new ArrayList<>();
+        for (Tuple tuple : positionList) {
+            BigInteger itemId = new BigInteger(tuple.get(1).toString());
+            Optional<StoreItem> item = storeItemRepository.findAllByIdAndAvailable(itemId);
+            if (item.isPresent()) {
+                storePositionList.add(item.get());
+            }
+        }
+        return storePositionList;
+    }
+
+    @Override
+    public List<StoreItem> findAllByAvailableAndDepartment(BigInteger departmentId) {
+        return storeItemRepository.findAllByAvailableAndDepartment(departmentId);
+    }
+
+    @Override
+    public List<StoreItem> findAllByAvailableAndPositionListContainsAndDepartment(Position position, BigInteger departmentId) {
+        // get list of item IDs with position
+        List<Tuple> positionList = storeItemRepository.findAllByPosition(position.getId());
+
+        List<StoreItem> storePositionList = new ArrayList<>();
+        for (Tuple tuple : positionList) {
+            BigInteger itemId = new BigInteger(tuple.get(1).toString());
+            Optional<StoreItem> item = storeItemRepository.findAllByIdAndDepartmentAndAvailable(itemId, departmentId);
+            if (item.isPresent()) {
+                storePositionList.add(item.get());
+            }
+        }
+        return storePositionList;
     }
 
     @Override

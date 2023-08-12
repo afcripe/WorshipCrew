@@ -1,5 +1,7 @@
 package net.dahliasolutions.services.store;
 
+import net.dahliasolutions.models.department.DepartmentRegional;
+import net.dahliasolutions.models.position.Position;
 import net.dahliasolutions.models.store.StoreItem;
 import net.dahliasolutions.models.store.StoreSubCategory;
 
@@ -14,6 +16,10 @@ public interface StoreItemServiceInterface {
     Optional<StoreItem> findByName(String name);
     List<StoreItem> searchAll(String searchTerm);
     List<StoreItem> findAll();
+    List<StoreItem> findAllByAvailable();
+    List<StoreItem> findAllByAvailableAndPositionListContains(Position position);
+    List<StoreItem> findAllByAvailableAndDepartment(BigInteger departmentId);
+    List<StoreItem> findAllByAvailableAndPositionListContainsAndDepartment(Position position, BigInteger departmentId);
     List<StoreItem> findBySubCategory(StoreSubCategory subCategory);
     void save(StoreItem storeItem);
     void deleteById(BigInteger id);

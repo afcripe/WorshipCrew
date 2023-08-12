@@ -9,4 +9,7 @@ public interface AdminSettingsServiceInterface {
     void setWikiHome(String name);
     void setPortalHome(String name);
     void setStoreHome(String name);
+    void setRestrictStorePosition(boolean bool);
+    void setRestrictStoreDepartment(boolean bool);
+
 }

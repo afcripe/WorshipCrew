@@ -35,6 +35,14 @@
                 onclick="window.location.href='/store/imageManager'">
               Manage Uploaded Images
             </li>
+            <li class="list-group-item selectableItem">
+              <label class="form-check-label">Restrict Items by Position</label>
+              <input id="inputRestrictPosition" type="checkbox" onchange="updateRestrictions('restrictStorePosition')">
+            </li>
+            <li class="list-group-item selectableItem">
+              <label class="form-check-label">Restrict Items by Department</label>
+              <input id="inputRestrictDepartment" type="checkbox" onchange="updateRestrictions('restrictStoreDepartment')">
+            </li>
           </ul>
 
           <div class="pt-4">
@@ -181,7 +189,12 @@
     </form>
   </dialog>
 
-  <script>
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    let jsIsRestrictPosition = /*[[${restrictPosition}]]*/ false;
+    let jsIsRestrictDepartment = /*[[${restrictDepartment}]]*/ false;
+    /*]]>*/
+
     const categorySelect = document.getElementById("categoryList");
     const template = document.getElementById("tmpSubCat");
     const subCategoryDisplay = document.getElementById("subCategories");
@@ -190,6 +203,26 @@
     const editSubNameDisplay = document.getElementById("editSubName");
     const deleteCatDisplay = document.getElementById("deleteCategory")
     const editCatDisplay = document.getElementById("editCategory")
+
+    const restrictPosition = document.getElementById("inputRestrictPosition");
+    const restrictDepartment = document.getElementById("inputRestrictDepartment");
+
+    restrictPosition.checked = jsIsRestrictPosition;
+    restrictDepartment.checked = jsIsRestrictDepartment;
+
+    async function updateRestrictions(auth) {
+      let formData = new FormData();
+        formData.set("name", auth)
+      debugger
+      const response = await fetch('/api/v1/store/setrestriction', {
+        method: 'POST',
+        body: formData
+      }).then(response => {
+        return response.json();
+      }).then(data => {
+        console.log(data);
+      });
+    }
 
     function newCategory() {
       document.getElementById("newCategoryDialog").showModal();

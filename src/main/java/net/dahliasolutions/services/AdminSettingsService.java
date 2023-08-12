@@ -24,7 +24,9 @@ public class AdminSettingsService implements AdminSettingsServiceInterface{
                             false,
                             "",
                             "",
-                            "")
+                            "",
+                            false,
+                            false)
             );
         }
         return adminSettings;
@@ -62,6 +64,20 @@ public class AdminSettingsService implements AdminSettingsServiceInterface{
     public void setStoreHome(String name) {
         AdminSettings adminSettings = getAdminSettings();
         adminSettings.setStoreHome(name);
+        adminSettingsRepository.save(adminSettings);
+    }
+
+    @Override
+    public void setRestrictStorePosition(boolean bool) {
+        AdminSettings adminSettings = getAdminSettings();
+        adminSettings.setRestrictStorePosition(bool);
+        adminSettingsRepository.save(adminSettings);
+    }
+
+    @Override
+    public void setRestrictStoreDepartment(boolean bool) {
+        AdminSettings adminSettings = getAdminSettings();
+        adminSettings.setRestrictStoreDepartment(bool);
         adminSettingsRepository.save(adminSettings);
     }
 
