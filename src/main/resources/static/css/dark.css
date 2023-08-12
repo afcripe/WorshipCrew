@@ -100,6 +100,10 @@
     color: #fff;
 }
 
+.dark .generic-icon {
+    color: var(--dwc-body-color-dark);
+}
+
 .dark .card {
     background: transparent;
     border-color: var(--dwc-border-color-dark);
@@ -129,6 +133,10 @@
 /*when hovering an item:*/
 .dark .autocomplete-items div:hover {
     background-color: var(--dwc-body-bg-dark);
+}
+
+.dark .filter-nav {
+    background-color: var(--dwc-side-nav-bg-dark);
 }
 
 .dark .filter-nav-links li {

@@ -8,7 +8,18 @@
     <div th:replace="~{order/moduleHeader :: header}">Header</div>
 
 
-    <div class="row pt-5 py-2">
+    <div class="row p-2">
+        <div class="col">
+            <div class="h3" style="float: left">
+                Open Requests Only
+            </div>
+            <div class="h3" style="float: right">
+                <a th:href="'/order/user/'+${user.id}" style="text-decoration: none">All Requests</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row pt-3 py-2">
         <div class="col">
             <h4>Items to Fulfill</h4>
         </div>

@@ -10,15 +10,22 @@ import org.springframework.data.repository.query.Param;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<OrderRequest, BigInteger> {
 
     List<OrderRequest> findAllByCampus(Campus campus);
     List<OrderRequest> findAllByCampusOrderByRequestDateDesc(Campus campus);
-
+    @Query(value = "SELECT * FROM ORDER_REQUEST WHERE ID = :id AND REQUEST_DATE BETWEEN :start AND :end ORDER BY REQUEST_DATE DESC", nativeQuery = true)
+    Optional<OrderRequest> findAllByIdAndCycle(@Param("id") BigInteger id, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+    @Query(value = "SELECT * FROM ORDER_REQUEST WHERE USER_ID = :userId AND REQUEST_DATE BETWEEN :start AND :end ORDER BY REQUEST_DATE DESC", nativeQuery = true)
+    List<OrderRequest> findAllByUserAndCycle(@Param("userId") BigInteger userId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
     @Query(value = "SELECT * FROM ORDER_REQUEST WHERE CAMPUS_ID = :campusId AND REQUEST_DATE BETWEEN :start AND :end ORDER BY REQUEST_DATE DESC", nativeQuery = true)
     List<OrderRequest> findAllByCampusAndCycle(@Param("campusId") BigInteger campusId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
-
+    @Query(value = "SELECT * FROM ORDER_REQUEST WHERE SUPERVISOR_ID = :supervisorId AND REQUEST_DATE BETWEEN :start AND :end ORDER BY REQUEST_DATE DESC", nativeQuery = true)
+    List<OrderRequest> findAllBySupervisorAndCycle(@Param("supervisorId") BigInteger supervisorId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+    @Query(value = "SELECT * FROM ORDER_REQUEST WHERE REQUEST_DATE BETWEEN :start AND :end ORDER BY REQUEST_DATE DESC", nativeQuery = true)
+    List<OrderRequest> findAllOrderByCycle(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
     @Query(value = "SELECT * FROM ORDER_REQUEST WHERE USER_ID = :userId ORDER BY REQUEST_DATE DESC", nativeQuery = true)
     List<OrderRequest> findAllByUser(@Param("userId") BigInteger userId);
     @Query(value = "SELECT * FROM ORDER_REQUEST WHERE USER_ID = :userId ORDER BY REQUEST_DATE DESC LIMIT 5", nativeQuery = true)

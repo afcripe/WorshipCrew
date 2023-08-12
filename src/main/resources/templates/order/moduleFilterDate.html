@@ -17,6 +17,11 @@
             <li th:onclick="updateCycle('now')" th:text="${session.cycle}">Current</li>
             <li th:onclick="updateCycle('right')"><i class="bi bi-caret-right-fill"></i></li>
         </ul>
+
+        <div id="cycleDates" class="filter-nav-date" th:if="${startDate != null}">
+            <span id="cycleStartDate" th:text="${#temporals.format(startDate,'MM-dd-yyyy')}"></span> -
+            <span id="cycleEndDate" th:text="${#temporals.format(endDate,'MM-dd-yyyy')}"></span>
+        </div>
     </div>
 
     <div class="filter-nav d-none d-md-flex">

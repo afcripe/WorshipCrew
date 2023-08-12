@@ -62,6 +62,7 @@ public class OrderController {
         List<OrderRequest> orderMentionList = orderService.findAllByMentionOpenOnly(user);
 
         model.addAttribute("editable", false);
+        model.addAttribute("user", user);
         model.addAttribute("openItemList", openItemList);
         model.addAttribute("openOrderList", openOrderList);
         model.addAttribute("orderMentionList", orderMentionList);
@@ -70,7 +71,29 @@ public class OrderController {
     }
 
     @GetMapping("/user/{id}")
-    public String getUserOrders(@PathVariable BigInteger id, Model model, HttpSession session) {
+    public String getUserOrders(@RequestParam Optional<String> cycle, @PathVariable BigInteger id, Model model, HttpSession session) {
+        Integer currentCycle = Integer.parseInt(session.getAttribute("cycle").toString());
+        if (cycle.isPresent()) {
+            switch (cycle.get()) {
+                case "left":
+                    currentCycle--;
+                    session.setAttribute("cycle", currentCycle);
+                    break;
+                case "right":
+                    if (currentCycle < 0) {
+                        currentCycle++;
+                        session.setAttribute("cycle", currentCycle);
+                        break;
+                    }
+                default:
+                    currentCycle=0;
+                    session.setAttribute("cycle", 0);
+            }
+        }
+
+        LocalDateTime startDate = getStartDate(session.getAttribute("dateFilter").toString(), currentCycle);
+        LocalDateTime endDate = getEndDate(session.getAttribute("dateFilter").toString(), currentCycle);
+
         Optional<User> user = userService.findById(id);
 
         if (user.isEmpty()) {
@@ -78,17 +101,21 @@ public class OrderController {
             return redirectService.pathName(session, "/order");
         }
 
-        List<OrderRequest> orderList = orderService.findAllByUser(user.get());
-        List<OrderItem> openItemList = orderItemService.findAllBySupervisorOpenOnly(user.get());
-        List<OrderRequest> openOrderList = orderService.findAllBySupervisorOpenOnly(user.get());
-        List<OrderRequest> orderMentionList = orderService.findAllByMentionOpenOnly(user.get());
+        List<OrderRequest> orderList = orderService.findAllByUserAndCycle(user.get().getId(), startDate, endDate);
+        List<OrderItem> itemList = orderItemService.findAllBySupervisorAndCycle(user.get().getId(), startDate, endDate);
+        List<OrderRequest> supervisorOrderList = orderService.findAllBySupervisorAndCycle(user.get().getId(), startDate, endDate);
+        List<OrderRequest> orderMentionList = orderService.findAllByMentionOpenAndCycle(user.get().getId(), startDate, endDate);
 
         model.addAttribute("editable", false);
         model.addAttribute("searchedUser", user.get().getFirstName()+" "+user.get().getLastName());
         model.addAttribute("orderList", orderList);
-        model.addAttribute("openItemList", openItemList);
-        model.addAttribute("openOrderList", openOrderList);
+        model.addAttribute("itemList", itemList);
+        model.addAttribute("supervisorOrderList", supervisorOrderList);
         model.addAttribute("orderMentionList", orderMentionList);
+
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+
         redirectService.setHistory(session, "/order/user/"+id);
         return "order/orderUser";
     }
@@ -103,26 +130,36 @@ public class OrderController {
                     session.setAttribute("cycle", currentCycle);
                     break;
                 case "right":
-                    currentCycle++;
-                    session.setAttribute("cycle", currentCycle);
-                    break;
+                    if (currentCycle < 0) {
+                        currentCycle++;
+                        session.setAttribute("cycle", currentCycle);
+                        break;
+                    }
                 default:
+                    currentCycle=0;
                     session.setAttribute("cycle", 0);
             }
         }
+
+        LocalDateTime startDate = getStartDate(session.getAttribute("dateFilter").toString(), currentCycle);
+        LocalDateTime endDate = getEndDate(session.getAttribute("dateFilter").toString(), currentCycle);
 
         List<DepartmentRegional> departmentList = departmentService.findAll();
 
         List<OrderItemDepartment> departmentItemList = new ArrayList<>();
         for (DepartmentRegional department : departmentList) {
             OrderItemDepartment departmentItem = new OrderItemDepartment(department, new ArrayList<>());
-            departmentItem.setOrderItemList(orderItemService.findAllByDepartment(department));
+            departmentItem.setOrderItemList(orderItemService.findAllByDepartmentAndCycle(department.getId(), startDate, endDate));
             departmentItemList.add(departmentItem);
         }
 
 
         model.addAttribute("editable", false);
         model.addAttribute("departmentItemList", departmentItemList);
+
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+
         redirectService.setHistory(session, "/order/department");
         return "order/orderDepartmentList";
     }
@@ -318,6 +355,9 @@ public class OrderController {
             case "M":
                 returnDate = returnDate.minusMonths(cycleAdjustment);
                 break;
+            case "W":
+                returnDate = returnDate.minusWeeks(cycleAdjustment);
+                break;
         }
         return returnDate;
     }
@@ -349,6 +389,9 @@ public class OrderController {
                 break;
             case "M":
                 returnDate = returnDate.minusMonths(cycleAdjustment);
+                break;
+            case "W":
+                returnDate = returnDate.minusWeeks(cycleAdjustment);
                 break;
         }
         return returnDate;

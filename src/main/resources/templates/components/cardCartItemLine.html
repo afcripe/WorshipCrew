@@ -6,7 +6,7 @@
 
     <div class="row p-2" >
       <div class="col-4" style="vertical-align: center; cursor: pointer;" th:onclick="navToItem([[*{productId}]])">
-        <img th:src="@{*{image.fileLocation}}" class="store_line_image mr-2 align-content-center" style="float: left">
+        <img th:if="*{image != null}" th:src="@{*{image.fileLocation}}" class="store_line_image mr-2 align-content-center" style="float: left">
         <h6 th:text="*{productName}" class=" align-content-center"></h6>
       </div>
       <div class="col-4" style="vertical-align: center; cursor: pointer;" th:onclick="navToItem([[*{productId}]])">

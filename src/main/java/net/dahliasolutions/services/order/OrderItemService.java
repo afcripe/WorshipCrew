@@ -10,6 +10,7 @@ import net.dahliasolutions.models.user.User;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -44,6 +45,16 @@ public class OrderItemService implements OrderItemServiceInterface {
     @Override
     public List<OrderItem> findAllByDepartment(DepartmentRegional department) {
         return orderItemRepository.findAllByDepartment(department);
+    }
+
+    @Override
+    public List<OrderItem> findAllByDepartmentAndCycle(BigInteger departmentId, LocalDateTime startDate, LocalDateTime endDate) {
+        return orderItemRepository.findAllByDepartmentAndCycle(departmentId, startDate, endDate);
+    }
+
+    @Override
+    public List<OrderItem> findAllBySupervisorAndCycle(BigInteger userId, LocalDateTime startDate, LocalDateTime endDate) {
+        return orderItemRepository.findAllBySupervisorAndCycle(userId, startDate, endDate);
     }
 
     @Override

@@ -70,6 +70,11 @@ public class OrderService implements OrderServiceInterface {
     }
 
     @Override
+    public Optional<OrderRequest> findAllByIdAndCycle(BigInteger id, LocalDateTime startDate, LocalDateTime endDate) {
+        return orderRepository.findAllByIdAndCycle(id, startDate, endDate);
+    }
+
+    @Override
     public List<OrderRequest> findAll() {
         List<OrderRequest> orderRequestList = orderRepository.findAll();
         for (OrderRequest orderRequest : orderRequestList) {
@@ -97,6 +102,16 @@ public class OrderService implements OrderServiceInterface {
     @Override
     public List<OrderRequest> findAllByCampusAndCycle(BigInteger campusId, LocalDateTime startDate, LocalDateTime endDate) {
         return orderRepository.findAllByCampusAndCycle(campusId, startDate, endDate);
+    }
+
+    @Override
+    public List<OrderRequest> findAllByUserAndCycle(BigInteger userId, LocalDateTime startDate, LocalDateTime endDate) {
+        return orderRepository.findAllByUserAndCycle(userId, startDate, endDate);
+    }
+
+    @Override
+    public List<OrderRequest> findAllBySupervisorAndCycle(BigInteger supervisorId, LocalDateTime startDate, LocalDateTime endDate) {
+        return orderRepository.findAllBySupervisorAndCycle(supervisorId, startDate, endDate);
     }
 
     @Override
@@ -135,11 +150,24 @@ public class OrderService implements OrderServiceInterface {
         List<OrderRequest> orderRequestList = new ArrayList<>();
         for (Tuple tuple : orderSupervisorList) {
             BigInteger orderId = new BigInteger(tuple.get(0).toString());
-            System.out.println(orderId);
             OrderRequest newRequest = orderRepository.findById(orderId).get();
             if (!newRequest.getOrderStatus().equals(OrderStatus.Cancelled)
                     && !newRequest.getOrderStatus().equals(OrderStatus.Complete)) {
                 orderRequestList.add(newRequest);
+            }
+        }
+        return orderRequestList;
+    }
+
+    @Override
+    public List<OrderRequest> findAllByMentionOpenAndCycle(BigInteger supervisorId, LocalDateTime startDate, LocalDateTime endDate) {
+        List<Tuple> orderSupervisorList = orderRepository.findAllMentionsBySupervisorId(supervisorId);
+        List<OrderRequest> orderRequestList = new ArrayList<>();
+        for (Tuple tuple : orderSupervisorList) {
+            BigInteger orderId = new BigInteger(tuple.get(0).toString());
+            Optional<OrderRequest> newRequest = orderRepository.findAllByIdAndCycle(orderId, startDate, endDate);
+            if (newRequest.isPresent()) {
+                orderRequestList.add(newRequest.get());
             }
         }
         return orderRequestList;

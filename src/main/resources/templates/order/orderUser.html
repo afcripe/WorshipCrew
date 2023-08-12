@@ -7,6 +7,7 @@
 
     <div th:replace="~{order/moduleHeader :: header}">Header</div>
 
+    <div th:replace="~{order/moduleFilterDate :: filterDate}">Filter</div>
 
     <div class="row pt-5 py-2">
         <div class="col">
@@ -23,13 +24,13 @@
 
     <div class="row pt-5 py-2">
         <div class="col">
-            <h4>Items for <span th:text="${searchedUser}"></span> Fulfill</h4>
+            <h4>Items for <span th:text="${searchedUser}"></span> to Fulfill</h4>
         </div>
     </div>
     <div class="row pt-2 pb-5 py-2">
-        <div class="col" th:if="${not #lists.isEmpty(openItemList)}" th:each="openItem : ${openItemList}">
+        <div class="col" th:if="${not #lists.isEmpty(itemList)}" th:each="orderItem : ${itemList}">
             <div class="row">
-                <div th:replace="~{components/cardOrderItemLineSummary :: cardFragment(${openItem})}">No Items</div>
+                <div th:replace="~{components/cardOrderItemLineSummary :: cardFragment(${orderItem})}">No Items</div>
             </div>
         </div>
     </div>
@@ -40,9 +41,9 @@
         </div>
     </div>
     <div class="row pt-2 pb-5 py-2">
-        <div class="col" th:if="${not #lists.isEmpty(openOrderList)}" th:each="openOrder : ${openOrderList}">
+        <div class="col" th:if="${not #lists.isEmpty(supervisorOrderList)}" th:each="supervisorOrder : ${supervisorOrderList}">
           <div class="row">
-            <div th:replace="~{components/cardOrderLine :: cardFragment(${openOrder})}">No Requests to Display</div>
+            <div th:replace="~{components/cardOrderLine :: cardFragment(${supervisorOrder})}">No Requests to Display</div>
           </div>
         </div>
     </div>

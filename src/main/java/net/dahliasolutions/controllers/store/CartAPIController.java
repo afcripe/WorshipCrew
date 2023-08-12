@@ -149,6 +149,7 @@ public class CartAPIController {
                         item.isSpecialOrder(),
                         item.isAvailable(),
                         item.getLeadTime(),
+                        orderRequest.getRequestDate(),
                         item.getDepartment(),
                         orderRequest.getOrderStatus(),
                         orderRequest.getSupervisor(),

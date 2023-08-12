@@ -270,6 +270,7 @@
         let pageNaveExp = document.getElementById("sideNavCollapsed");
         let pageNaveCol = document.getElementById("sideNavExpanded");
         let modHeader = document.getElementById("moduleHeader");
+        let storeCatHeader = document.getElementById("categoriesHeader");
         let storeCatNav = document.getElementById("storeCategoryNav");
         let tables = document.querySelectorAll("table");
 
@@ -280,6 +281,8 @@
                 if (storeCatNav != null) {
                     storeCatNav.classList.remove("bg-light");
                     storeCatNav.classList.add("bg-dark");
+                    storeCatHeader.classList.remove("bg-light");
+                    storeCatHeader.classList.add("bg-dark");
                 }
             } catch (e) {
                 console.log("dark mode is not enabled")
@@ -305,6 +308,8 @@
                 if (storeCatNav != null) {
                     storeCatNav.classList.remove("bg-dark");
                     storeCatNav.classList.add("bg-light");
+                    storeCatHeader.classList.remove("bg-dark");
+                    storeCatHeader.classList.add("bg-light");
                 }
             } catch (e) {
                 console.log("dark mode is not enabled")

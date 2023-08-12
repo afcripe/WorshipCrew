@@ -9,6 +9,7 @@ import net.dahliasolutions.models.store.StoreImage;
 import net.dahliasolutions.models.user.User;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -28,6 +29,7 @@ public class OrderItem {
     private boolean specialOrder;   //not held in stock and must be ordered
     private boolean available;      //available to order
     private int leadTime;
+    private LocalDateTime requestDate;
 
     @ManyToOne(fetch = FetchType.EAGER)
     private DepartmentRegional department;

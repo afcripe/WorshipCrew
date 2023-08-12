@@ -389,6 +389,11 @@
     color: var(--dwc-store);
     background-color: transparent;
 }
+
+.generic-icon {
+    color: var(--dwc-body-color);
+}
+
 .caret-right {
      transition: transform 1s;
 }
@@ -568,6 +573,7 @@
 
 /* Filter Nav Styles */
 .filter-nav {
+    background-color: var(--dwc-side-nav-bg);
     border: 1px solid var(--dwc-border-color);
     border-radius: 5px;
     font-size: medium;
