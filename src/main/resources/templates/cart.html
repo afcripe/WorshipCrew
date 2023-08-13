@@ -56,7 +56,7 @@
         <div class="col">
             <div style="float: right">
                 <button class="btn btn-sm btn-outline-primary"
-                        th:onclick="window.location.href='/profile/orders';">All Orders</button>
+                        th:onclick="window.location.href='/profile/requests';">All Orders</button>
             </div>
             <h4>Recent Requests</h4>
         </div>
@@ -78,7 +78,7 @@
             window.location.href="/store/item/"+id;
         }
         function navToRequest(id) {
-            window.location.href="/profile/order/"+id;
+            window.location.href="/profile/request/"+id;
         }
 
         async function updateCartItem(id, userid, target) {
@@ -150,7 +150,7 @@
                 return response.json();
             }).then(data => {
                 console.log(data);
-                window.location.href='/profile/order/'+data.id;
+                window.location.href='/profile/request/'+data.id;
             });
         }
     </script>

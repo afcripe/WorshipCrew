@@ -163,7 +163,7 @@ public class ProfileController {
 
     }
 
-    @GetMapping("/orders")
+    @GetMapping("/requests")
     public String getUserOrders(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) auth.getPrincipal();
@@ -172,7 +172,7 @@ public class ProfileController {
         return "profile/orderList";
     }
 
-    @GetMapping("/order/{id}")
+    @GetMapping("/request/{id}")
     public String getUserOrders(@PathVariable BigInteger id, Model model) {
         Optional<OrderRequest> order = orderService.findById(id);
         List<OrderNote> noteList = orderNoteService.findByOrderId(id);

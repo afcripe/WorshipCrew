@@ -14,7 +14,7 @@
         <div class="row pt-5 py-2">
             <div class="col">
                 <h4>
-                    <a th:href="'/order/department/'+*{department.department.name}" style="text-decoration: none">
+                    <a th:href="'/request/department/'+*{department.department.name}" style="text-decoration: none">
                         <span th:text="*{department.department.name}" style="text-decoration: none"></span>
                         (<span th:text="*{#lists.size(department.orderItemList)}" style="text-decoration: none"></span>)
                     </a>
@@ -35,7 +35,7 @@
 
     <script th:inline="javascript">
         function navToRequest(id) {
-            window.location.href="/order/"+id;
+            window.location.href="/request/order/"+id;
         }
         function toggleDepartment(department) {
             let divDepartment = document.getElementById(department);

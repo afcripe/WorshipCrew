@@ -18,11 +18,9 @@
                 <div class="col-12 col-md-6">
                     <h4>Request Id: <span th:text="*{id}"></span></h4>
                 </div>
-                <div class="col-12 col-md-6 text-right" th:if="${editable}">
-                    <th:block th:if="${editable}">
-                        <button class="btn btn-sm btn-primary" onclick="dialogChangeStatus()">Status / Note</button>
-                        <button class="btn btn-sm btn-primary" onclick="dialogIncludePerson()">Include Someone</button>
-                    </th:block>
+                <div class="col-12 col-md-6 text-right">
+                    <button class="btn btn-sm btn-primary" th:onclick="dialogChangeStatus([[*{supervisor.id}]])">Status / Note</button>
+                    <button id="btnIncludeSomeone" class="btn btn-sm btn-primary" th:onclick="dialogIncludePerson([[*{supervisor.id}]])">Include Someone</button>
                 </div>
 
             </div>
@@ -101,7 +99,7 @@
                 </div>
 
                 <div class="row py-2" th:each="item : *{requestItems}">
-                    <div th:replace="~{components/cardOrderItemLine :: cardFragment(${item})}">Request is Empty</div>
+                    <div th:replace="~{components/cardOrderItemLine :: cardFragment(${item}, ${currentUserId})}">Request is Empty</div>
                 </div>
             </div>
         </div>
@@ -131,7 +129,7 @@
             async function loadPeople() {
                 let dispPersonSelect = document.getElementById('personSelect');
                 debugger
-                const response = await fetch('/api/v1/order/getsupervisors')
+                const response = await fetch('/api/v1/request/getsupervisors')
                     .then(response => {
                         return response.json();
                     }).then(data => {
@@ -156,7 +154,7 @@
                 formData.set("userId", document.getElementById('personSelect').value);
                 formData.set("primary", document.getElementById('personPrimary').checked);
 
-                const response = await fetch('/api/v1/order/addsupervisor', {
+                const response = await fetch('/api/v1/request/addsupervisor', {
                     method: 'POST',
                     body: formData
                 }).then(response => {
@@ -202,7 +200,7 @@
                 let dispStatusNote = document.getElementById('statusNote');
                     dispStatusNote.value = "";
 
-                const response = await fetch('/api/v1/order/getstatusoptions')
+                const response = await fetch('/api/v1/request/getstatusoptions')
                     .then(response => {
                         return response.json();
                     }).then(data => {
@@ -231,7 +229,7 @@
                     formData.set("requestStatus", dispStatusSelect.value);
                     formData.set("RequestNote", dispStatusNote.value);
 
-                const response = await fetch('/api/v1/order/changestatus', {
+                const response = await fetch('/api/v1/request/changestatus', {
                     method: 'POST',
                     body: formData
                 }).then(response => {
@@ -275,7 +273,7 @@
             async function loadSupers(superId) {
                 let dispPersonSelect = document.getElementById('superSelect');
 
-                const response = await fetch('/api/v1/order/getsupervisors')
+                const response = await fetch('/api/v1/request/getsupervisors')
                     .then(response => {
                         return response.json();
                     }).then(data => {
@@ -301,7 +299,7 @@
                     formData.set("userId", document.getElementById('superSelect').value);
                     formData.set("primary", "false");
 
-                const response = await fetch('/api/v1/order/changeitemsupervisor', {
+                const response = await fetch('/api/v1/request/changeitemsupervisor', {
                     method: 'POST',
                     body: formData
                 }).then(response => {
@@ -342,7 +340,7 @@
                 let dispStatusSelect = document.getElementById('statusItemSelect');
                 document.getElementById("itemStatusId").value = itemId;
 
-                const response = await fetch('/api/v1/order/getstatusoptions')
+                const response = await fetch('/api/v1/request/getstatusoptions')
                     .then(response => {
                         return response.json();
                     }).then(data => {
@@ -370,7 +368,7 @@
                 formData.set("requestStatus", dispItemStatusSelect.value);
                 formData.set("RequestNote", "");
 
-                const response = await fetch('/api/v1/order/changeitemstatus', {
+                const response = await fetch('/api/v1/request/changeitemstatus', {
                     method: 'POST',
                     body: formData
                 }).then(response => {
@@ -409,6 +407,25 @@
     </dialog>
 
     <script th:inline="javascript">
+        /*<![CDATA[*/
+        userId = /*[[${currentUserId}]]*/ "0";
+        superId = /*[[${currentSuperId}]]*/ "0";
+        isEditable = /*[[${editable}]]*/ "0";
+        /*]]>*/
+        if (!isEditable) {
+            if (userId !== superId) {
+                document.getElementById("btnIncludeSomeone").style.display = "none";
+                document.getElementById("statusSelect").disabled = true;
+                try {
+                    document.getElementById("btnItemSupervisorLG").style.display = "none";
+                    document.getElementById("btnItemSupervisorSM").style.display = "none";
+                } catch (e) {
+
+                }
+            }
+        }
+
+
         const displayDivHistory = document.getElementById("divHistory");
         const displayBtnHistoryExpand = document.getElementById("btnHistoryExpand");
         const displayBtnHistoryCollapse = document.getElementById("btnHistoryCollapse");
@@ -439,7 +456,7 @@
             formData.set("userId", superId);
             formData.set("primary", "false");
 
-            const response = await fetch('/api/v1/order/removesupervisor', {
+            const response = await fetch('/api/v1/request/removesupervisor', {
                 method: 'POST',
                 body: formData
             }).then(response => {
@@ -464,7 +481,7 @@
             loadSupers(superId);
         }
 
-        function dialogChangeStatus() {
+        function dialogChangeStatus(superId) {
             displayChangeStatusDialog.showModal();
             loadStatusOptions();
         }

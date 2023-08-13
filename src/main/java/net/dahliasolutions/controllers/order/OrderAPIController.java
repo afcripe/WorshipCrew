@@ -26,7 +26,7 @@ import java.math.BigInteger;
 import java.util.*;
 
 @RestController
-@RequestMapping("/api/v1/order")
+@RequestMapping("/api/v1/request")
 @RequiredArgsConstructor
 public class OrderAPIController {
 
@@ -120,7 +120,7 @@ public class OrderAPIController {
         Optional<OrderRequest> orderRequest = orderService.findById(statusModel.requestId());
         if (orderRequest.isPresent()) {
             orderRequest.get().setOrderStatus(OrderStatus.valueOf(statusModel.requestStatus()));
-            orderRequest.get().setRequestNote(statusModel.RequestNote());
+//            orderRequest.get().setRequestNote(statusModel.RequestNote());
             orderService.save(orderRequest.get());
             orderNoteService.createOrderNote(new OrderNote(
                     null,
@@ -363,7 +363,6 @@ public class OrderAPIController {
     private Collection<UserRoles> getSupervisorCollection() {
         Collection<UserRoles> roles = new ArrayList<>();
         roles.add(rolesService.findByName("ADMIN_WRITE").get());
-        roles.add(rolesService.findByName("REQUEST_READ").get());
         roles.add(rolesService.findByName("REQUEST_WRITE").get());
         roles.add(rolesService.findByName("REQUEST_SUPERVISOR").get());
         return roles;

@@ -200,7 +200,7 @@ public class StoreController {
         return "store/item";
     }
 
-    @GetMapping("/item/edit/{id}")
+    @GetMapping("/edit/{id}")
     public String getItemToEdit(@PathVariable BigInteger id, Model model, HttpSession session) {
         BigInteger catId = BigInteger.valueOf(0);
         BigInteger subCatId = BigInteger.valueOf(0);

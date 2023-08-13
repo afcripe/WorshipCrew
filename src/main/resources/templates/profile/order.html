@@ -93,7 +93,7 @@
     </div>
 
     <div class="row py-2" th:each="item : *{requestItems}">
-        <div th:replace="~{components/cardOrderItemLine :: cardFragment(${item})}">Your Order is Empty</div>
+        <div th:replace="~{components/cardOrderItemLine :: cardFragment(${item}, ${orderRequest.user.id})}">Your Order is Empty</div>
     </div>
 
 
@@ -140,7 +140,7 @@
                     formData.set("id", inputId.value);
                     formData.set("name", displayInputReason.value);
 
-                fetch("/api/v1/order/updateReason", {
+                fetch("/api/v1/request/updateReason", {
                     method: "POST",
                     body: formData
                 }).then(response => {
@@ -160,7 +160,7 @@
             let formData = new FormData();
                 formData.set("id", id);
 
-            const response = await fetch('/api/v1/order/cancel', {
+            const response = await fetch('/api/v1/request/cancel', {
                 method: 'POST',
                 body: formData
             }).then(response => {

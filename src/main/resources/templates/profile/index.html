@@ -63,7 +63,7 @@
           <div class="card-title alert alert-primary">
             <div style="float: right">
               <button class="btn btn-sm btn-outline-primary"
-                      th:onclick="window.location.href='/profile/orders';">All Orders</button>
+                      th:onclick="window.location.href='/profile/requests';">All Orders</button>
             </div>
             <h5>
               Recent Requests
@@ -74,7 +74,7 @@
             <ul class="list-group list-group-flush" th:each="order : ${orderList}">
               <li class="list-group-item selectableItem" style="cursor: pointer;"
                   th:text="${#temporals.format(order.requestDate, 'MMM-dd-yyyy')}+'  |  '+${order.orderStatus}"
-                  th:onclick="window.location.href='/profile/order/[[${order.id}]]'"></li>
+                  th:onclick="window.location.href='/profile/request/[[${order.id}]]'"></li>
             </ul>
 
           </div>

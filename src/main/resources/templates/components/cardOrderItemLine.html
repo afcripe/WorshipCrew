@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://thymeleaf.org">
 
-<div th:fragment="cardFragment(orderItem)">
+<div th:fragment="cardFragment(orderItem, currentUserId)">
   <div th:id="*{productId}+'-item'" class="card p-2" th:object="${orderItem}">
 
     <div class="d-block d-lg-none">
@@ -23,7 +23,7 @@
         <div class="col-12">
           <div>
             Status: <span th:text="*{itemStatus}"></span>
-            <th:block th:if="${editable}">
+            <th:block th:if="${editable} or ${currentUserId} eq ${orderItem.supervisor.id}">
               <button class="btn btn-sm btn-primary" th:onclick="dialogChangeItemStatus([[*{id}]], [[*{itemStatus}]])">Change</button>
             </th:block>
           </div>
@@ -31,9 +31,7 @@
         <div class="col-12">
           <div>
             Fulfilled By: <span th:text="*{supervisor.firstName} + ' ' + *{supervisor.lastName}"></span>
-            <th:block th:if="${editable}">
-              <button class="btn btn-sm btn-primary" onclick="dialogAssignPerson()">Change</button>
-            </th:block>
+            <button id="btnItemSupervisorSM" class="btn btn-sm btn-primary" onclick="dialogAssignPerson()">Change</button>
           </div>
         </div>
       </div>
@@ -58,7 +56,7 @@
         <div class="col-6">
           <div>
             Status: <span th:text="*{itemStatus}"></span>
-            <th:block th:if="${editable}">
+            <th:block th:if="${editable} or ${currentUserId} eq ${orderItem.supervisor.id}">
               <button class="btn btn-sm btn-primary" th:onclick="dialogChangeItemStatus([[*{id}]], [[*{itemStatus}]])">Change</button>
             </th:block>
           </div>
@@ -66,9 +64,7 @@
         <div class="col-6">
           <div>
             Fulfilled By: <span th:text="*{supervisor.firstName} + ' ' + *{supervisor.lastName}"></span>
-            <th:block th:if="${editable}">
-              <button class="btn btn-sm btn-primary" th:onclick="dialogAssignPerson([[*{supervisor.id}]])">Change</button>
-            </th:block>
+            <button id="btnItemSupervisorLG" class="btn btn-sm btn-primary" th:onclick="dialogAssignPerson([[*{supervisor.id}]])">Change</button>
           </div>
         </div>
       </div>

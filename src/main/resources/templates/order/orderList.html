@@ -14,7 +14,7 @@
                 Open Requests Only
             </div>
             <div class="h3" style="float: right">
-                <a th:href="'/order/user/'+${user.id}" style="text-decoration: none">All Requests</a>
+                <a th:href="'/request/user/'+${user.id}" style="text-decoration: none">All Requests</a>
             </div>
         </div>
     </div>
@@ -61,7 +61,7 @@
 
     <script th:inline="javascript">
         function navToRequest(id) {
-            window.location.href="/order/"+id;
+            window.location.href="/request/order/"+id;
         }
     </script>
 

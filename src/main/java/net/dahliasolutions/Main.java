@@ -61,7 +61,6 @@ public class Main {
 //            roleService.createRole("RESOURCE_WRITE", "Create new resources");
 //            roleService.createRole("STORE_READ", "Browse that store and request items within assigned department");
 //            roleService.createRole("STORE_WRITE", "Create new items in the store for assigned department");
-//            roleService.createRole("REQUEST_READ", "View requests made by users");
 //            roleService.createRole("REQUEST_WRITE", "Update, assign, and fulfill user requests");
 //            roleService.createRole("REQUEST_SUPERVISOR", "Full access to user requests");
 //            roleService.createRole("SUPPORT_READ", "View support tickets");
@@ -102,7 +101,7 @@ public class Main {
 //                u.setPassword("password");
 //                u.setFirstName("Caleb");
 //                u.setLastName("Lawrence");
-//                u.setContactEmail("caleb@destinyworship.com");
+//                u.setContactEmail("afcripe@live.com");
 //                u = userService.createDefaultUser(u);
 //            u.setDirector(u);
 //            userService.save(u);
@@ -129,7 +128,7 @@ public class Main {
 //                u3.setPassword("password");
 //                u3.setFirstName("Aidan");
 //                u3.setLastName("Vaughn");
-//                u3.setContactEmail("aidan@destinyworship.com");
+//                u3.setContactEmail("afcripe@live.com");
 //                u3.setDirector(u);
 //                u3 = userService.createDefaultUser(u3);
 //            userService.addRoleToUser(u3.getUsername(), "ADMIN_WRITE");

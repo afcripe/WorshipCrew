@@ -155,10 +155,14 @@
             let detailsId = id+"-details";
             let counterEl = document.getElementById(counterId);
             let detailsEl = document.getElementById(detailsId);
+            let itemDetails = "";
+            if (detailsEl !== null) {
+                itemDetails = detailsEl.value;
+            }
             let formData = new FormData();
                 formData.set("id", id);
                 formData.set("userId", userid);
-                formData.set("details", detailsEl.value)
+                formData.set("details", itemDetails)
                 formData.set("count", counterEl.value);
 
             const response = await fetch('/api/v1/cart/additem', {

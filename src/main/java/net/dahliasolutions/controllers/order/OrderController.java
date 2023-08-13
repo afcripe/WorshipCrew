@@ -34,7 +34,7 @@ import java.util.*;
 import static java.lang.Math.abs;
 
 @Controller
-@RequestMapping("/order")
+@RequestMapping("/request")
 @RequiredArgsConstructor
 public class OrderController {
 
@@ -49,7 +49,7 @@ public class OrderController {
     @ModelAttribute
     public void addAttributes(Model model) {
         model.addAttribute("moduleTitle", "Requests");
-        model.addAttribute("moduleLink", "/order");
+        model.addAttribute("moduleLink", "/request");
     }
 
     @GetMapping("")
@@ -66,7 +66,7 @@ public class OrderController {
         model.addAttribute("openItemList", openItemList);
         model.addAttribute("openOrderList", openOrderList);
         model.addAttribute("orderMentionList", orderMentionList);
-        redirectService.setHistory(session, "/order");
+        redirectService.setHistory(session, "/request");
         return "order/orderList";
     }
 
@@ -98,7 +98,7 @@ public class OrderController {
 
         if (user.isEmpty()) {
             session.setAttribute("msgError", "User not found.");
-            return redirectService.pathName(session, "/order");
+            return redirectService.pathName(session, "/request");
         }
 
         List<OrderRequest> orderList = orderService.findAllByUserAndCycle(user.get().getId(), startDate, endDate);
@@ -116,7 +116,7 @@ public class OrderController {
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
 
-        redirectService.setHistory(session, "/order/user/"+id);
+        redirectService.setHistory(session, "/request/user/"+id);
         return "order/orderUser";
     }
 
@@ -160,7 +160,7 @@ public class OrderController {
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
 
-        redirectService.setHistory(session, "/order/department");
+        redirectService.setHistory(session, "/request/department");
         return "order/orderDepartmentList";
     }
 
@@ -170,7 +170,7 @@ public class OrderController {
 
         if (department.isEmpty()) {
             session.setAttribute("msgError", "Department not found.");
-            return redirectService.pathName(session, "/order");
+            return redirectService.pathName(session, "/request");
         }
 
         List<OrderItem> itemList = orderItemService.findAllByDepartment(department.get());
@@ -190,7 +190,7 @@ public class OrderController {
         model.addAttribute("department", department.get());
         model.addAttribute("openItemList", openItemList);
         model.addAttribute("closedItemList", closedItemList);
-        redirectService.setHistory(session, "/order/department/"+name);
+        redirectService.setHistory(session, "/request/department/"+name);
         return "order/orderDepartment";
     }
 
@@ -234,7 +234,7 @@ public class OrderController {
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
 
-        redirectService.setHistory(session, "/order/department");
+        redirectService.setHistory(session, "/request/department");
         return "order/orderCampusList";
     }
 
@@ -244,7 +244,7 @@ public class OrderController {
 
         if (campus.isEmpty()) {
             session.setAttribute("msgError", "Campus not found.");
-            return redirectService.pathName(session, "/order");
+            return redirectService.pathName(session, "/request");
         }
 
         List<OrderRequest> itemList = orderService.findAllByCampus(campus.get());
@@ -264,17 +264,19 @@ public class OrderController {
         model.addAttribute("campus", campus.get());
         model.addAttribute("openOrderList", openOrderList);
         model.addAttribute("closedOrderList", closedOrderList);
-        redirectService.setHistory(session, "/order/campus/"+name);
+        redirectService.setHistory(session, "/request/campus/"+name);
         return "order/orderCampus";
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/order/{id}")
     public String getOrder(@PathVariable BigInteger id, Model model, HttpSession session) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) auth.getPrincipal();
 
         Optional<OrderRequest> request = orderService.findById(id);
         if (request.isEmpty()) {
             session.setAttribute("msgError", "Request not found.");
-            return redirectService.pathName(session, "/order");
+            return redirectService.pathName(session, "/request");
         }
         // get Edit permission
         boolean editable = false;
@@ -284,9 +286,11 @@ public class OrderController {
         List<OrderNote> noteList = orderNoteService.findByOrderId(id);
 
         model.addAttribute("editable", editable);
+        model.addAttribute("currentUserId", user.getId());
+        model.addAttribute("currentSuperId", request.get().getSupervisor().getId());
         model.addAttribute("orderRequest", request.get());
         model.addAttribute("noteList", noteList);
-        redirectService.setHistory(session, "/order"+request.get().getId());
+        redirectService.setHistory(session, "/request/order"+request.get().getId());
         return "order/order";
     }
 
@@ -295,11 +299,11 @@ public class OrderController {
         // determine if search type
         switch (searchModel.getSearchType()) {
             case "request":
-                return "redirect:/order/"+searchModel.getSearchId();
+                return "redirect:/request/order/"+searchModel.getSearchId();
             case "user":
-                return "redirect:/order/user/"+searchModel.getSearchId();
+                return "redirect:/request/user/"+searchModel.getSearchId();
             default:
-                return "redirect:/order";
+                return "redirect:/request";
         }
     }
 
@@ -310,8 +314,7 @@ public class OrderController {
         Collection<UserRoles> roles = user.getUserRoles();
 
         for (UserRoles role : roles){
-            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("REQUEST_SUPERVISOR")
-                    || role.getName().equals("REQUEST_WRITE")) {
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("REQUEST_SUPERVISOR")) {
                 return true;
             }
         }

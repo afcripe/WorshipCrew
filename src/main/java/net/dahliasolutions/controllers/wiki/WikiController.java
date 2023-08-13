@@ -195,7 +195,7 @@ public class WikiController {
 
     }
 
-    @GetMapping("/article/new")
+    @GetMapping("/new")
     public String addNewPost(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) auth.getPrincipal();
@@ -214,7 +214,7 @@ public class WikiController {
         return "wiki/editPost";
     }
 
-    @GetMapping("/article/edit/{id}")
+    @GetMapping("/edit/{id}")
     public String addEditPost(@PathVariable("id") BigInteger id, Model model, HttpSession session) {
         Optional<WikiPost> wikiPost = wikiPostService.findById(id);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

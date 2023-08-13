@@ -4,7 +4,7 @@
         <div class="container-fluid">
 
             <div class="navbar-nav mt-2 mx-2">
-                <a class="nav-link h3" href="/order">
+                <a class="nav-link h3" href="/request">
                     <i class="bi bi-cart4 generic-icon"></i>
                 </a>
             </div>
@@ -19,14 +19,14 @@
             <div class="collapse navbar-collapse flex-grow-1" id="navbarBreadcrumb">
                 <ul class="navbar-nav mr-auto p-1">
                     <li class="nav-item">
-                        <a class="nav-link" href="/order/department">Department</a>
+                        <a class="nav-link" href="/request/department">Department</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/order/campus">Campus</a>
+                        <a class="nav-link" href="/request/campus">Campus</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav me-auto d-none d-sm-block"></ul>
-                <form autocomplete="off" method="post" th:action="@{/order/search}" class="d-flex me-auto mt-3 mt-sm-0 pl-5" style="height: 30px">
+                <form autocomplete="off" method="post" th:action="@{/request/search}" class="d-flex me-auto mt-3 mt-sm-0 pl-5" style="height: 30px">
                     <div class="autocomplete" style="display: inline-block; height: 30px">
                         <input id="searchTerm" name="searchTerm" class="form-control" type="text" style="height: 30px" placeholder="Search">
                         <input id="searchId" name="searchId" type="hidden"><input id="searchType" name="searchType" type="hidden">
@@ -62,7 +62,7 @@
                 let formData = new FormData();
                     formData.set("name", val)
 
-                const response = await fetch('/api/v1/order/search', {
+                const response = await fetch('/api/v1/request/search', {
                     method: 'POST',
                     body: formData
                 }).then(response => {
