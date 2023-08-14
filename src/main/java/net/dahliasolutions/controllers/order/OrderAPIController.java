@@ -8,7 +8,7 @@ import net.dahliasolutions.models.order.OrderItem;
 import net.dahliasolutions.models.order.OrderNote;
 import net.dahliasolutions.models.order.OrderRequest;
 import net.dahliasolutions.models.order.OrderStatus;
-import net.dahliasolutions.models.store.Cart;
+import net.dahliasolutions.models.records.*;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
 import net.dahliasolutions.services.mail.EmailService;
@@ -19,7 +19,6 @@ import net.dahliasolutions.services.user.UserRolesService;
 import net.dahliasolutions.services.user.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;

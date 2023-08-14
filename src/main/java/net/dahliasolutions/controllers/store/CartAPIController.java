@@ -5,7 +5,8 @@ import net.dahliasolutions.models.*;
 import net.dahliasolutions.models.mail.EmailDetails;
 import net.dahliasolutions.models.order.OrderItem;
 import net.dahliasolutions.models.order.OrderRequest;
-import net.dahliasolutions.models.order.OrderStatus;
+import net.dahliasolutions.models.records.SingleBigIntegerModel;
+import net.dahliasolutions.models.records.SingleStringModel;
 import net.dahliasolutions.models.store.*;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.services.mail.EmailService;
@@ -13,12 +14,11 @@ import net.dahliasolutions.services.order.OrderService;
 import net.dahliasolutions.services.store.CartItemService;
 import net.dahliasolutions.services.store.CartService;
 import net.dahliasolutions.services.store.StoreItemService;
+import net.dahliasolutions.services.store.StoreSettingService;
 import net.dahliasolutions.services.user.UserService;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,6 +33,7 @@ public class CartAPIController {
     private final OrderService orderService;
     private final UserService userService;
     private final EmailService emailService;
+    private final StoreSettingService storeSettingService;
 
     @GetMapping("{id}")
     public Cart getCart(@PathVariable BigInteger id) {
@@ -128,6 +129,7 @@ public class CartAPIController {
                                             @ModelAttribute SingleStringModel stringModel) {
         Cart cart = cartService.findById(integerModel.id());
         Optional<User> user = userService.findById(cart.getId());
+        User fulfillmentAgent;
 
         String reasonForRequest = "None Given";
         if (stringModel.name() != null) {
@@ -135,9 +137,33 @@ public class CartAPIController {
                 reasonForRequest = stringModel.name();
             }
         }
+
+        // determine who gets the fulfillment request
+        StoreSetting storeSetting = storeSettingService.getStoreSetting();
+        switch (storeSetting.getNotifyTarget()) {
+            case User:
+                if (storeSetting.getUser() != null) {
+                    fulfillmentAgent = storeSetting.getUser();
+                    break;
+                }
+            case RegionalDepartmentDirector:
+                fulfillmentAgent = userService.findById(user.get().getDepartment().getRegionalDepartment().getDirectorId()).get();
+                break;
+            case CampusDepartmentDirector:
+                fulfillmentAgent = userService.findById(user.get().getDepartment().getDirectorId()).get();
+                break;
+            case CampusDirector:
+                fulfillmentAgent = userService.findById(user.get().getCampus().getDirectorId()).get();
+                break;
+            default:
+                fulfillmentAgent = user.get().getDirector();
+                break;
+        }
+
         // create order
         OrderRequest orderRequest = orderService.createOrder(cart);
         orderRequest.setRequestNote(reasonForRequest);
+        orderRequest.setSupervisor(fulfillmentAgent);
 
         for (CartItem item : cart.getCartItems()) {
                 OrderItem orderItem = new OrderItem(
@@ -167,6 +193,8 @@ public class CartAPIController {
         EmailDetails emailDetailsSupervisor =
                 new EmailDetails(orderRequest.getSupervisor().getContactEmail(),"A New Request", "", null );
         BrowserMessage returnMsg2 = emailService.sendSupervisorRequest(emailDetailsSupervisor, orderRequest, orderRequest.getSupervisor().getId());
+
+        // send any additional notifications
 
         cartService.emptyCart(integerModel.id());
         return new SingleBigIntegerModel(orderRequest.getId());

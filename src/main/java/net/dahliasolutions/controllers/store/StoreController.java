@@ -4,7 +4,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.AdminSettings;
 import net.dahliasolutions.models.Notification;
-import net.dahliasolutions.models.NotificationModule;
+import net.dahliasolutions.models.EventModule;
 import net.dahliasolutions.models.department.DepartmentRegional;
 import net.dahliasolutions.models.position.Position;
 import net.dahliasolutions.models.position.PositionSelectedModel;
@@ -12,15 +12,10 @@ import net.dahliasolutions.models.store.*;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
 import net.dahliasolutions.models.wiki.WikiPost;
-import net.dahliasolutions.models.wiki.WikiTag;
-import net.dahliasolutions.models.wiki.WikiTagReference;
 import net.dahliasolutions.services.*;
 import net.dahliasolutions.services.department.DepartmentRegionalService;
 import net.dahliasolutions.services.position.PositionService;
-import net.dahliasolutions.services.store.StoreCategoryService;
-import net.dahliasolutions.services.store.StoreImageService;
-import net.dahliasolutions.services.store.StoreItemService;
-import net.dahliasolutions.services.store.StoreSubCategoryService;
+import net.dahliasolutions.services.store.*;
 import net.dahliasolutions.services.user.UserService;
 import net.dahliasolutions.services.wiki.WikiPostService;
 import org.springframework.security.core.Authentication;
@@ -50,6 +45,8 @@ public class StoreController {
     private final AdminSettingsService adminSettingsService;
     private final WikiPostService wikiPostService;
     private final NotificationService notificationService;
+    private final StoreSettingService storeSettingService;
+
     @ModelAttribute
     public void addAttributes(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -311,12 +308,29 @@ public class StoreController {
 
     @GetMapping("/settings")
     public String getStoreSettings(Model model) {
-        List<Notification> notificationList = notificationService.findAllByModule(NotificationModule.Store);
+        List<Notification> notificationList = notificationService.findAllByModule(EventModule.Store);
         List<StoreCategory> categoryList = categoryService.findAll();
+
+        StoreSetting storeSetting = storeSettingService.getStoreSetting();
+        BigInteger userId = BigInteger.valueOf(0);
+        if (storeSetting.getUser() != null) {
+            userId = storeSetting.getUser().getId();
+        }
+
+        List<StoreNotifyTarget> targetList = Arrays.asList(StoreNotifyTarget.values());
+        List<User> userList = userService.findAllByRoles("ADMIN_WRITE,RESOURCE_WRITE,RESOURCE_SUPERVISOR");
+
         model.addAttribute("categoryList", categoryList);
         model.addAttribute("storeHome", adminSettingsService.getAdminSettings().getStoreHome());
         model.addAttribute("restrictPosition", adminSettingsService.getAdminSettings().isRestrictStorePosition());
         model.addAttribute("restrictDepartment", adminSettingsService.getAdminSettings().isRestrictStoreDepartment());
+
+        model.addAttribute("storeSetting", storeSetting);
+        model.addAttribute("notifyTarget", storeSetting.getNotifyTarget().toString());
+        model.addAttribute("userId", userId);
+        model.addAttribute("targetList", targetList);
+        model.addAttribute("userList", userList);
+
         model.addAttribute("notificationList", notificationList);
         return "store/settings";
     }

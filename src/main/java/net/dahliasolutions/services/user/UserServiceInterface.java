@@ -5,6 +5,7 @@ import net.dahliasolutions.models.department.DepartmentCampus;
 import net.dahliasolutions.models.department.DepartmentRegional;
 import net.dahliasolutions.models.position.Position;
 import net.dahliasolutions.models.user.User;
+import net.dahliasolutions.models.user.UserRoles;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.math.BigInteger;
@@ -35,6 +36,8 @@ public interface UserServiceInterface extends UserDetailsService {
     List<User> findAllByDepartment(DepartmentRegional department);
     List<User> findAllByDepartmentAndDeleted(DepartmentRegional department, boolean deleted);
     List<User> findAllByActivated();
+    List<User> findAllByRole(UserRoles role);
+    List<User> findAllByRoles(String roles);
     List<User> findAllByDeleted(boolean deleted);
 
 }

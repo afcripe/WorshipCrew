@@ -4,7 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.data.NotificationRepository;
 import net.dahliasolutions.models.Notification;
-import net.dahliasolutions.models.NotificationModule;
+import net.dahliasolutions.models.EventModule;
 import net.dahliasolutions.models.user.User;
 import org.springframework.stereotype.Service;
 
@@ -41,7 +41,7 @@ public class NotificationService implements NotificationServiceInterface {
     }
 
     @Override
-    public List<Notification> findAllByModule(NotificationModule module) {
+    public List<Notification> findAllByModule(EventModule module) {
         return notificationRepository.findAllByModule(module);
     }
 

@@ -1,4 +1,4 @@
-package net.dahliasolutions.models;
+package net.dahliasolutions.models.records;
 
 import java.math.BigInteger;
 

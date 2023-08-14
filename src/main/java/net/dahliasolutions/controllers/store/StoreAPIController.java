@@ -3,20 +3,16 @@ package net.dahliasolutions.controllers.store;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.AdminSettings;
-import net.dahliasolutions.models.SingleBigIntegerModel;
-import net.dahliasolutions.models.SingleStringModel;
-import net.dahliasolutions.models.order.OrderItem;
-import net.dahliasolutions.models.order.OrderRequest;
+import net.dahliasolutions.models.records.SingleBigIntegerModel;
+import net.dahliasolutions.models.records.SingleStringModel;
 import net.dahliasolutions.models.store.*;
 import net.dahliasolutions.models.user.Profile;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
 import net.dahliasolutions.services.AdminSettingsService;
-import net.dahliasolutions.services.store.StoreCategoryService;
-import net.dahliasolutions.services.store.StoreItemOptionService;
-import net.dahliasolutions.services.store.StoreItemService;
-import net.dahliasolutions.services.store.StoreSubCategoryService;
+import net.dahliasolutions.services.store.*;
 import net.dahliasolutions.services.user.ProfileService;
+import net.dahliasolutions.services.user.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +34,8 @@ public class StoreAPIController {
     private final StoreSubCategoryService subCategoryService;
     private final StoreItemOptionService optionService;
     private final AdminSettingsService adminSettingsService;
+    private final UserService userService;
+    private final StoreSettingService storeSettingService;
 
     @GetMapping("")
     public List<StoreItem> goStoreHome() {
@@ -218,6 +216,20 @@ public class StoreAPIController {
             storeItemService.save(storeItem.get());
         }
         return item;
+    }
+
+
+    @PostMapping("/storesetting/update")
+    public String updateSettingNotify(@ModelAttribute SingleStringModel notifyModel, @ModelAttribute SingleBigIntegerModel userModel) {
+        StoreNotifyTarget target = StoreNotifyTarget.valueOf(notifyModel.name());
+        Optional<User> user = userService.findById(userModel.id());
+
+        storeSettingService.setStoreNotifyTarget(target);
+        if (target.equals(StoreNotifyTarget.User) && user.isPresent()) {
+            storeSettingService.setUser(user.get());
+        }
+
+        return "true";
     }
 
     /*  Determine Edit Permissions */

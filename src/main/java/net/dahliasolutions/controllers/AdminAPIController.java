@@ -1,7 +1,7 @@
 package net.dahliasolutions.controllers;
 
 import lombok.RequiredArgsConstructor;
-import net.dahliasolutions.models.SingleStringModel;
+import net.dahliasolutions.models.records.SingleStringModel;
 import net.dahliasolutions.services.AdminSettingsService;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,9 +16,6 @@ public class AdminAPIController {
     public void updateAdminSettings(@PathVariable String prop, @RequestBody SingleStringModel singleStringModel) {
         if (prop.equals("companyName")) {
             adminSettingsService.setCompanyName(singleStringModel.name());
-        }
-        if (prop.equals("monthlyStatements")) {
-            adminSettingsService.setMonthlyStatements(Boolean.parseBoolean(singleStringModel.name()));
         }
     }
 

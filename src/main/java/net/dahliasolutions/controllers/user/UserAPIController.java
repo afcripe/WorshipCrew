@@ -1,7 +1,7 @@
 package net.dahliasolutions.controllers.user;
 
 import lombok.RequiredArgsConstructor;
-import net.dahliasolutions.models.SingleStringModel;
+import net.dahliasolutions.models.records.SingleStringModel;
 import net.dahliasolutions.models.campus.Campus;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;

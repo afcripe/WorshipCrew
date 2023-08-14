@@ -16,7 +16,6 @@ public class AdminSettings {
     @Id
     private BigInteger id;
     private String companyName;
-    private boolean monthlyStatements;
     private String wikiHome;
     private String portalHome;
     private String storeHome;

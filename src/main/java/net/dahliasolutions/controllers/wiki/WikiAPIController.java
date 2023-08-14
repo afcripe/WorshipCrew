@@ -1,7 +1,8 @@
 package net.dahliasolutions.controllers.wiki;
 
 import lombok.RequiredArgsConstructor;
-import net.dahliasolutions.models.*;
+import net.dahliasolutions.models.records.DoubleStringModel;
+import net.dahliasolutions.models.records.SingleStringModel;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.wiki.*;
 import net.dahliasolutions.services.AdminSettingsService;

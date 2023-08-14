@@ -13,8 +13,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-public class Notification {
+public class Event {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

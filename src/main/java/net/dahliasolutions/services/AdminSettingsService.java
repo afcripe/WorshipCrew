@@ -21,7 +21,6 @@ public class AdminSettingsService implements AdminSettingsServiceInterface{
                     new AdminSettings(
                             BigInteger.valueOf(1),
                             "Destiny Worship Exchange",
-                            false,
                             "",
                             "",
                             "",
@@ -37,13 +36,6 @@ public class AdminSettingsService implements AdminSettingsServiceInterface{
     public void setCompanyName(String name) {
         AdminSettings adminSettings = getAdminSettings();
         adminSettings.setCompanyName(name);
-        adminSettingsRepository.save(adminSettings);
-    }
-
-    @Override
-    public void setMonthlyStatements(boolean bool) {
-        AdminSettings adminSettings = getAdminSettings();
-        adminSettings.setMonthlyStatements(bool);
         adminSettingsRepository.save(adminSettings);
     }
 

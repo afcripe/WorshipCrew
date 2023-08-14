@@ -1,6 +1,6 @@
 package net.dahliasolutions.models;
 
-public enum NotificationModule {
+public enum EventModule {
     Store,
     Resource,
     Support,
@@ -9,5 +9,6 @@ public enum NotificationModule {
     Campus,
     Department,
     Position,
+    Admin,
     Any
 }

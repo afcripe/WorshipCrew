@@ -207,6 +207,39 @@ public class UserService implements UserServiceInterface{
     }
 
     @Override
+    public List<User> findAllByRole(UserRoles role) {
+        List<User> allUsers = findAll();
+        List<User> userList = new ArrayList<>();
+        for (User user : allUsers) {
+            if (user.getUserRoles().contains(role)) {
+                userList.add(user);
+            }
+        }
+        return userList;
+    }
+
+    @Override
+    public List<User> findAllByRoles(String roles) {
+        String[] roleNames = roles.split(",");
+        List<UserRoles> rolesList = new ArrayList<>();
+        for ( int i=0; i<roleNames.length; i++ ) {
+            Optional<UserRoles> role = rolesRepository.findByName(roleNames[i]);
+            role.ifPresent(rolesList::add);
+        }
+
+        List<User> allUsers = findAll();
+        List<User> userList = new ArrayList<>();
+        for (User u : allUsers) {
+            for (UserRoles r : rolesList) {
+                if (u.getUserRoles().contains(r) && !userList.contains(u)) {
+                    userList.add(u);
+                }
+            }
+        }
+        return userList;
+    }
+
+    @Override
     public List<User> findAllByDeleted(boolean deleted) {
         return userRepository.findAllByDeleted(deleted);
     }

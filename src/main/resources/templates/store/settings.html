@@ -31,7 +31,7 @@
       <div class="card" style="max-width: 450px;">
         <div class="card-body">
           <ul class="list-group list-group-flush">
-            <li class="list-group-item selectableItem" style="cursor: pointer;"
+            <li class="list-group-item selectableItem"
                 onclick="window.location.href='/store/imageManager'">
               Manage Uploaded Images
             </li>
@@ -82,6 +82,45 @@
         </div>
       </div>
 
+    </div>
+
+    <div class="row">
+
+      <div class="card" style="max-width: 450px;">
+        <div class="card-body">
+
+          <div class="pt-4 ">
+            <h4>Request Processing</h4>
+            <p>Who is responsible for fulfilling requests?</p>
+            <div class="pb-1">
+              <select id="notificationTarget" class="form-control pb-1">
+                <option th:each="target : ${targetList}" th:value="*{target.name}" th:text="*{target.name}"
+                        th:selected="*{target.name} == ${notifyTarget}"></option>
+              </select>
+            </div>
+            <div class="pb-1">
+              <select id="notificationUser" class="form-control pb-1">
+                <option th:each="user : ${userList}" th:value="*{user.id}" th:text="*{user.firstName+' '+user.lastName}"
+                        th:selected="*{user.id} == ${userId}"></option>
+              </select>
+            </div>
+            <div>
+              <button id="btnStoreNotifyTarget" type="button" class="btn btn-sm btn-outline-store" style="float: right;"
+                      onclick="updateStoreNotifyTarget()">Update</button>
+            </div>
+            </div>
+        </div>
+      </div>
+
+      <div class="card" style="max-width: 450px;">
+        <div class="card-body">
+
+          <div class="pt-4 ">
+            <h4>Notifications</h4>
+            <p>Coming Soon</p>
+          </div>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -406,6 +445,28 @@
       }).then(data => {
         debugger
         bStoreHome.disabled = false;
+      });
+    }
+
+    async function updateStoreNotifyTarget() {
+      let inputTarget = document.getElementById("notificationTarget");
+      let inputUser = document.getElementById("notificationUser");
+      let btnSettings = document.getElementById("btnStoreNotifyTarget");
+
+      btnSettings.disabled = true;
+
+      let theForm = new FormData();
+        theForm.set("name", inputTarget.value);
+        theForm.set("id", inputUser.value);
+
+      const response = await fetch("/api/v1/store/storesetting/update", {
+        method: 'POST',
+        body: theForm
+      }).then(response => {
+        return response.json();
+      }).then(data => {
+        debugger
+        btnSettings.disabled = false;
       });
     }
 
