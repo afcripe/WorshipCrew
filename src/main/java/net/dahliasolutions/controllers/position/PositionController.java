@@ -2,18 +2,23 @@ package net.dahliasolutions.controllers.position;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import net.dahliasolutions.models.department.DepartmentRegional;
 import net.dahliasolutions.models.position.PermissionTemplate;
 import net.dahliasolutions.models.position.Position;
 import net.dahliasolutions.models.user.User;
+import net.dahliasolutions.models.user.UserRoles;
 import net.dahliasolutions.services.*;
 import net.dahliasolutions.services.position.PermissionTemplateService;
 import net.dahliasolutions.services.position.PositionService;
 import net.dahliasolutions.services.user.UserService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,22 +34,32 @@ public class PositionController {
 
     @ModelAttribute
     public void addAttributes(Model model) {
-        model.addAttribute("moduleTitle", "Settings");
-        model.addAttribute("moduleLink", "/admin");
+        model.addAttribute("moduleTitle", "Positions");
+        model.addAttribute("moduleLink", "/position");
     }
 
     @GetMapping("")
     public String getPositions(Model model, HttpSession session) {
-        redirectService.setHistory(session, "/position");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println(auth.getPrincipal().toString());
+        if (auth.getPrincipal().toString().equals("anonymousUser")) {
+            return "redirect:/";
+        }
+        if (!positionEdit()) {
+            session.setAttribute("msgError", "Access Denied");
+            return redirectService.pathName(session,"position");
+        }
         List<Position> positionList = positionService.findAll();
         List<PermissionTemplate> templateList = permissionTemplateService.findAll();
 
         model.addAttribute("templateList", templateList);
         model.addAttribute("positions", positionList);
-        return "admin/position/listPositions";
+
+        redirectService.setHistory(session, "/position");
+        return "position/listPositions";
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/position/{id}")
     public String getPosition(@PathVariable BigInteger id, Model model, HttpSession session) {
         Optional<Position> position = positionService.findById(id);
 
@@ -55,14 +70,14 @@ public class PositionController {
 
         redirectService.setHistory(session, "/position/id");
         model.addAttribute("position", position);
-        return "admin/position/position";
+        return "position/position";
     }
 
     @GetMapping("/new")
     public String setPosition(Model model) {
         Position position = new Position();
         model.addAttribute("position", position);
-        return "admin/position/positionNew";
+        return "position/positionNew";
     }
 
     @PostMapping("/create")
@@ -71,7 +86,7 @@ public class PositionController {
         if(position.isPresent() && !position.get().getId().equals(positionModel.getId())) {
             session.setAttribute("msgError", "Position Name Already Exists!");
             model.addAttribute("position", positionModel);
-            return "admin/position/positionNew";
+            return "position/positionNew";
         }
 
         positionService.updatePosition(new Position(
@@ -82,14 +97,14 @@ public class PositionController {
         return "redirect:/position";
     }
 
-    @GetMapping("/{id}/edit")
+    @GetMapping("/edit/{id}")
     public String editPosition(@PathVariable BigInteger id, Model model) {
         Optional<Position> position = positionService.findById(id);
         if(position.isEmpty()) {
             return "redirect:/position";
         }
         model.addAttribute("position", position.get());
-        return "admin/position/positionEdit";
+        return "position/positionEdit";
     }
 
     @PostMapping("/update")
@@ -111,7 +126,7 @@ public class PositionController {
         return "redirect:/position";
     }
 
-    @GetMapping("/{id}/delete")
+    @GetMapping("/delete/{id}")
     public String deletePosition(@PathVariable BigInteger id, HttpSession session) {
         List<User> userList = userService.findAllByPosition(positionService.findById(id).orElse(null));
         if (userList.size() > 0){
@@ -120,5 +135,18 @@ public class PositionController {
         }
         positionService.deletePositionById(id);
         return "redirect:/position";
+    }
+
+    private boolean positionEdit(){
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Collection<UserRoles> roles = user.getUserRoles();
+
+        for (UserRoles role : roles){
+            if (role.getName().equals("ADMIN_WRITE")) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

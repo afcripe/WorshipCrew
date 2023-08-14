@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.data.*;
 import net.dahliasolutions.models.campus.Campus;
 import net.dahliasolutions.models.department.DepartmentCampus;
+import net.dahliasolutions.models.department.DepartmentRegional;
 import net.dahliasolutions.models.position.Position;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
@@ -179,8 +180,25 @@ public class UserService implements UserServiceInterface{
     }
 
     @Override
-    public List<User> findAllByDepartment(DepartmentCampus department) {
-        return userRepository.findAllByDepartmentCampusAndDeleted(department, false);
+    public List<User> findAllByDepartment(DepartmentRegional department) {
+        List<User> userList = new ArrayList<>();
+        List<DepartmentCampus> campusDepartmentList = departmentCampusRepository.findAllByRegionalDepartment(department);
+        for (DepartmentCampus departmentCampus : campusDepartmentList) {
+            List<User> departmentUsers = userRepository.findAllByDepartmentAndDeleted(departmentCampus, false);
+            userList.addAll(departmentUsers);
+        }
+        return userList;
+    }
+
+    @Override
+    public List<User> findAllByDepartmentAndDeleted(DepartmentRegional department, boolean deleted) {
+        List<User> userList = new ArrayList<>();
+        List<DepartmentCampus> campusDepartmentList = departmentCampusRepository.findAllByRegionalDepartment(department);
+        for (DepartmentCampus departmentCampus : campusDepartmentList) {
+            List<User> departmentUsers = userRepository.findAllByDepartmentAndDeleted(departmentCampus, deleted);
+            userList.addAll(departmentUsers);
+        }
+        return userList;
     }
 
     @Override

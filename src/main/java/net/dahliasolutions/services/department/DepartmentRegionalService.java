@@ -1,6 +1,7 @@
 package net.dahliasolutions.services.department;
 
 import lombok.RequiredArgsConstructor;
+import net.dahliasolutions.data.DepartmentCampusRepository;
 import net.dahliasolutions.data.DepartmentRegionalRepository;
 import net.dahliasolutions.data.UserRepository;
 import net.dahliasolutions.models.department.DepartmentCampus;
@@ -17,6 +18,7 @@ import java.util.Optional;
 public class DepartmentRegionalService implements DepartmentRegionalServiceInterface {
 
     private final DepartmentRegionalRepository departmentRegionalRepository;
+    private final DepartmentCampusRepository departmentCampusRepository;
     private final UserRepository userRepository;
     private final DepartmentCampusService departmentCampusService;
 
@@ -63,6 +65,13 @@ public class DepartmentRegionalService implements DepartmentRegionalServiceInter
 
     @Override
     public void deleteDepartmentById(BigInteger id) {
+        Optional<DepartmentRegional> regional = departmentRegionalRepository.findById(id);
+        if (regional.isPresent()) {
+            List<DepartmentCampus> campusList = departmentCampusRepository.findDepartmentCampusesByRegionalDepartment(regional.get());
+            for (DepartmentCampus departmentCampus : campusList) {
+                departmentCampusRepository.delete(departmentCampus);
+            }
+        }
         departmentRegionalRepository.deleteById(id);
     }
 

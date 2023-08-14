@@ -93,10 +93,32 @@ public class SecurityConfig {
                     auth.requestMatchers("/resource/tagmanager").hasAnyAuthority("ADMIN_WRITE");
                     auth.requestMatchers("/resource/foldermanager").hasAnyAuthority("ADMIN_WRITE");
 
-                    auth.requestMatchers("/admin/**").hasAnyAuthority("ADMIN_WRITE", "DIRECTOR_READ", "DIRECTOR_WRITE", "CAMPUS_WRITE", "CAMPUS_READ", "USER_READ", "USER_WRITE");
+                    auth.requestMatchers("/campus").hasAnyAuthority("ADMIN_WRITE", "DIRECTOR_READ", "DIRECTOR_WRITE", "CAMPUS_WRITE", "CAMPUS_READ");
+                    auth.requestMatchers("/campus/*").hasAnyAuthority("ADMIN_WRITE", "DIRECTOR_READ", "DIRECTOR_WRITE", "CAMPUS_WRITE", "CAMPUS_READ");
+                    auth.requestMatchers("/campus/campus/**").hasAnyAuthority("ADMIN_WRITE", "DIRECTOR_READ", "DIRECTOR_WRITE", "CAMPUS_WRITE", "CAMPUS_READ");
+                    auth.requestMatchers("/campus/showhidden").hasAnyAuthority("ADMIN_WRITE");
+                    auth.requestMatchers("/campus/new/**").hasAnyAuthority("ADMIN_WRITE");
+                    auth.requestMatchers("/campus/create/**").hasAnyAuthority("ADMIN_WRITE");
+                    auth.requestMatchers("/campus/edit/**").hasAnyAuthority("ADMIN_WRITE");
+                    auth.requestMatchers("/campus/update/**").hasAnyAuthority("ADMIN_WRITE");
+
+                    auth.requestMatchers("/department").hasAnyAuthority("ADMIN_WRITE", "DIRECTOR_READ", "DIRECTOR_WRITE");
+                    auth.requestMatchers("/department/*").hasAnyAuthority("ADMIN_WRITE", "DIRECTOR_READ", "DIRECTOR_WRITE");
+                    auth.requestMatchers("/department/edit/**").hasAnyAuthority("ADMIN_WRITE");
+                    auth.requestMatchers("/department/new/**").hasAnyAuthority("ADMIN_WRITE");
+                    auth.requestMatchers("/department/create/**").hasAnyAuthority("ADMIN_WRITE");
+                    auth.requestMatchers("/department/update/**").hasAnyAuthority("ADMIN_WRITE");
+                    auth.requestMatchers("/department/delete/**").hasAnyAuthority("ADMIN_WRITE");
+
+                    auth.requestMatchers("/position").hasAnyAuthority("ADMIN_WRITE");
+                    auth.requestMatchers("/position/**").hasAnyAuthority("ADMIN_WRITE");
+                    auth.requestMatchers("/permissiontemplate").hasAnyAuthority("ADMIN_WRITE");
+                    auth.requestMatchers("/permissiontemplate/**").hasAnyAuthority("ADMIN_WRITE");
+
+                    auth.requestMatchers("/user").hasAnyAuthority("ADMIN_WRITE", "DIRECTOR_READ", "DIRECTOR_WRITE", "CAMPUS_WRITE", "CAMPUS_READ", "USER_READ", "USER_WRITE");
                     auth.requestMatchers("/user/**").hasAnyAuthority("ADMIN_WRITE", "DIRECTOR_READ", "DIRECTOR_WRITE", "CAMPUS_WRITE", "CAMPUS_READ", "USER_READ", "USER_WRITE");
-                    auth.requestMatchers("/campus/**").hasAnyAuthority("ADMIN_WRITE", "DIRECTOR_READ", "DIRECTOR_WRITE", "CAMPUS_WRITE", "CAMPUS_READ");
-                    auth.requestMatchers("/position/**").hasAnyAuthority("ADMIN_WRITE", "DIRECTOR_READ", "DIRECTOR_WRITE");
+
+                    auth.requestMatchers("/admin/**").hasAnyAuthority("ADMIN_WRITE", "DIRECTOR_READ", "DIRECTOR_WRITE", "CAMPUS_WRITE", "CAMPUS_READ", "USER_READ", "USER_WRITE");
                     auth.requestMatchers("/api/v1/**").permitAll();
                     auth.anyRequest().authenticated();
                 })

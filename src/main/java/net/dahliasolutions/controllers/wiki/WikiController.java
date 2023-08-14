@@ -238,6 +238,7 @@ public class WikiController {
     public String getWikiSettings(Model model) {
         model.addAttribute("wikiHome", adminSettingsService.getAdminSettings().getWikiHome());
         model.addAttribute("portalHome", adminSettingsService.getAdminSettings().getPortalHome());
+        model.addAttribute("docsHome", adminSettingsService.getAdminSettings().getDocumentationHome());
         return "wiki/settings";
     }
 

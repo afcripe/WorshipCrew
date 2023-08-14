@@ -1,5 +1,6 @@
 package net.dahliasolutions.controllers;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.AdminSettings;
@@ -7,10 +8,12 @@ import net.dahliasolutions.models.BrowserMessage;
 import net.dahliasolutions.models.mail.EmailDetails;
 import net.dahliasolutions.models.LoginModel;
 import net.dahliasolutions.models.user.User;
+import net.dahliasolutions.models.wiki.WikiFolder;
 import net.dahliasolutions.models.wiki.WikiPost;
 import net.dahliasolutions.services.*;
 import net.dahliasolutions.services.mail.EmailService;
 import net.dahliasolutions.services.user.UserService;
+import net.dahliasolutions.services.wiki.WikiFolderService;
 import net.dahliasolutions.services.wiki.WikiPostService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("")
@@ -32,6 +36,7 @@ public class IndexController {
     private final EmailService emailService;
     private final RedirectService redirectService;
     private final WikiPostService wikiPostService;
+    private final WikiFolderService wikiFolderService;
     private final AdminSettingsService adminSettingsService;
 
     @ModelAttribute
@@ -113,6 +118,46 @@ public class IndexController {
         }
 
         return wikiList.get(0);
+    }
+
+    @GetMapping("/articles/**")
+    public String addNewPost(Model model, HttpServletRequest request, HttpSession session) {
+
+        String requestURL = request.getRequestURL().toString();
+        String folderFile = requestURL.split("/articles")[1];
+        String[] folderList = folderFile.split("/");
+        String postURLName = folderList[folderList.length-1];
+        String postName = postURLName.replace("-", " ");
+        String folders = "";
+        for ( int i=1; i<folderList.length-1; i++ ) {
+            folders = folders + "/" + folderList[i];
+        }
+
+        Optional<WikiFolder> dir = wikiFolderService.findByFolder(folderFile);
+        if (dir.isPresent()){
+            List<WikiPost> wikiPostList = wikiPostService.findAllByFolder(dir.get().getFolder());
+            model.addAttribute("wikiPostList", wikiPostList);
+            model.addAttribute("folder", dir.get());
+            return "wiki/folderPosts";
+        }
+
+        List<WikiPost> wikiList = wikiPostService.findByTitle(postName);
+        if (wikiList.isEmpty()) {
+            session.setAttribute("msgError", "Post not Found.");
+            return redirectService.pathName(session, "/resource");
+        }
+        if (wikiList.size() > 1) {
+            for ( WikiPost w : wikiList ) {
+                if ( w.getFolder().equals(folders) ) {
+                    model.addAttribute("wikiPost", w);
+                    return "wiki/post";
+                }
+            }
+        }
+
+        model.addAttribute("wikiPost", wikiList.get(0));
+        return "documentation";
+
     }
 
 }

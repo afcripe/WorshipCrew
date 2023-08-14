@@ -20,6 +20,7 @@ public class AdminSettings {
     private String wikiHome;
     private String portalHome;
     private String storeHome;
+    private String documentationHome;
     private boolean restrictStorePosition;
     private boolean restrictStoreDepartment;
 }

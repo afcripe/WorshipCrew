@@ -50,8 +50,8 @@ public class UserController {
 
     @ModelAttribute
     public void addAttributes(Model model) {
-        model.addAttribute("moduleTitle", "Settings");
-        model.addAttribute("moduleLink", "/admin");
+        model.addAttribute("moduleTitle", "Users");
+        model.addAttribute("moduleLink", "/user");
     }
 
     @GetMapping("")
@@ -60,28 +60,39 @@ public class UserController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = (User) auth.getPrincipal();
         Collection<UserRoles> roles = currentUser.getUserRoles();
-        boolean fullList = false;
+        String listType = "Campus";
         for (UserRoles role : roles){
-            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("ADMIN_READ") ||
-                    role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")) {
-                fullList = true;
+            if (role.getName().equals("ADMIN_WRITE")) {
+                listType = "full";
+                break;
+            }if (role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")) {
+                listType = "department";
                 break;
             }
         }
 
         String title = "All Users";
         List<User> userList = new ArrayList<>();
-        if (fullList) {
-            userList = userService.findAll();
-        } else {
-            userList = userService.findAllByCampus(currentUser.getCampus());
-            title = "Campus Users";
+        switch (listType){
+            case "full":
+                userList = userService.findAll();
+                break;
+            case "department":
+                userList = userService.findAllByDepartmentAndDeleted(currentUser.getDepartment().getRegionalDepartment(), false);
+                title = "Department Users";
+                break;
+            default:
+                userList = userService.findAllByCampus(currentUser.getCampus());
+                title = "Campus Users";
         }
 
-        redirectService.setHistory(session, "/user");
+
         model.addAttribute("title", title);
         model.addAttribute("users", userList);
-        return "admin/user/listUsers";
+        model.addAttribute("userEdit", userEdit());
+
+        redirectService.setHistory(session, "/user");
+        return "user/listUsers";
     }
 
     @GetMapping("/viewdeleted")
@@ -90,26 +101,36 @@ public class UserController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = (User) auth.getPrincipal();
         Collection<UserRoles> roles = currentUser.getUserRoles();
-        boolean fullList = false;
+        String listType = "Campus";
         for (UserRoles role : roles){
-            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("ADMIN_READ") ||
-                    role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")) {
-                fullList = true;
+            if (role.getName().equals("ADMIN_WRITE")) {
+                listType = "full";
+                break;
+            }if (role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")) {
+                listType = "department";
                 break;
             }
         }
 
+        String title = "All Users";
         List<User> userList = new ArrayList<>();
-        if (fullList) {
-            userList = userService.findAllByDeleted(true);
-        } else {
-            userList = userService.findAllByCampusAndDeleted(currentUser.getCampus(), true);
+        switch (listType){
+            case "full":
+                userList = userService.findAllByDeleted(true);
+                break;
+            case "department":
+                userList = userService.findAllByDepartmentAndDeleted(currentUser.getDepartment().getRegionalDepartment(), true);
+                title = "Department Users";
+                break;
+            default:
+                userList = userService.findAllByCampusAndDeleted(currentUser.getCampus(), true);
+                title = "Campus Users";
         }
 
         redirectService.setHistory(session, "/user");
-        model.addAttribute("title", "All Users");
+        model.addAttribute("title", title);
         model.addAttribute("users", userList);
-        return "admin/user/listDeletedUsers";
+        return "user/listDeletedUsers";
     }
 
     @GetMapping("/{id}")
@@ -119,7 +140,6 @@ public class UserController {
             session.setAttribute("msgError", "User Not Found!");
             return redirectService.pathName(session, "user");
         }
-        redirectService.setHistory(session, "/user/"+id);
 
         boolean authResourceRead = false;
         boolean authResourceWrite = false;
@@ -158,10 +178,13 @@ public class UserController {
         model.addAttribute("authStoreRead", authStoreRead);
         model.addAttribute("authStoreWrite", authStoreWrite);
         model.addAttribute("authSupportWrite", authSupportWrite);
-        return "admin/user/user";
+        model.addAttribute("userEdit", userEdit());
+
+        redirectService.setHistory(session, "/user/"+id);
+        return "user/user";
     }
 
-    @GetMapping("/{id}/edit")
+    @GetMapping("/edit/{id}")
     public String updateUserForm(@PathVariable BigInteger id, Model model, HttpSession session) {
 
         Optional<User> user = userService.findById(id);
@@ -183,7 +206,7 @@ public class UserController {
             }
         }
 
-        if (!fullList && user.get().getPosition().getLevel() < currentUser.getPosition().getLevel()) {
+        if (!fullList && user.get().getPosition().getLevel() <= currentUser.getPosition().getLevel()) {
             session.setAttribute("msgError", "Permission to Edit User Denied!");
             return redirectService.pathName(session, "user");
         }
@@ -213,7 +236,7 @@ public class UserController {
         model.addAttribute("positionList", positionList);
         model.addAttribute("userList", userList);
 
-        return "admin/user/userEdit";
+        return "user/userEdit";
     }
 
     @PostMapping("/update")
@@ -300,7 +323,7 @@ public class UserController {
         model.addAttribute("campusList", campusList);
         model.addAttribute("departmentList", departmentList);
         model.addAttribute("userList", userList);
-        return "admin/user/userNew";
+        return "user/userNew";
     }
 
     @PostMapping("/create")
@@ -308,7 +331,7 @@ public class UserController {
         if(userService.verifyByUsername(userModel.username())) {
             model.addAttribute("registerUser", userModel);
             session.setAttribute("msgError", "Username already exists!");
-            return "admin/user/userNew";
+            return "user/userNew";
         }
         User newUser;
         User user = new User();
@@ -377,7 +400,7 @@ public class UserController {
         model.addAttribute("user", user);
         model.addAttribute("rolesList", roles);
 
-        return "admin/user/userAddPermission";
+        return "user/userAddPermission";
     }
 
     @PostMapping("/addpermission")
@@ -412,7 +435,7 @@ public class UserController {
 
         model.addAttribute("user", user);
 
-        return "admin/user/userSetPassword";
+        return "user/userSetPassword";
     }
 
     @PostMapping("/changepassword")
@@ -459,7 +482,7 @@ public class UserController {
         return "redirect:/user/"+user.getId().toString();
     }
 
-    @GetMapping("/{id}/delete")
+    @GetMapping("/delete/{id}")
     public String deletedUser(@PathVariable BigInteger id, HttpSession session) {
         Optional<User> user = userService.findById(id);
         if (user.isPresent()) {
@@ -472,7 +495,7 @@ public class UserController {
         return redirectService.pathName(session, "user");
     }
 
-    @GetMapping("/{id}/restore")
+    @GetMapping("/restore/{id}")
     public String restoreUser(@PathVariable BigInteger id, HttpSession session) {
         Optional<User> user = userService.findById(id);
         if (user.isPresent()) {
@@ -489,5 +512,18 @@ public class UserController {
             userService.save(user.get());
         }
         return redirectService.pathName(session, "user");
+    }
+
+    // get edit permission
+    private boolean userEdit(){
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Collection<UserRoles> roles = user.getUserRoles();
+
+        for (UserRoles role : roles){
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_WRITE")) {
+                return true;
+            }
+        }
+        return false;
     }
 }

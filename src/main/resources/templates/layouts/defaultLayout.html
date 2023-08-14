@@ -98,8 +98,7 @@
                         <a class="list-group-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')
                                                 or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')}"
                            href="/department">Departments</a>
-                        <a class="list-group-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')
-                                                or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')}"
+                        <a class="list-group-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')}"
                            href="/position">Positions</a>
                     </div>
                 </div>
@@ -142,8 +141,7 @@
                             or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')}" href="/department">
                             <i class="bi bi-collection"></i>
                         </a>
-                        <a class="list-group-item p-1" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')
-                            or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')}" href="/position">
+                        <a class="list-group-item p-1" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')}" href="/position">
                             <i class="bi bi-person-lines-fill"></i>
                         </a>
                     </div>

@@ -37,9 +37,16 @@
 
     <div class="pt-4" style="max-width: 450px;">
       <h4>Site Home Page</h4>
-      <p>Leave blank to use default page of recent articles.</p>
+      <p>Leave blank to use default site homepage.</p>
       <input id="inputPortalHome" type="text" style="width: 300px" th:value="${portalHome}" onkeyup="inputPortalSubmit()">
       <button id="btnPortalHome" type="button" class="btn btn-sm btn-outline-wiki" onclick="updatePortalHome()">Update</button>
+    </div>
+
+    <div class="pt-4" style="max-width: 450px;">
+      <h4>Documentation Home Page</h4>
+      <p>Leave blank to use default page of recent articles.</p>
+      <input id="inputDocsHome" type="text" style="width: 300px" th:value="${docsHome}" onkeyup="inputDocsSubmit()">
+      <button id="btnDocsHome" type="button" class="btn btn-sm btn-outline-wiki" onclick="updateDocsHome()">Update</button>
     </div>
 
   </div>
@@ -94,6 +101,32 @@
       }).then(data => {
         debugger
         bPortalHome.disabled = false;
+      });
+    }
+
+    function inputDocsSubmit(event) {
+      event.preventDefault();
+      if (event.key === 'Enter' || event.keyCode === 13) {
+        updateDocsHome();
+      }
+
+    }
+    async function updateDocsHome() {
+      let dHome = document.getElementById("inputDocsHome");
+      let bDocsHome = document.getElementById("btnDocsHome");
+
+      bDocsHome.disabled = true;
+
+      let theForm = new FormData();
+        theForm.set("name", dHome.value);
+      const response = await fetch("/api/v1/wiki/updatedocshome", {
+        method: 'POST',
+        body: theForm
+      }).then(response => {
+        return response.json();
+      }).then(data => {
+        debugger
+        bDocsHome.disabled = false;
       });
     }
   </script>

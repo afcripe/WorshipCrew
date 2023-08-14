@@ -109,9 +109,9 @@
                   <button type="submit" class="btn btn-sm btn-primary">Update</button>
                   <button type="button" class="btn btn-sm btn-warning" th:onclick="window.location.href=[[${session.redirectPath}]];">Cancel</button>
                   <button type="button" class="btn btn-sm btn-outline-danger" style="float: right;" th:unless="*{deleted}"
-                          th:onclick="window.location.href='/user/'+[[*{id}]]+'/delete';">Delete</button>
+                          th:onclick="window.location.href='/user/delete/'+[[*{id}]]+'';">Delete</button>
                   <button type="button" class="btn btn-sm btn-outline-success" style="float: right;"th:if="*{deleted}"
-                          th:onclick="window.location.href='/user/'+[[*{id}]]+'/restore';">Restore</button>
+                          th:onclick="window.location.href='/user/restore/'+[[*{id}]]+'';">Restore</button>
                 </div>
               </div>
             </form>

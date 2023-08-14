@@ -15,7 +15,7 @@
         const path = window.location.pathname;
 
         if(element.id == 'btnEdit') {
-          window.location.href='/campus/'+eventId;
+          window.location.href='/campus/campus/'+eventId;
         } else if(element.id == 'btnNew') {
           window.location.href='/campus/new';
         } else if(element.id == 'btnToggleDeleted') {
@@ -25,9 +25,9 @@
             window.location.href='/campus/showhidden';
           }
         } else if(element.id == 'btnRestore'){
-          window.location.href='/campus/'+eventId+'/restore';
+          window.location.href='/campus/restore/'+eventId;
         } else {
-          window.location.href='/campus/'+eventId;
+          window.location.href='/campus/campus/'+eventId;
         }
       }
     </script>

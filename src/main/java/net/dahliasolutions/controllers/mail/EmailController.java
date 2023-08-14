@@ -25,7 +25,7 @@ public class EmailController {
 
     @GetMapping("")
     public String testMailer(){
-        return "support";
+        return "documentation";
     }
 
     @GetMapping("/{randomString}")

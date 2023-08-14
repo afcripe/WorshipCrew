@@ -64,7 +64,10 @@
             <a class="nav-link" style="color: #eeeeee !important;" href="#" onclick="toggleTheme()" th:unless="${session.theme} eq 'dark'">Dark Theme</a>
           </li>
           <li class="nav-item d-block d-sm-none">
-            <a class="nav-link" style="color: #eeeeee !important;" href="#" onclick="toggleTheme()">Logout</a>
+            <a class="nav-link" style="color: #eeeeee !important;" href="/documentation">Help</a>
+          </li>
+          <li class="nav-item d-block d-sm-none">
+            <a class="nav-link" style="color: #eeeeee !important;" href="/logout">Logout</a>
           </li>
         </ul>
       </div>
@@ -101,7 +104,7 @@
                   <span th:if="${session.theme} eq 'dark'">Light Theme</span>
                   <span th:unless="${session.theme} eq 'dark'">Dark Theme</span>
                 </a></li>
-
+                <li><a class="dropdown-item dwc-dropdown-item" href="/documentation">Help</a></li>
                 <li class="dropdown-divider"></li>
                 <li><a class="dropdown-item dwc-dropdown-item" href="/logout">Logout</a></li>
               </ul>

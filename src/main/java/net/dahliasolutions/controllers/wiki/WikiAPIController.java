@@ -222,6 +222,12 @@ public class WikiAPIController {
         return wikiHomeModel;
     }
 
+    @PostMapping("/updatedocshome")
+    public SingleStringModel updateDocsHome(@ModelAttribute SingleStringModel wikiHomeModel) {
+        adminSettingsService.setDocumentationHome(wikiHomeModel.name());
+        return wikiHomeModel;
+    }
+
     @PostMapping("/updateportalhome")
     public SingleStringModel updatePortalHome(@ModelAttribute SingleStringModel portalHomeModel) {
         adminSettingsService.setPortalHome(portalHomeModel.name());

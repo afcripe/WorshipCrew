@@ -15,11 +15,11 @@
 
         <div class="card pb-2">
           <div class="card-title alert alert-primary">
-            <div style="float: right">
+            <div th:if="${userEdit}" style="float: right">
               <button class="btn btn-sm btn-info small"
                       th:onclick="window.location.href='/user/[[${user.id}]]/changepassword';">Password</button>
               <button class="btn btn-sm btn-success small"
-                      th:onclick="window.location.href='/user/[[${user.id}]]/edit';">Edit</button>
+                      th:onclick="window.location.href='/user/edit/[[${user.id}]]';">Edit</button>
             </div>
             <h5>
               <span th:text="*{firstName}"/> <span th:text="*{lastName}"/>
@@ -42,17 +42,15 @@
 
           <div class="card">
             <div class="card-title alert alert-primary bg-faded">
-              <button class="btn btn-sm btn-success small" style="float: right"
-                      th:onclick="window.location.href='/user/[[${user.id}]]/addpermission'">Add</button>
               <h5>Permissions</h5>
             </div>
             <div class="card-body">
               <input type="hidden" th:value="${user.id}" id="inputUserId">
-              <p><input type="checkbox" id="inputAuthResourceRead" checked onchange="updateAuth('RESOURCE_READ')"> View Resources</p>
-              <p><input type="checkbox" id="inputAuthResourceWrite" onchange="updateAuth('RESOURCE_WRITE')"> Create Resources</p>
-              <p><input type="checkbox" id="inputAuthStoreRead" onchange="updateAuth('STORE_READ')"> View Store</p>
-              <p><input type="checkbox" id="inputAuthStoreWrite" onchange="updateAuth('STORE_WRITE')"> Add Store Items</p>
-              <p><input type="checkbox" id="inputAuthSupportWrite" onchange="updateAuth('SUPPORT_WRITE')"> Submit Support Tickets</p>
+              <p><input type="checkbox" id="inputAuthResourceRead" disabled onchange="updateAuth('RESOURCE_READ')"> View Resources</p>
+              <p><input type="checkbox" id="inputAuthResourceWrite" disabled onchange="updateAuth('RESOURCE_WRITE')"> Create Resources</p>
+              <p><input type="checkbox" id="inputAuthStoreRead" disabled onchange="updateAuth('STORE_READ')"> View Store</p>
+              <p><input type="checkbox" id="inputAuthStoreWrite" disabled onchange="updateAuth('STORE_WRITE')"> Add Store Items</p>
+              <p><input type="checkbox" id="inputAuthSupportWrite" disabled onchange="updateAuth('SUPPORT_WRITE')"> Submit Support Tickets</p>
             </div>
           </div>
 
@@ -86,6 +84,7 @@
     let jsAuthStoreRead = /*[[${authStoreRead}]]*/ false;
     let jsAuthStoreWrite = /*[[${authStoreWrite}]]*/ false;
     let jsAuthSupportWrite = /*[[${authSupportWrite}]]*/ false;
+    let jsEditable = /*[[${userEdit}]]*/ false;
     /*]]>*/
 
     document.getElementById("inputAuthResourceRead").checked = jsAuthResourceRead;
@@ -93,6 +92,13 @@
     document.getElementById("inputAuthStoreRead").checked = jsAuthStoreRead;
     document.getElementById("inputAuthStoreWrite").checked = jsAuthStoreWrite;
     document.getElementById("inputAuthSupportWrite").checked = jsAuthSupportWrite;
+    if (jsEditable) {
+      document.getElementById("inputAuthResourceRead").disabled = false;
+      document.getElementById("inputAuthResourceWrite").disabled = false;
+      document.getElementById("inputAuthStoreRead").disabled = false;
+      document.getElementById("inputAuthStoreWrite").disabled = false;
+      document.getElementById("inputAuthSupportWrite").disabled = false;
+    }
 
     async function updateAuth(auth) {
       let userId = document.getElementById("inputUserId");

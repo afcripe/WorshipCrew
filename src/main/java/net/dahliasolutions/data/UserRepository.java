@@ -22,6 +22,7 @@ public interface UserRepository extends JpaRepository<User, BigInteger> {
     List<User> findAllByCampus(Campus campus);
     List<User> findAllByCampusAndDeleted(Campus campus, boolean deleted);
     List<User> findAllByDepartmentCampusAndDeleted(DepartmentCampus department, boolean deleted);
+    List<User> findAllByDepartmentAndDeleted(DepartmentCampus department, boolean deleted);
 
     List<User> findAllByActivated(boolean activated);
     List<User> findAllByDeleted(boolean deleted);

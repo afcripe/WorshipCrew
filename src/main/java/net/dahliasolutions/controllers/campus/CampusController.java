@@ -35,58 +35,72 @@ public class CampusController {
 
     @ModelAttribute
     public void addAttributes(Model model) {
-        model.addAttribute("moduleTitle", "Settings");
-        model.addAttribute("moduleLink", "/admin");
+        model.addAttribute("moduleTitle", "Campus");
+        model.addAttribute("moduleLink", "/campus");
     }
 
     @GetMapping("")
     public String getCampuses(Model model, HttpSession session) {
-        // get persmissions
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = (User) auth.getPrincipal();
-        Collection<UserRoles> roles = currentUser.getUserRoles();
-        boolean fullList = false;
-        for (UserRoles role : roles){
-            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("ADMIN_READ") ||
-                    role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")) {
-                fullList = true;
-                break;
-            }
+        // return list only when allowed else redirect to single campus
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!campusesView()) {
+            return "redirect:/campus/campus/"+currentUser.getCampus().getId();
         }
-
-        if (!fullList) { return "redirect:/campus/"+currentUser.getCampus().getId(); }
 
         List<Campus> campusList = campusList = campusService.findAll();
 
-        redirectService.setHistory(session, "/campus");
+        model.addAttribute("campusEdit", campusEdit());
+        model.addAttribute("departmentEdit", false);
         model.addAttribute("campusList", campusList);
-        return "admin/campus/listCampus";
+
+        redirectService.setHistory(session, "/campus");
+        return "campus/listCampus";
     }
 
     @GetMapping("/showhidden")
     public String getCampusesIncludeHidden(Model model, HttpSession session) {
-        redirectService.setHistory(session, "/campus/showhidden");
+        // only admins can view-edit hidden campuses
+        if (!campusEdit()) {
+            session.setAttribute("msgError", "Access Denied");
+            return redirectService.pathName(session, "campus");
+        }
+
         List<Campus> campusList = campusService.findAllIncludeHidden();
+
+        model.addAttribute("campusEdit", campusEdit());
+        model.addAttribute("departmentEdit", false);
         model.addAttribute("campusList", campusList);
-        return "admin/campus/listCampus";
+
+        redirectService.setHistory(session, "/campus/showhidden");
+        return "campus/listCampus";
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/campus/{id}")
     public String getCampus(@PathVariable BigInteger id, Model model, HttpSession session) {
-        redirectService.setHistory(session, "/campus/"+id);
-
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Campus> campus = campusService.findById(id);
         if (campus.isEmpty()) {
             session.setAttribute("msgError", "Campus Not Found");
             return redirectService.pathName(session, "campus");
         }
+        // verify permission
+        if (!user.getCampus().getId().equals(id)) {
+            if (!campusesView()) {
+                session.setAttribute("msgError", "Access Denied");
+                return redirectService.pathName(session, "campus");
+            }
+        }
 
         List<DepartmentCampus> departmentList = departmentCampusService.findAllByCampus(campus.get());
 
-
+        model.addAttribute("user", user);
+        model.addAttribute("campusEdit", campusEdit());
+        model.addAttribute("departmentEdit", departmentEdit(campus.get()));
         model.addAttribute("campus", campus.get());
         model.addAttribute("departmentList", departmentList);
-        return "admin/campus/campus";
+
+        redirectService.setHistory(session, "/campus/campus/"+id);
+        return "campus/campus";
     }
 
     @GetMapping("/new")
@@ -94,7 +108,7 @@ public class CampusController {
         CampusModel campusModel = new CampusModel(null, "", "", false, BigInteger.valueOf(0));
         model.addAttribute("campus", campusModel);
         model.addAttribute("directorList", userService.findAll());
-        return "admin/campus/campusNew";
+        return "campus/campusNew";
     }
 
     @PostMapping("/create")
@@ -103,7 +117,7 @@ public class CampusController {
         if(location != null) {
             session.setAttribute("msgError", "Campus Name Already Exists!");
             model.addAttribute("campus", campusModel);
-            return "admin/campus/campusNew";
+            return "campus/campusNew";
         }
 
         campusService.createCampus(campusModel.name(), campusModel.city(), campusModel.directorId());
@@ -111,7 +125,7 @@ public class CampusController {
         return redirectService.pathName(session, "campus");
     }
 
-    @GetMapping("/{id}/edit")
+    @GetMapping("/edit/{id}")
     public String editCampus(@PathVariable BigInteger id, Model model, HttpSession session) {
         Campus campus = campusService.findById(id).orElse(null);
         if(campus == null) {
@@ -122,7 +136,7 @@ public class CampusController {
         model.addAttribute("campus", campusModel);
         model.addAttribute("directorList", userService.findAll());
         model.addAttribute("mgrSelected", campus.getDirectorId());
-        return "admin/campus/campusEdit";
+        return "campus/campusEdit";
     }
 
     @PostMapping("/update")
@@ -149,7 +163,7 @@ public class CampusController {
         return redirectService.pathName(session, "campus");
     }
 
-    @GetMapping("/{id}/delete")
+    @GetMapping("/delete/{id}")
     public String deleteLocation(@PathVariable BigInteger id, HttpSession session) {
         List<User> userList = userService.findAllByCampus(campusService.findById(id).orElse(null));
         if (userList.size() > 0){
@@ -160,47 +174,38 @@ public class CampusController {
         return redirectService.pathName(session, "campus");
     }
 
-    @GetMapping("/{id}/restore")
+    @GetMapping("/restore/{id}")
     public String restoreLocation(@PathVariable BigInteger id, HttpSession session) {
         campusService.restoreById(id);
         return redirectService.pathName(session, "campus");
     }
 
 
-    @GetMapping("/{cId}/department/{dId}")
+    @GetMapping("/campus/{cId}/department/{dId}")
     public String editDepartment(@PathVariable BigInteger cId, @PathVariable BigInteger dId, Model model, HttpSession session) {
-        redirectService.setHistory(session, "/campus/"+cId);
-
         Optional<DepartmentCampus> departmentCampus = departmentCampusService.findById(dId);
         if(departmentCampus.isEmpty()) {
             session.setAttribute("msgError", "Department Not Found!");
-            return "redirect:/campus/"+cId;
+            return "redirect:/campus/campus/"+cId;
         }
-        Optional<DepartmentRegional> regional = departmentRegionalService.findById(departmentCampus.get().getRegionalDepartment().getId());
 
         Optional<Campus> campus = campusService.findById(cId);
         List<User> userList = userService.findAllByCampus(campus.get());
-        if (regional.get().getDirectorId() != null) {
-            Optional<User> regionalDir = userService.findById(regional.get().getDirectorId());
-            boolean userPresent = false;
-            for (User u : userList) {
-                if (u.getId().equals(regionalDir.get().getId())) {
-                    userPresent = true;
-                    break;
-                }
-            }
-            if (!userPresent) {
-                userList.add(regionalDir.get());
+        Optional<User> user = userService.findById(departmentCampus.get().getRegionalDepartment().getDirectorId());
+        if (user.isPresent()) {
+            if (!userList.contains(user.get())) {
+                userList.add(user.get());
             }
         }
 
-
         model.addAttribute("department", departmentCampus.get());
         model.addAttribute("directorList", userList);
-        return "admin/department/departmentCampusEdit";
+
+        redirectService.setHistory(session, "/campus/campus/"+cId);
+        return "campus/campusDepartmentEdit";
     }
 
-    @PostMapping("{id}/department/update")
+    @PostMapping("/campus/{id}/department/update")
     public String updateDepartment(@PathVariable BigInteger id, @ModelAttribute DepartmentCampus departmentCampusModel, Model model, HttpSession session) {
         Optional<DepartmentCampus> department = departmentCampusService.findById(departmentCampusModel.getId());
         if (department.isEmpty()) {
@@ -210,7 +215,46 @@ public class CampusController {
 
         department.get().setDirectorId(departmentCampusModel.getDirectorId());
         departmentCampusService.updateDepartment(department.get());
+
         session.setAttribute("msgSuccess", "Department Successfully Updated.");
         return redirectService.pathName(session, "campus");
+    }
+
+    private boolean campusesView() {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+        for (UserRoles role : roles){
+            if (role.getName().equals("ADMIN_WRITE")
+                || role.getName().equals("DIRECTOR_WRITE")
+                || role.getName().equals("DIRECTOR_READ")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean campusEdit() {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+        for (UserRoles role : roles){
+            if (role.getName().equals("ADMIN_WRITE")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean departmentEdit(Campus campus) {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+        for (UserRoles role : roles){
+            if (role.getName().equals("ADMIN_WRITE")) {
+                return true;
+            }
+            if (role.getName().equals("CAMPUS_WRITE") && currentUser.getCampus().getId().equals(campus.getId())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

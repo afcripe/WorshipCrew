@@ -35,20 +35,20 @@ public class PermissionTemplateController {
 
     @ModelAttribute
     public void addAttributes(Model model) {
-        model.addAttribute("moduleTitle", "Settings");
-        model.addAttribute("moduleLink", "/admin");
+        model.addAttribute("moduleTitle", "Positions");
+        model.addAttribute("moduleLink", "/position");
     }
 
     @GetMapping("")
-    public String getPositions(Model model, HttpSession session) {
+    public String getPositionTemplates(Model model, HttpSession session) {
         redirectService.setHistory(session, "/permissiontemplate");
         List<PermissionTemplate> templateList = permissionTemplateService.findAll();
         model.addAttribute("templateList", templateList);
-        return "admin/position/listTemplates";
+        return "position/listTemplates";
     }
 
     @GetMapping("/{id}")
-    public String getPosition(@PathVariable BigInteger id, Model model, HttpSession session) {
+    public String getPositionTemplate(@PathVariable BigInteger id, Model model, HttpSession session) {
         Optional<PermissionTemplate> template = permissionTemplateService.findById(id);
 
         if (template.isEmpty()) {
@@ -58,7 +58,7 @@ public class PermissionTemplateController {
 
         redirectService.setHistory(session, "/permissiontemplate/"+id);
         model.addAttribute("template", template.get());
-        return "admin/position/template";
+        return "position/template";
     }
 
     @GetMapping("/new")
@@ -70,7 +70,7 @@ public class PermissionTemplateController {
         model.addAttribute("template", template);
         model.addAttribute("positionList", positionList);
         model.addAttribute("roleList", roleList);
-        return "admin/position/templateNew";
+        return "position/templateNew";
     }
 
     @PostMapping("/create")
@@ -79,7 +79,7 @@ public class PermissionTemplateController {
         if(existingTemplate.isPresent()) {
             session.setAttribute("msgError", "Template Name Already Exists!");
             model.addAttribute("template", templateModel);
-            return "admin/position/templateNew";
+            return "position/templateNew";
         }
 
         PermissionTemplate newTemplate = new PermissionTemplate();
@@ -139,7 +139,7 @@ public class PermissionTemplateController {
         model.addAttribute("positionList", positionList);
         model.addAttribute("roleList", roleList);
         redirectService.setHistory(session, "/permissiontemplate/edit/"+id);
-        return "admin/position/templateEdit";
+        return "position/templateEdit";
     }
 
     @PostMapping("/update")
@@ -149,7 +149,7 @@ public class PermissionTemplateController {
         if(template.isEmpty()) {
             session.setAttribute("msgError", "Template Not Found!");
             model.addAttribute("template", templateModel);
-            return "admin/position/templateNew";
+            return "position/templateNew";
         }
         if(existingTemplate.isPresent()) {
             if (!existingTemplate.get().getId().equals(template.get().getId())) {
@@ -185,7 +185,7 @@ public class PermissionTemplateController {
         return "redirect:/position";
     }
 
-    @GetMapping("/{id}/delete")
+    @GetMapping("/delete/{id}")
     public String deletePosition(@PathVariable BigInteger id, HttpSession session) {
         permissionTemplateService.deletePermissionTemplateById(id);
         return "redirect:/position";

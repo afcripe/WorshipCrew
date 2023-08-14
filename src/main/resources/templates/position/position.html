@@ -9,7 +9,7 @@
 
 
 
-  <div class="container my-3" th:object="${department}">
+  <div class="container my-3" th:object="${position}">
 
     <div class="row">
 
@@ -19,7 +19,7 @@
           <div class="card-title alert alert-primary">
             <div style="float: right">
               <button class="btn btn-sm btn-success small"
-                      th:onclick="window.location.href='/department/[[${department.id}]]/edit';">Edit</button>
+                      th:onclick="window.location.href='/position/edit/[[${position.id}]]';">Edit</button>
             </div>
             <h5>
               <span th:text="*{name}"/>

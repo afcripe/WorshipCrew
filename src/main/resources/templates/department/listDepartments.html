@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<div class="container-fluid" layout:fragment="content">
+
+  <div th:replace="~{admin/moduleHeader :: header}">Header</div>
+
+  <div class="container my-3">
+
+    <div style="float: right">
+      <button class="btn btn-sm btn-success" th:onclick="window.location.href='/department/new';">Add</button>
+    </div>
+
+    <h1>Departments</h1>
+
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Director</th>
+        <th scope="col"></th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="department : ${departmentList}" class="selectableItem">
+        <td th:onclick="navToDepartment([[${department.id}]])"><span th:text="${department.name}"/></td>
+        <td th:onclick="navToDepartment([[${department.id}]])"><span th:text="${department.directorName}"/></td>
+        <td><button class="btn btn-sm btn-outline-success" th:onclick="navToDepartmentEdit([[${department.id}]])">Edit</button></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    function navToDepartment(Id) {
+      window.location.href='/department/department/'+Id;
+    }
+    function navToDepartmentEdit(Id) {
+      event.preventDefault();
+      window.location.href='/department/edit/'+Id;
+    }
+  </script>
+
+</div>
+
+</html>

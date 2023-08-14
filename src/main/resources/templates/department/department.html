@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<div class="container-fluid" layout:fragment="content">
+
+  <div th:replace="~{admin/moduleHeader :: header}">Header</div>
+
+
+
+  <div class="container my-3" th:object="${department}">
+
+    <div class="row">
+
+      <div class="col">
+
+        <div class="card" style="max-width: 500px">
+          <div class="card-title alert alert-primary">
+            <div style="float: right">
+              <button class="btn btn-sm btn-success small" th:if="${isAdmin}"
+                      th:onclick="window.location.href='/department/edit/[[*{id}]]'">Edit</button>
+            </div>
+            <h5>
+              Department: <span th:text="*{name}"/>
+            </h5>
+          </div>
+
+          <div class="card-body">
+            <p>Director: <span class="card-text" th:text="*{directorName}"/></p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="row">
+        <div class="col">
+
+          <table class="table table-striped">
+            <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Director</th>
+              <th scope="col"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${departmentList}">
+              <td><span th:text="${item.campus.name}"/></td>
+              <td><span th:text="${item.directorName}"/></td>
+              <td><button class="btn btn-sm btn-outline-success" th:if="${departmentEdit}"
+                          th:onclick="navToCampusDepartment([[${item.campus.id}]], [[${department.id}]]);">Edit</button></td>
+            </tr>
+            </tbody>
+          </table>
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    function navToCampusDepartment(cId, dId) {
+      window.location.href='/campus/campus/'+cId+'/department/'+dId;
+    }
+  </script>
+
+</div>
+
+</html>
