@@ -8,5 +8,7 @@ public record WikiPostModel (
         String body,
         String folder,
         String summary,
-        BigInteger authorId ) {
+        BigInteger authorId,
+        String anonymous,
+        String published) {
 }

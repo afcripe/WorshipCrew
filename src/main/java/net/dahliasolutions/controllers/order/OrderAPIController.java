@@ -120,7 +120,6 @@ public class OrderAPIController {
         Optional<OrderRequest> orderRequest = orderService.findById(statusModel.requestId());
         if (orderRequest.isPresent()) {
             orderRequest.get().setOrderStatus(OrderStatus.valueOf(statusModel.requestStatus()));
-//            orderRequest.get().setRequestNote(statusModel.RequestNote());
             orderService.save(orderRequest.get());
             orderNoteService.createOrderNote(new OrderNote(
                     null,
@@ -273,15 +272,16 @@ public class OrderAPIController {
         String noteDetail = "";
         if (requestItem.isPresent()) {
             if (newSuper.isPresent()) {
-                // save new super to request item
+                // save new super to request item and change item status to submitted
                 requestItem.get().setSupervisor(newSuper.get());
+                requestItem.get().setItemStatus(OrderStatus.Submitted);
                 orderItemService.save(requestItem.get());
                 // add new super to list if not primary
                 if (!requestItem.get().getOrderRequest().getSupervisor().equals(newSuper.get())) {
                     requestItem.get().getOrderRequest().setSupervisorList(
                             addToSupervisorList(newSuper.get(), requestItem.get().getOrderRequest().getSupervisorList()));
                 }
-                // save request with updated supre list
+                // save request with updated super list
                 orderService.save(requestItem.get().getOrderRequest());
                 // create new note for request
                 noteDetail = newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+

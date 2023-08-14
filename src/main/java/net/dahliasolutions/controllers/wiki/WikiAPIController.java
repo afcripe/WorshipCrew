@@ -55,6 +55,8 @@ public class WikiAPIController {
         wikiPost.get().setFolder(wikiPostModel.folder());
         wikiPost.get().setLastUpdated(LocalDateTime.now());
         wikiPost.get().setSummary(summary);
+        wikiPost.get().setAnonymous(Boolean.valueOf(wikiPostModel.anonymous()));
+        wikiPost.get().setPublished(Boolean.valueOf(wikiPostModel.published()));
 
         return wikiPostService.save(wikiPost.get()).getId();
     }

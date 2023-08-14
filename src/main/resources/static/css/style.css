@@ -113,6 +113,9 @@
 }
 /**/
 
+.selectableCard {
+    cursor: pointer;
+}
 .selectableItem {
     cursor: pointer;
 }

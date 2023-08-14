@@ -25,10 +25,16 @@
                     <div class="card m-1">
                         <div class="card-title h6">Tags</div>
                         <div class="card-section">
-                            <div class="tag_primary m-1" style="display: inline-block; cursor: pointer;" th:onclick="navToTag([[*{tag.id}]])"
+                            <div class="tag_primary m-1 selectableItem" style="display: inline-block;" th:onclick="navToTag([[*{tag.id}]])"
                                  th:each="tag : *{tagList}" th:text="${tag.name + '(' + tag.references + ')'}"></div>
                         </div>
                     </div>
+                </div>
+
+                <div class="card m-1">
+                    <div class="card-title h6">My Unpublished Articles</div>
+                    <div class="selectableItem p-1" th:onclick="navToPost([[*{unpublished.id}]])"
+                         th:each="unpublished : *{unpublishedList}" th:text="${unpublished.title}"></div>
                 </div>
 
             </div>
@@ -48,6 +54,9 @@
         }
         function navToFolder(name) {
             window.location.href="/resource/articles"+name;
+        }
+        function navToPost(id) {
+            window.location.href="/resource/article/"+id;
         }
 
         let folders = document.getElementById("divFolderNav");

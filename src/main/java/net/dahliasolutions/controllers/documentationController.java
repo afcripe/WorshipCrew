@@ -49,7 +49,13 @@ public class documentationController {
 
         AdminSettings adminSettings = adminSettingsService.getAdminSettings();
         if (!adminSettings.getDocumentationHome().equals("")) {
-            model.addAttribute("wikiPost", getDocsHomeFromPath(adminSettings.getDocumentationHome()));
+            WikiPost w = getDocsHomeFromPath(adminSettings.getDocumentationHome());
+            if (!w.isAnonymous()) {
+                session.setAttribute("msgError", "Access Denied to Article");
+                model.addAttribute("wikiPost", getDefaultDocs());
+                return redirectService.pathName(session, "/");
+            }
+            model.addAttribute("wikiPost", w);
         } else {
             model.addAttribute("wikiPost", getDefaultDocs());
         }
@@ -65,6 +71,10 @@ public class documentationController {
         String postURLName = folderList[folderList.length-1];
         String postName = postURLName.replace("-", " ");
         String folders = "";
+        WikiPost post = new WikiPost();
+                post.setPublished(false);
+                post.setAnonymous(false);
+
         for ( int i=1; i<folderList.length-1; i++ ) {
             folders = folders + "/" + folderList[i];
         }
@@ -73,12 +83,18 @@ public class documentationController {
         if (wikiList.size() > 1) {
             for ( WikiPost w : wikiList ) {
                 if ( w.getFolder().equals(folders) ) {
-                    return w;
+                    post = w;
                 }
             }
+        } else if (wikiList.size() == 1) {
+            post = wikiList.get(0);
         }
 
-        return wikiList.get(0);
+        if (!post.isAnonymous() || !post.isPublished()) {
+            post = getDefaultDocs();
+        }
+
+        return post;
     }
 
     private WikiPost getDefaultDocs() {
@@ -89,6 +105,8 @@ public class documentationController {
 
         WikiPost post = new WikiPost();
             post.setBody(postBody);
+            post.setPublished(true);
+            post.setAnonymous(true);
         return post;
     }
 }

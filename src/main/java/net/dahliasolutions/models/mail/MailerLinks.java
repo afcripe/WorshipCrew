@@ -22,6 +22,7 @@ public class MailerLinks {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private BigInteger id;
     private BigInteger userId;
+    private BigInteger serviceId;
     private String randomLinkString;
     private LocalDateTime expiration;
     private boolean forceExpire;

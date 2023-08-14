@@ -61,13 +61,22 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/*").permitAll();
+                    auth.requestMatchers("/").permitAll();
+                    auth.requestMatchers("/login").permitAll();
+                    auth.requestMatchers("/forgotpassword").permitAll();
+                    auth.requestMatchers("/signin").permitAll();
+                    auth.requestMatchers("/login").permitAll();
+                    auth.requestMatchers("/logout").permitAll();
+                    auth.requestMatchers("/passwordreset").permitAll();
+                    auth.requestMatchers("/logout").permitAll();
+                    auth.requestMatchers("/mailer").permitAll();
+                    auth.requestMatchers("/mailer/*").permitAll();
+
                     auth.requestMatchers("/css/**").permitAll();
                     auth.requestMatchers("/img/**").permitAll();
                     auth.requestMatchers("/content/**").permitAll();
                     auth.requestMatchers("/fonts/**").permitAll();
                     auth.requestMatchers("/js/**").permitAll();
-                    auth.requestMatchers("/mailer/**").permitAll();
 
                     auth.requestMatchers("/store").hasAnyAuthority("ADMIN_WRITE", "STORE_READ","STORE_WRITE");
                     auth.requestMatchers("/store/item/**").hasAnyAuthority("ADMIN_WRITE", "STORE_READ","STORE_WRITE");

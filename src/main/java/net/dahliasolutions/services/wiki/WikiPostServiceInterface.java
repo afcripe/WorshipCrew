@@ -13,13 +13,16 @@ public interface WikiPostServiceInterface {
     WikiPost createWikiPost(WikiPost wikiPost);
     Optional<WikiPost> findById(BigInteger id);
     List<WikiPost> findByTitle(String title);
+    List<WikiPost> findByTitleIncludeUnpublished(String title);
     List<WikiPost> searchByTitle(String title);
     List<WikiPost> searchAll(String searchTerm);
     List<WikiPost> findAll();
+    List<WikiPost> findAllUnpublished();
     List<WikiPost> findAllByFolder(String name);
     List<WikiPost> findRecent();
     List<WikiPost> findAllByTagId(BigInteger id);
     List<WikiPost> findByAuthor(BigInteger authorId);
+    List<WikiPost> findByAuthorAndUnpublished(BigInteger authorId);
     WikiPost save(WikiPost wikiPost);
     void mergeTags(WikiTag sourceTag, WikiTag destinationTag);
     void removeTag(WikiTag wikiTag);

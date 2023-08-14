@@ -3,6 +3,8 @@ package net.dahliasolutions.controllers.store;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.AdminSettings;
+import net.dahliasolutions.models.Notification;
+import net.dahliasolutions.models.NotificationModule;
 import net.dahliasolutions.models.department.DepartmentRegional;
 import net.dahliasolutions.models.position.Position;
 import net.dahliasolutions.models.position.PositionSelectedModel;
@@ -47,6 +49,7 @@ public class StoreController {
     private final StoreSubCategoryService subCategoryService;
     private final AdminSettingsService adminSettingsService;
     private final WikiPostService wikiPostService;
+    private final NotificationService notificationService;
     @ModelAttribute
     public void addAttributes(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -308,11 +311,13 @@ public class StoreController {
 
     @GetMapping("/settings")
     public String getStoreSettings(Model model) {
+        List<Notification> notificationList = notificationService.findAllByModule(NotificationModule.Store);
         List<StoreCategory> categoryList = categoryService.findAll();
         model.addAttribute("categoryList", categoryList);
         model.addAttribute("storeHome", adminSettingsService.getAdminSettings().getStoreHome());
         model.addAttribute("restrictPosition", adminSettingsService.getAdminSettings().isRestrictStorePosition());
         model.addAttribute("restrictDepartment", adminSettingsService.getAdminSettings().isRestrictStoreDepartment());
+        model.addAttribute("notificationList", notificationList);
         return "store/settings";
     }
 

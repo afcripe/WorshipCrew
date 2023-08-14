@@ -3,6 +3,7 @@ package net.dahliasolutions.services.user;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.data.*;
+import net.dahliasolutions.models.user.NotificationChannel;
 import net.dahliasolutions.models.user.Profile;
 import net.dahliasolutions.models.user.User;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ public class ProfileService implements ProfileServiceInterface{
                 profile.setTheme("default");
                 profile.setSideNavigation("expand");
                 profile.setStoreLayout("grid");
+                profile.setNotificationChannel(NotificationChannel.email);
         return profileRepository.save(profile);
     }
 

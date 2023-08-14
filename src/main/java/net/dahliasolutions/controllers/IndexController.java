@@ -122,40 +122,49 @@ public class IndexController {
 
     @GetMapping("/articles/**")
     public String addNewPost(Model model, HttpServletRequest request, HttpSession session) {
-
         String requestURL = request.getRequestURL().toString();
         String folderFile = requestURL.split("/articles")[1];
         String[] folderList = folderFile.split("/");
         String postURLName = folderList[folderList.length-1];
         String postName = postURLName.replace("-", " ");
         String folders = "";
+        WikiPost post = new WikiPost();
+                post.setPublished(false);
+                post.setAnonymous(false);
+
         for ( int i=1; i<folderList.length-1; i++ ) {
             folders = folders + "/" + folderList[i];
         }
 
         Optional<WikiFolder> dir = wikiFolderService.findByFolder(folderFile);
         if (dir.isPresent()){
-            List<WikiPost> wikiPostList = wikiPostService.findAllByFolder(dir.get().getFolder());
-            model.addAttribute("wikiPostList", wikiPostList);
-            model.addAttribute("folder", dir.get());
-            return "wiki/folderPosts";
+            session.setAttribute("msgError", "Article not Found.");
+            return redirectService.pathName(session, "/");
         }
 
         List<WikiPost> wikiList = wikiPostService.findByTitle(postName);
         if (wikiList.isEmpty()) {
-            session.setAttribute("msgError", "Post not Found.");
-            return redirectService.pathName(session, "/resource");
+            session.setAttribute("msgError", "Article not Found.");
+            return redirectService.pathName(session, "/");
         }
+
         if (wikiList.size() > 1) {
             for ( WikiPost w : wikiList ) {
                 if ( w.getFolder().equals(folders) ) {
-                    model.addAttribute("wikiPost", w);
-                    return "wiki/post";
+                    post = w;
+                    break;
                 }
             }
+        } else if(wikiList.size() == 1) {
+            post = wikiList.get(0);
         }
 
-        model.addAttribute("wikiPost", wikiList.get(0));
+        if (!post.isAnonymous() || !post.isPublished()) {
+            session.setAttribute("msgError", "Access Denied to Article");
+            return redirectService.pathName(session, "/");
+        }
+
+        model.addAttribute("wikiPost", post);
         return "documentation";
 
     }

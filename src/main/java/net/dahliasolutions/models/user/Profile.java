@@ -22,6 +22,9 @@ public class Profile {
     private String sideNavigation;
     private String storeLayout;
 
+    @Enumerated
+    private NotificationChannel notificationChannel;
+
     @OneToOne
     private User user;
 }

@@ -49,10 +49,11 @@ public class WikiController {
 
     @GetMapping("")
     public String getRecent(Model model, HttpSession session) {
-        redirectService.setHistory(session, "/resource");
         AdminSettings adminSettings = adminSettingsService.getAdminSettings();
-        if (!adminSettings.getWikiHome().equals("")) {
 
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (!adminSettings.getWikiHome().equals("")) {
             List<WikiTag> tags = wikiTagService.findAll();
             List<WikiTagReference> tagList = new ArrayList<>();
             for ( WikiTag tag : tags ) {
@@ -65,6 +66,9 @@ public class WikiController {
 
             model.addAttribute("wikiPost", getWikiFromPath(adminSettings.getWikiHome()));
             model.addAttribute("tagList", tagList);
+            model.addAttribute("unpublishedList", wikiPostService.findByAuthorAndUnpublished(user.getId()));
+
+            redirectService.setHistory(session, "/resource");
             return "wiki/wikiHome";
         }
 
@@ -84,6 +88,7 @@ public class WikiController {
 
         model.addAttribute("wikiPostList", wikiPostList);
         model.addAttribute("tagList", tagList);
+        model.addAttribute("unpublishedList", wikiPostService.findByAuthorAndUnpublished(user.getId()));
         model.addAttribute("folderList", folderList);
         return "wiki/index";
     }
@@ -164,6 +169,9 @@ public class WikiController {
         String postURLName = folderList[folderList.length-1];
         String postName = postURLName.replace("-", " ");
         String folders = "";
+        WikiPost post = new WikiPost();
+            post.setPublished(false);
+
         for ( int i=1; i<folderList.length-1; i++ ) {
             folders = folders + "/" + folderList[i];
         }
@@ -178,19 +186,26 @@ public class WikiController {
 
         List<WikiPost> wikiList = wikiPostService.findByTitle(postName);
         if (wikiList.isEmpty()) {
-            session.setAttribute("msgError", "Post not Found.");
+            session.setAttribute("msgError", "Article not Found.");
             return redirectService.pathName(session, "/resource");
         }
         if (wikiList.size() > 1) {
             for ( WikiPost w : wikiList ) {
                 if ( w.getFolder().equals(folders) ) {
-                    model.addAttribute("wikiPost", w);
-                    return "wiki/post";
+                    post = w;
+                    break;
                 }
             }
+        } else if(wikiList.size() == 1) {
+            post = wikiList.get(0);
         }
 
-        model.addAttribute("wikiPost", wikiList.get(0));
+        if (!post.isPublished()) {
+            session.setAttribute("msgError", "Access Denied to Article, Not Published");
+            return redirectService.pathName(session, "/resource");
+        }
+
+        model.addAttribute("wikiPost", post);
         return "wiki/post";
 
     }
@@ -208,6 +223,8 @@ public class WikiController {
             wikiPost.setLastUpdated(LocalDateTime.now());
             wikiPost.setSummary("");
             wikiPost.setAuthor(user);
+            wikiPost.setAnonymous(false);
+            wikiPost.setPublished(true);
             wikiPost.setTagList(new ArrayList<>());
 
         model.addAttribute("wikiPost", wikiPost);
@@ -239,6 +256,7 @@ public class WikiController {
         model.addAttribute("wikiHome", adminSettingsService.getAdminSettings().getWikiHome());
         model.addAttribute("portalHome", adminSettingsService.getAdminSettings().getPortalHome());
         model.addAttribute("docsHome", adminSettingsService.getAdminSettings().getDocumentationHome());
+        model.addAttribute("unpublishedList", wikiPostService.findAllUnpublished());
         return "wiki/settings";
     }
 

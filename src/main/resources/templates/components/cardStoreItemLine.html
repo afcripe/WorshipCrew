@@ -2,17 +2,17 @@
 <html lang="en" xmlns:th="http://thymeleaf.org">
 
 <div th:fragment="cardFragment(storeItem)">
-  <div class="card" th:object="${storeItem}">
+  <div class="card selectableCard" th:object="${storeItem}">
 
-    <div class="row mt-2" >
-      <div class="col-6 col-md-4" style="vertical-align: center" th:onclick="navToItem([[*{id}]])">
+    <div class="row mt-2" th:onclick="navToItem([[*{id}]])">
+      <div class="col-6 col-md-4" style="vertical-align: center">
         <th:block th:if="*{image}">
           <img th:src="@{*{image.fileLocation}}" class="store_line_image mr-2 align-content-center" style="float: left">
         </th:block>
         <h6 th:text="*{name}" class=" align-content-center"></h6>
       </div>
 
-      <div class="col-6 col-md-8" style="overflow-x: clip" th:onclick="navToItem([[*{id}]])">
+      <div class="col-6 col-md-8" style="overflow-x: clip">
         <p th:text="*{description}" style="overflow: clip; max-height: 1.5em;"></p>
       </div>
     </div>
@@ -28,7 +28,7 @@
           </div>
         </div>
 
-        <div class="d-none d-md-block col-3 mt-2">
+        <div class="d-none d-md-block col-3 mt-2" th:onclick="navToItem([[*{id}]])">
           <div th:unless="*{specialOrder}">
             Lead Time: <span th:text="*{leadTime}"></span> Days
           </div>

@@ -4,8 +4,9 @@
       layout:decorate="~{layouts/defaultLayout}" xmlns="http://www.w3.org/1999/html">
 
 <div class="container" layout:fragment="content">
+    <div id="contentDiv">Acknowledged</div>
 <script>
-  window.close();
+    document.getElementById("contentDiv").addEventListener('load', function() { temp.close(); } , false);
 </script>
 </div>
 

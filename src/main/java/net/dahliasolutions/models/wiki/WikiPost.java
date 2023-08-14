@@ -26,6 +26,8 @@ public class WikiPost {
     private LocalDateTime created;
     private LocalDateTime lastUpdated;
     private String summary;
+    private boolean anonymous;
+    private boolean published;
 
     @ManyToOne
     private User author;

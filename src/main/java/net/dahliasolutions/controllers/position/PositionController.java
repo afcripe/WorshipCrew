@@ -40,15 +40,6 @@ public class PositionController {
 
     @GetMapping("")
     public String getPositions(Model model, HttpSession session) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println(auth.getPrincipal().toString());
-        if (auth.getPrincipal().toString().equals("anonymousUser")) {
-            return "redirect:/";
-        }
-        if (!positionEdit()) {
-            session.setAttribute("msgError", "Access Denied");
-            return redirectService.pathName(session,"position");
-        }
         List<Position> positionList = positionService.findAll();
         List<PermissionTemplate> templateList = permissionTemplateService.findAll();
 

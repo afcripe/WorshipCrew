@@ -34,7 +34,7 @@ public class EmailService implements EmailServiceInterface{
     private final TemplateEngine templateEngine;
     private final AuthService authService;
     private final UserService userService;
-    private final MailerLinksRepository mailerLinksRepository;
+    private final MailerLinksService mailerLinksService;
     private final AppServer appServer;
 
     @Value("${spring.mail.username}") private String sender;
@@ -103,10 +103,10 @@ public class EmailService implements EmailServiceInterface{
             javaMailSender.send(message);
 
             MailerLinks mLink = new MailerLinks(
-                    null, id, linkString,
+                    null, id, id, linkString,
                     LocalDateTime.now().plusDays(14),
                     false, "setPassword");
-            mailerLinksRepository.save(mLink);
+            mailerLinksService.save(mLink);
 
             return new BrowserMessage("msgSuccess", "E-mail sent.");
         } catch (Exception e) {
@@ -135,10 +135,10 @@ public class EmailService implements EmailServiceInterface{
             javaMailSender.send(message);
 
             MailerLinks mLink = new MailerLinks(
-                    null, id, linkString,
+                    null, id, id, linkString,
                     LocalDateTime.now().plusDays(14),
                     false, "resetPassword");
-            mailerLinksRepository.save(mLink);
+            mailerLinksService.save(mLink);
 
             return new BrowserMessage("msgSuccess", "E-mail sent.");
         } catch (Exception e) {
@@ -195,10 +195,10 @@ public class EmailService implements EmailServiceInterface{
             javaMailSender.send(message);
 
             MailerLinks mLink = new MailerLinks(
-                    null, id, linkString,
+                    null, id, orderRequest.getId(), linkString,
                     LocalDateTime.now().plusDays(5),
-                    false, "acknowledge");
-            mailerLinksRepository.save(mLink);
+                    false, "acknowledgeRequest");
+            mLink = mailerLinksService.createLink(mLink);
 
             return new BrowserMessage("msgSuccess", "E-mail sent.");
         } catch (Exception e) {
@@ -230,10 +230,10 @@ public class EmailService implements EmailServiceInterface{
             javaMailSender.send(message);
 
             MailerLinks mLink = new MailerLinks(
-                    null, id, linkString,
+                    null, id, orderItem.getId(), linkString,
                     LocalDateTime.now().plusDays(5),
-                    false, "acknowledge");
-            mailerLinksRepository.save(mLink);
+                    false, "acknowledgeItem");
+            mailerLinksService.save(mLink);
 
             return new BrowserMessage("msgSuccess", "E-mail sent.");
         } catch (Exception e) {

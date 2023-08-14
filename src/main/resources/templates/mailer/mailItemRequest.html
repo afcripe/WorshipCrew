@@ -43,20 +43,20 @@
 <a th:href="${baseURL}" style="text-decoration: none;">
     <div class="card-header">
         <h2 class="card-header-text">
-            <img th:src="${baseURL}+'/img/favicon.png'" alt="Exchange Logo" width="32" class="float-left" />
+            <img th:src="${baseURL}+'/img/favicon.png'" alt="dwc" width="32" class="float-left" />
             &nbsp;Destiny Worship Crew
         </h2>
     </div>
 
 </a>
-<h4 class="float-left" th:text="${emailSubject}">Order Request</h4>
-<a class="float-right btnAcknowledge"
-        th:href="${webLink}+'?eventId='+${id}+'&action=acknowledgeItem'">Acknowledge</a>
 
 <!-- Content -->
 
 <div class="card" th:object="${requestItem}">
 
+    <h4 class="float-left" th:text="${emailSubject}">Order Request</h4>
+    <a class="float-right btnAcknowledge"
+       th:href="${webLink}+'?eventId='+${requestItem.id}+'&action=acknowledgeItem'">Acknowledge</a>
     <table class="table">
         <thead>
         <tr>

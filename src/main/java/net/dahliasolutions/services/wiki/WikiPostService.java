@@ -33,6 +33,11 @@ public class WikiPostService implements WikiPostServiceInterface {
     }
 
     @Override
+    public List<WikiPost> findByTitleIncludeUnpublished(String title) {
+        return wikiPostRepository.findByTitleIncludeUnpublished(title);
+    }
+
+    @Override
     public List<WikiPost> searchByTitle(String title) {
         return wikiPostRepository.searchByTitle(title);
     }
@@ -48,8 +53,13 @@ public class WikiPostService implements WikiPostServiceInterface {
     }
 
     @Override
+    public List<WikiPost> findAllUnpublished() {
+        return wikiPostRepository.findAllByPublished(false);
+    }
+
+    @Override
     public List<WikiPost> findAllByFolder(String name) {
-        return wikiPostRepository.findAllByFolder(name);
+        return wikiPostRepository.findAllByFolderAndPublished(name, true);
     }
 
     @Override
@@ -65,6 +75,11 @@ public class WikiPostService implements WikiPostServiceInterface {
     @Override
     public List<WikiPost> findByAuthor(BigInteger authorId) {
         return wikiPostRepository.findByAuthor(authorId);
+    }
+
+    @Override
+    public List<WikiPost> findByAuthorAndUnpublished(BigInteger authorId) {
+        return wikiPostRepository.findByAuthorAndUnpublished(authorId);
     }
 
     @Override
@@ -93,7 +108,7 @@ public class WikiPostService implements WikiPostServiceInterface {
 
     @Override
     public void removeFolder(WikiFolder wikiFolder) {
-        List<WikiPost> postList = wikiPostRepository.findAllByFolder(wikiFolder.getFolder());
+        List<WikiPost> postList = wikiPostRepository.findAllByFolderAndPublished(wikiFolder.getFolder(), true);
         for (WikiPost post : postList) {
             post.setFolder("/general");
         }
@@ -107,7 +122,7 @@ public class WikiPostService implements WikiPostServiceInterface {
 
     @Override
     public void updateFolder(String srcFolder, String destFolder) {
-        List<WikiPost> postList = wikiPostRepository.findAllByFolder(srcFolder);
+        List<WikiPost> postList = wikiPostRepository.findAllByFolderAndPublished(srcFolder, true);
         for (WikiPost post : postList) {
             post.setFolder(destFolder);
         }

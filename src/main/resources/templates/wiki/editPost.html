@@ -27,9 +27,17 @@
                     </div>
                 </div>
                 <div id="summaryRow" class="row" style="display: none">
-                    <div class="col pb-1">
+                    <div class="col-12 pb-1">
                         <input type="text" class="form-control-sm flex-grow" style="width: 100%" th:id="postSummary"
                                placeholder="Article Summary"  th:value="*{summary}"/>
+                        <div class="col-6">
+                            <label  for="anonymous">View in Documentation</label>
+                            <input id="anonymous" name="anonymous" type="checkbox" th:checked="*{anonymous}"/>
+
+                            <label  for="published">Published</label>
+                            <input id="published" name="published" type="checkbox" th:checked="*{published}"/>
+                        </div>
+
                     </div>
                 </div>
                 <dvi class="row">
@@ -526,7 +534,9 @@
             if (inputSummary.value === "") {
                 mySummary = myTextContent.substring(0,255);
             }
-
+            let myAnonymous = document.getElementById('anonymous');
+            let myPublished = document.getElementById('published');
+            debugger
             let formData = new FormData();
                 formData.set("id", document.getElementById('postId').value);
                 formData.set("title", document.getElementById('postTitle').value);
@@ -534,6 +544,8 @@
                 formData.set("folder", document.getElementById('folder').value);
                 formData.set("summary", mySummary);
                 formData.set("authorId", document.getElementById('authorId').value);
+                formData.set("anonymous", myAnonymous.checked);
+                formData.set("published", myPublished.checked);
 
             let newFolder = document.getElementById('folder').value;
             console.log(newFolder);

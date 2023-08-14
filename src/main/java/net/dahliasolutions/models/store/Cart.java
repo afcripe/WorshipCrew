@@ -7,11 +7,11 @@ import lombok.*;
 import java.math.BigInteger;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Entity
 public class Cart {
 
@@ -32,4 +32,11 @@ public class Cart {
         return counter;
     }
 
+    @Override
+    public String toString() {
+        return "Cart{" +
+                "id=" + id +
+                ", itemCount=" + itemCount +
+                '}';
+    }
 }

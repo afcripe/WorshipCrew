@@ -5,6 +5,7 @@ import net.dahliasolutions.models.campus.Campus;
 import net.dahliasolutions.models.position.Position;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.wiki.WikiTag;
+import net.dahliasolutions.services.NotificationService;
 import net.dahliasolutions.services.campus.CampusService;
 import net.dahliasolutions.services.department.DepartmentRegionalService;
 import net.dahliasolutions.services.position.PositionService;
@@ -19,6 +20,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Optional;
 
 //import java.math.BigInteger;
@@ -49,7 +51,7 @@ public class Main {
 //    @Bean
 //    CommandLineRunner run(UserRolesService roleService, PositionService positionService, WikiTagService wikiTagService,
 //                          UserService userService, CampusService campusService, DepartmentRegionalService departmentRegionalService,
-//                          WikiFolderService wikiFolderService) {
+//                          WikiFolderService wikiFolderService, NotificationService notificationService) {
 //        return args -> {
 //
 //            wikiTagService.createWikiTag(new WikiTag(null, "production"));
@@ -59,8 +61,10 @@ public class Main {
 //
 //            roleService.createRole("RESOURCE_READ", "View resources");
 //            roleService.createRole("RESOURCE_WRITE", "Create new resources");
+//            roleService.createRole("RESOURCE_SUPERVISOR", "Has full access to resources and resource settings");
 //            roleService.createRole("STORE_READ", "Browse that store and request items within assigned department");
 //            roleService.createRole("STORE_WRITE", "Create new items in the store for assigned department");
+//            roleService.createRole("STORE_SUPERVISOR", "Has full access to store and store settings");
 //            roleService.createRole("REQUEST_WRITE", "Update, assign, and fulfill user requests");
 //            roleService.createRole("REQUEST_SUPERVISOR", "Full access to user requests");
 //            roleService.createRole("SUPPORT_READ", "View support tickets");
@@ -74,6 +78,10 @@ public class Main {
 //            roleService.createRole("DIRECTOR_READ", "View all information regionally for assigned department");
 //            roleService.createRole("DIRECTOR_WRITE", "Edit all information regionally for assigned department, and manage positions");
 //            roleService.createRole("ADMIN_WRITE", "Has full access");
+//
+//            notificationService.save(new Notification(null, "All Requests",
+//                    "Get copied on all store requests.", NotificationModule.Request, new ArrayList<>()));
+//
 //
 //            Campus mainLocation = campusService.createCampus("Destin", "Destin", BigInteger.valueOf(0));
 //            Campus location1 = campusService.createCampus("FWB", "Fort Walton Beach", BigInteger.valueOf(1));

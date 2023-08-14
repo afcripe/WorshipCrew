@@ -14,64 +14,13 @@
     </div>
 
     <div class="row">
-      <div class="col-12 col-lg-6 pb-2">
-        <div class="card" style="max-width: 450px">
-        <div class="card-body">
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item selectableItem"
-                onclick="window.location.href='/resource/tagmanager'">
-              Manage Tags
-            </li>
-            <li class="list-group-item selectableItem"
-                onclick="window.location.href='/resource/foldermanager'">
-              Manage Folders
-            </li>
-          </ul>
-        </div>
-      </div>
-
-        <div class="pt-4" style="max-width: 450px;">
-          <h4>Resource Home Page</h4>
-          <p>Leave blank to use default page of recent articles.</p>
-          <input id="inputWikiHome" type="text" style="width: 300px" th:value="${wikiHome}" onkeyup="inputSubmit()">
-          <button id="btnWikiHome" type="button" class="btn btn-sm btn-outline-wiki" onclick="updateWikiHome()">Update</button>
-        </div>
-
-        <div class="pt-4" style="max-width: 450px;">
-          <h4>Site Home Page</h4>
-          <p>Leave blank to use default site homepage.</p>
-          <input id="inputPortalHome" type="text" style="width: 300px" th:value="${portalHome}" onkeyup="inputPortalSubmit()">
-          <button id="btnPortalHome" type="button" class="btn btn-sm btn-outline-wiki" onclick="updatePortalHome()">Update</button>
-        </div>
-
-        <div class="pt-4" style="max-width: 450px;">
-          <h4>Documentation Home Page</h4>
-          <p>Leave blank to use default page of recent articles.</p>
-          <input id="inputDocsHome" type="text" style="width: 300px" th:value="${docsHome}" onkeyup="inputDocsSubmit()">
-          <button id="btnDocsHome" type="button" class="btn btn-sm btn-outline-wiki" onclick="updateDocsHome()">Update</button>
-        </div>
-      </div>
 
       <div class="col-12 col-lg-6">
         <div class="card m-1">
-          <div class="card-title h6">Unpublished Articles</div>
+          <div class="card-title h6">Notification</div>
           <div>
-            <div class="row mx-2 p-1">
-              <div class="col-8">
-                <strong>Title</strong>
-              </div>
-              <div class="col-4">
-                <strong>Author</strong>
-              </div>
-            </div>
-            <div class="row selectableItem mx-2 p-1" th:onclick="navToPost([[*{unpublished.id}]])" th:each="unpublished : *{unpublishedList}">
-              <div class="col-8">
-                <span th:text="${unpublished.title}"></span>
-              </div>
-              <div class="col-4">
-                <span th:text="${unpublished.author.firstName}+' '+${unpublished.author.lastName}"></span>
-              </div>
-            </div>
+
+
           </div>
         </div>
       </div>

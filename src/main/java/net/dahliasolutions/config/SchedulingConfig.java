@@ -18,8 +18,19 @@ public class SchedulingConfig {
     private final EmailService emailService;
 
     @Scheduled(cron="0 0 10 1 * ?", zone="America/Chicago")
-    public void sendMonthlyStatements() {
-        System.out.println("Run Task");
+    public void runMonthly() {
+        System.out.println("Run Task Every Month");
+//        if (adminSettingsService.getAdminSettings().isMonthlyStatements()) {
+//            List<User> userList = userService.findAllByActivated();
+//            for(User user : userList) {
+//                emailService.sendStatement(user);
+//            }
+//        }
+    }
+
+    @Scheduled(cron="0 0/2 * * * ?", zone="America/Chicago")
+    public void runEvery2Minutes() {
+//        System.out.println("Run Task Every 2 Minutes");
 //        if (adminSettingsService.getAdminSettings().isMonthlyStatements()) {
 //            List<User> userList = userService.findAllByActivated();
 //            for(User user : userList) {

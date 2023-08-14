@@ -2,16 +2,16 @@
 <html lang="en" xmlns:th="http://thymeleaf.org">
 
 <div th:fragment="cardFragment(storeItem)">
-  <div class="card my-2" th:object="${storeItem}">
+  <div class="card my-2 selectableCard" th:object="${storeItem}">
 
     <div class="card-body">
 
-        <div class="row" th:onclick="navToItem([[*{id}]])" style="cursor: pointer">
+        <div class="row" th:onclick="navToItem([[*{id}]])">
             <div class="col">
                 <h3 th:text="*{name}"></h3>
             </div>
         </div>
-        <div class="row" th:onclick="navToItem([[*{id}]])" style="cursor: pointer">
+        <div class="row" th:onclick="navToItem([[*{id}]])">
             <div class="col">
 
                 <th:block th:if="*{image}">
@@ -44,7 +44,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <div class="row" th:onclick="navToItem([[*{id}]])">
                 <div class="col-6">
                     Lead Time: <span th:text="*{leadTime}"></span> Days
                 </div>
