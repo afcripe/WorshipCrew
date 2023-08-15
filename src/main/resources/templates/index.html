@@ -48,27 +48,4 @@
 
 </div>
 
-<!--
-  <div class="card-section" sec:authorize="isAuthenticated()">
-    <h2>Welcome</h2>
-    <div th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'VOLUNTEER_READ')}">
-      <div>This is only for ADMIN_WRITE or VOLUNTEER_READ</div>
-    </div>
-    <div sec:authorize="hasRole('USER')">Text visible to user.</div>
-    <div sec:authorize="hasRole('ADMIN_WRITE')">Text visible to admin.</div>
-    <div sec:authorize="isAuthenticated()">Text visible only to authenticated users.</div>
-    Authenticated username:
-    <div sec:authentication="name"></div>
-    Authenticated user's firstName:
-    <div sec:authentication="principal.firstName"></div>
-    Authenticated user's lastName:
-    <div sec:authentication="principal.lastName"></div>
-    Authenticated user's email:
-    <div sec:authentication="principal.lastName"></div>
-    Authenticated user roles:
-    <div sec:authentication="principal.authorities"></div>
-  </div>
--->
-
-
 </html>

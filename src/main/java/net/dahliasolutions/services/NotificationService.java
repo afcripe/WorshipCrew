@@ -3,6 +3,7 @@ package net.dahliasolutions.services;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.data.NotificationRepository;
+import net.dahliasolutions.models.EventType;
 import net.dahliasolutions.models.Notification;
 import net.dahliasolutions.models.EventModule;
 import net.dahliasolutions.models.user.User;
@@ -22,7 +23,9 @@ public class NotificationService implements NotificationServiceInterface {
 
     @Override
     public Notification save(Notification notification) {
-        return notificationRepository.save(notification);
+        Notification update = notificationRepository.save(notification);
+        Notification verify = findById(update.getId()).get();
+        return update;
     }
 
     @Override
@@ -46,7 +49,22 @@ public class NotificationService implements NotificationServiceInterface {
     }
 
     @Override
+    public List<Notification> findAllByType(EventType type) {
+        return notificationRepository.findAllByType(type);
+    }
+
+    @Override
+    public List<Notification> findAllByModuleAndType(EventModule module, EventType type) {
+        return notificationRepository.findAllByModuleAndType(module, type);
+    }
+
+    @Override
     public List<Notification> findByUser(User user) {
         return findByUser(user);
+    }
+
+    @Override
+    public void deleteById(BigInteger id) {
+        notificationRepository.deleteById(id);
     }
 }

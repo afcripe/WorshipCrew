@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+
+    <link rel="icon" type="image/x-icon" href="@{favicon.ico}">
+
+    <style>
+        .card{background: transparent; border: #4b5257 solid 0.1rem; border-radius: 0.3rem; padding: 1rem 1rem 1rem 1rem;}
+        .card-header{position:relative;padding:0.5rem 0.5rem;margin-bottom:1rem;border:1px solid transparent;border-radius:0.3rem; background-color: #212529; color: white;vertical-align: center}
+        .card-header-text{color: #8fcafe}
+        .float-left{float: left;}
+        .float-right{float: right;}
+        .emphasis{font-weight: bold;}
+        .de-emphasize{(font-size: 0.5rem;)}
+        .table{width:100%;margin-bottom:1rem;vertical-align:top;}
+        .table th{text-align: left;}
+    </style>
+</head>
+
+<body class="container-fluid d-flex flex-column min-vh-100">
+
+<!-- Header -->
+<a th:href="${baseURL}" style="text-decoration: none;">
+<div class="card-header">
+    <h2 class="card-header-text">
+        <img th:src="${baseURL}+'/img/favicon.png'" alt="dwc" width="32" class="float-left" />
+        &nbsp;Destiny Worship Crew
+    </h2>
+</div>
+
+</a>
+<h4 th:text="${emailSubject}">System Notification</h4>
+
+<!-- Content -->
+
+<div class="card" th:object="${notification}">
+
+    <div><span class="emphasis" th:text="*{name}"></span></div>
+
+    <div><span th:text="*{Description}"></span></div>
+
+    <br><br>
+
+    <div style="padding: 2px;">
+        <div class="float-left de-emphasize">Module: <span th:text="*{module}"></span></div>
+        <div class="float-right de-emphasize">Event: <span th:text="*{type}"></span></div>
+    </div>
+
+</div>
+
+<br />
+
+<!-- Footer -->
+
+</body>
+
+</html>

@@ -2,12 +2,20 @@ package net.dahliasolutions.controllers.order;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import net.dahliasolutions.models.EventModule;
+import net.dahliasolutions.models.EventType;
+import net.dahliasolutions.models.Notification;
 import net.dahliasolutions.models.UniversalSearchModel;
 import net.dahliasolutions.models.campus.Campus;
 import net.dahliasolutions.models.department.DepartmentRegional;
 import net.dahliasolutions.models.order.*;
+import net.dahliasolutions.models.records.BigIntegerStringModel;
+import net.dahliasolutions.models.store.StoreCategory;
+import net.dahliasolutions.models.store.StoreNotifyTarget;
+import net.dahliasolutions.models.store.StoreSetting;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
+import net.dahliasolutions.services.NotificationService;
 import net.dahliasolutions.services.RedirectService;
 import net.dahliasolutions.services.campus.CampusService;
 import net.dahliasolutions.services.department.DepartmentRegionalService;
@@ -40,6 +48,7 @@ public class OrderController {
     private final DepartmentRegionalService departmentService;
     private final CampusService campusService;
     private final RedirectService redirectService;
+    private final NotificationService notificationService;
 
     @ModelAttribute
     public void addAttributes(Model model) {
@@ -63,6 +72,21 @@ public class OrderController {
         model.addAttribute("orderMentionList", orderMentionList);
         redirectService.setHistory(session, "/request");
         return "order/orderList";
+    }
+
+    @GetMapping("/settings")
+    public String getStoreSettings(Model model) {
+        List<Notification> notificationList = notificationService.findAllByModule(EventModule.Request);
+        List<User> users = userService.findAll();
+        List<BigIntegerStringModel> userList = new ArrayList<>();
+        for (User u : users) {
+            userList.add(new BigIntegerStringModel(u.getId(), u.getFirstName()+' '+u.getLastName()));
+        }
+
+        model.addAttribute("notificationList", notificationList);
+        model.addAttribute("typeList", Arrays.asList(EventType.values()));
+        model.addAttribute("userList", userList);
+        return "order/settings";
     }
 
     @GetMapping("/user/{id}")

@@ -1,5 +1,6 @@
 package net.dahliasolutions.data;
 
+import net.dahliasolutions.models.EventType;
 import net.dahliasolutions.models.Notification;
 import net.dahliasolutions.models.EventModule;
 import net.dahliasolutions.models.user.User;
@@ -13,5 +14,7 @@ public interface NotificationRepository extends JpaRepository<Notification, BigI
 
     Optional<Notification> findByName(String name);
     List<Notification> findAllByModule(EventModule module);
+    List<Notification> findAllByType(EventType type);
+    List<Notification> findAllByModuleAndType(EventModule module, EventType type);
     List<Notification> findAllByUsers(User user);
 }

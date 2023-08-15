@@ -476,19 +476,10 @@
     border-radius: 5px;
     margin: 5px;
 }
-/*.store_card_image {*/
-/*    max-height: 250px;*/
-/*    aspect-ratio: 1 / 1;*/
-/*    position:relative;*/
-/*    overflow:hidden;*/
-/*}*/
-/*.store_card_image img{*/
-/*    position: absolute;*/
-/*    object-fit: contain;*/
-/*    top: 50%;*/
-/*    left: 50%;*/
-/*    transform: translateX(-50%) translateY(-50%);*/
-/*}*/
+
+.store-item-description {
+    white-space: pre-wrap;
+}
 .store_card_description {
     max-height: 250px;
     overflow: clip;

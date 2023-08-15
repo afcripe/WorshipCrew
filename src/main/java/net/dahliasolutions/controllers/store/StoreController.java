@@ -264,6 +264,9 @@ public class StoreController {
         boolean specialOrder = storeItemModel.specialOrder() != null;
         boolean available = storeItemModel.available() != null;
 
+        String desc = storeItemModel.description();
+        System.out.println(desc);
+
         storeItem.get().setName(storeItemModel.name());
         storeItem.get().setDescription(storeItemModel.description());
         storeItem.get().setSpecialOrder(specialOrder);

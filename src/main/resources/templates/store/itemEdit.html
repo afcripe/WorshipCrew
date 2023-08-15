@@ -227,6 +227,7 @@
               <div class="row p-2">
                 <div class="col-xs-12 col-sm-4">
                   <label for="description" class="form-label">Description</label>
+
                 </div>
                 <div class="col-xs-12 col-sm-8">
                   <textarea class="form-control-sm w-100" id="description" th:text="*{description}" name="description">
@@ -365,7 +366,7 @@
           <div class="card-body">
             <div id="editOption" class="pt-4">
               <input id="optionId" type="hidden" value="0">
-              <input id="optionName" type="text" class="form-control" style="width: 200px; display: inline-block;">
+              <input id="optionName" type="text" onkeyup="submitOption()" class="form-control" style="width: 200px; display: inline-block;">
               <div style="float: right; display: inline-block">
                 <button id="editOptionSend" type="button" class="btn btn-sm btn-store" style="display: inline-block" onclick="updateOption()">Submit</button>
                 <button id="clearOptionSend" type="button" class="btn btn-sm btn-store pl-2" style="display: inline-block" onclick="clearOption()">Clear</button>
@@ -462,6 +463,12 @@
     optionNameDisplay.value = name;
   }
 
+  function submitOption() {
+    if (event.keyCode === 13) {
+      updateOption();
+    }
+  }
+
   async function updateOption() {
     let itemId = document.getElementById("id");
     let formData = new FormData();
@@ -472,10 +479,8 @@
       method: 'POST',
       body: formData
     }).then(response => {
-      debugger
       return response.json();
     }).then(data => {
-      debugger
       getOptions();
     });
   }
@@ -491,7 +496,6 @@
       return response.json();
     }).then(data => {
       console.log(data);
-      debugger
       for (let key in data) {
         let obj = data[key];
         let divID = "id-" + obj.id;
@@ -519,18 +523,36 @@
     let formData = new FormData();
         formData.set("id", id)
         formData.set("name", name)
-    debugger
     const response = await fetch('/api/v1/store/options/delete/'+itemId.value, {
       method: 'POST',
       body: formData
     }).then(response => {
       return response.json();
     }).then(data => {
-      debugger
       getOptions();
     });
   }
+/*
+  function descriptionCharFilter() {
+    let ta = document.getElementById("description");
+    let desc = ta.value;
+    let lastChar = desc.substring(desc.length-1, desc.length);
+    let last2Char = desc.substring(desc.length-2, desc.length);
 
+    if (lastChar === "<") {
+      ta.value=ta.value.slice(0, -1)+"&lt;";
+      ta.focus();
+    }
+    if (lastChar === ">") {
+      ta.value=ta.value.slice(0, -1)+"&gt;";
+      ta.focus();
+    }
+    if (last2Char === "& ") {
+      ta.value=ta.value.slice(0, -2)+"&amp;";
+      ta.focus();
+    }
+  }
+*/
   function submitForm() {
     let theForm = document.getElementById("itemForm");
     let pList = document.getElementById("positionSelect");

@@ -3,23 +3,94 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/defaultLayout}">
 
-<div class="container-fluid m-0 p-0" layout:fragment="content">
+<div class="container-fluid m-0 px2" layout:fragment="content">
+  <template id="notificationTemplate">
+    <div>
+      <label class="form-control-label selectableItem"></label>
+      <div class="pl-2" style="display: none;">
+        <form>
+          <input name="id" type="hidden"/>
 
-  <div th:replace="~{wiki/moduleHeader :: header}">Header</div>
+          <label class="form-control-label" style="float: left">Notification Name:</label>
+          <input name="name" class="form-control"/>
+
+          <label class="form-control-label" style="float: left">Description:</label>
+          <input name="description" class="form-control"/>
+
+          <input type="hidden" name="module" class="form-control"/>
+
+          <label class="form-control-label" style="float: left">Type:</label>
+          <select class="form-control w-100" name="type">
+            <option th:each="t : ${typeList}" th:value="${t.name}" th:text="${t.name}"></option>
+          </select>
+
+          <label class="form-control-label" style="float: left">User</label>
+          <input type="hidden" name="users">
+          <select class="form-control-sm w-100" name="userMultiSelect">
+            <option th:each="u : ${userList}" th:value="${u.id}" th:text="${u.name}"></option>
+          </select>
+
+          <div style="float: right">
+            <button type="button" class="btn btn-sm btn-outline-primary">Update</button>
+            <button type="button" class="btn btn-sm btn-outline-danger">Delete</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </template>
+
+  <div th:replace="~{order/moduleHeader :: header}">Header</div>
 
   <div class="container my-3">
 
     <div class="col-xs-1 col-md-2">
-      <h2 class="color-wiki">Settings</h2>
+      <h2>Settings</h2>
     </div>
 
     <div class="row">
 
       <div class="col-12 col-lg-6">
         <div class="card m-1">
-          <div class="card-title h6">Notification</div>
-          <div>
+          <div class="card-title m-4">
+            <button class="btn btn-sm btn-primary" style="float: right;" onclick="newNotification()">Add</button>
+            <h4>Notifications</h4>
+          </div>
+          <div class="card-body">
+            <div id="divNotifications" th:each="notify : ${notificationList}">
+              <div th:id="'ntf-'+${notify.id}">
+                <label th:text="${notify.name}" class="form-control-label selectableItem" th:onclick="toggleNotification([[${notify.id}]])"></label>
+                  <div class="pl-2" th:id="'cnt-'+${notify.id}" style="display: none;">
+                    <form th:onsubmit="updateNotification([[${notify.id}]])">
+                      <input name="id" type="hidden" th:value="${notify.id}"/>
 
+                      <label class="form-control-label" style="float: left">Notification Name:</label>
+                      <input name="name" class="form-control" th:value="${notify.name}"/>
+
+                      <label class="form-control-label" style="float: left">Description:</label>
+                      <input name="description" class="form-control" th:value="${notify.Description}"/>
+
+                      <input type="hidden" name="module" class="form-control" th:value="${notify.module}"/>
+
+                      <label class="form-control-label" style="float: left">Type:</label>
+                      <select class="form-control w-100" name="type">
+                        <option th:each="t : ${typeList}" th:value="${t.name}"
+                                th:selected="${t.name} == *{typeName}" th:text="${t.name}"></option>
+                      </select>
+
+                      <label class="form-control-label" style="float: left">User</label>
+                      <input th:id="'users-'+${notify.id}" type="hidden" name="users">
+                      <select th:id="'userList-'+${notify.id}" class="form-control-sm w-100" name="userMultiSelect" multiple th:onchange="onUserSelect([[${notify.id}]])">
+                        <option th:each="u : ${userList}" th:value="${u.id}" th:text="${u.name}"></option>
+                      </select>
+
+                      <div style="float: right">
+                        <button type="button" class="btn btn-sm btn-outline-primary" th:onclick="updateNotification([[${notify.id}]])">Update</button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" th:onclick="deleteNotification([[${notify.id}]])">Delete</button>
+                      </div>
+                    </form>
+                  </div>
+              </div>
+            </div>
 
           </div>
         </div>
@@ -29,86 +100,160 @@
   </div>
 
   <script>
-    function navToPost(id) {
-      window.location.href="/resource/article/"+id;
+    const notifyTemplate = document.getElementById("notificationTemplate");
+    const notificationList = document.getElementById("divNotifications");
+
+    function newNotificationDialog() {
+      document.getElementById("newNotification").showModal();
     }
-    function inputSubmit(event) {
-      event.preventDefault();
-      if (event.key === 'Enter' || event.keyCode === 13) {
-        updateWikiHome();
+
+    async function toggleNotification(id) {
+      let cntID = "cnt-"+id;
+      let cntDiv = document.getElementById(cntID);
+      let formData = new FormData();
+          formData.set("id", id);
+
+      if (cntDiv.style.display === "none") {
+        const response = await fetch('/api/v1/request/getnotification', {
+          method: 'POST',
+          body: formData
+        }).then(response => {
+          return response.json();
+        }).then(data => {
+          let selectors = cntDiv.querySelectorAll("select");
+          let typeSelect = selectors[0];
+
+          for (let o=0; o<typeSelect.options.length; o++) {
+            if (typeSelect.options[o].value === data.type) {
+              typeSelect.options[o].setAttribute('selected', 'selected');;
+            }
+          }
+
+          let elementId = "users-"+id;
+          let uList = document.getElementById(elementId);
+              uList.value = "";
+          let userSelect = selectors[1];
+          for (let o=0; o<userSelect.options.length; o++) {
+            for (let su=0; su<data.users.length; su++) {
+              let optVal = userSelect.options[o].value;
+              let dataVal = String(data.users[su].id);
+              debugger
+              if (optVal === dataVal) {
+                userSelect.options[o].setAttribute('selected', 'selected');
+                uList.value = uList.value+dataVal+" ";
+              } else {
+                userSelect.options[o].removeAttribute('selected');
+              }
+            }
+          }
+          cntDiv.style.display = "block";
+        });
+      } else {
+        cntDiv.style.display = "none";
       }
 
     }
-    async function updateWikiHome() {
-      let wHome = document.getElementById("inputWikiHome");
-      let bHome = document.getElementById("btnWikiHome");
 
-      bHome.disabled = true;
+    function onUserSelect(id){
+      debugger
+      let elementId = "users-"+id;
+      let listId = "userList-"+id;
+      let uList = document.getElementById(elementId);
+      let uSelect = document.getElementById(listId);
 
-      let theForm = new FormData();
-          theForm.set("name", wHome.value);
-      const response = await fetch("/api/v1/wiki/updatewikihome", {
-        method: 'POST',
-        body: theForm
-      }).then(response => {
-        return response.json();
-      }).then(data => {
-        debugger
-        bHome.disabled = false;
-      });
-    }
-
-    function inputPortalSubmit(event) {
-      event.preventDefault();
-      if (event.key === 'Enter' || event.keyCode === 13) {
-        updatePortalHome();
+      let collection = uSelect.selectedOptions;
+      let u = "";
+      let i = 0;
+      for (let i = 0; i < collection.length; i++) {
+        u = u+collection[i].value+" ";
       }
-
+      uList.value = u;
     }
-    async function updatePortalHome() {
-      let pHome = document.getElementById("inputPortalHome");
-      let bPortalHome = document.getElementById("btnPortalHome");
 
-      bPortalHome.disabled = true;
+    async function updateNotification(id) {
+      let cntID = "cnt-"+id;
+      let cntDiv = document.getElementById(cntID);
+      let thisForm = cntDiv.querySelectorAll("form")
+      let updateForm = thisForm[0];
+      let formData = new FormData();
+      formData.set("id", updateForm[0].value)
+      formData.set("name", updateForm[1].value)
+      formData.set("description", updateForm[2].value)
+      formData.set("module", updateForm[3].value)
+      formData.set("type", updateForm[4].value)
+      formData.set("users", updateForm[5].value)
+      debugger
 
-      let theForm = new FormData();
-        theForm.set("name", pHome.value);
-      const response = await fetch("/api/v1/wiki/updateportalhome", {
+      const response = await fetch('/api/v1/request/updatenotification', {
         method: 'POST',
-        body: theForm
+        body: formData
       }).then(response => {
         return response.json();
       }).then(data => {
-        debugger
-        bPortalHome.disabled = false;
+        cntDiv.style.display = "none";
       });
     }
 
-    function inputDocsSubmit(event) {
-      event.preventDefault();
-      if (event.key === 'Enter' || event.keyCode === 13) {
-        updateDocsHome();
-      }
+    async function deleteNotification(id) {
+      let ntfID = "ntf-"+id;
+      let ntfDiv = document.getElementById(ntfID);
+      let formData = new FormData();
+          formData.set("id", id)
 
-    }
-    async function updateDocsHome() {
-      let dHome = document.getElementById("inputDocsHome");
-      let bDocsHome = document.getElementById("btnDocsHome");
-
-      bDocsHome.disabled = true;
-
-      let theForm = new FormData();
-        theForm.set("name", dHome.value);
-      const response = await fetch("/api/v1/wiki/updatedocshome", {
+      const response = await fetch('/api/v1/request/deletenotification', {
         method: 'POST',
-        body: theForm
+        body: formData
       }).then(response => {
         return response.json();
       }).then(data => {
-        debugger
-        bDocsHome.disabled = false;
+        ntfDiv.remove();
       });
     }
+
+    async function newNotification() {
+      debugger
+      let newID = "1";
+      let newName = "New Notification";
+      let newDescription = "This is New";
+      let newModule = "Request";
+
+      let clone = notifyTemplate.content.cloneNode(true);
+      let parentDiv = clone.querySelector("div");
+          parentDiv.id = "ntf-"+newID;
+      // first label
+      let titleLabel = parentDiv.querySelector("label");
+          titleLabel.innerText = newName;
+          titleLabel.addEventListener("click", function (event) {toggleNotification(newID)});
+      // hide enabled content
+      let contentDiv = parentDiv.querySelector("div");
+          contentDiv.id = "cnt-"+newID;
+      // form content
+      let contentForm = contentDiv.querySelector("form");
+          contentForm.addEventListener("submit", function (event) {updateNotification(newID)});
+
+      // inputs
+      let formInputs = contentForm.querySelectorAll("input");
+          formInputs[0].value = newID;
+          formInputs[1].value = newName;
+          formInputs[2].value = newDescription;
+          formInputs[3].value = newModule;
+          formInputs[4].id = "users-"+newID;
+
+      // selects
+      let formSelects = contentForm.querySelectorAll("select");
+          formSelects[1].id = "userList-"+newID;
+          formSelects[1].addEventListener("change", function (event) {onUserSelect(newID)});
+
+      // buttons
+      let buttonDiv = contentForm.querySelector("div");
+      let contentBtn = buttonDiv.querySelectorAll("button");
+          contentBtn[0].addEventListener("click", function (event) {updateNotification(newID)});
+          contentBtn[1].addEventListener("click", function (event) {deleteNotification(newID)});
+
+      // add to list
+      notificationList.appendChild(clone);
+    }
+
   </script>
 
 </div>

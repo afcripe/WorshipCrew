@@ -9,6 +9,7 @@ import net.dahliasolutions.models.records.SingleBigIntegerModel;
 import net.dahliasolutions.models.records.SingleStringModel;
 import net.dahliasolutions.models.store.*;
 import net.dahliasolutions.models.user.User;
+import net.dahliasolutions.services.EventService;
 import net.dahliasolutions.services.mail.EmailService;
 import net.dahliasolutions.services.order.OrderService;
 import net.dahliasolutions.services.store.CartItemService;
@@ -34,6 +35,7 @@ public class CartAPIController {
     private final UserService userService;
     private final EmailService emailService;
     private final StoreSettingService storeSettingService;
+    private final EventService eventService;
 
     @GetMapping("{id}")
     public Cart getCart(@PathVariable BigInteger id) {
@@ -195,6 +197,13 @@ public class CartAPIController {
         BrowserMessage returnMsg2 = emailService.sendSupervisorRequest(emailDetailsSupervisor, orderRequest, orderRequest.getSupervisor().getId());
 
         // send any additional notifications
+        String userFullName = user.get().getFirstName()+" "+user.get().getLastName();
+        String eventName = "A New Request by "+userFullName;
+        String superFullName = orderRequest.getSupervisor().getFirstName()+" "+orderRequest.getSupervisor().getLastName();
+        String eventDesc = "A New Request has been placed by "+userFullName+
+                ", and sent to "+superFullName+" for fulfillment";
+        Event e = new Event(eventName, eventDesc, orderRequest.getId(), EventModule.Request, EventType.New);
+        eventService.dispatchEvent(e);
 
         cartService.emptyCart(integerModel.id());
         return new SingleBigIntegerModel(orderRequest.getId());

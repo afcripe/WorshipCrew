@@ -25,7 +25,7 @@ public class StoreSettingService implements StoreSettingServiceInterface {
             return storeSettingRepository.save(
                     new StoreSetting(
                             BigInteger.valueOf(1),
-                            StoreNotifyTarget.DepartmentDirector,
+                            StoreNotifyTarget.RegionalDepartmentDirector,
                             null)
             );
         }

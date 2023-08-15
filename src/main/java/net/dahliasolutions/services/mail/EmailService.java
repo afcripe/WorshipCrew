@@ -242,6 +242,31 @@ public class EmailService implements EmailServiceInterface{
     }
 
     @Override
+    public BrowserMessage sendSystemNotification(EmailDetails emailDetails, Event event) {
+        // set template variables
+        Context context = new Context();
+        context.setVariable("baseURL", appServer.getBaseURL());
+        context.setVariable("notification", event);
+        context.setVariable("emailSubject", emailDetails.getSubject());
+
+        // create mail message
+        MimeMessage message = javaMailSender.createMimeMessage();
+
+        try {
+            message.setFrom(new InternetAddress(sender));
+            message.setRecipients(MimeMessage.RecipientType.TO, emailDetails.getRecipient());
+            message.setSubject(emailDetails.getSubject());
+            // Set the email's content to be the HTML template
+            message.setContent(templateEngine.process("mailer/mailNotification", context), "text/html; charset=utf-8");
+
+            javaMailSender.send(message);
+            return new BrowserMessage("msgSuccess", "E-mail sent.");
+        } catch (Exception e) {
+            return new BrowserMessage("msgError", e.getMessage());
+        }
+    }
+
+    @Override
     public void sendStatement(User user) {
 
         // set template variables

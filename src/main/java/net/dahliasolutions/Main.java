@@ -79,8 +79,10 @@ public class Main {
 //            roleService.createRole("DIRECTOR_WRITE", "Edit all information regionally for assigned department, and manage positions");
 //            roleService.createRole("ADMIN_WRITE", "Has full access");
 //
-//            notificationService.save(new Notification(null, "All Requests",
-//                    "Get copied on all store requests.", NotificationModule.Request, new ArrayList<>()));
+//            notificationService.save(new Notification(
+//                    null, "All Requests",
+//                    "Notify on all new store requests.",
+//                    EventModule.Request, EventType.New, new ArrayList<>()));
 //
 //
 //            Campus mainLocation = campusService.createCampus("Destin", "Destin", BigInteger.valueOf(0));
