@@ -5,9 +5,9 @@
 
 <div class="container-fluid m-0 px2" layout:fragment="content">
   <template id="notificationTemplate">
-    <div>
-      <label class="form-control-label selectableItem"></label>
-      <div class="pl-2" style="display: none;">
+    <div class="card-section my-2">
+      <label class="form-control-label selectableItem w-100"></label>
+      <div class="pl-2">
         <form>
           <input name="id" type="hidden"/>
 
@@ -30,9 +30,9 @@
             <option th:each="u : ${userList}" th:value="${u.id}" th:text="${u.name}"></option>
           </select>
 
-          <div style="float: right">
-            <button type="button" class="btn btn-sm btn-outline-primary">Update</button>
-            <button type="button" class="btn btn-sm btn-outline-danger">Delete</button>
+          <div>
+            <button type="button" class="btn btn-sm btn-primary">Update</button>
+            <button type="button" class="btn btn-sm btn-danger">Delete</button>
           </div>
         </form>
       </div>
@@ -52,14 +52,14 @@
       <div class="col-12 col-lg-6">
         <div class="card m-1">
           <div class="card-title m-4">
-            <button class="btn btn-sm btn-primary" style="float: right;" onclick="newNotification()">Add</button>
+            <button class="btn btn-sm btn-primary" style="float: right;" onclick="notificationDialog()">Add</button>
             <h4>Notifications</h4>
           </div>
-          <div class="card-body">
+          <div id="notificationCards" class="card-body">
             <div id="divNotifications" th:each="notify : ${notificationList}">
-              <div th:id="'ntf-'+${notify.id}">
-                <label th:text="${notify.name}" class="form-control-label selectableItem" th:onclick="toggleNotification([[${notify.id}]])"></label>
-                  <div class="pl-2" th:id="'cnt-'+${notify.id}" style="display: none;">
+              <div th:id="'ntf-'+${notify.id}" class="card-section my-2">
+                <label th:text="${notify.id}+' - '+${notify.name}" class="form-control-label selectableItem w-100" th:onclick="toggleNotification([[${notify.id}]])"></label>
+                  <div class="pl-2 notification-edit" th:id="'cnt-'+${notify.id}" style="display: none;">
                     <form th:onsubmit="updateNotification([[${notify.id}]])">
                       <input name="id" type="hidden" th:value="${notify.id}"/>
 
@@ -83,9 +83,10 @@
                         <option th:each="u : ${userList}" th:value="${u.id}" th:text="${u.name}"></option>
                       </select>
 
-                      <div style="float: right">
-                        <button type="button" class="btn btn-sm btn-outline-primary" th:onclick="updateNotification([[${notify.id}]])">Update</button>
-                        <button type="button" class="btn btn-sm btn-outline-danger" th:onclick="deleteNotification([[${notify.id}]])">Delete</button>
+                      <div>
+                        <div style="display: inline-block; width: 50%;"></div>
+                        <button type="button" class="btn btn-sm btn-primary" th:onclick="updateNotification([[${notify.id}]])">Update</button>
+                        <button type="button" class="btn btn-sm btn-danger" th:onclick="deleteNotification([[${notify.id}]])">Delete</button>
                       </div>
                     </form>
                   </div>
@@ -99,21 +100,75 @@
 
   </div>
 
+  <dialog id="newNotificationDialog" class="upload-modal">
+    <script>
+      async function postNewNotify() {
+        let formData = new FormData();
+            formData.set("id", 0);
+            formData.set("name", document.getElementById('notificationName').value);
+
+        const response = await fetch('/api/v1/request/newnotification', {
+          method: 'POST',
+          body: formData
+        }).then(response => {
+          return response.json();
+        }).then(data => {
+          newNotification(data.id, data.name);
+          keyEscNotify();
+        });
+      }
+      function keyNewNotify(event) {
+        event.preventDefault();
+        if (event.key === "Enter" || event.keyCode === 13) {
+          postNewNotify();
+        }
+        if (event.key === "Escape") {
+          keyEscNotify();
+        }
+      }
+      function keyEscNotify() {
+        document.getElementById('notificationName').value = "";
+        document.getElementById("newNotificationDialog").close();
+      }
+    </script>
+    <h2>New Notification</h2>
+    <form onsubmit="postNewNotify()" style="width: 300px; max-width: 450px">
+      <label for="notificationName" class="form-label">Name</label>
+      <input class="form-control" id="notificationName" onkeyup="keyNewNotify(event)">
+      <div class="pt-2">
+        <button id="btnSubmit" type="button" class="btn btn-sm btn-primary" onclick="postNewNotify()">Add</button>
+        <button id="btnCancel" type="button" class="btn btn-sm btn-outline-primary" onclick="keyEscCat()">Cancel</button>
+      </div>
+    </form>
+  </dialog>
+
   <script>
     const notifyTemplate = document.getElementById("notificationTemplate");
-    const notificationList = document.getElementById("divNotifications");
+    const notificationList = document.getElementById("notificationCards");
 
-    function newNotificationDialog() {
-      document.getElementById("newNotification").showModal();
+    function notificationDialog() {
+      document.getElementById("newNotificationDialog").showModal();
     }
 
     async function toggleNotification(id) {
+      // let card = document.getElementById("notificationCards");
       let cntID = "cnt-"+id;
       let cntDiv = document.getElementById(cntID);
       let formData = new FormData();
           formData.set("id", id);
 
       if (cntDiv.style.display === "none") {
+        debugger
+        // close all notification editors before continuing
+        let divLoop = notificationList.querySelectorAll(".notification-edit");
+        for (let d in divLoop) {
+          try {
+            divLoop[d].style.display = "none";
+          } catch (e) {
+            // e
+          }
+        }
+
         const response = await fetch('/api/v1/request/getnotification', {
           method: 'POST',
           body: formData
@@ -210,11 +265,10 @@
       });
     }
 
-    async function newNotification() {
-      debugger
-      let newID = "1";
-      let newName = "New Notification";
-      let newDescription = "This is New";
+    async function newNotification(id, name) {
+      let newID = id;
+      let newName = name;
+      let newDescription = "";
       let newModule = "Request";
 
       let clone = notifyTemplate.content.cloneNode(true);
@@ -222,7 +276,7 @@
           parentDiv.id = "ntf-"+newID;
       // first label
       let titleLabel = parentDiv.querySelector("label");
-          titleLabel.innerText = newName;
+          titleLabel.innerText = newID+' - '+newName;
           titleLabel.addEventListener("click", function (event) {toggleNotification(newID)});
       // hide enabled content
       let contentDiv = parentDiv.querySelector("div");

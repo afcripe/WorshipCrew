@@ -430,6 +430,15 @@ public class OrderAPIController {
         return searchReturn;
     }
 
+    @PostMapping("/newnotification")
+    public BigIntegerStringModel updateOrderNotification(@ModelAttribute BigIntegerStringModel notifyModel) {
+        Notification notify = new Notification(
+                null, notifyModel.name(), "",
+                EventModule.Request, EventType.New, new ArrayList<>());
+        notify = notificationService.save(notify);
+        return new BigIntegerStringModel(notify.getId(), notify.getName());
+    }
+
     @PostMapping("/getnotification")
     public Notification getOrderNotification(@ModelAttribute SingleBigIntegerModel intModel) {
         Optional<Notification> notify = notificationService.findById(intModel.id());
@@ -469,7 +478,6 @@ public class OrderAPIController {
         }
         return notifyModel;
     }
-
 
     @PostMapping("/deletenotification")
     public SingleBigIntegerModel deleteOrderNotification(@ModelAttribute SingleBigIntegerModel intModel) {
