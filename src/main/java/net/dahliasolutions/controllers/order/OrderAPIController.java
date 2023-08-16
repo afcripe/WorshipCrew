@@ -93,7 +93,8 @@ public class OrderAPIController {
                 String userFullName = orderRequest.get().getUser().getFirstName()+" "+orderRequest.get().getUser().getLastName();
                 String eventName = "A Request Has Been Cancelled.";
                 String eventDesc = "A Request with id"+orderRequest.get().getId().toString()+" has been cancelled by "+userFullName;
-                Event e = new Event(eventName, eventDesc, orderRequest.get().getId(), EventModule.Request, EventType.Cancel);
+                    // cancel
+                Event e = new Event(null, eventName, eventDesc, orderRequest.get().getId(), EventModule.Request, EventType.Cancelled);
                 eventService.dispatchEvent(e);
             }
         }
@@ -128,6 +129,7 @@ public class OrderAPIController {
     public ChangeStatusModel updateRequestStatus(@ModelAttribute ChangeStatusModel statusModel) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) auth.getPrincipal();
+        OrderStatus setStatus = OrderStatus.valueOf(statusModel.requestStatus());
         Optional<OrderRequest> orderRequest = orderService.findById(statusModel.requestId());
         if (orderRequest.isPresent()) {
             orderRequest.get().setOrderStatus(OrderStatus.valueOf(statusModel.requestStatus()));
@@ -138,7 +140,7 @@ public class OrderAPIController {
                     null,
                     statusModel.RequestNote(),
                     BigInteger.valueOf(0),
-                    OrderStatus.valueOf(statusModel.requestStatus()),
+                    setStatus,
                     user));
         }
 
@@ -148,11 +150,16 @@ public class OrderAPIController {
 
         // send any additional notifications
         String userFullName = user.getFirstName()+" "+user.getLastName();
-        String eventName = "A Request Status has been updated by "+userFullName;
-        String eventDesc = "The Request Status for Request ID, "+orderRequest.get().getId()+
-                ", has been updated to, "+statusModel.requestStatus()+", by "+userFullName;
-        Event e = new Event(eventName, eventDesc, orderRequest.get().getId(), EventModule.Request, EventType.Change);
+        String eventName = "Request "+orderRequest.get().getId()+" Status has been updated to "+setStatus;
+        String eventDesc = "The Request Status for Request , "+orderRequest.get().getId()+
+                ", has been updated to, "+setStatus+", by "+userFullName;
+        Event e = new Event(null, eventName, eventDesc, orderRequest.get().getId(), EventModule.Request, EventType.Changed);
         eventService.dispatchEvent(e);
+        //closed
+        if (setStatus.equals(OrderStatus.Complete)) {
+            e.setType(EventType.Closed);
+            eventService.dispatchEvent(e);
+        }
 
         return statusModel;
     }
@@ -161,11 +168,12 @@ public class OrderAPIController {
     public ChangeStatusModel updateItemStatus(@ModelAttribute ChangeStatusModel statusModel) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) auth.getPrincipal();
+        OrderStatus setStatus = OrderStatus.valueOf(statusModel.requestStatus());
         Optional<OrderItem> requestItem = orderItemService.findById(statusModel.requestId());
         String noteDetail = "";
         if (requestItem.isPresent()) {
             // update item status
-            requestItem.get().setItemStatus(OrderStatus.valueOf(statusModel.requestStatus()));
+            requestItem.get().setItemStatus(setStatus);
             orderItemService.save(requestItem.get());
             // add new note to order
             noteDetail = requestItem.get().getSupervisor().getFirstName()+" "+requestItem.get().getSupervisor().getLastName()+
@@ -189,11 +197,16 @@ public class OrderAPIController {
 
             // send any additional notifications
             String userFullName = user.getFirstName()+" "+user.getLastName();
-            String eventName = "A Requested Item Status was changed by "+userFullName;
+            String eventName = "A Requested Item Status was changed to "+setStatus;
             String eventDesc = "An Item Status for Request ID, "+requestItem.get().getOrderRequest().getId()+
-                    ", has been updated to, "+statusModel.requestStatus()+", by "+userFullName;
-            Event e = new Event(eventName, eventName, requestItem.get().getOrderRequest().getId(), EventModule.Request, EventType.ItemUpdate);
+                    ", has been updated to, "+setStatus+", by "+userFullName;
+            Event e = new Event(null, eventName, eventName, requestItem.get().getOrderRequest().getId(), EventModule.Request, EventType.ItemUpdated);
             eventService.dispatchEvent(e);
+            // complete
+            if (setStatus.equals(OrderStatus.Complete)) {
+                e.setType(EventType.Closed);
+                eventService.dispatchEvent(e);
+            }
         }
 
         return statusModel;
@@ -230,11 +243,11 @@ public class OrderAPIController {
 
                     // send any additional notifications
                     String userFullName = user.getFirstName()+" "+user.getLastName();
-                    String eventName = "A Request Supervisor was changed by"+userFullName;
+                    String eventName = "A Request "+orderRequest.get().getId()+" Supervisor was changed to "+newSuper.get().getFirstName()+" "+newSuper.get().getLastName();
                     String eventDesc = "Request with Request ID, "+orderRequest.get().getId()+", was assigned to "+
                             newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+
                             " by "+userFullName;
-                    Event e = new Event(eventName, eventDesc, orderRequest.get().getId(), EventModule.Request, EventType.Change);
+                    Event e = new Event(null, eventName, eventDesc, orderRequest.get().getId(), EventModule.Request, EventType.Changed);
                     eventService.dispatchEvent(e);
                 } else {
                     noteDetail = newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+" was add to the request.";
@@ -254,11 +267,11 @@ public class OrderAPIController {
 
                     // send any additional notifications
                     String userFullName = user.getFirstName()+" "+user.getLastName();
-                    String eventName = "A Supervisor was added to a Request"+userFullName;
+                    String eventName = newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+" was added to a Request "+orderRequest.get().getId();
                     String eventDesc = newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+
                             " has been added to Request with ID, "+orderRequest.get().getId()+
                             ", by "+userFullName;
-                    Event e = new Event(eventName, eventDesc, orderRequest.get().getId(), EventModule.Request, EventType.Change);
+                    Event e = new Event(null, eventName, eventDesc, orderRequest.get().getId(), EventModule.Request, EventType.Changed);
                     eventService.dispatchEvent(e);
                 }
             }
@@ -302,11 +315,11 @@ public class OrderAPIController {
 
                 // send any additional notifications
                 String userFullName = user.getFirstName()+" "+user.getLastName();
-                String eventName = "A Supervisor was removed from a Request"+userFullName;
+                String eventName = newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+" was removed from Request "+orderRequest.get().getId();
                 String eventDesc = newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+
                         " has removed from Request with ID, "+orderRequest.get().getId()+
                         ", by "+userFullName;
-                Event e = new Event(eventName, eventDesc, orderRequest.get().getId(), EventModule.Request, EventType.Change);
+                Event e = new Event(null, eventName, eventDesc, orderRequest.get().getId(), EventModule.Request, EventType.Changed);
                 eventService.dispatchEvent(e);
             } else {
                 session.setAttribute("msgError", "Cannot remove someone who is assigned to request.");
@@ -355,11 +368,11 @@ public class OrderAPIController {
 
                 // send any additional notifications
                 String userFullName = user.getFirstName()+" "+user.getLastName();
-                String eventName = "A Request Item Supervisor was changed by"+userFullName;
+                String eventName = newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+" has been made a Supervisor on an item for request "+requestItem.get().getOrderRequest().getId();
                 String eventDesc = "An item in Request with ID, "+requestItem.get().getOrderRequest().getId()+", was assigned to "+
                         newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+
                         " by "+userFullName;
-                Event e = new Event(eventName, eventDesc, requestItem.get().getOrderRequest().getId(), EventModule.Request, EventType.Change);
+                Event e = new Event(null, eventName, eventDesc, requestItem.get().getOrderRequest().getId(), EventModule.Request, EventType.Changed);
                 eventService.dispatchEvent(e);
             }
         }
@@ -392,7 +405,7 @@ public class OrderAPIController {
             String eventName = "A Request Reason was updated by "+userFullName;
             String eventDesc = "A Request Reason for Request with ID, "+request.get().getId()+
                     ", was update to ("+requestModel.name()+") by "+userFullName;
-            Event e = new Event(eventName, eventDesc, request.get().getId(), EventModule.Request, EventType.Change);
+            Event e = new Event(null, eventName, eventDesc, request.get().getId(), EventModule.Request, EventType.Changed);
             eventService.dispatchEvent(e);
 
             return 1;
@@ -428,62 +441,6 @@ public class OrderAPIController {
             }
         }
         return searchReturn;
-    }
-
-    @PostMapping("/newnotification")
-    public BigIntegerStringModel updateOrderNotification(@ModelAttribute BigIntegerStringModel notifyModel) {
-        Notification notify = new Notification(
-                null, notifyModel.name(), "",
-                EventModule.Request, EventType.New, new ArrayList<>());
-        notify = notificationService.save(notify);
-        return new BigIntegerStringModel(notify.getId(), notify.getName());
-    }
-
-    @PostMapping("/getnotification")
-    public Notification getOrderNotification(@ModelAttribute SingleBigIntegerModel intModel) {
-        Optional<Notification> notify = notificationService.findById(intModel.id());
-        return notify.get();
-    }
-
-    @PostMapping("/updatenotification")
-    public NotificationModel updateOrderNotification(@ModelAttribute NotificationModel notifyModel) {
-        System.out.println(notifyModel);
-        Optional<Notification> notify = notificationService.findById(notifyModel.id());
-
-        if (notify.isPresent()) {
-            notify.get().setName(notifyModel.name());
-            notify.get().setDescription(notifyModel.description());
-            notify.get().setModule(EventModule.valueOf(notifyModel.module()));
-            notify.get().setType(EventType.valueOf(notifyModel.type()));
-
-            // update user list
-            List<String> items = Arrays.asList(notifyModel.users().split("\s"));
-            ArrayList<User> ul = new ArrayList<>();
-            for (String s : items) {
-                if (!s.equals("")) {
-                    try {
-                        int i = Integer.parseInt(s);
-                        Optional<User> u = userService.findById(BigInteger.valueOf(i));
-                        if (u.isPresent()) {
-                            ul.add(u.get());
-                        }
-                    } catch (Error e) {
-                        System.out.println(e);
-                    }
-                }
-            }
-            notify.get().setUsers(ul);
-
-            notificationService.save(notify.get());
-        }
-        return notifyModel;
-    }
-
-    @PostMapping("/deletenotification")
-    public SingleBigIntegerModel deleteOrderNotification(@ModelAttribute SingleBigIntegerModel intModel) {
-        Optional<Notification> notify = notificationService.findById(intModel.id());
-        notify.ifPresent(notification -> notificationService.deleteById(notification.getId()));
-        return intModel;
     }
 
     private Collection<UserRoles> getSupervisorCollection() {

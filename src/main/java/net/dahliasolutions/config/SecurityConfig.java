@@ -128,7 +128,10 @@ public class SecurityConfig {
                     auth.requestMatchers("/user/**").hasAnyAuthority("ADMIN_WRITE", "DIRECTOR_READ", "DIRECTOR_WRITE", "CAMPUS_WRITE", "CAMPUS_READ", "USER_READ", "USER_WRITE");
 
                     auth.requestMatchers("/admin/**").hasAnyAuthority("ADMIN_WRITE", "DIRECTOR_READ", "DIRECTOR_WRITE", "CAMPUS_WRITE", "CAMPUS_READ", "USER_READ", "USER_WRITE");
-                    auth.requestMatchers("/api/v1/**").permitAll();
+
+                    auth.requestMatchers("/api/v1/admin").permitAll();
+                    auth.requestMatchers("/api/v1/**").authenticated();
+
                     auth.anyRequest().authenticated();
                 })
                 .formLogin().loginPage("/login").defaultSuccessUrl("/user/").successHandler((request, response, authentication) -> {

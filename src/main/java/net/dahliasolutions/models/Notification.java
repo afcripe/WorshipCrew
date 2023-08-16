@@ -29,7 +29,7 @@ public class Notification {
     private EventType type;
 
     @Nullable
-    @OneToMany
+    @ManyToMany
     private List<User> users;
 
     @Override
