@@ -6,6 +6,7 @@ import net.dahliasolutions.models.Message;
 import net.dahliasolutions.models.Notification;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
 import java.util.Optional;
 
 @Service
@@ -15,7 +16,7 @@ public class MessageService implements MessageServiceInterface{
     private final MessageRepository messageRepository;
 
     @Override
-    public Message createMessage(Long id, Notification notification) {
+    public Message createMessage(BigInteger id, Notification notification) {
         Message message = new Message();
             message.setId(id);
             message.setName(notification.getName());
@@ -33,7 +34,7 @@ public class MessageService implements MessageServiceInterface{
     }
 
     @Override
-    public Optional<Message> findById(Long id) {
+    public Optional<Message> findById(BigInteger id) {
         return messageRepository.findById(id);
     }
 }

@@ -10,6 +10,7 @@ import net.dahliasolutions.services.order.OrderService;
 import net.dahliasolutions.services.user.UserService;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,11 +38,13 @@ public class EventService {
 
         // create new message from notification with event id
         if (dispatch.getId() == null) {
-            newEvent.setId(Instant.now().toEpochMilli());
+            newEvent.setId(BigInteger.valueOf(Instant.now().toEpochMilli()));
             message = messageService.createMessage(newEvent.getId(), notifyList.get(0));
+            message.setUsers(new ArrayList<>());
         } else {
             message = messageService.findById(newEvent.getId()).get();
         }
+        messageService.save(message);
         for (Notification notify : notifyList) {
             switch (dispatch.getModule()) {
                 case Request:
@@ -85,6 +88,7 @@ public class EventService {
                         message.getUsers().add(u);
                     }
                 }
+                messageService.save(message);
         }
     }
 

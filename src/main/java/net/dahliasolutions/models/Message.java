@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import net.dahliasolutions.models.user.User;
 
+import java.math.BigInteger;
 import java.util.List;
 
 @Getter
@@ -16,7 +17,7 @@ import java.util.List;
 public class Message {
 
     @Id
-    private Long id;
+    private BigInteger id;
     private String name;
     private String Description;
 

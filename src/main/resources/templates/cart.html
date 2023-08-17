@@ -141,7 +141,7 @@
 
             let formData = new FormData();
                 formData.set("id", userid);
-                formData.set("requestNote", elRequestNote.value);
+                formData.set("name", elRequestNote.value);
 
             const response = await fetch('/api/v1/cart/placeOrder', {
                 method: 'POST',

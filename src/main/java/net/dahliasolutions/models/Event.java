@@ -12,7 +12,7 @@ import java.math.BigInteger;
 @AllArgsConstructor
 public class Event {
 
-    private Long id;
+    private BigInteger id;
     private String name;
     private String Description;
     private BigInteger itemId;

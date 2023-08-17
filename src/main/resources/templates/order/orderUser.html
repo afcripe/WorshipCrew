@@ -15,10 +15,8 @@
         </div>
     </div>
     <div class="row pt-2 pb-5 py-2">
-        <div class="col" th:if="${not #lists.isEmpty(orderList)}" th:each="order : ${orderList}">
-            <div class="row">
-                <div th:replace="~{components/cardOrderLine :: cardFragment(${order})}">No Requests to Display</div>
-            </div>
+        <div class="row py-1" th:if="${not #lists.isEmpty(orderList)}" th:each="order : ${orderList}">
+            <div th:replace="~{components/cardOrderLine :: cardFragment(${order})}">No Requests to Display</div>
         </div>
     </div>
 
@@ -28,10 +26,8 @@
         </div>
     </div>
     <div class="row pt-2 pb-5 py-2">
-        <div class="col" th:if="${not #lists.isEmpty(itemList)}" th:each="orderItem : ${itemList}">
-            <div class="row">
-                <div th:replace="~{components/cardOrderItemLineSummary :: cardFragment(${orderItem})}">No Items</div>
-            </div>
+        <div class="row py-1" th:if="${not #lists.isEmpty(itemList)}" th:each="orderItem : ${itemList}">
+            <div th:replace="~{components/cardOrderItemLineSummary :: cardFragment(${orderItem})}">No Items</div>
         </div>
     </div>
 
@@ -41,10 +37,8 @@
         </div>
     </div>
     <div class="row pt-2 pb-5 py-2">
-        <div class="col" th:if="${not #lists.isEmpty(supervisorOrderList)}" th:each="supervisorOrder : ${supervisorOrderList}">
-          <div class="row">
+        <div class="row py-1" th:if="${not #lists.isEmpty(supervisorOrderList)}" th:each="supervisorOrder : ${supervisorOrderList}">
             <div th:replace="~{components/cardOrderLine :: cardFragment(${supervisorOrder})}">No Requests to Display</div>
-          </div>
         </div>
     </div>
 
@@ -54,10 +48,8 @@
         </div>
     </div>
     <div class="row pt-5 pb-5 py-2">
-        <div class="col" th:if="${not #lists.isEmpty(orderMentionList)}" th:each="orderMention : ${orderMentionList}">
-            <div class="row">
-                <div th:replace="~{components/cardOrderLine :: cardFragment(${orderMention})}">No Requests to Display</div>
-            </div>
+        <div class="row py-1" th:if="${not #lists.isEmpty(orderMentionList)}" th:each="orderMention : ${orderMentionList}">
+            <div th:replace="~{components/cardOrderLine :: cardFragment(${orderMention})}">No Requests to Display</div>
         </div>
     </div>
 

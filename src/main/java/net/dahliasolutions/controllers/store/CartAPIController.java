@@ -5,6 +5,7 @@ import net.dahliasolutions.models.*;
 import net.dahliasolutions.models.mail.EmailDetails;
 import net.dahliasolutions.models.order.OrderItem;
 import net.dahliasolutions.models.order.OrderRequest;
+import net.dahliasolutions.models.records.BigIntegerStringModel;
 import net.dahliasolutions.models.records.SingleBigIntegerModel;
 import net.dahliasolutions.models.records.SingleStringModel;
 import net.dahliasolutions.models.store.*;
@@ -127,16 +128,15 @@ public class CartAPIController {
     }
 
     @PostMapping("/placeOrder")
-    public SingleBigIntegerModel placeOrder(@ModelAttribute SingleBigIntegerModel integerModel,
-                                            @ModelAttribute SingleStringModel stringModel) {
-        Cart cart = cartService.findById(integerModel.id());
+    public SingleBigIntegerModel placeOrder(@ModelAttribute BigIntegerStringModel cartModel) {
+        Cart cart = cartService.findById(cartModel.id());
         Optional<User> user = userService.findById(cart.getId());
         User fulfillmentAgent;
 
         String reasonForRequest = "None Given";
-        if (stringModel.name() != null) {
-            if (!stringModel.name().equals("")) {
-                reasonForRequest = stringModel.name();
+        if (cartModel.name() != null) {
+            if (!cartModel.name().equals("")) {
+                reasonForRequest = cartModel.name();
             }
         }
 
@@ -202,10 +202,10 @@ public class CartAPIController {
         String superFullName = orderRequest.getSupervisor().getFirstName()+" "+orderRequest.getSupervisor().getLastName();
         String eventDesc = "A New Request has been placed by "+userFullName+
                 ", and sent to "+superFullName+" for fulfillment";
-        Event e = new Event(eventName, eventDesc, orderRequest.getId(), EventModule.Request, EventType.New);
+        Event e = new Event(null, eventName, eventDesc, orderRequest.getId(), EventModule.Request, EventType.New);
         eventService.dispatchEvent(e);
 
-        cartService.emptyCart(integerModel.id());
+        cartService.emptyCart(cartModel.id());
         return new SingleBigIntegerModel(orderRequest.getId());
     }
 }
