@@ -36,6 +36,9 @@
 
                             <label  for="published">Published</label>
                             <input id="published" name="published" type="checkbox" th:checked="*{published}"/>
+
+                            <label  for="hideInfo">Hide Info by Default</label>
+                            <input id="hideInfo" name="hideInfo" type="checkbox" th:checked="*{hideInfo}"/>
                         </div>
 
                     </div>
@@ -49,6 +52,9 @@
                                 plugins: 'link lists image media code',
                                 toolbar: 'alignleft aligncenter alignright alignjustify | formatselect | bullist numlist | outdent indent | link code',
                                 toolbar_mode: 'floating',
+                                relative_urls: false,
+                                remove_script_host: true,
+                                document_base_url: 'http://localhost:8081/',
                                 tinycomments_author: 'Post Author'
                             });
                         </script>
@@ -489,8 +495,8 @@
             <div class="d-flex">
                 <input id="folderPath" class="form-control pr-2 w-50" type="text"
                        placeholder="New Folder" style="float: left;" onkeyup="folderNewPath(event)">
-                <button type="button" class="btn btn-sm btn-wiki m-2 w-25" style="float: right"
-                        onclick="newFolder()">New</button>
+<!--                <button type="button" class="btn btn-sm btn-wiki m-2 w-25" style="float: right"-->
+<!--                        onclick="newFolder()">New</button>-->
                 <button type="button" class="btn btn-sm btn-wiki m-2 w-25" style="float: right"
                         onclick="folderDialogOK()">OK</button>
             </div>
@@ -536,7 +542,8 @@
             }
             let myAnonymous = document.getElementById('anonymous');
             let myPublished = document.getElementById('published');
-            debugger
+            let myHideInfo = document.getElementById('hideInfo');
+
             let formData = new FormData();
                 formData.set("id", document.getElementById('postId').value);
                 formData.set("title", document.getElementById('postTitle').value);
@@ -546,7 +553,8 @@
                 formData.set("authorId", document.getElementById('authorId').value);
                 formData.set("anonymous", myAnonymous.checked);
                 formData.set("published", myPublished.checked);
-
+                formData.set("hideInfo", myHideInfo.checked);
+            debugger
             let newFolder = document.getElementById('folder').value;
             console.log(newFolder);
 

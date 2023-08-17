@@ -37,6 +37,10 @@
 
     <dialog id="newFolder" class="tag-dialog">
         <script>
+            function loadFolder() {
+                document.getElementById('newTagName').value = "/";
+                document.getElementById('newTagName').focus();
+            }
             async function addNewTag(tag, target) {
                 let apiURL = '/api/v1/wiki/foldermanager/new';
                 let formData = new FormData();
@@ -51,7 +55,7 @@
                     return response.json();
                 }).then(data => {
                     window.location.reload();
-                });;
+                });
             }
 
             function newTagDialogOK() {
@@ -154,6 +158,7 @@
 
         async function newFolder() {
             document.getElementById('newFolder').showModal();
+            loadFolder();
         }
 
     </script>

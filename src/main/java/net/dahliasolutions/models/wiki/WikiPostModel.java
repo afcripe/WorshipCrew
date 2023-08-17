@@ -10,5 +10,6 @@ public record WikiPostModel (
         String summary,
         BigInteger authorId,
         String anonymous,
-        String published) {
+        String published,
+        String hideInfo) {
 }

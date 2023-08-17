@@ -164,6 +164,7 @@ public class WikiController {
     public String addNewPost(Model model, HttpServletRequest request, HttpSession session) {
 
         String requestURL = request.getRequestURL().toString();
+        requestURL = requestURL.replace("/articles/articles", "/articles");
         String folderFile = requestURL.split("/articles")[1];
         String[] folderList = folderFile.split("/");
         String postURLName = folderList[folderList.length-1];
@@ -186,7 +187,7 @@ public class WikiController {
 
         List<WikiPost> wikiList = wikiPostService.findByTitle(postName);
         if (wikiList.isEmpty()) {
-            session.setAttribute("msgError", "Article not Found.");
+            session.setAttribute("msgError", "Article not Found. It may not be Published.");
             return redirectService.pathName(session, "/resource");
         }
         if (wikiList.size() > 1) {
@@ -224,7 +225,8 @@ public class WikiController {
             wikiPost.setSummary("");
             wikiPost.setAuthor(user);
             wikiPost.setAnonymous(false);
-            wikiPost.setPublished(true);
+            wikiPost.setPublished(false);
+            wikiPost.setHideInfo(false);
             wikiPost.setTagList(new ArrayList<>());
 
         model.addAttribute("wikiPost", wikiPost);

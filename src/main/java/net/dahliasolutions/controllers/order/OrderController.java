@@ -78,14 +78,14 @@ public class OrderController {
     public String getStoreSettings(Model model) {
         List<Notification> notificationList = notificationService.findAllByModule(EventModule.Request);
         List<User> users = userService.findAll();
-        List<BigIntegerStringModel> userList = new ArrayList<>();
+        List<BigIntegerStringModel> notificationUsers = new ArrayList<>();
         for (User u : users) {
-            userList.add(new BigIntegerStringModel(u.getId(), u.getFirstName()+' '+u.getLastName()));
+            notificationUsers.add(new BigIntegerStringModel(u.getId(), u.getFirstName()+' '+u.getLastName()));
         }
 
         model.addAttribute("notificationList", notificationList);
         model.addAttribute("typeList", Arrays.asList(EventType.values()));
-        model.addAttribute("userList", userList);
+        model.addAttribute("notificationUsers", notificationUsers);
         return "order/settings";
     }
 

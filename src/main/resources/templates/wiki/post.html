@@ -19,29 +19,38 @@
             <hr />
 
         </div>
-        <div class="row">
-            <div class="col-12 col-lg-9">
+
+        <div class="wiki-article">
+            <div class="wiki-body">
                 <div th:utext="*{body}"></div>
             </div>
-            <div class="col-12 col-lg-3">
+
+            <div class="wiki-info-tab hide">
+                <div class="wiki-info-tab-title selectableItem" onclick="toggleResourceInfo()">
+                    Tags
+                </div>
+                <div class="wiki-info-tab-title selectableItem" onclick="toggleResourceInfo()">
+                    Article Info
+                </div>
+            </div>
+
+            <div class="wiki-info">
                 <div class="card m-1 gradient-right">
-                    <div class="card-title h6">Article Info</div>
-                    <div class="card-section">
-                        Article Location: <a id="articleLink" href="#"><i class="bi bi-box-arrow-up-right"></i></a><br>
-                            <span id="articleLinkText"></span><br><br>
-                        Author:<br>
-                            <span id="articleAuthor" th:text="*{author.firstName + ' ' + author.lastName}"></span><br>
-                        Updated:<br>
-                            <span id="articleDate" th:text="*{#temporals.format(lastUpdated, 'MMM-dd-yyyy HH:mm')}"></span><br>
-                    </div>
+                    <div class="card-title h6 selectableItem" onclick="toggleResourceInfo()">Article Info</div>
+                    <hr>
+                    Article Location: <a id="articleLink" href="#"><i class="bi bi-box-arrow-up-right"></i></a><br>
+                        <span id="articleLinkText"></span><br><br>
+                    Author:<br>
+                        <span id="articleAuthor" th:text="*{author.firstName + ' ' + author.lastName}"></span><br>
+                    Updated:<br>
+                        <span id="articleDate" th:text="*{#temporals.format(lastUpdated, 'MMM-dd-yyyy HH:mm')}"></span><br>
                 </div>
 
                 <div class="card m-1 gradient-right">
-                    <div class="card-title h6">Tags</div>
-                    <div class="card-section">
-                        <div class="tag_primary m-1" style="display: inline-block; cursor: pointer;" th:onclick="navToTag([[*{id}]])"
-                             th:each="tag : *{tagList}" th:text="${tag.name}"></div>
-                    </div>
+                    <div class="card-title h6 selectableItem" onclick="toggleResourceInfo()">Tags</div>
+                    <hr>
+                    <div class="tag_primary m-1" style="display: inline-block; cursor: pointer;" th:onclick="navToTag([[*{id}]])"
+                         th:each="tag : *{tagList}" th:text="${tag.name}"></div>
                 </div>
             </div>
         </div>
@@ -52,6 +61,7 @@
         /*<![CDATA[*/
         let postFolder = /*[[${wikiPost.folder}]]*/ " ";
         let postTitle = /*[[${wikiPost.title}]]*/ " ";
+        let hideInfo = /*[[${wikiPost.hideInfo}]]*/ " ";
         const websiteDomain = /*[[${baseURL}]]*/ " ";
         /*]]>*/
 
@@ -63,6 +73,35 @@
 
         function navToTag(id) {
             window.location.href="/resource/tag/"+id;
+        }
+
+        function toggleResourceInfo() {
+            debugger
+            let tab = document.querySelector(".wiki-info-tab");
+            let info = document.querySelectorAll(".wiki-info");
+            if (tab.classList.contains("hide")) {
+                tab.classList.remove("hide");
+                for (let key in info) {
+                    try {
+                        info[key].classList.add("hide");
+                    } catch (e) {
+                        console.log(info[key])
+                    }
+                }
+            } else {
+                tab.classList.add("hide");
+                for (let key in info) {
+                    try {
+                        info[key].classList.remove("hide");
+                    } catch (e) {
+                        console.log(info[key])
+                    }
+                }
+            }
+        }
+
+        if (hideInfo) {
+            toggleResourceInfo();
         }
     </script>
 

@@ -2,12 +2,11 @@ package net.dahliasolutions.controllers.store;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import net.dahliasolutions.models.AdminSettings;
-import net.dahliasolutions.models.Notification;
-import net.dahliasolutions.models.EventModule;
+import net.dahliasolutions.models.*;
 import net.dahliasolutions.models.department.DepartmentRegional;
 import net.dahliasolutions.models.position.Position;
 import net.dahliasolutions.models.position.PositionSelectedModel;
+import net.dahliasolutions.models.records.BigIntegerStringModel;
 import net.dahliasolutions.models.store.*;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
@@ -46,6 +45,7 @@ public class StoreController {
     private final WikiPostService wikiPostService;
     private final NotificationService notificationService;
     private final StoreSettingService storeSettingService;
+    private final EventService eventService;
 
     @ModelAttribute
     public void addAttributes(Model model) {
@@ -89,7 +89,6 @@ public class StoreController {
         model.addAttribute("storeItems", itemList);
         return "store/index";
     }
-
 
     @GetMapping("/{category}/{subCategory}")
     public String goStoreCategory(@PathVariable String category, @PathVariable String subCategory, Model model, HttpSession session) {
@@ -186,6 +185,14 @@ public class StoreController {
         StoreItem newItem = storeItemService.createStoreItem(storeItem);
         session.setAttribute("msgSuccess", "Item successfully added.");
 
+        // send any additional notifications
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String userFullName = user.getFirstName()+" "+user.getLastName();
+        String eventName = userFullName+"Created a new store item.";
+        String eventDesc = newItem.getName()+" was added to the store by "+userFullName;
+        Event e = new Event(null, eventName, eventDesc, newItem.getId(), EventModule.Store, EventType.New);
+        eventService.dispatchEvent(e);
+
         return "redirect:/store/item/"+newItem.getId().toString();
     }
 
@@ -193,10 +200,13 @@ public class StoreController {
     public String getItem(@PathVariable("id") BigInteger id, Model model, HttpSession session) {
         redirectService.setHistory(session, "/store/item/"+id);
         Optional<StoreItem> storeItem = storeItemService.findById(id);
-        if (storeItem.isEmpty()) {
-            session.setAttribute("msgError", "Item not found.");
+
+        if (storeItem.isPresent()) {
+            model.addAttribute("storeItem", storeItem.get());
+        } else {
+            model.addAttribute("storeItem", new StoreItem());
         }
-        model.addAttribute("storeItem", storeItem.get());
+
         return "store/item";
     }
 
@@ -265,7 +275,6 @@ public class StoreController {
         boolean available = storeItemModel.available() != null;
 
         String desc = storeItemModel.description();
-        System.out.println(desc);
 
         storeItem.get().setName(storeItemModel.name());
         storeItem.get().setDescription(storeItemModel.description());
@@ -306,22 +315,36 @@ public class StoreController {
         storeItemService.save(storeItem.get());
         session.setAttribute("msgSuccess", "Item successfully updated.");
 
+        // send any additional notifications
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String userFullName = user.getFirstName()+" "+user.getLastName();
+        String eventName = userFullName+"Updated a store item.";
+        String eventDesc = storeItem.get().getName()+" was updated by "+userFullName;
+        Event e = new Event(null, eventName, eventDesc, storeItem.get().getId(), EventModule.Store, EventType.Changed);
+        eventService.dispatchEvent(e);
+
         return "redirect:/store/item/"+storeItemModel.id().toString();
     }
 
     @GetMapping("/settings")
     public String getStoreSettings(Model model) {
-        List<Notification> notificationList = notificationService.findAllByModule(EventModule.Store);
+        // Categories
         List<StoreCategory> categoryList = categoryService.findAll();
-
+        // Request Target
         StoreSetting storeSetting = storeSettingService.getStoreSetting();
         BigInteger userId = BigInteger.valueOf(0);
         if (storeSetting.getUser() != null) {
             userId = storeSetting.getUser().getId();
         }
-
         List<StoreNotifyTarget> targetList = Arrays.asList(StoreNotifyTarget.values());
         List<User> userList = userService.findAllByRoles("ADMIN_WRITE,RESOURCE_WRITE,RESOURCE_SUPERVISOR");
+        // Notifications
+        List<Notification> notificationList = notificationService.findAllByModule(EventModule.Store);
+        List<User> users = userService.findAll();
+        List<BigIntegerStringModel> notificationUsers = new ArrayList<>();
+        for (User u : users) {
+            notificationUsers.add(new BigIntegerStringModel(u.getId(), u.getFirstName()+' '+u.getLastName()));
+        }
 
         model.addAttribute("categoryList", categoryList);
         model.addAttribute("storeHome", adminSettingsService.getAdminSettings().getStoreHome());
@@ -335,6 +358,9 @@ public class StoreController {
         model.addAttribute("userList", userList);
 
         model.addAttribute("notificationList", notificationList);
+        model.addAttribute("typeList", Arrays.asList(EventType.values()));
+        model.addAttribute("notificationUsers", notificationUsers);
+
         return "store/settings";
     }
 

@@ -5,9 +5,6 @@
 
 <div class="container-fluid m-0 px2" layout:fragment="content">
 
-  <script>
-    const notificationModule = "Request";
-  </script>
 
   <div th:replace="~{order/moduleHeader :: header}">Header</div>
 
@@ -21,6 +18,9 @@
 
       <div class="col-12 col-lg-6">
 
+        <script>
+          const notificationModule = "Request";
+        </script>
         <div th:replace="~{components/cardNotification :: cardFragment}">Notification</div>
 
       </div>

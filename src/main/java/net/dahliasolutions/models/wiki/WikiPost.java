@@ -28,6 +28,7 @@ public class WikiPost {
     private String summary;
     private boolean anonymous;
     private boolean published;
+    private boolean hideInfo;
 
     @ManyToOne
     private User author;

@@ -6,6 +6,7 @@ import lombok.*;
 import net.dahliasolutions.models.user.User;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -20,6 +21,7 @@ public class Message {
     private BigInteger id;
     private String name;
     private String Description;
+    private LocalDateTime dateSent;
 
     @Enumerated
     private EventModule module;

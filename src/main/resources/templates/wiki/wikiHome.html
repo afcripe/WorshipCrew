@@ -11,30 +11,36 @@
 
         <div class="row mt-2">
 
-            <h1 class="color-wiki">Welcome to Destiny Resources</h1>
-
-            <div class="row">
-
-                <div class="col-12 col-lg-9">
-
+            <div class="wiki-article">
+                <div class="wiki-body">
                     <div th:utext="${wikiPost.body}"></div>
-
                 </div>
 
-                <div class="col-12 col-lg-3">
-                    <div class="card m-1">
-                        <div class="card-title h6">Tags</div>
-                        <div class="card-section">
-                            <div class="tag_primary m-1 selectableItem" style="display: inline-block;" th:onclick="navToTag([[*{tag.id}]])"
-                                 th:each="tag : *{tagList}" th:text="${tag.name + '(' + tag.references + ')'}"></div>
-                        </div>
+                <div class="wiki-info-tab hide">
+                    <div class="wiki-info-tab-title selectableItem" onclick="toggleResourceInfo()">
+                        Unpublished
+                    </div>
+                    <div class="wiki-info-tab-title selectableItem" onclick="toggleResourceInfo()">
+                        Tags
                     </div>
                 </div>
 
-                <div class="card m-1">
-                    <div class="card-title h6">My Unpublished Articles</div>
-                    <div class="selectableItem p-1" th:onclick="navToPost([[*{unpublished.id}]])"
-                         th:each="unpublished : *{unpublishedList}" th:text="${unpublished.title}"></div>
+                <div class="wiki-info">
+                    <div class="card m-1 gradient-right">
+                        <div class="card-title h6 selectableItem" onclick="toggleResourceInfo()">Tags</div>
+                        <hr>
+                        <div>
+                        <div class="tag_primary m-1 selectableItem" style="display: inline-block;" th:onclick="navToTag([[*{tag.id}]])"
+                             th:each="tag : *{tagList}" th:text="${tag.name + '(' + tag.references + ')'}"></div>
+                        </div>
+                    </div>
+
+                    <div class="card m-1 gradient-right">
+                        <div class="card-title h6 selectableItem" onclick="toggleResourceInfo()">Unpublished Articles</div>
+                        <hr>
+                        <div class="selectableItem p-1" th:onclick="navToPost([[*{unpublished.id}]])"
+                             th:each="unpublished : *{unpublishedList}" th:text="${unpublished.title}"></div>
+                    </div>
                 </div>
 
             </div>
@@ -46,37 +52,44 @@
     <script th:inline="javascript">
         /*<![CDATA[*/
         let searchTerm = /*[[${searchTerm}]]*/ " ";
+        let hideInfo = /*[[${wikiPost.hideInfo}]]*/ " ";
         /*]]>*/
         document.getElementById("searchInput").value = searchTerm;
 
         function navToTag(id) {
             window.location.href="/resource/tag/"+id;
         }
-        function navToFolder(name) {
-            window.location.href="/resource/articles"+name;
-        }
         function navToPost(id) {
             window.location.href="/resource/article/"+id;
         }
 
-        let folders = document.getElementById("divFolderNav");
-        let caretDown = document.getElementById("cartFolderNavDown");
-        let caretRight = document.getElementById("cartFolderNavRight");
-
-        folders.classList.remove("folder-nav-collapse");
-        caretDown.style.display = "none";
-        caretRight.style.display = "inline-block";
-
-        function toggleFolders() {
-            if (folders.classList.contains("folder-nav-collapse")){
-                folders.classList.remove("folder-nav-collapse");
-                caretDown.style.display = "none";
-                caretRight.style.display = "inline-block";
+        function toggleResourceInfo() {
+            debugger
+            let tab = document.querySelector(".wiki-info-tab");
+            let info = document.querySelectorAll(".wiki-info");
+            if (tab.classList.contains("hide")) {
+                tab.classList.remove("hide");
+                for (let key in info) {
+                    try {
+                        info[key].classList.add("hide");
+                    } catch (e) {
+                        console.log(info[key])
+                    }
+                }
             } else {
-                folders.classList.add("folder-nav-collapse");
-                caretDown.style.display = "inline-block";
-                caretRight.style.display = "none";
+                tab.classList.add("hide");
+                for (let key in info) {
+                    try {
+                        info[key].classList.remove("hide");
+                    } catch (e) {
+                        console.log(info[key])
+                    }
+                }
             }
+        }
+
+        if (hideInfo) {
+            toggleResourceInfo();
         }
     </script>
 

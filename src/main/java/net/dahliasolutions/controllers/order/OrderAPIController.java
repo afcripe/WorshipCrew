@@ -40,7 +40,6 @@ public class OrderAPIController {
     private final UserRolesService rolesService;
     private final EmailService emailService;
     private final EventService eventService;
-    private final NotificationService notificationService;
 
     @GetMapping("")
     public String getOrders() { return null; }

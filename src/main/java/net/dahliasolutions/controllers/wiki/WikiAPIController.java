@@ -32,6 +32,9 @@ public class WikiAPIController {
     @PostMapping("/save")
     public BigInteger postWiki(@ModelAttribute WikiPostModel wikiPostModel) {
         Optional<WikiPost> wikiPost = wikiPostService.findById(wikiPostModel.id());
+        boolean doc = Boolean.valueOf(wikiPostModel.anonymous());
+        boolean pub = Boolean.valueOf(wikiPostModel.published());
+        boolean info = Boolean.valueOf(wikiPostModel.hideInfo());
 
         // remove line breaks from summary
         String summary = wikiPostModel.summary().replace("\r\n", " ");
@@ -47,6 +50,9 @@ public class WikiAPIController {
                 newPost.setLastUpdated(LocalDateTime.now());
                 newPost.setSummary(summary);
                 newPost.setAuthor(user);
+                newPost.setAnonymous(doc);
+                newPost.setPublished(pub);
+                newPost.setHideInfo(info);
                 newPost.setTagList(new ArrayList<>());
             return wikiPostService.createWikiPost(newPost).getId();
         }
@@ -56,8 +62,9 @@ public class WikiAPIController {
         wikiPost.get().setFolder(wikiPostModel.folder());
         wikiPost.get().setLastUpdated(LocalDateTime.now());
         wikiPost.get().setSummary(summary);
-        wikiPost.get().setAnonymous(Boolean.valueOf(wikiPostModel.anonymous()));
-        wikiPost.get().setPublished(Boolean.valueOf(wikiPostModel.published()));
+        wikiPost.get().setAnonymous(doc);
+        wikiPost.get().setPublished(pub);
+        wikiPost.get().setHideInfo(info);
 
         return wikiPostService.save(wikiPost.get()).getId();
     }
@@ -182,11 +189,17 @@ public class WikiAPIController {
 
     @PostMapping("/foldermanager/new")
     public WikiFolder newFolderByManager(@ModelAttribute SingleStringModel folderModel) {
-        Optional<WikiFolder> wikiFolder = wikiFolderService.findByFolder(folderModel.name());
+        // confirm starting slash
+        String folderName = folderModel.name();
+        if (!folderModel.name().startsWith("/")) {
+            folderName = "/"+folderModel.name();
+        }
+
+        Optional<WikiFolder> wikiFolder = wikiFolderService.findByFolder(folderName);
 
         if (wikiFolder.isPresent()) { return null; }
 
-        return wikiFolderService.save(folderModel.name());
+        return wikiFolderService.save(folderName);
     }
 
     @PostMapping("/foldermanager/delete")

@@ -33,32 +33,18 @@ public class StoreItemService implements StoreItemServiceInterface {
     @Override
     public Optional<StoreItem> findById(BigInteger id) {
         Optional<StoreItem> storeItem = storeItemRepository.findById(id);
-//        List<StoreItemOption> options = optionRepository.findAllByStoreItem(storeItem.get());
-//        for (StoreItemOption option : options) {
-//            storeItem.get().getItemOptions().add(option);
-//        }
         return storeItem;
     }
 
     @Override
     public Optional<StoreItem> findByName(String name) {
         Optional<StoreItem> storeItem = storeItemRepository.findByName(name);
-//        List<StoreItemOption> options = optionRepository.findAllByStoreItem(storeItem.get());
-//        for (StoreItemOption option : options) {
-//            storeItem.get().getItemOptions().add(option);
-//        }
         return storeItem;
     }
 
     @Override
     public List<StoreItem> searchAll(String searchTerm) {
         List<StoreItem> storeItems = storeItemRepository.searchAll(searchTerm);
-//        for (StoreItem item : storeItems) {
-//            List<StoreItemOption> options = optionRepository.findAllByStoreItem(item);
-//            for (StoreItemOption option : options) {
-//                item.getItemOptions().add(option);
-//            }
-//        }
         return storeItems;
     }
 
@@ -66,12 +52,6 @@ public class StoreItemService implements StoreItemServiceInterface {
     @Override
     public List<StoreItem> findAll() {
         List<StoreItem> storeItems = storeItemRepository.findAll();
-//        for (StoreItem item : storeItems) {
-//            List<StoreItemOption> options = optionRepository.findAllByStoreItem(item);
-//            for (StoreItemOption option : options) {
-//                item.getItemOptions().add(option);
-//            }
-//        }
         return storeItems;
     }
 

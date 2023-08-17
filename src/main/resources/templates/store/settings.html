@@ -27,7 +27,7 @@
     </div>
 
     <div class="row">
-
+<!-- Store options and links -->
       <div class="card" style="max-width: 450px;">
         <div class="card-body">
           <ul class="list-group list-group-flush">
@@ -53,7 +53,7 @@
           </div>
         </div>
       </div>
-
+<!-- Categories -->
       <div class="card" style="max-width: 450px;">
         <div class="card-title m-4">
           <button class="btn btn-sm btn-store" style="float: right;" onclick="newCategory()">Add Category</button>
@@ -85,7 +85,7 @@
     </div>
 
     <div class="row">
-
+<!-- Request targets -->
       <div class="card" style="max-width: 450px;">
         <div class="card-body">
 
@@ -111,16 +111,11 @@
             </div>
         </div>
       </div>
-
-      <div class="card" style="max-width: 450px;">
-        <div class="card-body">
-
-          <div class="pt-4 ">
-            <h4>Notifications</h4>
-            <p>Coming Soon</p>
-          </div>
-        </div>
-      </div>
+<!-- Notifications -->
+      <script>
+        const notificationModule = "Store";
+      </script>
+      <div th:replace="~{components/cardNotification :: cardFragment}">Notification</div>
     </div>
 
   </div>

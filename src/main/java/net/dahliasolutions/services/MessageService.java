@@ -7,6 +7,7 @@ import net.dahliasolutions.models.Notification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -21,6 +22,7 @@ public class MessageService implements MessageServiceInterface{
             message.setId(id);
             message.setName(notification.getName());
             message.setDescription(notification.getDescription());
+            message.setDateSent(LocalDateTime.now());
             message.setModule(notification.getModule());
             message.setType(notification.getType());
             message.setNotification(notification);

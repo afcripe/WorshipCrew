@@ -2,18 +2,15 @@
 <html lang="en" xmlns:th="http://thymeleaf.org">
 
 <div th:fragment="cardFragment(wikiPost)">
-  <div class="card selectableItem" th:object="${wikiPost}">
-    <script>
-      function navToPost(id) {
-        window.location.href="/resource/article/"+id;
-      }
-    </script>
-
-    <div class="row m-2" style="overflow: hidden; max-height: 30px; cursor: pointer;" th:onclick="navToPost([[*{id}]])">
-      [[*{title}]] &nbsp;&nbsp;|&nbsp;&nbsp; [[*{summary}]]
-    </div>
-
+  <div class="card selectableItem m-2" th:object="${wikiPost}" style="overflow: hidden; max-height: 30px;" th:onclick="navToPost([[*{id}]])">
+    [[*{title}]] &nbsp;&nbsp;|&nbsp;&nbsp; [[*{summary}]]
   </div>
+
+  <script>
+    function navToPost(id) {
+      window.location.href="/resource/article/"+id;
+    }
+  </script>
 </div>
 
 </html>

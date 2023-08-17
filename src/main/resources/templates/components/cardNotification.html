@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://thymeleaf.org">
 
-<div th:fragment="cardFragment">
+<div class="card" style="max-width: 450px;" th:fragment="cardFragment">
 
     <template id="notificationTemplate">
         <div class="card-section my-2">
@@ -26,11 +26,11 @@
                     <label class="form-control-label" style="float: left">User</label>
                     <input type="hidden" name="users">
                     <select class="form-control-sm w-100" name="userMultiSelect" multiple>
-                        <option th:each="u : ${userList}" th:value="${u.id}" th:text="${u.name}"></option>
+                        <option th:each="u : ${notificationUsers}" th:value="${u.id}" th:text="${u.name}"></option>
                     </select>
 
                     <div>
-                        <button type="button" class="btn btn-sm btn-primary">Update</button>
+                        <button type="button" class="btn btn-sm btn-generic">Update</button>
                         <button type="button" class="btn btn-sm btn-danger">Delete</button>
                     </div>
                 </form>
@@ -38,50 +38,48 @@
         </div>
     </template>
 
-    <div class="card m-1">
-        <div class="card-title m-4">
-            <button class="btn btn-sm btn-primary" style="float: right;" onclick="notificationDialog()">Add</button>
-            <h4>Notifications</h4>
-        </div>
-        <div id="notificationCards" class="card-body">
-            <div th:each="notify : ${notificationList}">
-                <div th:id="'ntf-'+${notify.id}" class="card-section my-2">
-                    <label th:text="${notify.id}+' - '+${notify.name}" class="form-control-label selectableItem w-100" th:onclick="toggleNotification([[${notify.id}]])"></label>
-                    <div class="pl-2 notification-edit" th:id="'cnt-'+${notify.id}" style="display: none;">
-                        <form th:onsubmit="updateNotification([[${notify.id}]])">
-                            <input name="id" type="hidden" th:value="${notify.id}"/>
+    <div class="card-title m-4">
+        <button class="btn btn-sm btn-generic" style="float: right;" onclick="notificationDialog()">Add</button>
+        <h4>Notifications</h4>
+    </div>
+    <div id="notificationCards" class="card-body">
+        <div th:each="notify : ${notificationList}">
+            <div th:id="'ntf-'+${notify.id}" class="card-section my-2">
+                <label th:text="${notify.id}+' - '+${notify.name}" class="form-control-label selectableItem w-100" th:onclick="toggleNotification([[${notify.id}]])"></label>
+                <div class="pl-2 notification-edit" th:id="'cnt-'+${notify.id}" style="display: none;">
+                    <form th:onsubmit="updateNotification([[${notify.id}]])">
+                        <input name="id" type="hidden" th:value="${notify.id}"/>
 
-                            <label class="form-control-label" style="float: left">Notification Name:</label>
-                            <input name="name" class="form-control" th:value="${notify.name}"/>
+                        <label class="form-control-label" style="float: left">Notification Name:</label>
+                        <input name="name" class="form-control" th:value="${notify.name}"/>
 
-                            <label class="form-control-label" style="float: left">Description:</label>
-                            <input name="description" class="form-control" th:value="${notify.Description}"/>
+                        <label class="form-control-label" style="float: left">Description:</label>
+                        <input name="description" class="form-control" th:value="${notify.Description}"/>
 
-                            <input type="hidden" name="module" class="form-control" th:value="${notify.module}"/>
+                        <input type="hidden" name="module" class="form-control" th:value="${notify.module}"/>
 
-                            <label class="form-control-label" style="float: left">Type:</label>
-                            <select class="form-control w-100" name="type">
-                                <option th:each="t : ${typeList}" th:value="${t.name}"
-                                        th:selected="${t.name} == *{typeName}" th:text="${t.name}"></option>
-                            </select>
+                        <label class="form-control-label" style="float: left">Type:</label>
+                        <select class="form-control w-100" name="type">
+                            <option th:each="t : ${typeList}" th:value="${t.name}"
+                                    th:selected="${t.name} == *{typeName}" th:text="${t.name}"></option>
+                        </select>
 
-                            <label class="form-control-label" style="float: left">User</label>
-                            <input th:id="'users-'+${notify.id}" type="hidden" name="users">
-                            <select th:id="'userList-'+${notify.id}" class="form-control-sm w-100" name="userMultiSelect" multiple th:onchange="onUserSelect([[${notify.id}]])">
-                                <option th:each="u : ${userList}" th:value="${u.id}" th:text="${u.name}"></option>
-                            </select>
+                        <label class="form-control-label" style="float: left">User</label>
+                        <input th:id="'users-'+${notify.id}" type="hidden" name="users">
+                        <select th:id="'userList-'+${notify.id}" class="form-control-sm w-100" name="userMultiSelect" multiple th:onchange="onUserSelect([[${notify.id}]])">
+                            <option th:each="u : ${notificationUsers}" th:value="${u.id}" th:text="${u.name}"></option>
+                        </select>
 
-                            <div>
-                                <div style="display: inline-block; width: 50%;"></div>
-                                <button type="button" class="btn btn-sm btn-primary" th:onclick="updateNotification([[${notify.id}]])">Update</button>
-                                <button type="button" class="btn btn-sm btn-danger" th:onclick="deleteNotification([[${notify.id}]])">Delete</button>
-                            </div>
-                        </form>
-                    </div>
+                        <div>
+                            <div style="display: inline-block; width: 50%;"></div>
+                            <button type="button" class="btn btn-sm btn-generic" th:onclick="updateNotification([[${notify.id}]])">Update</button>
+                            <button type="button" class="btn btn-sm btn-danger" th:onclick="deleteNotification([[${notify.id}]])">Delete</button>
+                        </div>
+                    </form>
                 </div>
             </div>
-
         </div>
+
     </div>
 
     <dialog id="newNotificationDialog" class="upload-modal">
@@ -120,8 +118,8 @@
             <label for="notificationName" class="form-label">Name</label>
             <input class="form-control" id="notificationName" onkeyup="keyNewNotify(event)">
             <div class="pt-2">
-                <button id="btnSubmit" type="button" class="btn btn-sm btn-primary" onclick="postNewNotify()">Add</button>
-                <button id="btnCancel" type="button" class="btn btn-sm btn-outline-primary" onclick="keyEscCat()">Cancel</button>
+                <button id="btnSubmit" type="button" class="btn btn-sm btn-generic" onclick="postNewNotify()">Add</button>
+                <button id="btnCancel" type="button" class="btn btn-sm btn-outline-generic" onclick="keyEscNotify()">Cancel</button>
             </div>
         </form>
     </dialog>
