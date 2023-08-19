@@ -8,14 +8,14 @@
     <div th:replace="~{wiki/moduleHeader :: header}">Header</div>
 
     <div class="row pt-2">
-        <h5 onclick="toggleFolders()">Find Articles by Folders
-            <i id="cartFolderNavDown" class="bi bi-caret-down-fill" style="display: none"></i>
-            <i id="cartFolderNavRight" class="bi bi-caret-right-fill"></i>
-        </h5>
-        <div id="divFolderNav" class="folder-nav folder-nav-collapse">
-            <div th:each="folder : ${folderList}" style="display: inline-block">
-                <div class="tag_primary m-1" style="display: inline-block; cursor: pointer;"
-                     th:onclick="navToFolder([[*{folder.folder}]])" th:text="${folder.folder}">List</div>
+        <div class="col-12 col-lg-9">
+            <h5 onclick="toggleFolders()">Find Articles by Folders
+                <i id="cartFolderNavDown" class="bi bi-caret-down-fill" style="display: none"></i>
+                <i id="cartFolderNavRight" class="bi bi-caret-right-fill"></i>
+            </h5>
+            <div id="divFolderNav" class="folder-nav folder-nav-collapse">
+                <div id="folderChooser" class="px-5" style="border: 1px solid darkgray; border-radius: 5px; text-align: left;">
+                </div>
             </div>
         </div>
     </div>
@@ -73,6 +73,7 @@
     <script th:inline="javascript">
         /*<![CDATA[*/
         let searchTerm = /*[[${searchTerm}]]*/ " ";
+        const treeData = /*[[${folderTree}]]*/ "";
         /*]]>*/
         document.getElementById("searchInput").value = searchTerm;
 
@@ -106,6 +107,60 @@
             }
         }
 
+        function loadFolders() {
+            debugger
+            const chooser = document.getElementById("folderChooser");
+            let parentUL = document.createElement("ul");
+            parentUL.id = "folderTree";
+            for (let i in treeData.folders) {
+                createList(parentUL, treeData.folders[i]);
+            }
+            chooser.appendChild(parentUL);
+
+            let toggler = document.getElementsByClassName("caret");
+            for (let i = 0; i < toggler.length; i++) {
+                toggler[i].addEventListener("click", function() {
+                    this.parentElement.querySelector(".nested").classList.toggle("active");
+                    this.classList.toggle("caret-down");
+                });
+            }
+        }
+
+        function createList(parent, data) {
+            let li = document.createElement("li"),
+                ul;
+
+            let item = document.createElement("span");
+            item.textContent = data.name;
+            item.dataset.path = data.path;
+            item.classList.add("selectableItem");
+            item.addEventListener("click", function (event){
+                selectTreeFolder(event.target, data.path);
+                event.stopPropagation();
+            })
+            li.appendChild(item);
+
+            parent.appendChild(li);
+            console.log(data.folders.length);
+            if (data.folders.length > 0) {
+                let c = document.createElement("span");
+                c.classList.add("caret")
+                li.insertBefore(c, li.firstChild);
+
+                ul = document.createElement("ul");
+                ul.classList.add("nested")
+                li.appendChild(ul);
+
+                for( let f in data.folders ) {
+                    createList(ul, data.folders[f]);
+                }
+            }
+        }
+
+        function selectTreeFolder(element, str) {
+            navToFolder(str);
+        }
+
         function toggleResourceInfo() {
             debugger
             let tab = document.querySelector(".wiki-info-tab");
@@ -130,6 +185,8 @@
                 }
             }
         }
+
+        loadFolders();
 
     </script>
 

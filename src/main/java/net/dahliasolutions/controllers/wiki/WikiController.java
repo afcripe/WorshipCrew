@@ -67,6 +67,7 @@ public class WikiController {
             model.addAttribute("wikiPost", getWikiFromPath(adminSettings.getWikiHome()));
             model.addAttribute("tagList", tagList);
             model.addAttribute("unpublishedList", wikiPostService.findByAuthorAndUnpublished(user.getId()));
+            model.addAttribute("folderTree", wikiFolderService.getFolderTree());
 
             redirectService.setHistory(session, "/resource");
             return "wiki/wikiHome";
@@ -89,7 +90,7 @@ public class WikiController {
         model.addAttribute("wikiPostList", wikiPostList);
         model.addAttribute("tagList", tagList);
         model.addAttribute("unpublishedList", wikiPostService.findByAuthorAndUnpublished(user.getId()));
-        model.addAttribute("folderList", folderList);
+        model.addAttribute("folderTree", wikiFolderService.getFolderTree());
         return "wiki/index";
     }
 
@@ -311,9 +312,20 @@ public class WikiController {
 
         model.addAttribute("wikiPostList", wikiPostList);
         model.addAttribute("tagList", tagList);
-        model.addAttribute("folderList", folderList);
+        model.addAttribute("folderTree", wikiFolderService.getFolderTree());
         model.addAttribute("searchTerm", searcher);
         return "wiki/index";
+    }
+
+    @GetMapping("/folders")
+    public String loadFolderTree(Model model) {
+        List<WikiFolder> folders = wikiFolderService.findAll();
+        String[] folderArray = new String[folders.size()];
+        for (int i=0; i<folders.size(); i++) {
+            folderArray[i] = folders.get(i).getFolder();
+        }
+        model.addAttribute("folderList", folderArray);
+        return "wiki/folderDialog";
     }
 
     private WikiPost getWikiFromPath(String path) {

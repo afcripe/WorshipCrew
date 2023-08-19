@@ -128,6 +128,9 @@
 .selectableItem:hover {
     background-color: var(--dwc-highlight);
 }
+.selected-item {
+    border: 1px solid var(--dwc-wiki);
+}
 
 .gradient-right {
     background-image: linear-gradient(to right, var(--dwc-body-bg) , var(--dwc-gradient));
@@ -159,7 +162,7 @@
 .wiki-info-tab {
     right: 10px;
     transform-origin: 100% 50%;
-    transform: rotate(-90deg) translate(50%, -50%);
+    transform: rotate(-90deg) translate(25%, -50%);
 }
 
 .wiki-info-tab-title {
@@ -722,4 +725,43 @@
 }
 .notification-edit {
 
+}
+
+/* Folder Tree */
+/* Remove default bullets */
+ul, #folderTree {
+    list-style-type: none;
+}
+#folderTree {
+    margin: 0;
+    padding: 0;
+}
+
+/* Style the caret/arrow */
+.caret {
+    cursor: pointer;
+    user-select: none; /* Prevent text selection */
+}
+
+/* Create the caret/arrow with a unicode, and style it */
+.caret::before {
+    content: "\25B6";
+    color: black;
+    display: inline-block;
+    margin-right: 6px;
+}
+
+/* Rotate the caret/arrow icon when clicked on (using JavaScript) */
+.caret-down::before {
+    transform: rotate(90deg);
+}
+
+/* Hide the nested list */
+.nested {
+    display: none;
+}
+
+/* Show the nested list when the user clicks on the caret/arrow (with JavaScript) */
+.active {
+    display: block;
 }

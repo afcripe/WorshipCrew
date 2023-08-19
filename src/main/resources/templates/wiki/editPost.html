@@ -381,124 +381,110 @@
         </form>
     </dialog>
     <dialog id="chooseFolder" class="tag-dialog">
-        <template id="tmpFolder">
-            <div class="m-0 p-0" style="cursor: pointer"></div>
-        </template>
+
         <script>
             async function loadFolders() {
-                const nchooser = document.getElementById("folderChooser");
-                while (nchooser.firstChild) {
-                    nchooser.removeChild(nchooser.lastChild);
+                const chooser = document.getElementById("folderChooser");
+                while (chooser.firstChild) {
+                    chooser.removeChild(chooser.lastChild);
                 }
                 const template = document.getElementById("tmpFolder");
-                let apiURL = '/api/v1/wiki/folders';
+                let apiURL = '/api/v1/wiki/foldertree';
 
                 const response = await fetch(apiURL
                 ).then(response => {
                     return response.json();
                 }).then(data => {
-                    console.log(data);
-                    for (let key in data) {
-                        let obj = data[key];
+                    let parentUL = document.createElement("ul");
+                    parentUL.id = "folderTree";
+                    for (let i in data.folders) {
+                        createList(parentUL, data.folders[i]);
+                    }
+                    chooser.appendChild(parentUL);
 
-                        let clone = template.content.cloneNode(true);
-                        let folderDiv = clone.querySelector("div");
-                            folderDiv.innerText = obj.folder;
-
-                        folderDiv.addEventListener("click", function (event) {
-                            selectFolder(event.target, 1);
+                    let toggler = document.getElementsByClassName("caret");
+                    for (let i = 0; i < toggler.length; i++) {
+                        toggler[i].addEventListener("click", function() {
+                            this.parentElement.querySelector(".nested").classList.toggle("active");
+                            this.classList.toggle("caret-down");
                         });
-                        folderDiv.addEventListener("dblclick", function (event) {
-                            selectFolder(event.target, 2);
-                        });
-
-                        nchooser.appendChild(clone);
                     }
                 });
             }
 
-            async function newFolder() {
-                const fChooser = document.getElementById("folderChooser");
-                const template = document.getElementById("tmpFolder");
-                let folderArray = fChooser.querySelectorAll("div");
+            function createList(parent, data) {
+                let li = document.createElement("li"),
+                    ul;
 
-                for(let key in folderArray) {
-                    let folderNode = folderArray[key];
-                    try {folderNode.classList.remove("grid_image_selected_primary")}
-                    catch (error) {console.log("not an folder")}
-                }
+                let item = document.createElement("span");
+                item.textContent = data.name;
+                item.dataset.path = data.path;
+                item.classList.add("selectableItem");
+                if (data.path === postfolder) {item.classList.add("selected-item")}
+                item.addEventListener("click", function (event){
+                    selectTreeFolder(event.target, data.path, 0);
+                    event.stopPropagation();
+                })
+                item.addEventListener("dblclick", function (event){
+                    selectTreeFolder(event.target, data.path, 1);
+                    event.stopPropagation();
+                })
+                li.appendChild(item);
 
-                let apiURL = '/api/v1/wiki/folder';
-                let formData = new FormData();
-                    formData.set("name", document.getElementById('folderPath').value)
+                parent.appendChild(li);
+                console.log(data.folders.length);
+                if (data.folders.length > 0) {
+                    let c = document.createElement("span");
+                    c.classList.add("caret")
+                    li.insertBefore(c, li.firstChild);
 
-                const responseNewFolder = await fetch(apiURL, {
-                    method: 'POST',
-                    body: formData
-                }).then(response => {
-                    return response.json();
-                }).then(data => {
-                    if (data.folder !== "") {
-                        let clone = template.content.cloneNode(true);
-                        let folderDiv = clone.querySelector("div");
-                            folderDiv.innerText = data.folder;
+                    ul = document.createElement("ul");
+                    ul.classList.add("nested")
+                    li.appendChild(ul);
 
-                        folderDiv.addEventListener("click", function (event) {
-                            selectFolder(event.target, 1);
-                        });
-                        folderDiv.addEventListener("dblclick", function (event) {
-                            selectFolder(event.target, 2);
-                        });
-                        folderDiv.classList.add("grid_image_selected_primary");
-
-                        document.getElementById('wikiPath').value = data.folder;
-                        fChooser.appendChild(clone);
-                        document.getElementById('folderPath').value = "";
+                    for( let f in data.folders ) {
+                        createList(ul, data.folders[f]);
                     }
-                });
-            }
-
-            function selectFolder(element, type) {
-                const divChooser = document.getElementById("folderChooser");
-                let folderArray = divChooser.querySelectorAll("div");
-
-                for(let key in folderArray) {
-                    let folderNode = folderArray[key];
-                    try {folderNode.classList.remove("grid_image_selected_primary")}
-                    catch (error) {console.log("not an folder")}
                 }
-                element.classList.add("grid_image_selected_primary");
-                document.getElementById("wikiPath").value = element.innerText;
-                if (type > 1) { dialogOK(); }
             }
 
-            function folderDialogOK() {
-                document.getElementById('folder').value = document.getElementById("wikiPath").value;
+            function selectTreeFolder(element, str, type) {
+                let selectedItems = document.querySelectorAll(".selected-item")
+                for (let s in selectedItems) {
+                    try {selectedItems[s].classList.remove("selected-item")} catch (e) {}
+                }
+                element.classList.add("selected-item");
+                document.getElementById("wikiPath").value = str;
+                document.getElementById('folder').value = str;
+                if (type > 1) { dialogFolderOK(); }
+            }
+
+            function dialogFolderOK(){
                 document.getElementById("chooseFolder").close();
             }
 
-            function folderNewPath(event) {
-                event.preventDefault();
-                if (event.key == "Enter") { newFolder() }
+            function dialogFolderEsc() {
+                document.getElementById("wikiPath").value = document.getElementById("wikiOldPath").value;
+                document.getElementById('folder').value = document.getElementById("wikiOldPath").value;
+                document.getElementById("chooseFolder").close();
             }
-
         </script>
+
         <form onsubmit="folderNewPath(event)" method="dialog">
             <div class="d-flex">
                 <label for="wikiPath" class="form-control-label h4 w-50" style="float: left">Folder Path</label>
-                <input id="wikiPath" class="form-control pr-2 w-50" type="text" th:value="${wikiPost.folder}"
+                <input id="wikiPath" class="form-control pr-2 w-50" type="text"
                        placeholder="New Folder" style="float: left;" onkeyup="folderNewPath()" disabled>
+                <input id="wikiOldPath" type="hidden">
             </div>
 
-            <div id="folderChooser" class="border border-1 rounded"
-                 style="width: 410px; height: 410px;"></div>
+            <div id="folderChooser" class="border border-1 rounded text-left"
+                 style="width: 410px; height: 410px; text-align: left;">
+            </div>
             <div class="d-flex">
-                <input id="folderPath" class="form-control pr-2 w-50" type="text"
-                       placeholder="New Folder" style="float: left;" onkeyup="folderNewPath(event)">
-<!--                <button type="button" class="btn btn-sm btn-wiki m-2 w-25" style="float: right"-->
-<!--                        onclick="newFolder()">New</button>-->
-                <button type="button" class="btn btn-sm btn-wiki m-2 w-25" style="float: right"
-                        onclick="folderDialogOK()">OK</button>
+                <button type="button" class="btn btn-sm btn-wiki m-2 w-25" onclick="dialogFolderOK()">OK</button>
+                <div class="w-50" style="display: inline"></div>
+                <button type="button" class="btn btn-sm btn-outline-wiki m-2 w-25" onclick="dialogFolderEsc()">Cancel</button>
             </div>
         </form>
     </dialog>
@@ -507,10 +493,11 @@
         /*<![CDATA[*/
         const websiteDomain = /*[[${baseURL}]]*/ " ";
         let postTags = /*[[${wikiPost.tagList}]]*/ " ";
-        let postContent = /*[[${wikiPost.body}]]*/ " ";
+        let postfolder = /*[[${wikiPost.folder}]]*/ " ";
         /*]]>*/
-
-        //tinyMCE.activeEditor.setContent(postContent);
+        /* Static Link Domain
+        // http://localhost:8081/
+        // https://www.destinyworshipexchange.com/
 
         let closeOnSave = false;
         const iconSaving = document.getElementById('savingIcon');
@@ -573,10 +560,12 @@
                 }
             });
         }
+
         function closeEditor() {
             closeOnSave = true;
             processPost();
         }
+
         function manageTags() {
             if ( document.getElementById('postId').value > 0 ) {
                 document.getElementById("chooseTag").showModal();
@@ -585,14 +574,19 @@
                 alert("Please save you new article before adding tags.");
             }
         }
+
         function manageFolder() {
             if ( document.getElementById('postId').value > 0 ) {
                 document.getElementById("chooseFolder").showModal();
+                document.getElementById("wikiPath").value = document.getElementById('folder').value;
+                document.getElementById("wikiOldPath").value = document.getElementById('folder').value;
+
                 loadFolders();
             } else {
                 alert("Please save you new article before adding it to a folder.");
             }
         }
+
         function uploadImageClick() {
             document.getElementById("uploadDialog").showModal();
         }

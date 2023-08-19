@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -195,11 +196,18 @@ public class WikiAPIController {
             folderName = "/"+folderModel.name();
         }
 
-        Optional<WikiFolder> wikiFolder = wikiFolderService.findByFolder(folderName);
+        String[] folders = folderName.split("/");
+        String baseFolder = "";
+        WikiFolder latestFolder = new WikiFolder();
+        for (int i=1; i < folders.length; i++) {
+            baseFolder = baseFolder+"/"+folders[i];
+            Optional<WikiFolder> wikiFolder = wikiFolderService.findByFolder(baseFolder);
+            if (wikiFolder.isEmpty()) {
+                wikiFolderService.save(baseFolder);
+            }
+        }
 
-        if (wikiFolder.isPresent()) { return null; }
-
-        return wikiFolderService.save(folderName);
+        return latestFolder;
     }
 
     @PostMapping("/foldermanager/delete")
@@ -236,6 +244,11 @@ public class WikiAPIController {
     public SingleStringModel updateWikiHome(@ModelAttribute SingleStringModel wikiHomeModel) {
         adminSettingsService.setWikiHome(wikiHomeModel.name());
         return wikiHomeModel;
+    }
+
+    @GetMapping("/foldertree")
+    public WikiFolderTree getFoldersByTree() {
+        return wikiFolderService.getFolderTree();
     }
 
     @PostMapping("/updatedocshome")
