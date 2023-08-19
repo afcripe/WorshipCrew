@@ -152,15 +152,14 @@
 
 
 .wiki-info-tab {
-    position: fixed;
-    top: 0;
-    bottom: 0;
+    position: absolute;
+    top: 50%;
+    right: 15px;
     height: 1.5em;
     margin: auto;
 }
 
 .wiki-info-tab {
-    right: 10px;
     transform-origin: 100% 50%;
     transform: rotate(-90deg) translate(25%, -50%);
 }
@@ -172,6 +171,7 @@
     border: .05rem solid black;
     border-radius: 5px;
 }
+
 
 .wiki-info {
     max-width: 300px;
@@ -612,9 +612,7 @@
 }
 
 .folder-nav {
-    width: 100%;
     height: 0%;
-    overflow: clip;
     transition: width 1s;
     display: none;
 }
