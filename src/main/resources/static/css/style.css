@@ -145,7 +145,7 @@
 }
 .wiki-body {
     flex-grow: 1;
-    min-width: 400px;
+    min-width: 300px;
     padding-right:  25px;
     padding-bottom: 15px;
 }
@@ -153,25 +153,28 @@
 
 .wiki-info-tab {
     position: absolute;
-    top: 50%;
-    right: 15px;
+    top: 300px;
+    right: -70px;
     height: 1.5em;
     margin: auto;
 }
 
 .wiki-info-tab {
-    transform-origin: 100% 50%;
-    transform: rotate(-90deg) translate(25%, -50%);
+    transform: rotate(-90deg);
 }
 
 .wiki-info-tab-title {
-    display: inline;
+    display: inline-block;
     margin: 0 5px 0 5px;
     padding: 0 10px 0 10px;
     border: .05rem solid black;
     border-radius: 5px;
 }
-
+.wiki-info-tab-spacer {
+    display: inline-block;
+    margin: 0 5px 0 5px;
+    padding: 0 10px 0 10px;
+}
 
 .wiki-info {
     max-width: 300px;

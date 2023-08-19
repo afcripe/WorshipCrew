@@ -25,7 +25,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/static/**")
                 .addResourceLocations("/static/");
         registry.addResourceHandler("/content/**")
-                .addResourceLocations("file:///Users/afcripe/var/destinyworshipexchange/content/");
+                .addResourceLocations("file:///var/destinyworshipexchange/content/");
         System.out.println(appServer.getResourceDir());
     }
 // file:///Users/afcripe/var/destinyworshipexchange/content/

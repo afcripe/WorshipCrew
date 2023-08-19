@@ -32,21 +32,21 @@ public class Main {
         System.out.println(getAppServerSingleton().getBaseURL());
     }
 
-//    @Bean
-//    @Scope("singleton")
-//    static public AppServer getAppServerSingleton(){
-//        return new AppServer("https://www.destinyworshipexchange.com",
-//                "/var/destinyworshipexchange/content",
-//                "/content");
-//    }
-
     @Bean
     @Scope("singleton")
     static public AppServer getAppServerSingleton(){
-        return new AppServer("http://localhost:8081",
-                "/Users/afcripe/var/destinyworshipexchange/content",
+        return new AppServer("https://www.destinyworshipexchange.com",
+                "/var/destinyworshipexchange/content",
                 "/content");
     }
+
+//    @Bean
+//    @Scope("singleton")
+//    static public AppServer getAppServerSingleton(){
+//        return new AppServer("http://localhost:8081",
+//                "/Users/afcripe/var/destinyworshipexchange/content",
+//                "/content");
+//    }
 
 //    @Bean
 //    CommandLineRunner run(UserRolesService roleService, PositionService positionService, WikiTagService wikiTagService,
