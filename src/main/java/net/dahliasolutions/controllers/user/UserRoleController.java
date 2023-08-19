@@ -30,6 +30,6 @@ public class UserRoleController {
         redirectService.setHistory(session, "/roles");
         List<UserRoles> roleList = rolesService.findAll();
         model.addAttribute("roleList", roleList);
-        return "admin/user/listUserRoles";
+        return "user/listUserRoles";
     }
 }
