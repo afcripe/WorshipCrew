@@ -1,6 +1,6 @@
 <div th:fragment="header" xmlns:th="http://thymeleaf.org">
 
-    <nav id="moduleHeader" class="navbar navbar-expand-md navbar-light bg-light">
+    <nav id="moduleHeader" class="navbar navbar-expand-md navbar-light bg-dark">
       <div class="container-fluid w-100">
 
           <div class="navbar-nav mt-2 mx-2">
@@ -79,7 +79,7 @@
 
     </nav>
 
-    <nav id="categoriesHeader" class="navbar navbar-light bg-light d-md-none" th:if="${showCategories}">
+    <nav id="categoriesHeader" class="navbar navbar-light bg-dark d-md-none" th:if="${showCategories}">
         <div class="container-fluid w-100">
             <button class="navbar-toggler category-nav-title" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCategories" aria-controls="navbarCategories" aria-expanded="false" aria-label="Toggle navigation">
                 Categories

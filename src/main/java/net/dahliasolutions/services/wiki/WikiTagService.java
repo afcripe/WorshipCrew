@@ -17,6 +17,7 @@ public class WikiTagService implements WikiTagServiceInterface{
 
     @Override
     public WikiTag createWikiTag(WikiTag wikiTag) {
+        wikiTag.setName(wikiTag.getName().toLowerCase());
         return wikiTagRepository.save(wikiTag);
     }
 
@@ -37,6 +38,7 @@ public class WikiTagService implements WikiTagServiceInterface{
 
     @Override
     public void save(WikiTag wikiTag) {
+        wikiTag.setName(wikiTag.getName().toLowerCase());
         wikiTagRepository.save(wikiTag);
     }
 

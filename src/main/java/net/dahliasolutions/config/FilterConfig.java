@@ -22,8 +22,6 @@ public class FilterConfig extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        System.out.println(request.getContextPath());
-        System.out.println(request.getRequestURL());
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (!auth.getPrincipal().equals("anonymousUser")) {
             User user = (User) auth.getPrincipal();

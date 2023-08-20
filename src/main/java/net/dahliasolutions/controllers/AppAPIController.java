@@ -1,5 +1,6 @@
 package net.dahliasolutions.controllers;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.user.Profile;
@@ -24,7 +25,7 @@ public class AppAPIController {
     private final UserService userService;
 
     @GetMapping("/removeerrormsg")
-    public void removeErrorMSG(HttpSession session) {
+    public void removeErrorMSG(HttpServletRequest request, HttpSession session) {
         try {
             session.removeAttribute("msgError");
             session.removeAttribute("msgSuccess");

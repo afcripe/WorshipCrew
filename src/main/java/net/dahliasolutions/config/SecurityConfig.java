@@ -69,7 +69,6 @@ public class SecurityConfig {
                     auth.requestMatchers("/login").permitAll();
                     auth.requestMatchers("/logout").permitAll();
                     auth.requestMatchers("/passwordreset").permitAll();
-                    auth.requestMatchers("/logout").permitAll();
                     auth.requestMatchers("/mailer").permitAll();
                     auth.requestMatchers("/mailer/*").permitAll();
 
@@ -151,13 +150,15 @@ public class SecurityConfig {
                         session.setAttribute("sideNavigation", "expand");
                         session.setAttribute("storeLayout", "grid");
                     }
-                    String savedRequest = request.getSession().getAttribute("SPRING_SECURITY_SAVED_REQUEST").toString();
-                    savedRequest = savedRequest.substring(21,savedRequest.length()-1);
+                    String savedRequest = "/";
+                    try {
+                        savedRequest = request.getSession().getAttribute("SPRING_SECURITY_SAVED_REQUEST").toString();
+                        savedRequest = savedRequest.substring(21, savedRequest.length() - 1);
+                    } catch (Error e) { }
+                    if (savedRequest.contains("api")) {
+                        savedRequest = request.getContextPath();
+                    }
                     response.sendRedirect(savedRequest);
-                }).failureHandler((request, response, exception) -> {
-                    HttpSession session = request.getSession();
-                    session.setAttribute("msgError", "Incorrect Username or Password!");
-                    response.sendRedirect("/login");
                 })
                 .and().exceptionHandling().accessDeniedHandler((request, response, accessDeniedException) -> {
                     HttpSession session = request.getSession();

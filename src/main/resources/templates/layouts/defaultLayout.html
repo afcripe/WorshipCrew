@@ -27,7 +27,7 @@
 
     </head>
 
-    <body class="container-fluid d-flex flex-column px-0 mb-0">
+    <body class="container-fluid d-flex flex-column px-0 mb-0 dark">
 
         <!--- Header --->
         <div th:replace="~{layouts/commonHeader :: header}">Header</div>
@@ -36,7 +36,7 @@
         <th:block th:if="${session.msgSuccess}">
             <div id="messageSuccessDiv" class="alert-fixed" th:onclick="'javascript:clearSuccess()'">
                 <div class="alert-success alert-fixed-success align-content-center">
-                    <p style="text-align: center" th:text="${session.msgSuccess}"/>
+                    <p style="text-align: center" th:text="${session.msgSuccess}"></p>
                     <script  th:inline="javascript">
                         fetch("/api/v1/app/removesuccessmsg");
                         setTimeout(() => {
@@ -53,7 +53,7 @@
         <th:block th:if="${session.msgError}">
             <div id="messageErrorDiv" class="alert-fixed" th:onclick="'javascript:clearError()'">
                 <div class="alert-danger align-content-center alert-fixed-danger">
-                    <span th:text="${session.msgError}"/>
+                    <span th:text="${session.msgError}"></span>
                     <script  th:inline="javascript">
                         fetch("/api/v1/app/removeerrormsg");
                         setTimeout(() => {
