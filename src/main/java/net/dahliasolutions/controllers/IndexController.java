@@ -56,7 +56,7 @@ public class IndexController {
     }
 
     @GetMapping("/login")
-    public String loginForm(){
+    public String loginForm(HttpServletRequest request){
         return "index";
     }
 
@@ -76,11 +76,6 @@ public class IndexController {
     @GetMapping("/logout")
     public String logout() {
         return "logout";
-    }
-
-    @PostMapping("/login")
-    public String loginUser(@ModelAttribute LoginModel loginModel){
-        return "redirect:/user/index";
     }
 
     @PostMapping("/passwordreset")

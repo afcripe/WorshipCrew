@@ -14,6 +14,8 @@
     </div>
   </template>
 
+  <div th:replace="~{store/moduleHeader :: header}">Header</div>
+
   <div class="container" th:object="${storeItem}">
     <div class="row m-2">
 
@@ -452,7 +454,6 @@
     selectedSubCat = subCategorySelect.value;
   }
 
-
   function clearOption() {
     optionIdDisplay.value = 0;
     optionNameDisplay.value = "";
@@ -532,27 +533,7 @@
       getOptions();
     });
   }
-/*
-  function descriptionCharFilter() {
-    let ta = document.getElementById("description");
-    let desc = ta.value;
-    let lastChar = desc.substring(desc.length-1, desc.length);
-    let last2Char = desc.substring(desc.length-2, desc.length);
 
-    if (lastChar === "<") {
-      ta.value=ta.value.slice(0, -1)+"&lt;";
-      ta.focus();
-    }
-    if (lastChar === ">") {
-      ta.value=ta.value.slice(0, -1)+"&gt;";
-      ta.focus();
-    }
-    if (last2Char === "& ") {
-      ta.value=ta.value.slice(0, -2)+"&amp;";
-      ta.focus();
-    }
-  }
-*/
   function submitForm() {
     let theForm = document.getElementById("itemForm");
     let pList = document.getElementById("positionSelect");

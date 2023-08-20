@@ -79,7 +79,7 @@
 
     </nav>
 
-    <nav id="categoriesHeader" class="navbar navbar-light bg-light d-md-none">
+    <nav id="categoriesHeader" class="navbar navbar-light bg-light d-md-none" th:if="${showCategories}">
         <div class="container-fluid w-100">
             <button class="navbar-toggler category-nav-title" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCategories" aria-controls="navbarCategories" aria-expanded="false" aria-label="Toggle navigation">
                 Categories
@@ -176,4 +176,5 @@
             });
         }
     </script>
+
 </div>

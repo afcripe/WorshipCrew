@@ -57,6 +57,7 @@ public class StoreController {
         model.addAttribute("moduleLink", "/store");
         model.addAttribute("userId", user.getId());
         model.addAttribute("categoryList", categoryList);
+        model.addAttribute("showCategories", true);
     }
 
     @GetMapping("")
@@ -124,6 +125,7 @@ public class StoreController {
         model.addAttribute("userList", userList);
         model.addAttribute("positionList", positionList);
         model.addAttribute("departmentList", departmentRegionalList);
+        model.addAttribute("showCategories", false);
         return "store/itemNew";
     }
 
@@ -260,6 +262,7 @@ public class StoreController {
         model.addAttribute("categoryList", categoryList);
         model.addAttribute("categoryId", catId);
         model.addAttribute("subCategoryId", subCatId);
+        model.addAttribute("showCategories", false);
         return "store/itemEdit";
     }
 
@@ -360,6 +363,7 @@ public class StoreController {
         model.addAttribute("notificationList", notificationList);
         model.addAttribute("typeList", Arrays.asList(EventType.values()));
         model.addAttribute("notificationUsers", notificationUsers);
+        model.addAttribute("showCategories", false);
 
         return "store/settings";
     }
@@ -385,6 +389,7 @@ public class StoreController {
         }
 
         model.addAttribute("imageList", imageList);
+        model.addAttribute("showCategories", false);
         return "store/imageManager";
     }
 

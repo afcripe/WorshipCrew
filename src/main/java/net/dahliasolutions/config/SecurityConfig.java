@@ -6,6 +6,7 @@ import net.dahliasolutions.data.UserRepository;
 import net.dahliasolutions.models.user.Profile;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.services.user.ProfileService;
+import org.apache.catalina.authenticator.SavedRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -134,7 +135,7 @@ public class SecurityConfig {
 
                     auth.anyRequest().authenticated();
                 })
-                .formLogin().loginPage("/login").defaultSuccessUrl("/user/").successHandler((request, response, authentication) -> {
+                .formLogin().loginPage("/login").successHandler((request, response, authentication) -> {
                     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
                     User user = (User) auth.getPrincipal();
                     HttpSession session = request.getSession();
@@ -150,7 +151,9 @@ public class SecurityConfig {
                         session.setAttribute("sideNavigation", "expand");
                         session.setAttribute("storeLayout", "grid");
                     }
-                    response.sendRedirect(request.getContextPath());
+                    String savedRequest = request.getSession().getAttribute("SPRING_SECURITY_SAVED_REQUEST").toString();
+                    savedRequest = savedRequest.substring(21,savedRequest.length()-1);
+                    response.sendRedirect(savedRequest);
                 }).failureHandler((request, response, exception) -> {
                     HttpSession session = request.getSession();
                     session.setAttribute("msgError", "Incorrect Username or Password!");

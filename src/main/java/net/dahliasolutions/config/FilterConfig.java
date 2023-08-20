@@ -22,15 +22,8 @@ public class FilterConfig extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        // set default sidebar nav
-//        if (request.getSession().getAttribute("showSideNav") == null && request.getSession().getAttribute("hideSideNav") == null) {
-//            request.getSession().setAttribute("showSideNav", true);
-//        }
-        // set default list-grid display for store
-//        if (request.getSession().getAttribute("storeListGrid") == null) {
-//            request.getSession().setAttribute("storeListGrid", "list");
-//        }
-        // get the cart item count for store
+        System.out.println(request.getContextPath());
+        System.out.println(request.getRequestURL());
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (!auth.getPrincipal().equals("anonymousUser")) {
             User user = (User) auth.getPrincipal();
