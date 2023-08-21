@@ -22,5 +22,5 @@ public class SLA {
     private int responseLevel;
     private String name;
     private String description;
-    private int  responseDue;
+    private int  responseDue;       // days from ticket submission to resolve
 }

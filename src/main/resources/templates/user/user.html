@@ -11,18 +11,19 @@
 
     <div class="row m-0 p-0">
 
-      <div class="col-12 col-md-6">
+      <div class="col-12 col-md-6 col-lg-8">
 
         <div class="card pb-2">
           <div class="card-title alert alert-primary">
             <div th:if="${userEdit}" style="float: right">
-              <button class="btn btn-sm btn-info small"
+              <button class="btn btn-sm btn-info small" th:unless="*{deleted}"
                       th:onclick="window.location.href='/user/[[${user.id}]]/changepassword';">Password</button>
               <button class="btn btn-sm btn-success small"
                       th:onclick="window.location.href='/user/edit/[[${user.id}]]';">Edit</button>
             </div>
             <h5>
-              <span th:text="*{firstName}"/> <span th:text="*{lastName}"/>
+              <span th:text="*{firstName}+' '+*{lastName}"></span>
+              <span style="color: orangered" th:if="*{deleted}">(Deleted)</span>
             </h5>
           </div>
 
@@ -56,7 +57,7 @@
 
           <div class="card mt-2" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')}">
             <div class="card-title alert alert-primary bg-faded">
-              <button class="btn btn-sm btn-success small" style="float: right"
+              <button class="btn btn-sm btn-success small" style="float: right" th:unless="*{deleted}"
                       th:onclick="window.location.href='/user/[[${user.id}]]/addpermission'">Add</button>
               <h5>User Roles <span id="authRefresh" style="display: none;" onclick="window.location.reload()"><i class="bi bi-arrow-repeat"></i></span></h5>
             </div>

@@ -2,18 +2,18 @@ package net.dahliasolutions.controllers.support;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import net.dahliasolutions.models.records.BigIntegerStringModel;
 import net.dahliasolutions.models.support.Ticket;
+import net.dahliasolutions.models.support.TicketModel;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.services.RedirectService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
+import java.math.BigInteger;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -33,7 +33,6 @@ public class SupportController {
     }
     @GetMapping("")
     public String goSupportHome(Model model, HttpSession session) {
-        redirectService.setHistory(session, "/support");
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) auth.getPrincipal();
 
@@ -49,11 +48,33 @@ public class SupportController {
         model.addAttribute("supervisorTickets", supervisorTickets);
         model.addAttribute("campusTickets", campusTickets);
         model.addAttribute("departmentTickets", departmentTickets);
+
+        redirectService.setHistory(session, "/support");
         return "support/index";
     }
 
+    @GetMapping("/ticket/{id}")
+    public String goTicket(@PathVariable BigInteger id, Model model, HttpSession session) {
+
+        redirectService.setHistory(session, "/support/ticket"+id);
+        return "support/ticket";
+    }
+
+    @GetMapping("/new")
+    public String goNewTicket(Model model, HttpSession session) {
+
+        redirectService.setHistory(session, "/support");
+        return "support/ticketNew";
+    }
+
+    @PostMapping("/create")
+    public String createTicket(@ModelAttribute TicketModel ticketModel, HttpSession session) {
+
+        return "redirect:/ticket/"+ BigInteger.valueOf(1).toString();
+    }
+
     @GetMapping("/search/{searchTerm}")
-    public String searchArticle(@PathVariable String searchTerm, Model model, HttpSession session) {
+    public String searchTickets(@PathVariable String searchTerm, Model model, HttpSession session) {
         redirectService.setHistory(session, "/support/search/title/"+searchTerm);
         String searcher = URLDecoder.decode(searchTerm, StandardCharsets.UTF_8);
         // List<StoreItem> itemList = storeItemService.searchAll(searcher);

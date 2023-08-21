@@ -33,11 +33,11 @@
     </script>
 
     <div style="float: right">
+      <button class="btn btn-sm btn-outline-warning" id="btnToggleDeleted"
+              th:onclick="'javascript:navLocationTable(event, this, 0)'">Toggle Deleted</button>
+      &nbsp;
       <button class="btn btn-sm btn-success" id="btnNew"
               th:onclick="'javascript:navLocationTable(event, this, 0)'">Add</button>
-      &nbsp;
-      <button class="btn btn-sm btn-warning" id="btnToggleDeleted"
-              th:onclick="'javascript:navLocationTable(event, this, 0)'">Toggle Deleted</button>
     </div>
 
     <h1>Campuses</h1>
@@ -55,7 +55,7 @@
       <tr th:each="campus : ${campusList}" class="selectableItem" style="cursor: pointer"
           th:onclick="'javascript:navLocationTable(event, this, '+${campus.id}+')'" id="btnEdit">
         <th:block th:if="${campus.hidden}">
-          <td style="text-decoration: line-through; color: darkred"><span th:text="${campus.name}"/></td>
+          <td style="text-decoration: line-through; color: orangered"><span th:text="${campus.name}"/></td>
         </th:block>
         <th:block th:unless="${campus.hidden}">
           <td><span th:text="${campus.name}"/></td>

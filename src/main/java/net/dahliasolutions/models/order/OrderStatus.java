@@ -8,6 +8,6 @@ public enum OrderStatus {
     Approved,
     Denied,
     Cancelled,
-    Backorder,
+    OnHold,
     Complete
 }

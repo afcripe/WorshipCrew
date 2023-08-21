@@ -21,8 +21,28 @@
         </div>
 
         <div class="wiki-article">
-            <div class="wiki-body">
+            <div class="wiki-body col-12 col-md-9">
                 <div th:utext="*{body}"></div>
+            </div>
+
+            <div class="wiki-info col-12 col-md-3">
+                <div class="card m-1">
+                    <div class="card-title h6 selectableItem m-2" onclick="toggleResourceInfo()">Article Info</div>
+                    <hr class="pt-0">
+                    <span><u>Article Location:</u><a id="articleLink" href="#"><i class="bi bi-box-arrow-up-right"></i></a></span>
+                        <div class="p-2" id="articleLinkText"></div>
+                    <u>Author:</u>
+                        <div class="m-2" id="articleAuthor" th:text="*{author.firstName + ' ' + author.lastName}"></div>
+                    <u>Updated:</u>
+                        <div class="m-2" id="articleDate" th:text="*{#temporals.format(lastUpdated, 'MMM-dd-yyyy HH:mm')}"></div>
+                </div>
+
+                <div class="card m-1">
+                    <div class="card-title h6 selectableItem m-2" onclick="toggleResourceInfo()">Tags</div>
+                    <hr>
+                    <div class="tag_primary m-1" style="display: inline-block; cursor: pointer;" th:onclick="navToTag([[*{id}]])"
+                         th:each="tag : *{tagList}" th:text="${tag.name}"></div>
+                </div>
             </div>
 
             <div class="wiki-info-tab hide">
@@ -34,25 +54,6 @@
                 </div>
             </div>
 
-            <div class="wiki-info">
-                <div class="card m-1 gradient-right">
-                    <div class="card-title h6 selectableItem" onclick="toggleResourceInfo()">Article Info</div>
-                    <hr>
-                    Article Location: <a id="articleLink" href="#"><i class="bi bi-box-arrow-up-right"></i></a><br>
-                        <span id="articleLinkText"></span><br><br>
-                    Author:<br>
-                        <span id="articleAuthor" th:text="*{author.firstName + ' ' + author.lastName}"></span><br>
-                    Updated:<br>
-                        <span id="articleDate" th:text="*{#temporals.format(lastUpdated, 'MMM-dd-yyyy HH:mm')}"></span><br>
-                </div>
-
-                <div class="card m-1 gradient-right">
-                    <div class="card-title h6 selectableItem" onclick="toggleResourceInfo()">Tags</div>
-                    <hr>
-                    <div class="tag_primary m-1" style="display: inline-block; cursor: pointer;" th:onclick="navToTag([[*{id}]])"
-                         th:each="tag : *{tagList}" th:text="${tag.name}"></div>
-                </div>
-            </div>
         </div>
 
     </div>

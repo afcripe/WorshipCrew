@@ -1,5 +1,8 @@
 package net.dahliasolutions.config;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.data.UserRepository;
@@ -17,13 +20,16 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
+import java.io.IOException;
 import java.util.Optional;
 
 @Configuration
@@ -78,29 +84,34 @@ public class SecurityConfig {
                     auth.requestMatchers("/fonts/**").permitAll();
                     auth.requestMatchers("/js/**").permitAll();
 
-                    auth.requestMatchers("/store").hasAnyAuthority("ADMIN_WRITE", "STORE_READ","STORE_WRITE");
-                    auth.requestMatchers("/store/item/**").hasAnyAuthority("ADMIN_WRITE", "STORE_READ","STORE_WRITE");
-                    auth.requestMatchers("/store/edit/**").hasAnyAuthority("ADMIN_WRITE", "STORE_WRITE");
-                    auth.requestMatchers("/store/settings/**").hasAnyAuthority("ADMIN_WRITE");
+                    auth.requestMatchers("/store").hasAnyAuthority("ADMIN_WRITE", "STORE_SUPERVISOR", "STORE_READ","STORE_WRITE");
+                    auth.requestMatchers("/store/item/**").hasAnyAuthority("ADMIN_WRITE", "STORE_SUPERVISOR", "STORE_READ","STORE_WRITE");
+                    auth.requestMatchers("/store/edit/**").hasAnyAuthority("ADMIN_WRITE", "STORE_SUPERVISOR", "STORE_WRITE");
+                    auth.requestMatchers("/store/settings/**").hasAnyAuthority("ADMIN_WRITE", "STORE_SUPERVISOR");
 
-                    auth.requestMatchers("/request").hasAnyAuthority("ADMIN_WRITE", "REQUEST_WRITE", "REQUEST_SUPERVISOR");
-                    auth.requestMatchers("/request/order/**").hasAnyAuthority("ADMIN_WRITE", "REQUEST_WRITE", "REQUEST_SUPERVISOR");
+                    auth.requestMatchers("/request").hasAnyAuthority("ADMIN_WRITE", "REQUEST_SUPERVISOR", "REQUEST_WRITE");
+                    auth.requestMatchers("/request/order/**").hasAnyAuthority("ADMIN_WRITE", "REQUEST_SUPERVISOR", "REQUEST_WRITE");
                     auth.requestMatchers("/request/department/**").hasAnyAuthority("ADMIN_WRITE", "REQUEST_SUPERVISOR");
                     auth.requestMatchers("/request/campus/**").hasAnyAuthority("ADMIN_WRITE", "REQUEST_SUPERVISOR");
                     auth.requestMatchers("/request/user/**").hasAnyAuthority("ADMIN_WRITE", "REQUEST_SUPERVISOR");
-                    auth.requestMatchers("/request/settings/**").hasAnyAuthority("ADMIN_WRITE");
+                    auth.requestMatchers("/request/settings/**").hasAnyAuthority("ADMIN_WRITE", "REQUEST_SUPERVISOR");
 
-                    auth.requestMatchers("/resource").hasAnyAuthority("ADMIN_WRITE", "RESOURCE_READ", "RESOURCE_WRITE");
-                    auth.requestMatchers("/resource/tag/**").hasAnyAuthority("ADMIN_WRITE", "RESOURCE_READ", "RESOURCE_WRITE");
-                    auth.requestMatchers("/resource/folder/**").hasAnyAuthority("ADMIN_WRITE", "RESOURCE_READ", "RESOURCE_WRITE");
-                    auth.requestMatchers("/resource/group/**").hasAnyAuthority("ADMIN_WRITE", "RESOURCE_READ", "RESOURCE_WRITE");
-                    auth.requestMatchers("/resource/search/**").hasAnyAuthority("ADMIN_WRITE", "RESOURCE_READ", "RESOURCE_WRITE");
-                    auth.requestMatchers("/resource/article/**").hasAnyAuthority("ADMIN_WRITE", "RESOURCE_READ", "RESOURCE_WRITE");
-                    auth.requestMatchers("/resource/new/**").hasAnyAuthority("ADMIN_WRITE", "RESOURCE_WRITE");
-                    auth.requestMatchers("/resource/edit/**").hasAnyAuthority("ADMIN_WRITE", "RESOURCE_WRITE");
-                    auth.requestMatchers("/resource/settings").hasAnyAuthority("ADMIN_WRITE");
-                    auth.requestMatchers("/resource/tagmanager").hasAnyAuthority("ADMIN_WRITE");
-                    auth.requestMatchers("/resource/foldermanager").hasAnyAuthority("ADMIN_WRITE");
+                    auth.requestMatchers("/resource").hasAnyAuthority("ADMIN_WRITE", "RESOURCE_SUPERVISOR", "RESOURCE_WRITE", "RESOURCE_READ");
+                    auth.requestMatchers("/resource/tag/**").hasAnyAuthority("ADMIN_WRITE", "RESOURCE_SUPERVISOR", "RESOURCE_WRITE", "RESOURCE_READ");
+                    auth.requestMatchers("/resource/folder/**").hasAnyAuthority("ADMIN_WRITE", "RESOURCE_SUPERVISOR", "RESOURCE_WRITE", "RESOURCE_READ");
+                    auth.requestMatchers("/resource/group/**").hasAnyAuthority("ADMIN_WRITE", "RESOURCE_SUPERVISOR", "RESOURCE_WRITE", "RESOURCE_READ");
+                    auth.requestMatchers("/resource/search/**").hasAnyAuthority("ADMIN_WRITE", "RESOURCE_SUPERVISOR", "RESOURCE_WRITE", "RESOURCE_READ");
+                    auth.requestMatchers("/resource/article/**").hasAnyAuthority("ADMIN_WRITE", "RESOURCE_SUPERVISOR", "RESOURCE_WRITE", "RESOURCE_READ");
+                    auth.requestMatchers("/resource/new/**").hasAnyAuthority("ADMIN_WRITE", "RESOURCE_SUPERVISOR", "RESOURCE_WRITE");
+                    auth.requestMatchers("/resource/edit/**").hasAnyAuthority("ADMIN_WRITE", "RESOURCE_SUPERVISOR", "RESOURCE_WRITE");
+                    auth.requestMatchers("/resource/settings").hasAnyAuthority("ADMIN_WRITE", "RESOURCE_SUPERVISOR");
+                    auth.requestMatchers("/resource/tagmanager").hasAnyAuthority("ADMIN_WRITE", "RESOURCE_SUPERVISOR");
+                    auth.requestMatchers("/resource/foldermanager").hasAnyAuthority("ADMIN_WRITE", "RESOURCE_SUPERVISOR");
+
+                    auth.requestMatchers("/support").hasAnyAuthority("ADMIN_WRITE", "SUPPORT_SUPERVISOR", "SUPPORT_AGENT", "SUPPORT_WRITE", "SUPPORT_READ");
+                    auth.requestMatchers("/support/item/**").hasAnyAuthority("ADMIN_WRITE", "SUPPORT_SUPERVISOR", "SUPPORT_AGENT", "SUPPORT_WRITE", "SUPPORT_READ");
+                    auth.requestMatchers("/support/new/**").hasAnyAuthority("ADMIN_WRITE", "SUPPORT_SUPERVISOR", "SUPPORT_AGENT", "SUPPORT_WRITE");
+                    auth.requestMatchers("/request/settings/**").hasAnyAuthority("ADMIN_WRITE", "SUPPORT_SUPERVISOR");
 
                     auth.requestMatchers("/campus").hasAnyAuthority("ADMIN_WRITE", "DIRECTOR_READ", "DIRECTOR_WRITE", "CAMPUS_WRITE", "CAMPUS_READ");
                     auth.requestMatchers("/campus/*").hasAnyAuthority("ADMIN_WRITE", "DIRECTOR_READ", "DIRECTOR_WRITE", "CAMPUS_WRITE", "CAMPUS_READ");
@@ -152,12 +163,13 @@ public class SecurityConfig {
                     }
                     String savedRequest = "/";
                     try {
-                        savedRequest = request.getSession().getAttribute("SPRING_SECURITY_SAVED_REQUEST").toString();
+                        savedRequest = session.getAttribute("SPRING_SECURITY_SAVED_REQUEST").toString();
                         savedRequest = savedRequest.substring(21, savedRequest.length() - 1);
                     } catch (Error e) { }
                     if (savedRequest.contains("api")) {
                         savedRequest = request.getContextPath();
                     }
+                    session.setAttribute("loginRedirect", savedRequest);
                     response.sendRedirect(savedRequest);
                 })
                 .and().exceptionHandling().accessDeniedHandler((request, response, accessDeniedException) -> {

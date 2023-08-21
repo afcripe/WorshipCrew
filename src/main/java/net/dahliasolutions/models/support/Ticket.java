@@ -23,24 +23,23 @@ public class Ticket {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private BigInteger id;
     private LocalDateTime ticketDate;
-    private LocalDateTime ticketDue;
-    private String ticketDetail;
+    private LocalDateTime ticketDue;        // updates based on SLA
+    private String ticketDetail;            // issue submitted
 
     @ManyToOne(fetch = FetchType.EAGER)
-    private TicketPriority priority;
-
+    private TicketPriority priority;        // user determined priority
 
     @ManyToOne(fetch = FetchType.EAGER)
-    private SLA sla;
+    private SLA sla;                        // agent determined priority
 
     @Enumerated(EnumType.STRING)
     private TicketStatus ticketStatus;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    private DepartmentRegional department;
+    private Campus campus;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    private Campus campus;
+    private DepartmentRegional department;
 
     @ManyToOne(fetch = FetchType.EAGER)
     private User user;

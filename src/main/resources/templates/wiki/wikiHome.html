@@ -12,8 +12,26 @@
         <div class="row mt-2">
 
             <div class="wiki-article">
-                <div class="wiki-body">
+                <div class="wiki-body col-12 col-md-9">
                     <div th:utext="${wikiPost.body}"></div>
+                </div>
+
+                <div class="wiki-info col-12 col-md-3">
+                    <div class="card m-1">
+                        <div class="card-title h6 selectableItem p-2" onclick="toggleResourceInfo()">Tags</div>
+                        <hr>
+                        <div>
+                        <div class="tag_primary m-1 selectableItem" style="display: inline-block;" th:onclick="navToTag([[*{tag.id}]])"
+                             th:each="tag : *{tagList}" th:text="${tag.name + '(' + tag.references + ')'}"></div>
+                        </div>
+                    </div>
+
+                    <div class="card m-1">
+                        <div class="card-title h6 selectableItem p-2" onclick="toggleResourceInfo()">Unpublished Articles</div>
+                        <hr>
+                        <div class="selectableItem p-1" th:onclick="navToPost([[*{unpublished.id}]])"
+                             th:each="unpublished : *{unpublishedList}" th:text="${unpublished.title}"></div>
+                    </div>
                 </div>
 
                 <div class="wiki-info-tab hide">
@@ -22,24 +40,6 @@
                     </div>
                     <div class="wiki-info-tab-title selectableItem" onclick="toggleResourceInfo()">
                         Tags
-                    </div>
-                </div>
-
-                <div class="wiki-info">
-                    <div class="card m-1 gradient-right">
-                        <div class="card-title h6 selectableItem" onclick="toggleResourceInfo()">Tags</div>
-                        <hr>
-                        <div>
-                        <div class="tag_primary m-1 selectableItem" style="display: inline-block;" th:onclick="navToTag([[*{tag.id}]])"
-                             th:each="tag : *{tagList}" th:text="${tag.name + '(' + tag.references + ')'}"></div>
-                        </div>
-                    </div>
-
-                    <div class="card m-1 gradient-right">
-                        <div class="card-title h6 selectableItem" onclick="toggleResourceInfo()">Unpublished Articles</div>
-                        <hr>
-                        <div class="selectableItem p-1" th:onclick="navToPost([[*{unpublished.id}]])"
-                             th:each="unpublished : *{unpublishedList}" th:text="${unpublished.title}"></div>
                     </div>
                 </div>
 
