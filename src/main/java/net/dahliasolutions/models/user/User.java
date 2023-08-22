@@ -31,9 +31,14 @@ public class User implements UserDetails {
     private String password;
     private String firstName;
     private String lastName;
+    transient String fullname;
     private String contactEmail;
     private boolean activated;
     private boolean deleted;
+
+    public String getFullName() {
+         return firstName+" "+lastName;
+    }
 
     @ManyToOne
     @JsonIgnore

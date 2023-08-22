@@ -54,7 +54,7 @@ public class UserService implements UserServiceInterface{
 
     @Override
     public boolean verifyByUsername(String username) {
-        return userRepository.existsByUsername(username);
+        return userRepository.existsByUsernameIgnoreCase(username);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class UserService implements UserServiceInterface{
 
     @Override
     public void addRoleToUser(String username, String roleName) {
-        Optional<User> user = userRepository.findByUsername(username);
+        Optional<User> user = userRepository.findByUsernameIgnoreCase(username);
         Optional<UserRoles> role = rolesRepository.findByName(roleName);
         if (user.isPresent() && role.isPresent()) {
             user.get().getUserRoles().add(role.get());
@@ -131,12 +131,12 @@ public class UserService implements UserServiceInterface{
 
     @Override
     public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+        return userRepository.findByUsernameIgnoreCase(username);
     }
 
     @Override
     public void updateUserPosition(String username, String positionName) {
-        Optional<User> user = userRepository.findByUsername(username);
+        Optional<User> user = userRepository.findByUsernameIgnoreCase(username);
         Optional<Position> position = positionRepository.findByName(positionName);
         if (user.isPresent() && position.isPresent()) {
             user.get().setPosition(position.get());
@@ -146,7 +146,7 @@ public class UserService implements UserServiceInterface{
 
     @Override
     public void updateUserCampus(String username, String campusName) {
-        Optional<User> user = userRepository.findByUsername(username);
+        Optional<User> user = userRepository.findByUsernameIgnoreCase(username);
         Optional<Campus> campus = campusRepository.findByName(campusName);
         if (user.isPresent() && campus.isPresent()) {
             user.get().setCampus(campus.get());
@@ -156,7 +156,7 @@ public class UserService implements UserServiceInterface{
 
     @Override
     public void updateUserDepartment(String username, String departmentName) {
-        Optional<User> user = userRepository.findByUsername(username);
+        Optional<User> user = userRepository.findByUsernameIgnoreCase(username);
         Optional<DepartmentCampus> department = departmentCampusRepository.findByNameAndCampus(departmentName, user.get().getCampus());
         if (user.isPresent() && department.isPresent()) {
             user.get().setDepartment(department.get());
@@ -166,7 +166,7 @@ public class UserService implements UserServiceInterface{
 
     @Override
     public void updateUserLocationByLocationId(String username, BigInteger locationId) {
-        Optional<User> user = userRepository.findByUsername(username);
+        Optional<User> user = userRepository.findByUsernameIgnoreCase(username);
         Optional<Campus> campus = campusRepository.findById(locationId);
         if (user.isPresent() && campus.isPresent()) {
             user.get().setCampus(campus.get());
@@ -199,6 +199,11 @@ public class UserService implements UserServiceInterface{
             userList.addAll(departmentUsers);
         }
         return userList;
+    }
+
+    @Override
+    public List<User> findAllByDepartmentCampus(DepartmentCampus department) {
+        return userRepository.findAllByDepartmentAndDeleted(department, false);
     }
 
     @Override
@@ -246,7 +251,7 @@ public class UserService implements UserServiceInterface{
 
     @Override
     public UserDetails loadUserByUsername(String username) {
-        Optional<User> user = userRepository.findByUsername(username);
+        Optional<User> user = userRepository.findByUsernameIgnoreCase(username);
 
         return user.orElse(null);
     }

@@ -432,8 +432,7 @@ public class OrderAPIController {
         } else {
             List<User> foundUsers = userService.searchAllByFullName(stringModel.name());
             for (User user : foundUsers) {
-                String fullName = user.getFirstName()+" "+user.getLastName();
-                searchReturn.add(new UniversalSearchModel(fullName, "user", user.getId()));
+                searchReturn.add(new UniversalSearchModel(user.getFullName(), "user", user.getId()));
             }
         }
         return searchReturn;

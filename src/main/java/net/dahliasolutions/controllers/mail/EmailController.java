@@ -51,29 +51,29 @@ public class EmailController {
                                      @RequestParam BigInteger eventId,
                                      @RequestParam String action,
                                      Model model) {
-        MailerLinks mailerLinks = mailerLinksService.findByRandomLinkString(randomString).orElse(null);
-        if (mailerLinks == null) {
+        Optional<MailerLinks> mailerLinks = mailerLinksService.findByRandomLinkString(randomString);
+        if (mailerLinks.isEmpty()) {
             model.addAttribute("errorMessage", "Link not Valid!");
             return "error";
         }
-        if (mailerLinks.getExpiration().isBefore(LocalDateTime.now()) || mailerLinks.isForceExpire()) {
+        if (mailerLinks.get().getExpiration().isBefore(LocalDateTime.now()) || mailerLinks.get().isForceExpire()) {
             model.addAttribute("errorMessage", " The link has Expired!");
             return "error";
         }
 
-        User user = userService.findById((mailerLinks.getUserId())).orElse(null);
+        User user = userService.findById((mailerLinks.get().getUserId())).orElse(null);
         model.addAttribute("userDetails", user);
         model.addAttribute("randomString", randomString);
 
-        switch (mailerLinks.getServiceMethod()) {
+        switch (mailerLinks.get().getServiceMethod()) {
             case "setPassword":
             case "resetPassword":
                 return "mailer/setPassword";
             case "acknowledgeRequest":
-                updateOrderRequest(mailerLinks);
+                updateOrderRequest(mailerLinks.get());
                 return "mailer/acknowledge";
             case "acknowledgeItem":
-                updateOrderRequestItem(mailerLinks);
+                updateOrderRequestItem(mailerLinks.get());
                 return "mailer/acknowledge";
             default:
                 model.addAttribute("errorMessage", "Link not Valid!");

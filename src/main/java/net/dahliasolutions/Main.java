@@ -33,21 +33,21 @@ public class Main {
         System.out.println(getAppServerSingleton().getBaseURL());
     }
 
-    @Bean
-    @Scope("singleton")
-    static public AppServer getAppServerSingleton(){
-        return new AppServer("https://www.destinyworshipexchange.com",
-                "/var/destinyworshipexchange/content",
-                "/content");
-    }
-
 //    @Bean
 //    @Scope("singleton")
 //    static public AppServer getAppServerSingleton(){
-//        return new AppServer("http://localhost:8081",
-//                "/Users/afcripe/var/destinyworshipexchange/content",
+//        return new AppServer("https://www.destinyworshipexchange.com",
+//                "/var/destinyworshipexchange/content",
 //                "/content");
 //    }
+
+    @Bean
+    @Scope("singleton")
+    static public AppServer getAppServerSingleton(){
+        return new AppServer("http://localhost:8081",
+                "/Users/afcripe/var/destinyworshipexchange/content",
+                "/content");
+    }
 
 //    @Bean
 //    CommandLineRunner run(UserRolesService roleService, PositionService positionService, WikiTagService wikiTagService,
@@ -74,6 +74,7 @@ public class Main {
 //            roleService.createRole("SUPPORT_SUPERVISOR", "Has full access to view, manage, and assign support tickets");
 //            roleService.createRole("USER_READ", "View user information for assigned campus");
 //            roleService.createRole("USER_WRITE", "Create and edite users for assigned campus");
+//            roleService.createRole("USER_SUPERVISOR", "Has full access to view, manage, and assign support tickets");
 //            roleService.createRole("CAMPUS_READ", "View all information for assigned campus");
 //            roleService.createRole("CAMPUS_WRITE", "Edite information for assigned campus");
 //            roleService.createRole("DIRECTOR_READ", "View all information regionally for assigned department");
@@ -114,35 +115,72 @@ public class Main {
 //            userService.updateUserCampus(u.getUsername(), "Destin");
 //            userService.updateUserDepartment(u.getUsername(), "Production");
 //
-//            User u2 = new User();
-//                u2.setUsername("afcripe@live.com");
-//                u2.setPassword("password");
-//                u2.setFirstName("Andrew");
-//                u2.setLastName("Cripe");
-//                u2.setContactEmail("afcripe@live.com");
-//                u2.setDirector(u);
-//                u2 = userService.createDefaultUser(u2);
-//            userService.addRoleToUser(u2.getUsername(), "ADMIN_WRITE");
-//            userService.updateUserPosition(u2.getUsername(), "Leader");
-//            userService.updateUserCampus(u2.getUsername(), "Destin");
-//            userService.updateUserDepartment(u2.getUsername(), "Production");
-//
-//            User u3 = new User();
-//                u3.setUsername("aidan@destinyworship.com");
-//                u3.setPassword("password");
-//                u3.setFirstName("Aidan");
-//                u3.setLastName("Vaughn");
-//                u3.setContactEmail("afcripe@live.com");
-//                u3.setDirector(u);
-//                u3 = userService.createDefaultUser(u3);
-//            userService.addRoleToUser(u3.getUsername(), "ADMIN_WRITE");
-//            userService.updateUserPosition(u3.getUsername(), "Leader");
-//            userService.updateUserCampus(u3.getUsername(), "Destin");
-//            userService.updateUserDepartment(u3.getUsername(), "Production");
-//
 //            mainLocation.setDirectorId(u.getId());
 //            mainLocation.setDirectorName("Caleb Lawrence");
 //            campusService.save(mainLocation);
+//
+//
+//
+//
+//
+//            User u2 = new User();
+//                u2.setUsername("aiden@destinyworship.com");
+//                u2.setPassword("password");
+//                u2.setFirstName("Aiden");
+//                u2.setLastName("Vaughn");
+//                u2.setContactEmail("afcripe@live.com");
+//                u2 = userService.createDefaultUser(u2);
+//                u2.setDirector(u);
+//            userService.save(u2);
+//            userService.addRoleToUser(u2.getUsername(), "ADMIN_WRITE");
+//            userService.updateUserPosition(u2.getUsername(), "Regional Director");
+//            userService.updateUserCampus(u2.getUsername(), "Destin");
+//            userService.updateUserDepartment(u2.getUsername(), "Production");
+//
+//
+//            User u3 = new User();
+//                u3.setUsername("Jake@destinyworship.com");
+//                u3.setPassword("password");
+//                u3.setFirstName("Jake");
+//                u3.setLastName("Smith");
+//                u3.setContactEmail("afcripe@live.com");
+//                u3 = userService.createDefaultUser(u3);
+//                u3.setDirector(u);
+//            userService.save(u3);
+//            userService.addRoleToUser(u3.getUsername(), "ADMIN_WRITE");
+//            userService.updateUserPosition(u3.getUsername(), "Regional Director");
+//            userService.updateUserCampus(u3.getUsername(), "Destin");
+//            userService.updateUserDepartment(u3.getUsername(), "Production");
+//
+//
+//            User u4 = new User();
+//                u4.setUsername("steven@destinyworship.com");
+//                u4.setPassword("password");
+//                u4.setFirstName("Steven");
+//                u4.setLastName("Theriot");
+//                u4.setContactEmail("afcripe@live.com");
+//                u4 = userService.createDefaultUser(u4);
+//                u4.setDirector(u);
+//            userService.save(u4);
+//            userService.addRoleToUser(u4.getUsername(), "ADMIN_WRITE");
+//            userService.updateUserPosition(u4.getUsername(), "Regional Director");
+//            userService.updateUserCampus(u4.getUsername(), "Destin");
+//            userService.updateUserDepartment(u4.getUsername(), "Production");
+//
+//
+//            User u5 = new User();
+//                u5.setUsername("adam@destinyworship.com");
+//                u5.setPassword("password");
+//                u5.setFirstName("Adam");
+//                u5.setLastName("Mills");
+//                u5.setContactEmail("afcripe@live.com");
+//                u5 = userService.createDefaultUser(u5);
+//                u5.setDirector(u);
+//            userService.save(u5);
+//            userService.addRoleToUser(u5.getUsername(), "ADMIN_WRITE");
+//            userService.updateUserPosition(u5.getUsername(), "Regional Director");
+//            userService.updateUserCampus(u5.getUsername(), "Destin");
+//            userService.updateUserDepartment(u5.getUsername(), "Production");
 //        };
 //
 //    }

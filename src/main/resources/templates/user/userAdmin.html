@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<div class="container-fluid" layout:fragment="content">
+
+  <div th:replace="~{admin/moduleHeader :: header}">Header</div>
+
+  <div class="container my-3">
+
+    <div th:if="${userEdit}" style="float: right">
+      <button class="btn btn-sm btn-outline-warning"
+              th:onclick="window.location.href='/user/viewdeleted';">View Deleted</button>
+      <button class="btn btn-sm btn-success"
+              th:onclick="window.location.href='/user/new';">Add</button>
+    </div>
+
+    <h1>User Admin</h1>
+
+    <div class="row py-2">
+      <div class="col-12 col-md-6">
+        <form autocomplete="off" method="post" th:action="@{/user/search}" class="d-flex me-auto mt-3 mt-sm-0 pl-5" style="height: 30px">
+          <div class="autocomplete" style="display: inline-block; height: 30px">
+            <input id="searchTerm" name="searchTerm" class="form-control" type="text" style="height: 30px" placeholder="Search">
+            <input id="searchId" name="searchId" type="hidden"><input id="searchType" name="searchType" type="hidden">
+          </div>
+          <button id="btnSearch" class="btn btn-sm btn-outline-wiki mx-1 px-1" type="submit">Search</button>
+        </form>
+      </div>
+
+      <div class="col-12 col-md-6">
+        <div class="row">
+          <div class="col-md-6">
+            <select id="filterCampus" class="form-control" style="display: inline-block" onchange="onChangeFilter()">
+              <option value="">Selected Campus</option>
+              <option th:each="l : ${campusList}" th:value="${l.name}"
+                      th:text="${l.name}" th:selected="${l.name} == ${selectedCampus}"></option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <select id="filterDepartment" class="form-control" style="display: inline-block" onchange="onChangeFilter()">
+              <option value="">Selected Campus</option>
+              <option th:each="d : ${departmentList}" th:value="${d.name}"
+                      th:text="${d.name}" th:selected="${d.name} == ${selectedDepartment}"></option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  <div class="row d-block d-md-none">
+      <table class="table table-striped">
+        <thead>
+        <tr>
+          <th scope="col">User</th>
+          <th scope="col">Campus</th>
+          <th scope="col">Dep / Pos</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="user : ${users}" class="selectableItem" style="cursor: pointer"
+            th:onclick="window.location.href='/user/[[${user.id}]]';">
+          <td>
+            <span th:text="*{user.username}"></span><br>
+            <span th:text="*{user.firstName}+' '+*{user.lastName}"></span>
+          </td>
+          <td>
+            <span th:if="*{user.campus}" th:text="*{user.campus.name}"></span><br>
+          </td>
+          <td>
+            <span th:if="*{user.position}" th:text="${user.position.name}"/><br>
+            <span th:if="*{user.department}" th:text="${user.department.name}"/>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+  </div>
+
+  <div class="row d-none d-md-block">
+      <table class="table table-striped">
+        <thead>
+        <tr>
+          <th scope="col">Username</th>
+          <th scope="col">Name</th>
+          <th scope="col">Campus</th>
+          <th scope="col">Department</th>
+          <th scope="col">Position</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="user : ${users}" class="selectableItem" style="cursor: pointer"
+            th:onclick="window.location.href='/user/[[${user.id}]]';">
+          <td th:text="*{user.username}"></td>
+          <td><span th:text="*{user.firstName}+' '+*{user.lastName}"></span></td>
+          <td><span th:if="*{user.campus}" th:text="*{user.campus.name}"></span></td>
+          <td><span th:if="*{user.department}" th:text="${user.department.name}"/></td>
+          <td><span th:if="*{user.position}" th:text="${user.position.name}"/></td>
+        </tr>
+        </tbody>
+      </table>
+  </div>
+
+  </div>
+
+  <script>
+    const selectCampus = document.getElementById("filterCampus");
+    const selectDepartment = document.getElementById("filterDepartment");
+
+    function onChangeFilter() {
+      let paramString = "?";
+      if (selectCampus.selectedIndex > 0) {
+        paramString = paramString+"campus="+selectCampus.value;
+        if (selectDepartment.selectedIndex > 0) {
+          paramString = paramString+"&department="+selectDepartment.value;
+        }
+      } else if (selectDepartment.selectedIndex > 0) {
+        paramString = paramString+"department="+selectDepartment.value;
+      }
+      let path = window.location.href.split('?')[0]
+      window.location.href=path+paramString;
+
+    }
+
+    function autocomplete(inp, arr) {
+      /*the autocomplete function takes two arguments,
+      the text field element and an array of possible autocompleted values:*/
+      let currentFocus;
+      /*execute a function when someone writes in the text field:*/
+      inp.addEventListener("input", async function(e) {
+        let a, b, i, val = this.value;
+        /*close any already open lists of autocompleted values*/
+        closeAllLists();
+        if (!val) { return false;}
+        currentFocus = -1;
+        /*create a DIV element that will contain the items (values):*/
+        a = document.createElement("DIV");
+        a.setAttribute("id", this.id + "autocomplete-list");
+        a.setAttribute("class", "autocomplete-items");
+        /*append the DIV element as a child of the autocomplete container:*/
+        this.parentNode.appendChild(a);
+
+        /* retreive search from server */
+        let formData = new FormData();
+        formData.set("name", val)
+
+        const response = await fetch('/api/v1/request/search', {
+          method: 'POST',
+          body: formData
+        }).then(response => {
+          return response.json();
+        }).then(data => {
+          /* for each object in search return add to autocomplete */
+          for (let key in data) {
+            let obj = data[key];
+            /*create a DIV element for each matching element:*/
+            b = document.createElement("DIV");
+            /*make the matching letters bold:*/
+            b.innerHTML = "<strong>" + obj.searchTerm.substring(0, val.length) + "</strong>";
+            b.innerHTML += obj.searchTerm.substring(val.length);
+            /*insert a input field that will hold the current item's value:*/
+            b.innerHTML += "<input type='hidden' value='" + obj.searchTerm + "'>";
+            /*insert a input field that will hold the current item's value:*/
+            b.innerHTML += "<input type='hidden' value='" + obj.searchId + "'>";
+            /*insert a input field that will hold the current  item's type:*/
+            b.innerHTML += "<input type='hidden' value='" + obj.searchType + "'>";
+            /*execute a function when someone clicks on the item value (DIV element):*/
+            b.addEventListener("click", function(e) {
+              /*insert the value for the autocomplete form fields:*/
+              inp.value = this.getElementsByTagName("input")[0].value;
+              document.getElementById("searchId").value = this.getElementsByTagName("input")[1].value;
+              document.getElementById("searchType").value = this.getElementsByTagName("input")[2].value;
+              /*close the list of autocompleted values,
+              (or any other open lists of autocompleted values:*/
+              closeAllLists();
+            });
+            a.appendChild(b);
+          }
+        });
+      });
+      /*execute a function presses a key on the keyboard:*/
+      inp.addEventListener("keydown", function(e) {
+        var x = document.getElementById(this.id + "autocomplete-list");
+        if (x) x = x.getElementsByTagName("div");
+        if (e.keyCode === 40) {
+          /*If the arrow DOWN key is pressed,
+          increase the currentFocus variable:*/
+          currentFocus++;
+          /*and make the current item more visible:*/
+          addActive(x);
+        } else if (e.keyCode === 38) { //up
+          /*If the arrow UP key is pressed,
+          decrease the currentFocus variable:*/
+          currentFocus--;
+          /*and make the current item more visible:*/
+          addActive(x);
+        } else if (e.keyCode === 13 || e.keyCode ===9) {
+          /*If the ENTER key is pressed, prevent the form from being submitted,*/
+          e.preventDefault();
+          if (currentFocus > -1) {
+            /*and simulate a click on the "active" item:*/
+            if (x) x[currentFocus].click();
+          } else {
+            currentFocus++;
+            if (x) x[currentFocus].click();
+          }
+          /* advance the focus */
+          document.getElementById("btnSearch").focus();
+        } else if (e.keyCode === 9) {
+          if (currentFocus > -1) {
+            /*and simulate a click on the "active" item:*/
+            if (x) x[currentFocus].click();
+          } else {
+            currentFocus++;
+            if (x) x[currentFocus].click();
+          }
+        } else if (e.keyCode === 27){
+          closeAllLists();
+        }
+      });
+      function addActive(x) {
+        /*a function to classify an item as "active":*/
+        if (!x) return false;
+        /*start by removing the "active" class on all items:*/
+        removeActive(x);
+        if (currentFocus >= x.length) currentFocus = 0;
+        if (currentFocus < 0) currentFocus = (x.length - 1);
+        /*add class "autocomplete-active":*/
+        x[currentFocus].classList.add("autocomplete-active");
+      }
+      function removeActive(x) {
+        /*a function to remove the "active" class from all autocomplete items:*/
+        for (var i = 0; i < x.length; i++) {
+          x[i].classList.remove("autocomplete-active");
+        }
+      }
+      function closeAllLists(elmnt) {
+        /*close all autocomplete lists in the document,
+        except the one passed as an argument:*/
+        var x = document.getElementsByClassName("autocomplete-items");
+        for (var i = 0; i < x.length; i++) {
+          if (elmnt !== x[i] && elmnt !== inp) {
+            x[i].parentNode.removeChild(x[i]);
+          }
+        }
+      }
+      /*execute a function when someone clicks in the document:*/
+      document.addEventListener("click", function (e) {
+        closeAllLists(e.target);
+      });
+    }
+
+    /*An array containing all the country names in the world:*/
+    let activeUsers = ["Andrew Cripe", "Caleb Lawrence", "Aidan Vaughn"];
+    /*initiate the autocomplete function on the "myInput" element, and pass along the countries array as possible autocomplete values:*/
+    autocomplete(document.getElementById("searchTerm"), activeUsers);
+  </script>
+
+</div>
+
+</html>

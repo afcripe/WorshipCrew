@@ -42,10 +42,11 @@
             <form method="post" th:action="@{/user/create}">
               <div class="row p-2">
                 <div class="col-xs-12 col-sm-4">
-                  <label for="username" class="form-label">Username</label>
+                  <label for="username" class="form-label">E-mail</label>
                 </div>
                 <div class="col-xs-12 col-sm-8">
-                  <input th:value="*{username}" type="text" class="form-control" id="username" name="username">
+                  <input th:value="*{username}" type="email" class="form-control" id="username" name="username"
+                  pattern="^.+@[^\.].*\.[a-z]{2,}$">
                 </div>
               </div>
               <div class="row p-2">
@@ -64,31 +65,13 @@
                   <input th:value="*{lastName}" type="text" class="form-control" id="lastName"  name="lastName">
                 </div>
               </div>
-              <div class="row p-2">
-                <div class="col-xs-12 col-sm-4">
-                  <label for="password" class="form-label">Password</label>
-                </div>
-                <div class="col-xs-12 col-sm-8">
-                  <input th:value="*{contactEmail}" type="password" class="form-control" id="password"  name="password">
-                </div>
-              </div>
-              <div class="row p-2">
-                <div class="col-sm-4 d-none d-sm-block">
-                  <div>&nbsp;</div>
-                </div>
-                <div class="col-xs-12 col-sm-8">
-                  <input type="checkbox" class="form-check-input" value="activated"
-                         id="activated" name="activated" onchange="javascript:navForm()">
-                  <label for="password" class="form-check-label">Send Welcome E-mail</label>
-                </div>
-              </div>
 
               <div class="row p-2">
                 <div class="col-xs-12 col-sm-4">
                   <label for="campus" class="form-label">Campus</label>
                 </div>
                 <div class="col-xs-12 col-sm-8">
-                  <select id="campus" name="campus" class="form-control">
+                  <select id="campus" name="campus" class="form-control" onchange="getUserList()">
                     <option value="" disabled selected>Select Campus</option>
                     <option th:each="l : ${campusList}" th:value="${l.name}"
                             th:text="${l.name}"></option>
@@ -100,7 +83,7 @@
                   <label for="department" class="form-label">Department</label>
                 </div>
                 <div class="col-xs-12 col-sm-8">
-                  <select id="department" name="department" class="form-control">
+                  <select id="department" name="department" class="form-control" onchange="getUserList()">
                     <option value="" disabled selected>Select Department</option>
                     <option th:each="d : ${departmentList}" th:value="${d.name}"
                             th:text="${d.name}"></option>
@@ -116,7 +99,7 @@
                   <select id="position" name="position" class="form-control">
                     <option value="" disabled selected>Select Position</option>
                     <option th:each="p : ${positionList}" th:value="${p.name}"
-                            th:text="${p.name}"></option>
+                            th:text="${p.name}" onchange="getUserList()"></option>
                   </select>
                 </div>
               </div>
@@ -149,8 +132,55 @@
 
     </div>
 
-
   </div>
+
+  <script>
+    const userOptions = document.getElementById("directorId");
+    const campusSelect = document.getElementById("campus");
+    const departmentSelect = document.getElementById("department");
+    let userID = "0";
+
+    async function getUserList() {
+      let campusOpt = campusSelect.options[campusSelect.selectedIndex];
+      let departmentOpt = departmentSelect.options[departmentSelect.selectedIndex];
+      let campusVal = "";
+      let departmentVal = "";
+      if (campusSelect.selectedIndex > 0) { campusVal = campusOpt.text }
+      if (departmentSelect.selectedIndex > 0) { departmentVal = departmentOpt.text }
+
+      debugger
+      let formData = new FormData();
+      formData.set("campus", campusVal);
+      formData.set("department", departmentVal);
+      formData.set("userId", userID);
+
+      const response = await fetch('/api/v1/user/filteredusers', {
+        method: 'POST',
+        body: formData
+      }).then(response => {
+        return response.json();
+      }).then(data => {
+        // remove old options
+        while (userOptions.firstChild) {
+          userOptions.removeChild(userOptions.lastChild);
+        }
+
+        // add new options
+        for (let i in data) {
+          let user = data[i];
+          let opt = document.createElement("option");
+          opt.textContent = user.firstName+" "+user.lastName;
+          opt.value = user.id;
+          if(user.id === userID) {
+            opt.selected = true;
+          }
+          userOptions.appendChild(opt);
+        }
+      });
+    }
+
+  </script>
+
 </div>
 
 </html>

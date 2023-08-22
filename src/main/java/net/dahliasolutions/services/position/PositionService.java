@@ -39,6 +39,11 @@ public class PositionService implements PositionServiceInterface {
 
     @Override
     public List<Position> findAllByLevelGreaterThan(int level) {
+        return positionRepository.findAllByLevelGreaterThan(level);
+    }
+
+    @Override
+    public List<Position> findAllByLevelGreaterThanOrEqual(int level) {
         return positionRepository.findAllByLevelGreaterThanOrLevelEquals(level);
     }
 

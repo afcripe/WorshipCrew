@@ -7,8 +7,10 @@ import net.dahliasolutions.models.campus.Campus;
 import net.dahliasolutions.models.department.DepartmentCampus;
 import net.dahliasolutions.models.department.DepartmentRegional;
 import net.dahliasolutions.models.mail.EmailDetails;
+import net.dahliasolutions.models.order.OrderStatus;
 import net.dahliasolutions.models.position.PermissionTemplate;
 import net.dahliasolutions.models.position.Position;
+import net.dahliasolutions.models.records.CampusDepartmentModel;
 import net.dahliasolutions.models.user.*;
 import net.dahliasolutions.services.*;
 import net.dahliasolutions.services.campus.CampusService;
@@ -27,10 +29,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.swing.text.html.Option;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 @RequestMapping("/user")
@@ -47,6 +46,8 @@ public class UserController {
     private final PermissionTemplateService permissionTemplateService;
     private final EmailService emailService;
     private final RedirectService redirectService;
+    private final AdminSettingsService adminService;
+    private final EventService eventService;
 
     @ModelAttribute
     public void addAttributes(Model model) {
@@ -56,80 +57,158 @@ public class UserController {
 
     @GetMapping("")
     public String getUsers(Model model, HttpSession session) {
-        // get permissions
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = (User) auth.getPrincipal();
-        Collection<UserRoles> roles = currentUser.getUserRoles();
-        String listType = "Campus";
-        for (UserRoles role : roles){
-            if (role.getName().equals("ADMIN_WRITE")) {
-                listType = "full";
-                break;
-            }if (role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")) {
-                listType = "department";
-                break;
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String permission = permissionType(currentUser);
+
+        List<User> userList = userList(currentUser);
+        Collections.sort(userList, new Comparator<User>() {
+            @Override
+            public int compare(User user1, User user2) {
+                return user1.getFullName().compareToIgnoreCase(user2.getFullName());
             }
-        }
+        });
 
-        String title = "All Users";
-        List<User> userList = new ArrayList<>();
-        switch (listType){
-            case "full":
-                userList = userService.findAll();
-                break;
-            case "department":
-                userList = userService.findAllByDepartmentAndDeleted(currentUser.getDepartment().getRegionalDepartment(), false);
-                title = "Department Users";
-                break;
-            default:
-                userList = userService.findAllByCampus(currentUser.getCampus());
-                title = "Campus Users";
-        }
-
-
-        model.addAttribute("title", title);
+        model.addAttribute("title", permission);
         model.addAttribute("users", userList);
-        model.addAttribute("userEdit", userEdit());
+        model.addAttribute("userEdit", userWrite(currentUser));
 
         redirectService.setHistory(session, "/user");
+        if (permission.equals("All Users")) {
+            model.addAttribute("campusList", campusService.findAll());
+            model.addAttribute("departmentList", departmentRegionalService.findAll());
+            model.addAttribute("selectedCampus", "");
+            model.addAttribute("selectedDepartment", "");
+            return "user/userAdmin";
+        }
+        return "user/listUsers";
+    }
+
+    @GetMapping(value = "", params = {"campus"})
+    public String getUsersFilterCampus(@RequestParam String campus, Model model, HttpSession session) {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String permission = permissionType(currentUser);
+        List<User> userList = userList(currentUser);
+
+        // only filter if all users permission
+        if (permission.equals("All Users")) {
+            Optional<Campus> filteredCampus = campusService.findByName(campus);
+            if (filteredCampus.isPresent()) {
+                userList = userService.findAllByCampus(filteredCampus.get());
+            }
+        }
+        Collections.sort(userList, new Comparator<User>() {
+            @Override
+            public int compare(User user1, User user2) {
+                return user1.getFullName().compareToIgnoreCase(user2.getFullName());
+            }
+        });
+
+        model.addAttribute("title", permission);
+        model.addAttribute("users", userList);
+        model.addAttribute("userEdit", userWrite(currentUser));
+
+        redirectService.setHistory(session, "/user");
+        if (permission.equals("All Users")) {
+            model.addAttribute("campusList", campusService.findAll());
+            model.addAttribute("departmentList", departmentRegionalService.findAll());
+            model.addAttribute("selectedCampus", campus);
+            model.addAttribute("selectedDepartment", "");
+            return "user/userAdmin";
+        }
+        return "user/listUsers";
+    }
+
+    @GetMapping(value = "", params = {"department"})
+    public String getUsersFilterDepartment(@RequestParam String department, Model model, HttpSession session) {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String permission = permissionType(currentUser);
+        List<User> userList = userList(currentUser);
+
+        // only filter if all users permission
+        if (permission.equals("All Users")) {
+            Optional<DepartmentRegional> filteredDepartment = departmentRegionalService.findByName(department);
+            if (filteredDepartment.isPresent()) {
+                userList = userService.findAllByDepartment(filteredDepartment.get());
+            }
+        }
+        Collections.sort(userList, new Comparator<User>() {
+            @Override
+            public int compare(User user1, User user2) {
+                return user1.getFullName().compareToIgnoreCase(user2.getFullName());
+            }
+        });
+
+        model.addAttribute("title", permission);
+        model.addAttribute("users", userList);
+        model.addAttribute("userEdit", userWrite(currentUser));
+
+        redirectService.setHistory(session, "/user");
+        if (permission.equals("All Users")) {
+            model.addAttribute("campusList", campusService.findAll());
+            model.addAttribute("departmentList", departmentRegionalService.findAll());
+            model.addAttribute("selectedCampus", "");
+            model.addAttribute("selectedDepartment", department);
+            return "user/userAdmin";
+        }
+        return "user/listUsers";
+    }
+
+    @GetMapping(value = "", params = {"campus", "department"})
+    public String getUsersFilterCampusDepartment(@RequestParam String campus, @RequestParam String department, Model model, HttpSession session) {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String permission = permissionType(currentUser);
+        List<User> userList = userList(currentUser);;
+
+        // only filter if all users permission
+        if (permission.equals("All Users")) {
+            Optional<Campus> filteredCampus = campusService.findByName(campus);
+            if (filteredCampus.isPresent()) {
+                Optional<DepartmentCampus> filteredDepartment = departmentCampusService.findByNameAndCampus(department, filteredCampus.get());
+                if (filteredDepartment.isPresent()) {
+                    userList = userService.findAllByDepartmentCampus(filteredDepartment.get());
+                }
+            }
+
+        }
+        Collections.sort(userList, new Comparator<User>() {
+            @Override
+            public int compare(User user1, User user2) {
+                return user1.getFullName().compareToIgnoreCase(user2.getFullName());
+            }
+        });
+
+        model.addAttribute("title", permission);
+        model.addAttribute("users", userList);
+        model.addAttribute("userEdit", userWrite(currentUser));
+
+        redirectService.setHistory(session, "/user");
+        if (permission.equals("All Users")) {
+            model.addAttribute("campusList", campusService.findAll());
+            model.addAttribute("departmentList", departmentRegionalService.findAll());
+            model.addAttribute("selectedCampus", campus);
+            model.addAttribute("selectedDepartment", department);
+            return "user/userAdmin";
+        }
         return "user/listUsers";
     }
 
     @GetMapping("/viewdeleted")
     public String getDeletedUsers(Model model, HttpSession session) {
-        // get permissions
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = (User) auth.getPrincipal();
-        Collection<UserRoles> roles = currentUser.getUserRoles();
-        String listType = "Campus";
-        for (UserRoles role : roles){
-            if (role.getName().equals("ADMIN_WRITE")) {
-                listType = "full";
-                break;
-            }if (role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")) {
-                listType = "department";
-                break;
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String permission = permissionType(currentUser);
+        List<User> userList = userList(currentUser);
+        Collections.sort(userList, new Comparator<User>() {
+            @Override
+            public int compare(User user1, User user2) {
+                return user1.getFirstName().compareToIgnoreCase(user2.getFirstName());
             }
-        }
+        });
 
-        String title = "All Users";
-        List<User> userList = new ArrayList<>();
-        switch (listType){
-            case "full":
-                userList = userService.findAllByDeleted(true);
-                break;
-            case "department":
-                userList = userService.findAllByDepartmentAndDeleted(currentUser.getDepartment().getRegionalDepartment(), true);
-                title = "Department Users";
-                break;
-            default:
-                userList = userService.findAllByCampusAndDeleted(currentUser.getCampus(), true);
-                title = "Campus Users";
-        }
+        model.addAttribute("title", permission);
+        model.addAttribute("users", userList);
 
         redirectService.setHistory(session, "/user");
-        model.addAttribute("title", title);
-        model.addAttribute("users", userList);
+
         return "user/listDeletedUsers";
     }
 
@@ -140,6 +219,8 @@ public class UserController {
             session.setAttribute("msgError", "User Not Found!");
             return redirectService.pathName(session, "user");
         }
+
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         boolean authResourceRead = false;
         boolean authResourceWrite = false;
@@ -178,7 +259,7 @@ public class UserController {
         model.addAttribute("authStoreRead", authStoreRead);
         model.addAttribute("authStoreWrite", authStoreWrite);
         model.addAttribute("authSupportWrite", authSupportWrite);
-        model.addAttribute("userEdit", userEdit());
+        model.addAttribute("userEdit", userEdit(currentUser, user.get()));
 
         redirectService.setHistory(session, "/user/"+id);
         return "user/user";
@@ -186,61 +267,35 @@ public class UserController {
 
     @GetMapping("/edit/{id}")
     public String updateUserForm(@PathVariable BigInteger id, Model model, HttpSession session) {
-
         Optional<User> user = userService.findById(id);
         if (user.isEmpty()) {
             session.setAttribute("msgError", "User Not Found!");
             return redirectService.pathName(session, "user");
         }
 
-        // get persmissions
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = (User) auth.getPrincipal();
-        Collection<UserRoles> roles = currentUser.getUserRoles();
-        boolean fullList = false;
-        for (UserRoles role : roles){
-            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("ADMIN_READ") ||
-                    role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")) {
-                fullList = true;
-                break;
-            }
-        }
-
-        if (!fullList && user.get().getPosition().getLevel() <= currentUser.getPosition().getLevel()) {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        boolean editeUser = userEdit(currentUser, user.get());
+        if (!editeUser) {
             session.setAttribute("msgError", "Permission to Edit User Denied!");
             return redirectService.pathName(session, "user");
         }
-
-
-        List<Campus> campusList = new ArrayList<>();
-        List<User> userList = new ArrayList<>();
-        List<Position> positionList = new ArrayList<>();
-        if (fullList) {
-            campusList = campusService.findAll();
-            userList = userService.findAll();
-            positionList = positionService.findAll();
-        } else {
-            campusList.add(currentUser.getCampus());
-            userList = userService.findAllByCampus(currentUser.getCampus());
-            positionList = positionService.findAllByLevelGreaterThan(currentUser.getPosition().getLevel());
-        }
-
-        List<DepartmentRegional> departmentList = departmentRegionalService.findAll();
 
         model.addAttribute("user", user.get());
         model.addAttribute("userCampus", user.get().getCampus().getName());
         model.addAttribute("userDepartment", user.get().getDepartment().getName());
         model.addAttribute("userPosition", user.get().getPosition().getName());
-        model.addAttribute("campusList", campusList);
-        model.addAttribute("departmentList", departmentList);
-        model.addAttribute("positionList", positionList);
-        model.addAttribute("userList", userList);
+
+        model.addAttribute("campusList", campusList(currentUser));
+        model.addAttribute("departmentList", departmentList(currentUser));
+        model.addAttribute("positionList", positionList(currentUser));
+        model.addAttribute("userList", filteredUserList(user.get(), user.get().getDirector()));
 
         return "user/userEdit";
     }
 
     @PostMapping("/update")
     public String updateUserResult(@ModelAttribute UserModel userModel, Model model, HttpSession session) {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<User> user = userService.findById(userModel.id());
         Optional<User> exists = userService.findByUsername(userModel.username());
 
@@ -280,54 +335,45 @@ public class UserController {
             }
         }
 
-
-        model.addAttribute("user", user);
+        model.addAttribute("user", user.get());
         session.setAttribute("msgSuccess", "User successfully updated.");
+
+        // send any additional notifications
+        String userFullName = currentUser.getFirstName()+" "+currentUser.getLastName();
+        String theUser = user.get().getFirstName()+" "+user.get().getLastName();
+        String eventName = "User "+theUser+" has been updated";
+        String eventDesc = "User "+theUser+" was updated by "+userFullName;
+        // update
+        Event e = new Event(null, eventName, eventDesc, user.get().getId(), EventModule.User, EventType.Changed);
+        eventService.dispatchEvent(e);
 
         return "redirect:/user/"+userModel.id().toString();
     }
 
     @GetMapping("/new")
     public String newUserForm(Model model) {
-        // get persmissions
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = (User) auth.getPrincipal();
-        Collection<UserRoles> roles = currentUser.getUserRoles();
-        boolean fullList = false;
-        for (UserRoles role : roles){
-            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("ADMIN_READ") ||
-                    role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")) {
-                fullList = true;
-                break;
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        List<User> userList = userList(currentUser);
+        Collections.sort(userList, new Comparator<User>() {
+            @Override
+            public int compare(User user1, User user2) {
+                return user1.getFirstName().compareToIgnoreCase(user2.getFirstName());
             }
-        }
-
-        List<Campus> campusList = new ArrayList<>();
-        List<User> userList = new ArrayList<>();
-        List<Position> positionList = new ArrayList<>();
-        if (fullList) {
-            campusList = campusService.findAll();
-            userList = userService.findAll();
-            positionList = positionService.findAll();
-        } else {
-            campusList.add(currentUser.getCampus());
-            userList = userService.findAllByCampus(currentUser.getCampus());
-            positionList = positionService.findAllByLevelGreaterThan(currentUser.getPosition().getLevel());
-        }
+        });
 
         User user = new User();
-        List<DepartmentRegional> departmentList = departmentRegionalService.findAll();
 
         model.addAttribute("user", user);
-        model.addAttribute("positionList", positionList);
-        model.addAttribute("campusList", campusList);
-        model.addAttribute("departmentList", departmentList);
-        model.addAttribute("userList", userList);
+        model.addAttribute("campusList", campusList(currentUser));
+        model.addAttribute("departmentList", departmentList(currentUser));
+        model.addAttribute("positionList", positionList(currentUser));
+        model.addAttribute("userList", userList(currentUser));
         return "user/userNew";
     }
 
     @PostMapping("/create")
     public String createUser(@ModelAttribute UserModel userModel, Model model, HttpSession session) {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if(userService.verifyByUsername(userModel.username())) {
             model.addAttribute("registerUser", userModel);
             session.setAttribute("msgError", "Username already exists!");
@@ -353,18 +399,25 @@ public class UserController {
             }
         }
 
-        if (userModel.activated() == null){
-            user.setPassword(userModel.password());
-            userService.createDefaultUser(user);
-        } else {
-            userService.createUser(user);
-            EmailDetails emailDetails = new EmailDetails(user.getContactEmail(),"",
-                    "Welcome to Destiny Worship Exchange", null);
-            emailService.sendWelcomeMail(emailDetails, user.getId());
-        }
+        // Send Password E-mail
+        AdminSettings adminSettings = adminService.getAdminSettings();
+        userService.createUser(user);
+        EmailDetails emailDetails = new EmailDetails(user.getContactEmail(),
+                "Welcome to " + adminSettings.getCompanyName(),
+                "Welcome to " + adminSettings.getCompanyName(), null);
+        BrowserMessage msg = emailService.sendWelcomeMail(emailDetails, user.getId());
 
         model.addAttribute("user", user);
         session.setAttribute("msgSuccess", "User successfully added.");
+
+        // send any additional notifications
+        String userFullName = currentUser.getFirstName()+" "+currentUser.getLastName();
+        String theUser = user.getFirstName()+" "+user.getLastName();
+        String eventName = "New User "+theUser+" has been added";
+        String eventDesc = "User "+theUser+" was added by "+userFullName;
+        // new
+        Event e = new Event(null, eventName, eventDesc, user.getId(), EventModule.User, EventType.New);
+        eventService.dispatchEvent(e);
 
         return "redirect:/user/"+user.getId().toString();
     }
@@ -427,9 +480,14 @@ public class UserController {
 
     @GetMapping("/{id}/changepassword")
     public String changeUserPasswordForm(@PathVariable BigInteger id, Model model, HttpSession session) {
-        User user = userService.findById(id).orElse(null);
-        if(user == null){
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<User> user = userService.findById(id);
+        if(user.isEmpty()){
             session.setAttribute("msgError", "No User Found!");
+            return "redirect:/user/"+id.toString();
+        }
+        if(!userEdit(currentUser, user.get())) {
+            session.setAttribute("msgError", "Permission Denied!");
             return "redirect:/user/"+id.toString();
         }
 
@@ -440,50 +498,65 @@ public class UserController {
 
     @PostMapping("/changepassword")
     public String changeUserPassword(@ModelAttribute ChangePasswordModel changePasswordModel, HttpSession session) {
-        User user = userService.findById(changePasswordModel.id()).orElse(null);
-        if(user == null){
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<User> user = userService.findById(changePasswordModel.id());
+        if(user.isEmpty()){
             session.setAttribute("msgError", "No User Found!");
             return "redirect:/user/"+changePasswordModel.id().toString();
         }
 
-        // Verify Admin has permission
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User admin = (User) auth.getPrincipal();
-        LoginModel loginModel = new LoginModel(admin.getUsername(), changePasswordModel.currentPassword());
-        boolean isAuth = authService.verifyAuthorizedByPassword(loginModel,"ADMIN_WRITE");
         String pwdTemplate = "/user/"+changePasswordModel.id().toString()+"/changepassword";
-        if(!isAuth) {
+        boolean isAuth = authService.verifyUserPassword(currentUser,changePasswordModel.currentPassword());
+        // verify permission
+        if (!userEdit(currentUser, user.get())) {
             session.setAttribute("msgError", "Access Denied!");
             return "redirect:"+pwdTemplate;
-        } else if (!changePasswordModel.newPassword().equals(changePasswordModel.confirmPassword())) {
+        }
+        if (!authService.verifyUserPassword(currentUser,changePasswordModel.currentPassword())) {
+            session.setAttribute("msgError", "Incorrect Admin Password!");
+            return "redirect:"+pwdTemplate;
+        }
+        // Verify passwords match
+        if (!changePasswordModel.newPassword().equals(changePasswordModel.confirmPassword())) {
             session.setAttribute("msgError", "Passwords Do Not Match!");
             return "redirect:"+pwdTemplate;
-        } else {
-            userService.updateUserPasswordById(changePasswordModel.id(), changePasswordModel.newPassword());
-            session.setAttribute("msgSuccess", "Password Change Successful.");
         }
+
+        userService.updateUserPasswordById(changePasswordModel.id(), changePasswordModel.newPassword());
+        session.setAttribute("msgSuccess", "Password Change Successful.");
+
+        // send any additional notifications
+        String userFullName = currentUser.getFirstName()+" "+currentUser.getLastName();
+        String theUser = user.get().getFirstName()+" "+user.get().getLastName();
+        String eventName = "User "+theUser+" password was changed";
+        String eventDesc = "User "+theUser+" password was changed by "+userFullName;
+        // changed
+        Event e = new Event(null, eventName, eventDesc, user.get().getId(), EventModule.User, EventType.Changed);
+        eventService.dispatchEvent(e);
+
         return "redirect:/user/"+changePasswordModel.id();
     }
 
     @PostMapping("/{id}/sendPasswordChange")
     public String sendPasswordChangeRequest(@PathVariable BigInteger id, HttpSession session) {
-        User user = userService.findById(id).orElse(null);
-        if(user == null){
+        Optional<User> user = userService.findById(id);
+        if(user.isEmpty()){
             session.setAttribute("msgError", "No User Found!");
             return "redirect:/user/"+id.toString();
         }
 
-        EmailDetails emailDetails = new EmailDetails(user.getContactEmail(),"",
+        EmailDetails emailDetails = new EmailDetails(user.get().getContactEmail(),"",
                 "Password Change Request", null);
-        BrowserMessage msg = emailService.sendPasswordResetMail(emailDetails, user.getId());
+        BrowserMessage msg = emailService.sendPasswordResetMail(emailDetails, user.get().getId());
 
         session.setAttribute(msg.getMsgType(), msg.getMessage());
 
-        return "redirect:/user/"+user.getId().toString();
+        return "redirect:/user/"+user.get().getId().toString();
     }
 
     @GetMapping("/delete/{id}")
     public String deletedUser(@PathVariable BigInteger id, HttpSession session) {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<User> user = userService.findById(id);
         if (user.isPresent()) {
             if (!user.get().isDeleted()) {
@@ -492,11 +565,25 @@ public class UserController {
                 userService.save(user.get());
             }
         }
+
+        // send any additional notifications
+        String userFullName = currentUser.getFirstName()+" "+currentUser.getLastName();
+        String theUser = user.get().getFirstName()+" "+user.get().getLastName();
+        String eventName = "User "+theUser+" was deleted";
+        String eventDesc = "User "+theUser+" was deleted by "+userFullName;
+        // changed
+        Event e = new Event(null, eventName, eventDesc, user.get().getId(), EventModule.User, EventType.Changed);
+        eventService.dispatchEvent(e);
+        // deleted
+        e.setType(EventType.Deleted);
+        eventService.dispatchEvent(e);
+
         return redirectService.pathName(session, "user");
     }
 
     @GetMapping("/restore/{id}")
     public String restoreUser(@PathVariable BigInteger id, HttpSession session) {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<User> user = userService.findById(id);
         if (user.isPresent()) {
             if (user.get().isDeleted()) {
@@ -511,14 +598,33 @@ public class UserController {
             }
             userService.save(user.get());
         }
+
+        // send any additional notifications
+        String userFullName = currentUser.getFirstName()+" "+currentUser.getLastName();
+        String theUser = user.get().getFirstName()+" "+user.get().getLastName();
+        String eventName = "User "+theUser+" was restored";
+        String eventDesc = "User "+theUser+" was restored by "+userFullName;
+        // changed
+        Event e = new Event(null, eventName, eventDesc, user.get().getId(), EventModule.User, EventType.Changed);
+        eventService.dispatchEvent(e);
+
         return redirectService.pathName(session, "user");
     }
 
-    // get edit permission
-    private boolean userEdit(){
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Collection<UserRoles> roles = user.getUserRoles();
+    @PostMapping("/search")
+    public String searchRequests(@ModelAttribute UniversalSearchModel searchModel) {
+        // determine if search type
+        switch (searchModel.getSearchType()) {
+            case "user":
+                return "redirect:/user/"+searchModel.getSearchId();
+            default:
+                return "redirect:/user";
+        }
+    }
 
+    // get edit permission
+    private boolean userWrite(User currentUser){
+        Collection<UserRoles> roles = currentUser.getUserRoles();
         for (UserRoles role : roles){
             if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_WRITE")) {
                 return true;
@@ -526,4 +632,163 @@ public class UserController {
         }
         return false;
     }
+
+    private boolean userEdit(User currentUser, User user){
+        List<User> userList = userList(currentUser);
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+        for (UserRoles role : roles){
+            if (role.getName().equals("ADMIN_WRITE")) {
+                return true;
+            }
+            if (role.getName().equals("USER_WRITE")) {
+                if (userList.contains(user) && user.getPosition().getLevel() <= currentUser.getPosition().getLevel()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private String permissionType(User currentUser) {
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+        String typeString = "Campus Users";
+        for (UserRoles role : roles){
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_SUPERVISOR")) {
+                typeString = "All Users";
+            } else if (role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")) {
+                typeString = "Department Users";
+            } else if (role.getName().equals("CAMPUS_WRITE") || role.getName().equals("CAMPUS_READ")) {
+                typeString = "Campus Users";
+            } else if (role.getName().equals("USER_WRITE") || role.getName().equals("USER_READ")) {
+                typeString = "Campus Department Users";
+            }
+        }
+        return typeString;
+    }
+
+    private List<User> userList(User currentUser) {
+        String permission = permissionType(currentUser);
+        List<User> userList;
+        switch (permission){
+            case "All Users":
+                userList = userService.findAll();
+                break;
+            case "Department Users":
+                userList = userService.findAllByDepartmentAndDeleted(currentUser.getDepartment().getRegionalDepartment(), false);
+                break;
+            case "Campus Users":
+                userList = userService.findAllByCampus(currentUser.getCampus());
+                break;
+            default:
+                userList = userService.findAllByDepartmentCampus(currentUser.getDepartment());
+        }
+        return userList;
+    }
+
+    private List<Position> positionList(User currentUser) {
+        List<Position> positionList;
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+        for (UserRoles role : roles){
+            if (role.getName().equals("ADMIN_WRITE")) {
+                positionList = positionService.findAll();
+                return positionList;
+            }
+        }
+        return positionService.findAllByLevelGreaterThan(currentUser.getPosition().getLevel());
+    }
+
+    private List<Campus> campusList(User currentUser) {
+        List<Campus> campusList = new ArrayList<>();
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+        for (UserRoles role : roles){
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")) {
+                campusList = campusService.findAll();
+                return campusList;
+            }
+        }
+        campusList.add(currentUser.getCampus());
+        return campusList;
+    }
+
+    private List<DepartmentRegional> departmentList(User currentUser) {
+        List<DepartmentRegional> departmentList = new ArrayList<>();
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+        for (UserRoles role : roles){
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("CAMPUS_WRITE") || role.getName().equals("CAMPUS_READ")) {
+                departmentList = departmentRegionalService.findAll();
+                return departmentList;
+            }
+        }
+        departmentList.add(currentUser.getDepartment().getRegionalDepartment());
+        return departmentList;
+    }
+
+    private List<User> filteredUserList(User user, User director) {
+        // init return
+        List<User> userListReturn ;
+        DepartmentRegional department = user.getDepartment().getRegionalDepartment();
+        Optional<User> depDirector = userService.findById(department.getDirectorId());
+
+        Optional<DepartmentCampus> campusDep = departmentCampusService.findByNameAndCampus(department.getName(), user.getCampus());
+        if (campusDep.isPresent()) {
+            userListReturn = userService.findAllByDepartmentCampus(campusDep.get());
+            if (depDirector.isPresent()) {
+                if (!userListReturn.contains(depDirector.get())) {
+                    userListReturn.add(depDirector.get());
+                }
+            }
+        } else {
+            userListReturn = userService.findAllByDepartment(department);
+        }
+
+        if (director != null) { userListReturn.add(director); }
+
+        Collections.sort(userListReturn, new Comparator<User>() {
+            @Override
+            public int compare(User user1, User user2) {
+                return user1.getFullName().compareToIgnoreCase(user2.getFullName());
+            }
+        });
+
+        return userListReturn;
+    }
+
+    private List<User> filteredUserList(Campus campus, DepartmentRegional department, User user) {
+        // init return
+        List<User> userListReturn;
+        Optional<User> director = userService.findById(department.getDirectorId());
+
+        if (campus == null) {
+            userListReturn = userService.findAllByDepartment(department);
+            if (director.isPresent()) {
+                if (!userListReturn.contains(director.get())) {
+                    userListReturn.add(director.get());
+            }
+            }
+        } else {
+            Optional<DepartmentCampus> campusDep = departmentCampusService.findByNameAndCampus(department.getName(), campus);
+            if (campusDep.isPresent()) {
+                userListReturn = userService.findAllByDepartmentCampus(campusDep.get());
+                if (director.isPresent()) {
+                    if (!userListReturn.contains(director.get())) {
+                        userListReturn.add(director.get());
+                    }
+                }
+            } else {
+                userListReturn = userService.findAllByDepartment(department);
+            }
+        }
+
+        if (user != null) { userListReturn.add(user); }
+
+        Collections.sort(userListReturn, new Comparator<User>() {
+            @Override
+            public int compare(User user1, User user2) {
+                return user1.getFullName().compareToIgnoreCase(user2.getFullName());
+            }
+        });
+
+        return userListReturn;
+    }
+
 }

@@ -2,7 +2,6 @@ package net.dahliasolutions.controllers.department;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 import net.dahliasolutions.models.campus.Campus;
 import net.dahliasolutions.models.department.DepartmentCampus;
 import net.dahliasolutions.models.department.DepartmentRegional;
@@ -13,7 +12,6 @@ import net.dahliasolutions.services.department.DepartmentCampusService;
 import net.dahliasolutions.services.department.DepartmentRegionalService;
 import net.dahliasolutions.services.RedirectService;
 import net.dahliasolutions.services.user.UserService;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -59,10 +57,7 @@ public class DepartmentController {
             }
             // if director permissions redirect to regional department
             if (role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")) {
-                Optional<DepartmentRegional> regional = departmentRegionalService.findByName(user.getDepartment().getName());
-                if (regional.isPresent()) {
-                    return "redirect:/department/department/" + regional.get().getId();
-                }
+                return "redirect:/department/department/" + user.getDepartment().getRegionalDepartment().getId();
             }
         }
         session.setAttribute("msgError", "Problem loading Department");

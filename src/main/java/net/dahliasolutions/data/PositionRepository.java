@@ -12,6 +12,8 @@ import java.util.Optional;
 public interface PositionRepository extends JpaRepository<Position, BigInteger> {
 
     Optional<Position> findByName(String positionName);
+    @Query(value = "SELECT * FROM POSITION WHERE LEVEL > :level", nativeQuery = true)
+    List<Position> findAllByLevelGreaterThan(@Param("level") int level);
     @Query(value = "SELECT * FROM POSITION WHERE LEVEL >= :level", nativeQuery = true)
     List<Position> findAllByLevelGreaterThanOrLevelEquals(@Param("level") int level);
     @Query(value = "SELECT * FROM POSITION ORDER BY LEVEL DESC LIMIT 1", nativeQuery = true)

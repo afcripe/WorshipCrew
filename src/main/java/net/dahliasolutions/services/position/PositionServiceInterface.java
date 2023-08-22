@@ -12,6 +12,7 @@ public interface PositionServiceInterface {
     Optional<Position> findByName(String positionName);
     List<Position> findAll();
     List<Position> findAllByLevelGreaterThan(int level);
+    List<Position> findAllByLevelGreaterThanOrEqual(int level);
     Optional<Position> findFirst1OrderByLevelDesc();
     Position createPosition(String name);
     Position save(Position position);

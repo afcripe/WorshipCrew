@@ -32,7 +32,7 @@
           th:onclick="window.location.href='/user/[[${user.id}]]';">
         <td>
           <span th:text="*{user.username}"></span><br>
-          <span th:text="*{user.firstName}"></span><span th:text="*{user.lastName}"></span>
+          <span th:text="*{user.firstName}+' '+*{user.lastName}"></span>
         </td>
         <td>
           <span th:if="*{user.campus}" th:text="*{user.campus.name}"></span><br>
@@ -60,7 +60,7 @@
       <tr th:each="user : ${users}" class="selectableItem" style="cursor: pointer"
           th:onclick="window.location.href='/user/[[${user.id}]]';">
         <td th:text="*{user.username}"></td>
-        <td><span th:text="*{user.firstName}"></span><span th:text="*{user.lastName}"></span></td>
+        <td><span th:text="*{user.firstName}+' '+*{user.lastName}"></span></td>
         <td><span th:if="*{user.campus}" th:text="*{user.campus.name}"></span></td>
         <td><span th:if="*{user.department}" th:text="${user.department.name}"/></td>
         <td><span th:if="*{user.position}" th:text="${user.position.name}"/></td>

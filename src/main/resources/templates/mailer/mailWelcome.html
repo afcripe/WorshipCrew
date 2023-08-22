@@ -33,9 +33,9 @@
 <h4 th:text="${emailSubject}">Welcome</h4>
 
 <!-- Content -->
-<p>Welcome, <span th:text="${userDetails.firstName}">New User</span>.</p>
+<p>Welcome, <span th:text="${userDetails.firstName}+' '+${userDetails.lastName}">New User</span>.</p>
 
-<p>Please click <a th:href="${welcomeLink}" th:text="here">here</a> to confirm your E-mail and set your password.</p>
+<p>Please click <a th:href="${welcomeLink}+'?eventId='+${userDetails.id}+'&action=setPassword'" th:text="here">here</a> to confirm your E-mail and set your password.</p>
 
 <!-- Footer -->
 

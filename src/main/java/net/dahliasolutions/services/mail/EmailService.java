@@ -122,6 +122,7 @@ public class EmailService implements EmailServiceInterface{
         context.setVariable("baseURL", appServer.getBaseURL());
         context.setVariable("resetLink", appServer.getBaseURL()+"/mailer/"+linkString);
         context.setVariable("emailSubject", emailDetails.getSubject());
+        context.setVariable("userId", id);
 
         MimeMessage message = javaMailSender.createMimeMessage();
 

@@ -35,6 +35,7 @@ public interface UserServiceInterface extends UserDetailsService {
     List<User> findAllByPosition(Position position);
     List<User> findAllByDepartment(DepartmentRegional department);
     List<User> findAllByDepartmentAndDeleted(DepartmentRegional department, boolean deleted);
+    List<User> findAllByDepartmentCampus(DepartmentCampus department);
     List<User> findAllByActivated();
     List<User> findAllByRole(UserRoles role);
     List<User> findAllByRoles(String roles);
