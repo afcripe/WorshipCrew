@@ -1,4 +1,4 @@
-<div th:fragment="header">
+<div th:fragment="header" xmlns:th="http://thymeleaf.org">
 
     <nav id="moduleHeader" class="navbar navbar-expand-md navbar-light bg-dark">
       <div class="container-fluid w-100">
@@ -9,7 +9,7 @@
           </a>
         </div>
         <div class="navbar-nav mt-2 mx-2" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'SUPPORT_SUPERVISOR')}">
-          <a class="nav-link h3" href="#">
+          <a class="nav-link h3" href="/support/settings">
             <i class="bi bi-gear h3 color-support"></i>
           </a>
         </div>

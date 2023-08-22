@@ -13,31 +13,45 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class TicketPriorityService implements TicketPriorityServiceInterface {
 
-    private final TicketPriorityRepository TicketPriorityRepository;
+    private final TicketPriorityRepository ticketPriorityRepository;
 
 
     @Override
-    public TicketPriority createTicket(TicketPriority ticketPriority) {
-        return null;
+    public TicketPriority createPriority(TicketPriority ticketPriority) {
+        return ticketPriorityRepository.save(ticketPriority);
+    }
+
+    @Override
+    public int getNextDisplayOrder() {
+        List<TicketPriority> lastPriority = ticketPriorityRepository.findFirst1OrderByDisplayOrderDesc();
+        if (lastPriority.isEmpty()) {
+            return 1;
+        }
+        return lastPriority.get(0).getDisplayOrder()+1;
     }
 
     @Override
     public Optional<TicketPriority> findById(BigInteger id) {
-        return Optional.empty();
+        return ticketPriorityRepository.findById(id);
+    }
+
+    @Override
+    public Optional<TicketPriority> findByPriorityLikeIgnoreCase(String priority) {
+        return ticketPriorityRepository.findByPriorityLikeIgnoreCase(priority);
     }
 
     @Override
     public List<TicketPriority> findAll() {
-        return null;
+        return ticketPriorityRepository.findAllOrderByDisplayOrderAsc();
     }
 
     @Override
     public TicketPriority save(TicketPriority ticketPriority) {
-        return null;
+        return ticketPriorityRepository.save(ticketPriority);
     }
 
     @Override
     public void deleteById(BigInteger id) {
-
+        ticketPriorityRepository.deleteById(id);
     }
 }

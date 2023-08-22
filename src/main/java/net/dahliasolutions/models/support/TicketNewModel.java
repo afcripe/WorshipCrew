@@ -9,13 +9,12 @@ import java.math.BigInteger;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class TicketModel {
+public class TicketNewModel {
 
-    private String detail;
+    private String summary;
+    private String details;
     private String priority;
-    private String status;
     private BigInteger campus;
     private BigInteger department;
-    private String note;
     private String image;
 }

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<div class="container-fluid m-0 px2" layout:fragment="content">
+
+
+  <div th:replace="~{support/moduleHeader :: header}">Header</div>
+
+  <div class="container my-3">
+
+    <div class="col-xs-1 col-md-2">
+      <h2>Settings</h2>
+    </div>
+
+    <div class="row">
+      <div class="col-12 col-lg-6">
+
+        <div class="card" style="max-width: 450px;">
+
+          <div class="card-title m-4">
+            <button class="btn btn-sm btn-support" style="float: right;" onclick="newPriority()">New</button>
+            <h4>User Priority Level</h4>
+          </div>
+
+          <div class="card-body">
+            <table>
+              <tr>
+                <th class="p-1">Name</th>
+                <th class="p-1">Display Order</th>
+                <th class="p-1">&nbsp;</th>
+              </tr>
+              <tr th:each="p : ${priorityList}">
+                <td class="p-1"><span th:text="*{p.priority}"></span></td>
+                <td class="p-1"><span th:text="*{p.displayOrder}"></span></td>
+                <td class="p-1">
+                  <button id="editCategory" type="button" class="btn btn-sm btn-support" th:onclick="editPriority([[*{p.id}]])">Edit</button>
+                  <button id="deleteCategory" type="button" class="btn btn-sm btn-outline-support pl-2" th:onclick="deletePriority([[*{p.id}]])">Delete</button>
+                </td>
+              </tr>
+            </table>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="col-12 col-lg-6">
+
+        <script>
+          const notificationModule = "Support";
+        </script>
+        <div th:replace="~{components/cardNotification :: cardFragment}">Notification</div>
+
+      </div>
+
+    </div>
+
+
+  </div>
+
+  <dialog id="newPriorityDialog" class="upload-modal">
+    <script>
+      async function getNextDisplayOrder() {
+        const response = await fetch('/api/v1/support/priority/getnextdisplay', {
+          method: 'GET'
+        }).then(response => {
+          return response.json();
+        }).then(data => {
+          document.getElementById('priorityDisplayOrder').value = data.id;
+        });
+      }
+
+      async function postNewPriority() {
+        document.getElementById("btnSubmitPriority").setAttribute("disables","disabled");
+        let formData = new FormData();
+            formData.set("id", "");
+            formData.set("displayOrder", document.getElementById('priorityDisplayOrder').value);
+            formData.set("priority", document.getElementById('priorityName').value);
+
+        const response = await fetch('/api/v1/support/priority/new', {
+          method: 'POST',
+          body: formData
+        }).then(response => {
+          return response.json();
+        }).then(data => {
+          window.location.reload();
+        });
+      }
+      function keyNewPriority(event) {
+        event.preventDefault();
+        if (event.key === "Enter" || event.keyCode === 13) {
+          postNewPriority();
+        }
+        if (event.key === "Escape") {
+          keyEscPriority();
+        }
+      }
+
+      function keyEscPriority() {
+        document.getElementById("newPriorityDialog").close();
+      }
+
+    </script>
+    <h2>New Priority Level</h2>
+    <form id="formNewPriority" onsubmit="postNewPriority()" style="width: 300px; max-width: 450px">
+      <label for="priorityName" class="form-label">Name</label>
+      <input class="form-control" id="priorityName" onkeyup="keyNewPriority(event)">
+      <label for="priorityDisplayOrder" class="form-label">Display Order</label>
+      <input type="number" class="form-control" id="priorityDisplayOrder">
+      <div class="pt-2">
+        <button id="btnSubmitPriority" type="button" class="btn btn-sm btn-support" onclick="postNewPriority()">Add Item</button>
+        <button id="btnCancelPriority" type="button" class="btn btn-sm btn-outline-support" onclick="keyEscPriority()">Cancel</button>
+      </div>
+
+    </form>
+  </dialog>
+
+  <dialog id="editPriorityDialog" class="upload-modal">
+    <script>
+      async function loadEditPriority(id) {
+        let inptEditPriorityName = document.getElementById("editPriorityName");
+        let inptEditDisplayOrder = document.getElementById("editPriorityDisplayOrder");
+        let inptEditId = document.getElementById("editPriorityId");
+
+        let formData = new FormData();
+            formData.set("id", id);
+        const response = await fetch('/api/v1/support/priority/getpriority', {
+          method: 'POST',
+          body: formData
+        }).then(response => {
+          return response.json();
+        }).then(data => {
+          inptEditPriorityName.value = data.priority;
+          inptEditDisplayOrder.value = data.displayOrder;
+          inptEditId.value = data.id;
+        });
+      }
+
+      async function postEditPriority() {
+        let inptEditPriorityName = document.getElementById("editPriorityName");
+        let inptEditDisplayOrder = document.getElementById("editPriorityDisplayOrder");
+        let inptEditId = document.getElementById("editPriorityId");
+        debugger
+        document.getElementById("btnSubmitEditPriority").setAttribute("disables","disabled");
+        let formData = new FormData();
+            formData.set("id", inptEditId.value);
+            formData.set("priority", inptEditPriorityName.value);
+            formData.set("displayOrder", inptEditDisplayOrder.value);
+
+        const response = await fetch('/api/v1/support/priority/update', {
+          method: 'POST',
+          body: formData
+        }).then(response => {
+          return response.json();
+        }).then(data => {
+          window.location.reload();
+        });
+      }
+      function keyEditPriority(event) {
+        event.preventDefault();
+        if (event.key === "Enter" || event.keyCode === 13) {
+          postEditPriority();
+        }
+        if (event.key === "Escape") {
+          keyEscEditPriority();
+        }
+      }
+
+      function keyEscEditPriority() {
+        document.getElementById("editPriorityDialog").close();
+      }
+
+    </script>
+    <h2>Edit Priority Level</h2>
+    <form id="formEditPriority" onsubmit="postEditPriority()" style="width: 300px; max-width: 450px">
+      <input type="hidden" id="editPriorityId">
+      <label class="form-label">Name</label>
+      <input class="form-control" id="editPriorityName" onkeyup="keyEditPriority(event)">
+      <label class="form-label">Display Order</label>
+      <input type="number" class="form-control" id="editPriorityDisplayOrder">
+      <div class="pt-2">
+        <button id="btnSubmitEditPriority" type="button" class="btn btn-sm btn-support" onclick="postEditPriority()">Add Item</button>
+        <button id="btnCancelEditPriority" type="button" class="btn btn-sm btn-outline-support" onclick="keyEscEditPriority()">Cancel</button>
+      </div>
+
+    </form>
+  </dialog>
+
+
+  <script>
+    const dialogNewPriority = document.getElementById("newPriorityDialog");
+    const dialogEditPriority = document.getElementById("editPriorityDialog");
+
+    function newPriority() {
+      getNextDisplayOrder();
+      dialogNewPriority.showModal();
+    }
+
+    function editPriority(id) {
+      loadEditPriority(id);
+      dialogEditPriority.showModal();
+    }
+
+    async function deletePriority(id) {
+
+    }
+  </script>
+
+</div>
+
+</html>

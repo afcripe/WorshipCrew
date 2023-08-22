@@ -50,7 +50,8 @@
       </div>
       <div class="col-xs-1 col-md-10">
         <div id="dpCompanyText">
-          <span id="textCompanyName" class="fs-4" th:text="${adminSettings.companyName}"></span>
+          <span id="textCompanyName" class="fs-4"th:if="${#lists.contains(userRoles,'ADMIN_WRITE')}"
+                th:text="${adminSettings.companyName}"></span>
           <i id="btnEdit" class="bi bi-pencil-square" onclick="javascript:navAdmin(this)"></i>
         </div>
         <div id="dpCompanyInput" style="display: none">

@@ -626,7 +626,8 @@ public class UserController {
     private boolean userWrite(User currentUser){
         Collection<UserRoles> roles = currentUser.getUserRoles();
         for (UserRoles role : roles){
-            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_WRITE")) {
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_WRITE")
+                    || role.getName().equals("USER_SUPERVISOR")) {
                 return true;
             }
         }
@@ -637,7 +638,7 @@ public class UserController {
         List<User> userList = userList(currentUser);
         Collection<UserRoles> roles = currentUser.getUserRoles();
         for (UserRoles role : roles){
-            if (role.getName().equals("ADMIN_WRITE")) {
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_SUPERVISOR")) {
                 return true;
             }
             if (role.getName().equals("USER_WRITE")) {
@@ -689,7 +690,7 @@ public class UserController {
         List<Position> positionList;
         Collection<UserRoles> roles = currentUser.getUserRoles();
         for (UserRoles role : roles){
-            if (role.getName().equals("ADMIN_WRITE")) {
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_SUPERVISOR")) {
                 positionList = positionService.findAll();
                 return positionList;
             }
@@ -701,7 +702,8 @@ public class UserController {
         List<Campus> campusList = new ArrayList<>();
         Collection<UserRoles> roles = currentUser.getUserRoles();
         for (UserRoles role : roles){
-            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")) {
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_SUPERVISOR")
+                    || role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")) {
                 campusList = campusService.findAll();
                 return campusList;
             }
@@ -714,7 +716,8 @@ public class UserController {
         List<DepartmentRegional> departmentList = new ArrayList<>();
         Collection<UserRoles> roles = currentUser.getUserRoles();
         for (UserRoles role : roles){
-            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("CAMPUS_WRITE") || role.getName().equals("CAMPUS_READ")) {
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_SUPERVISOR")
+                    || role.getName().equals("CAMPUS_WRITE") || role.getName().equals("CAMPUS_READ")) {
                 departmentList = departmentRegionalService.findAll();
                 return departmentList;
             }

@@ -13,28 +13,26 @@
             <li class="nav-item">
               <a class="nav-link" href="/admin" >Settings</a>
             </li>
-            <li class="nav-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
+            <li class="nav-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'USER_SUPERVISOR')
                               or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
                               or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')
                               or #lists.contains(userRoles,'USER_READ') or #lists.contains(userRoles,'USER_WRITE')}">
               <a class="nav-link" href="/user">Users</a>
             </li>
-            <li class="nav-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
+            <li class="nav-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'USER_SUPERVISOR')
                               or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
                               or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')}">
               <a class="nav-link" href="/campus">Campuses</a>
             </li>
             </li>
-            <li class="nav-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
+            <li class="nav-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'USER_SUPERVISOR')
                               or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')}">
               <a class="nav-link" href="/department">Departments</a>
             </li>
-            <li class="nav-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
-                              or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')}">
+            <li class="nav-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'USER_SUPERVISOR')}">
               <a class="nav-link" href="/position">Positions</a>
             </li>
-            <li class="nav-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
-                                or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')}">
+            <li class="nav-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'USER_SUPERVISOR')}">
               <a class="nav-link" href="/roles">User Roles</a>
             </li>
           </ul>

@@ -1,6 +1,7 @@
 package net.dahliasolutions.models.support;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
 import net.dahliasolutions.models.campus.Campus;
@@ -25,10 +26,9 @@ public class Ticket {
     private LocalDateTime ticketDate;
     private LocalDateTime ticketDue;        // updates based on SLA
     private String ticketDetail;            // issue submitted
+    private String priority;                // user determined priority
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    private TicketPriority priority;        // user determined priority
-
+    @Nullable
     @ManyToOne(fetch = FetchType.EAGER)
     private SLA sla;                        // agent determined priority
 

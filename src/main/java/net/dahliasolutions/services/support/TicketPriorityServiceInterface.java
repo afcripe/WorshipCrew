@@ -8,8 +8,10 @@ import java.util.Optional;
 
 public interface TicketPriorityServiceInterface {
 
-    TicketPriority createTicket(TicketPriority ticketPriority);
+    TicketPriority createPriority(TicketPriority ticketPriority);
+    int getNextDisplayOrder();
     Optional<TicketPriority> findById(BigInteger id);
+    Optional<TicketPriority> findByPriorityLikeIgnoreCase(String priority);
     List<TicketPriority> findAll();
     TicketPriority save(TicketPriority ticketPriority);
     void deleteById(BigInteger id);
