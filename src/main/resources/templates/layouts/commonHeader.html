@@ -34,21 +34,25 @@
             <a class="nav-link" style="color: #eeeeee !important;" href="/">Home</a>
           </li>
           <li class="nav-item d-sm-none">
-            <a class="nav-link" style="color: #eeeeee !important;" href="/store">Store</a>
+            <a class="nav-link" style="color: #eeeeee !important;" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')
+                  or #lists.contains(userRoles,'STORE_SUPERVISOR') or #lists.contains(userRoles,'STORE_READ')
+                  or #lists.contains(userRoles,'STORE_WRITE')}"  href="/store">Store</a>
           </li>
           <li class="nav-item d-sm-none">
-            <a class="nav-link" style="color: #eeeeee !important;" href="/resource">Resource</a>
+            <a class="nav-link" style="color: #eeeeee !important;"th:if="${#lists.contains(userRoles,'ADMIN_WRITE')
+                  or #lists.contains(userRoles,'RESOURCE_SUPERVISOR') or #lists.contains(userRoles,'RESOURCE_READ')
+                  or #lists.contains(userRoles,'RESOURCE_WRITE')}" href="/resource">Resource</a>
           </li>
           <li class="nav-item d-sm-none">
-            <a class="nav-link" style="color: #eeeeee !important;" href="/support">Support</a>
+            <a class="nav-link" style="color: #eeeeee !important;" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')
+                  or #lists.contains(userRoles,'SUPPORT_READ') or #lists.contains(userRoles,'SUPPORT_WRITE')
+                  or #lists.contains(userRoles,'SUPPORT_AGENT') or #lists.contains(userRoles,'SUPPORT_SUPERVISOR')}" href="/support">Support</a>
           </li>
-          <li class="nav-item d-block d-sm-none" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
-                                                or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
-                                                or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')
+          <li class="nav-item d-block d-sm-none" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'REQUEST_SUPERVISOR')
                                                 or #lists.contains(userRoles,'REQUEST_WRITE')}">
             <a class="nav-link" style="color: #eeeeee !important;" href="/request">Requests</a>
           </li>
-          <li class="nav-item d-block d-sm-none" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
+          <li class="nav-item d-block d-sm-none" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'USER_SUPERVISOR')
                                                 or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
                                                 or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')}">
             <a class="nav-link" style="color: #eeeeee !important;" href="/admin">Settings</a>
@@ -83,9 +87,9 @@
 
         <div class="collapse navbar-collapse flex-grow-0 pl-2 pr-5">
           <ul class="navbar-nav me-auto orderRequest-last" sec:authorize="isAuthenticated()">
-            <th:block th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'ADMIN_READ')
-                      or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
-                      or #lists.contains(userRoles,'MANAGER_READ') or #lists.contains(userRoles,'MANAGER_WRITE')}">
+            <th:block th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'USER_SUPERVISOR')
+                          or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
+                          or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')}">
               <li class="nav-item">
                 <a class="nav-link mx-2" href="/admin" title="Settings">
                   <h4 style="color: lightskyblue;">

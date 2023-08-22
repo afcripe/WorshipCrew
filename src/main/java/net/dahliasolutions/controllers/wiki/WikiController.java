@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.*;
 import net.dahliasolutions.models.user.User;
+import net.dahliasolutions.models.user.UserRoles;
 import net.dahliasolutions.models.wiki.*;
 import net.dahliasolutions.services.AdminSettingsService;
 import net.dahliasolutions.services.RedirectService;
@@ -22,6 +23,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -152,17 +154,20 @@ public class WikiController {
 
     @GetMapping("/article/{id}")
     public String getPost(@PathVariable("id") BigInteger id, Model model, HttpSession session) {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<WikiPost> wikiPost = wikiPostService.findById(id);
         if (wikiPost.isEmpty()) {
             session.setAttribute("msgError", "Article not Found.");
             return redirectService.pathName(session, "/resource");
         }
         model.addAttribute("wikiPost", wikiPost.get());
+        model.addAttribute("wikiPostEditor", postEditor(currentUser, wikiPost.get().getAuthor()));
         return "wiki/post";
     }
 
     @GetMapping("/articles/**")
     public String addNewPost(Model model, HttpServletRequest request, HttpSession session) {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         String requestURL = request.getRequestURL().toString();
         requestURL = requestURL.replace("/articles/articles", "/articles");
@@ -208,6 +213,7 @@ public class WikiController {
         }
 
         model.addAttribute("wikiPost", post);
+        model.addAttribute("wikiPostEditor", postEditor(currentUser, post.getAuthor()));
         return "wiki/post";
 
     }
@@ -237,15 +243,14 @@ public class WikiController {
     @GetMapping("/edit/{id}")
     public String addEditPost(@PathVariable("id") BigInteger id, Model model, HttpSession session) {
         Optional<WikiPost> wikiPost = wikiPostService.findById(id);
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) auth.getPrincipal();
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         // if not found, redirect to new post
         if (wikiPost.isEmpty()) {
             return "redirect:/resource/article/new";
         }
         // validate author
-        if (!wikiPost.get().getAuthor().getId().equals(user.getId())) {
+        if (!postEditor(currentUser, wikiPost.get().getAuthor())) {
             session.setAttribute("msgError", "Edit permission denied.");
             return redirectService.pathName(session, "/resource");
         }
@@ -349,5 +354,27 @@ public class WikiController {
         }
 
         return wikiList.get(0);
+    }
+
+
+    private boolean postEditor(User currentUser){
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+        for (UserRoles role : roles){
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("RESOURCE_SUPERVISOR")) {
+                return true;
+            }
+        }
+        return false;
+    }
+    private boolean postEditor(User currentUser, User author){
+        if(currentUser.equals(author)) { return true; }
+
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+        for (UserRoles role : roles){
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("RESOURCE_SUPERVISOR")) {
+                return true;
+            }
+        }
+        return false;
     }
 }

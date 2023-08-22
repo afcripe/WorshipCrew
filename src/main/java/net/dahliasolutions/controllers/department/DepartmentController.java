@@ -49,7 +49,7 @@ public class DepartmentController {
 
         for (UserRoles role : roles){
             // if admin, continue to listing
-            if (role.getName().equals("ADMIN_WRITE")) {
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_SUPERVISOR")) {
                 model.addAttribute("departmentList", departmentRegionalService.findAll());
 
                 redirectService.setHistory(session, "/department");
@@ -233,7 +233,7 @@ public class DepartmentController {
         Collection<UserRoles> roles = user.getUserRoles();
 
         for (UserRoles role : roles){
-            if (role.getName().equals("ADMIN_WRITE")) {
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_SUPERVISOR")) {
                 return true;
             }
             if (role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")) {
@@ -250,7 +250,7 @@ public class DepartmentController {
         Collection<UserRoles> roles = user.getUserRoles();
 
         for (UserRoles role : roles){
-            if (role.getName().equals("ADMIN_WRITE")) {
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_SUPERVISOR")) {
                 return true;
             }
             if (role.getName().equals("DIRECTOR_WRITE")) {
@@ -270,7 +270,7 @@ public class DepartmentController {
         List<DepartmentRegional> departmentRegionalList = new ArrayList<>();
 
         for (UserRoles role : roles){
-            if (role.getName().equals("ADMIN_WRITE")) {
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_SUPERVISOR")) {
                 return departmentRegionalService.findAll();
             }
             if (role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")) {

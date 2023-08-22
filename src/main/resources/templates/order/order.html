@@ -223,11 +223,12 @@
                 document.getElementById("btnStatusSubmit").setAttribute("disabled", "disabled");
                 let dispStatusSelect = document.getElementById('statusSelect');
                 let dispStatusNote = document.getElementById('statusNote');
+                document.getElementById("btnStatusSubmit").setAttribute("disabled", "disabled");
                 debugger
                 let formData = new FormData();
                     formData.set("requestId", document.getElementById('orderId').value);
                     formData.set("requestStatus", dispStatusSelect.value);
-                    formData.set("RequestNote", dispStatusNote.value);
+                    formData.set("requestNote", dispStatusNote.value);
 
                 const response = await fetch('/api/v1/request/changestatus', {
                     method: 'POST',
@@ -360,13 +361,14 @@
                     });
             }
             async function postItemStatus() {
-                document.getElementById("btnSuperSubmit").setAttribute("disabled", "disabled");
+                document.getElementById("btnItemStatusSubmit").setAttribute("disabled", "disabled");
                 let dispItemStatusSelect = document.getElementById('statusItemSelect');
-                debugger
+                let dispStatusNote = document.getElementById('statusItemNote');
+
                 let formData = new FormData();
-                formData.set("requestId", document.getElementById("itemStatusId").value);
-                formData.set("requestStatus", dispItemStatusSelect.value);
-                formData.set("RequestNote", "");
+                    formData.set("requestId", document.getElementById("itemStatusId").value);
+                    formData.set("requestStatus", dispItemStatusSelect.value);
+                    formData.set("requestNote", dispStatusNote.value);
 
                 const response = await fetch('/api/v1/request/changeitemstatus', {
                     method: 'POST',
@@ -391,13 +393,17 @@
                 document.getElementById("changeItemStatusDialog").close();
             }
         </script>
-        <h2>Update Request Status</h2>
+        <h2>Item Status</h2>
         <form id="formChangeItemStatus" onsubmit="postItemStatus()" style="width: 300px; max-width: 450px">
             <label for="statusItemSelect" class="form-control-label">Change Status</label>
             <select class="form-control py-1" id="statusItemSelect" onkeyup="keyItemStatus(event)">
                 <option></option>
             </select>
             <input type="hidden" id="itemStatusId">
+
+            <label class="form-control-label">Note</label>
+            <textarea id="statusItemNote" class="form-control w-100"></textarea>
+
             <div class="pt-2">
                 <button id="btnItemStatusSubmit" type="button" class="btn btn-sm btn-primary" onclick="postItemStatus()">Update</button>
                 <button id="btnItemStatusCancel" type="button" class="btn btn-sm btn-outline-primary" onclick="keyEscItemStatus()">Cancel</button>

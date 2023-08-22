@@ -8,6 +8,7 @@ import net.dahliasolutions.models.*;
 import net.dahliasolutions.models.mail.EmailDetails;
 import net.dahliasolutions.models.mail.MailerLinks;
 import net.dahliasolutions.models.order.OrderItem;
+import net.dahliasolutions.models.order.OrderNote;
 import net.dahliasolutions.models.order.OrderRequest;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.services.AuthService;
@@ -235,6 +236,34 @@ public class EmailService implements EmailServiceInterface{
                     LocalDateTime.now().plusDays(5),
                     false, "acknowledgeItem");
             mailerLinksService.save(mLink);
+
+            return new BrowserMessage("msgSuccess", "E-mail sent.");
+        } catch (Exception e) {
+            return new BrowserMessage("msgError", e.getMessage());
+        }
+    }
+
+    @Override
+    public BrowserMessage sendItemUpdate(EmailDetails emailDetails, OrderItem orderItem, OrderNote orderNote) {
+
+        // set template variables
+        Context context = new Context();
+        context.setVariable("baseURL", appServer.getBaseURL());
+        context.setVariable("requestItem", orderItem);
+        context.setVariable("orderNote", orderNote);
+        context.setVariable("emailSubject", emailDetails.getSubject());
+
+        // create mail message
+        MimeMessage message = javaMailSender.createMimeMessage();
+
+        try {
+            message.setFrom(new InternetAddress(sender));
+            message.setRecipients(MimeMessage.RecipientType.TO, emailDetails.getRecipient());
+            message.setSubject(emailDetails.getSubject());
+            // Set the email's content to be the HTML template
+            message.setContent(templateEngine.process("mailer/mailItemUpdate", context), "text/html; charset=utf-8");
+
+            javaMailSender.send(message);
 
             return new BrowserMessage("msgSuccess", "E-mail sent.");
         } catch (Exception e) {

@@ -133,11 +133,11 @@ public class OrderAPIController {
         if (orderRequest.isPresent()) {
             orderRequest.get().setOrderStatus(OrderStatus.valueOf(statusModel.requestStatus()));
             orderService.save(orderRequest.get());
-            orderNoteService.createOrderNote(new OrderNote(
+            OrderNote orderNote = orderNoteService.createOrderNote(new OrderNote(
                     null,
                     orderRequest.get().getId(),
                     null,
-                    statusModel.RequestNote(),
+                    statusModel.requestNote(),
                     BigInteger.valueOf(0),
                     setStatus,
                     user));
@@ -169,15 +169,17 @@ public class OrderAPIController {
         User user = (User) auth.getPrincipal();
         OrderStatus setStatus = OrderStatus.valueOf(statusModel.requestStatus());
         Optional<OrderItem> requestItem = orderItemService.findById(statusModel.requestId());
-        String noteDetail = "";
+        String noteDetail = statusModel.requestNote();
         if (requestItem.isPresent()) {
             // update item status
             requestItem.get().setItemStatus(setStatus);
             orderItemService.save(requestItem.get());
             // add new note to order
-            noteDetail = requestItem.get().getSupervisor().getFirstName()+" "+requestItem.get().getSupervisor().getLastName()+
-                    " updated the status of "+requestItem.get().getProductName()+" to "+statusModel.requestStatus()+".";
-            orderNoteService.createOrderNote(new OrderNote(
+            if (noteDetail.equals("")) {
+                noteDetail = requestItem.get().getSupervisor().getFirstName() + " " + requestItem.get().getSupervisor().getLastName() +
+                        " updated the status of " + requestItem.get().getProductName() + " to " + statusModel.requestStatus() + ".";
+            }
+            OrderNote orderNote = orderNoteService.createOrderNote(new OrderNote(
                     null,
                     requestItem.get().getOrderRequest().getId(),
                     null,
@@ -188,11 +190,21 @@ public class OrderAPIController {
             // Email everyone
             EmailDetails emailDetailsUser =
                     new EmailDetails(requestItem.get().getOrderRequest().getUser().getContactEmail(),"The Status of a Request Item Changed", "", null );
-            BrowserMessage returnMsg = emailService.sendUserRequest(emailDetailsUser, requestItem.get().getOrderRequest());
+            BrowserMessage returnMsg = emailService.sendItemUpdate(emailDetailsUser, requestItem.get(), orderNote);
 
             EmailDetails emailDetailsSupervisor =
                     new EmailDetails(requestItem.get().getOrderRequest().getSupervisor().getContactEmail(),"The Status of a Request Item Changed", "", null );
-            BrowserMessage returnMsg2 = emailService.sendUserRequest(emailDetailsSupervisor, requestItem.get().getOrderRequest());
+            BrowserMessage returnMsg2 = emailService.sendItemUpdate(emailDetailsSupervisor, requestItem.get(), orderNote);
+
+
+//            EmailDetails emailDetailsUser =
+//                    new EmailDetails(requestItem.get().getOrderRequest().getUser().getContactEmail(),"The Status of a Request Item Changed", "", null );
+//            BrowserMessage returnMsg = emailService.sendUserRequest(emailDetailsUser, requestItem.get().getOrderRequest());
+//
+//            EmailDetails emailDetailsSupervisor =
+//                    new EmailDetails(requestItem.get().getOrderRequest().getSupervisor().getContactEmail(),"The Status of a Request Item Changed", "", null );
+//            BrowserMessage returnMsg2 = emailService.sendUserRequest(emailDetailsSupervisor, requestItem.get().getOrderRequest());
+
 
             // send any additional notifications
             String userFullName = user.getFirstName()+" "+user.getLastName();
