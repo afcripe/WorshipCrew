@@ -1,13 +1,17 @@
 package net.dahliasolutions.controllers.support;
 
 import lombok.RequiredArgsConstructor;
+import net.dahliasolutions.models.NotifyTarget;
 import net.dahliasolutions.models.records.SingleBigIntegerModel;
 import net.dahliasolutions.models.records.SingleIntModel;
 import net.dahliasolutions.models.records.SingleStringModel;
 import net.dahliasolutions.models.store.StoreCategory;
 import net.dahliasolutions.models.support.Ticket;
 import net.dahliasolutions.models.support.TicketPriority;
+import net.dahliasolutions.models.user.User;
+import net.dahliasolutions.services.support.SupportSettingService;
 import net.dahliasolutions.services.support.TicketPriorityService;
+import net.dahliasolutions.services.user.UserService;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
@@ -20,6 +24,8 @@ import java.util.Optional;
 public class SupportAPIController {
 
     private final TicketPriorityService ticketPriorityService;
+    private final UserService userService;
+    private final SupportSettingService supportSettingService;
 
     @GetMapping("")
     public List<Ticket> getSupportTickets() {
@@ -65,5 +71,19 @@ public class SupportAPIController {
             return ticketPriorityService.save(priority.get());
         }
         return ticketPriorityModel;
+    }
+
+
+    @PostMapping("/supportsetting/update")
+    public String updateSupportNotify(@ModelAttribute SingleStringModel notifyModel, @ModelAttribute SingleBigIntegerModel userModel) {
+        NotifyTarget target = NotifyTarget.valueOf(notifyModel.name());
+        Optional<User> user = userService.findById(userModel.id());
+
+        supportSettingService.setSupportNotifyTarget(target);
+        if (target.equals(NotifyTarget.User) && user.isPresent()) {
+            supportSettingService.setUser(user.get());
+        }
+
+        return "true";
     }
 }

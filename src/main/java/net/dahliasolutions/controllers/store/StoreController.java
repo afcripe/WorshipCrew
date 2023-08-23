@@ -339,7 +339,7 @@ public class StoreController {
         if (storeSetting.getUser() != null) {
             userId = storeSetting.getUser().getId();
         }
-        List<StoreNotifyTarget> targetList = Arrays.asList(StoreNotifyTarget.values());
+        List<NotifyTarget> targetList = Arrays.asList(NotifyTarget.values());
         List<User> userList = userService.findAllByRoles("ADMIN_WRITE,RESOURCE_WRITE,RESOURCE_SUPERVISOR");
         // Notifications
         List<Notification> notificationList = notificationService.findAllByModule(EventModule.Store);

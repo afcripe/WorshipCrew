@@ -5,10 +5,10 @@ import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.campus.Campus;
 import net.dahliasolutions.models.department.DepartmentCampus;
 import net.dahliasolutions.models.department.DepartmentRegional;
-import net.dahliasolutions.models.position.Position;
-import net.dahliasolutions.models.records.BigIntegerStringModel;
+import net.dahliasolutions.models.NotifyTarget;
+import net.dahliasolutions.models.store.StoreSetting;
+import net.dahliasolutions.models.support.SupportSetting;
 import net.dahliasolutions.models.support.Ticket;
-import net.dahliasolutions.models.support.TicketModel;
 import net.dahliasolutions.models.support.TicketNewModel;
 import net.dahliasolutions.models.support.TicketStatus;
 import net.dahliasolutions.models.user.User;
@@ -19,7 +19,9 @@ import net.dahliasolutions.services.campus.CampusService;
 import net.dahliasolutions.services.department.DepartmentCampusService;
 import net.dahliasolutions.services.department.DepartmentRegionalService;
 import net.dahliasolutions.services.mail.EmailService;
+import net.dahliasolutions.services.support.SupportSettingService;
 import net.dahliasolutions.services.support.TicketPriorityService;
+import net.dahliasolutions.services.support.TicketService;
 import net.dahliasolutions.services.user.UserRolesService;
 import net.dahliasolutions.services.user.UserService;
 import org.springframework.security.core.Authentication;
@@ -39,12 +41,14 @@ import java.util.*;
 @RequiredArgsConstructor
 public class SupportController {
 
+    private final TicketService ticketService;
     private final TicketPriorityService ticketPriorityService;
     private final UserService userService;
     private final UserRolesService rolesService;
     private final CampusService campusService;
     private final DepartmentRegionalService departmentRegionalService;
     private final DepartmentCampusService departmentCampusService;
+    private final SupportSettingService supportSettingService;
     private final RedirectService redirectService;
     private final EmailService emailService;
     private final EventService eventService;
@@ -85,8 +89,20 @@ public class SupportController {
 
     @GetMapping("/settings")
     public String goSupportSettings(Model model) {
+        // Request Target
+        SupportSetting supportSetting = supportSettingService.getSupportSetting();
+        BigInteger userId = BigInteger.valueOf(0);
+        if (supportSetting.getUser() != null) {
+            userId = supportSetting.getUser().getId();
+        }
+        List<NotifyTarget> targetList = Arrays.asList(NotifyTarget.values());
+        List<User> userList = userService.findAllByRoles("ADMIN_WRITE,SUPPORT_AGENT,SUPPORT_SUPERVISOR");
 
         model.addAttribute("priorityList", ticketPriorityService.findAll());
+        model.addAttribute("targetList", targetList);
+        model.addAttribute("userList", userList);
+        model.addAttribute("notifyTarget", supportSetting.getNotifyTarget().toString());
+        model.addAttribute("userId", userId);
         return "support/settings";
     }
 
@@ -105,23 +121,9 @@ public class SupportController {
     @PostMapping("/create")
     public String createTicket(@ModelAttribute TicketNewModel ticketNewModel, HttpSession session) {
         User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Ticket ticket = ticketService.createTicket(ticketNewModel, currentUser);
 
-        Ticket ticket = new Ticket(
-                null,
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-                ticketNewModel.getSummary(),
-                ticketNewModel.getPriority(),
-                null,
-                TicketStatus.Open,
-                campusService.findById(ticketNewModel.getCampus()).get(),
-                departmentRegionalService.findById(ticketNewModel.getDepartment()).get(),
-                currentUser,
-                currentUser.getDirector(),
-                new ArrayList<>(),
-                new ArrayList<>());
-
-        return "redirect:/ticket/"+ BigInteger.valueOf(1).toString();
+        return "redirect:/ticket/"+ticket.getId().toString();
     }
 
     @GetMapping("/search/{searchTerm}")

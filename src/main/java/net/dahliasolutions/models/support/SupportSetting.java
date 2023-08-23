@@ -1,4 +1,4 @@
-package net.dahliasolutions.models.store;
+package net.dahliasolutions.models.support;
 
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
@@ -14,7 +14,7 @@ import java.math.BigInteger;
 @AllArgsConstructor
 @Builder
 @Entity
-public class StoreSetting {
+public class SupportSetting {
 
     @Id
     private BigInteger id;

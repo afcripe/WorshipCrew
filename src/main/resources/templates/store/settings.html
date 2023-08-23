@@ -93,13 +93,13 @@
             <h4>Request Processing</h4>
             <p>Who is responsible for fulfilling requests?</p>
             <div class="pb-1">
-              <select id="notificationTarget" class="form-control pb-1">
+              <select id="notificationTarget" class="form-control pb-1" onchange="notifyTargetChange()">
                 <option th:each="target : ${targetList}" th:value="*{target.name}" th:text="*{target.name}"
                         th:selected="*{target.name} == ${notifyTarget}"></option>
               </select>
             </div>
             <div class="pb-1">
-              <select id="notificationUser" class="form-control pb-1">
+              <select id="notificationUser" class="form-control pb-1" th:readonly="${notifyTarget != 'User'}">
                 <option th:each="user : ${userList}" th:value="*{user.id}" th:text="*{user.firstName+' '+user.lastName}"
                         th:selected="*{user.id} == ${userId}"></option>
               </select>
@@ -240,6 +240,9 @@
 
     const restrictPosition = document.getElementById("inputRestrictPosition");
     const restrictDepartment = document.getElementById("inputRestrictDepartment");
+
+    const selectNotificationChange = document.getElementById("notificationTarget");
+    const selectNotificationUser = document.getElementById("notificationUser");
 
     restrictPosition.checked = jsIsRestrictPosition;
     restrictDepartment.checked = jsIsRestrictDepartment;
@@ -441,6 +444,18 @@
         debugger
         bStoreHome.disabled = false;
       });
+    }
+
+    function notifyTargetChange() {
+      if (selectNotificationChange.value === "User") {
+        try {
+          selectNotificationUser.removeAttribute("readonly");
+        } catch (e) {}
+      } else {
+        try {
+          selectNotificationUser.setAttribute("readonly", "readonly");
+        } catch (e) {}
+      }
     }
 
     async function updateStoreNotifyTarget() {

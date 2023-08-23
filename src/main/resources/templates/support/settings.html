@@ -15,7 +15,6 @@
     </div>
 
     <div class="row">
-      <div class="col-12 col-lg-6">
 
         <div class="card" style="max-width: 450px;">
 
@@ -44,16 +43,40 @@
 
         </div>
 
+    </div>
+    <div class="row">
+
+      <!-- Request targets -->
+      <div class="card" style="max-width: 450px;">
+        <div class="card-body">
+
+          <div class="pt-4 ">
+            <h4>Ticket Processing</h4>
+            <p>Who receives new tickets?</p>
+            <div class="pb-1">
+              <select id="notificationTarget" class="form-control pb-1" onchange="notifyTargetChange()">
+                <option th:each="target : ${targetList}" th:value="*{target.name}" th:text="*{target.name}"
+                        th:selected="*{target.name} == ${notifyTarget}"></option>
+              </select>
+            </div>
+            <div class="pb-1">
+              <select id="notificationUser" class="form-control pb-1" th:readonly="${notifyTarget != 'User'}">
+                <option th:each="user : ${userList}" th:value="*{user.id}" th:text="*{user.firstName+' '+user.lastName}"
+                        th:selected="*{user.id} == ${userId}"></option>
+              </select>
+            </div>
+            <div>
+              <button id="btnSupportNotifyTarget" type="button" class="btn btn-sm btn-outline-support" style="float: right;"
+                      onclick="updateSupportNotifyTarget()">Update</button>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="col-12 col-lg-6">
-
-        <script>
-          const notificationModule = "Support";
-        </script>
-        <div th:replace="~{components/cardNotification :: cardFragment}">Notification</div>
-
-      </div>
+      <script>
+        const notificationModule = "Support";
+      </script>
+      <div th:replace="~{components/cardNotification :: cardFragment}">Notification</div>
 
     </div>
 
@@ -192,6 +215,8 @@
   <script>
     const dialogNewPriority = document.getElementById("newPriorityDialog");
     const dialogEditPriority = document.getElementById("editPriorityDialog");
+    const selectNotifyChange = document.getElementById("notificationTarget");
+    const selectNotifyUser = document.getElementById("notificationUser");
 
     function newPriority() {
       getNextDisplayOrder();
@@ -206,6 +231,38 @@
     async function deletePriority(id) {
 
     }
+
+    function notifyTargetChange() {
+      if (selectNotifyChange.value === "User") {
+        try {
+          selectNotifyUser.removeAttribute("readonly");
+        } catch (e) {}
+      } else {
+        try {
+          selectNotifyUser.setAttribute("readonly", "readonly");
+        } catch (e) {}
+      }
+    }
+
+    async function updateSupportNotifyTarget() {
+      let btnSettings = document.getElementById("btnSupportNotifyTarget");
+      btnSettings.disabled = true;
+
+      let theForm = new FormData();
+          theForm.set("name", selectNotifyChange.value);
+          theForm.set("id", selectNotifyUser.value);
+
+      const response = await fetch("/api/v1/support/supportsetting/update", {
+        method: 'POST',
+        body: theForm
+      }).then(response => {
+        return response.json();
+      }).then(data => {
+        debugger
+        btnSettings.disabled = false;
+      });
+    }
+
   </script>
 
 </div>

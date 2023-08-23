@@ -2,6 +2,7 @@ package net.dahliasolutions.services.support;
 
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.data.TicketRepository;
+import net.dahliasolutions.models.support.SupportSetting;
 import net.dahliasolutions.models.support.Ticket;
 import net.dahliasolutions.models.support.TicketNewModel;
 import net.dahliasolutions.models.support.TicketStatus;
@@ -23,14 +24,22 @@ public class TicketService implements TicketServiceInterface {
     private final TicketRepository ticketRepository;
     private final CampusService campusService;
     private final DepartmentRegionalService departmentService;
+    private final SupportSettingService supportSettingService;
 
 
     @Override
     public Ticket createTicket(TicketNewModel model, User user) {
-        User agent = user.getDirector();
-        Integer defaultDue = 3;
+        SupportSetting supportSetting = supportSettingService.getSupportSetting();
+
+        // ToDo - create default respond days in supportSetting
+        int defaultDue = 3;
         LocalDateTime today = LocalDateTime.now();
         LocalDateTime dueDate = today.plusDays(defaultDue);
+
+        // ToDo - create default SLA in supportSetting
+
+        // ToDo - determine who gets the ticket base on supportSetting
+        User agent = user.getDirector();
 
         Ticket ticket = ticketRepository.save(new Ticket(
                     null,

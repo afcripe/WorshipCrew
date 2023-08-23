@@ -1,13 +1,10 @@
 package net.dahliasolutions.services.store;
 
 import lombok.RequiredArgsConstructor;
-import net.dahliasolutions.data.AdminSettingsRepository;
 import net.dahliasolutions.data.StoreSettingRepository;
-import net.dahliasolutions.models.AdminSettings;
-import net.dahliasolutions.models.store.StoreNotifyTarget;
+import net.dahliasolutions.models.NotifyTarget;
 import net.dahliasolutions.models.store.StoreSetting;
 import net.dahliasolutions.models.user.User;
-import net.dahliasolutions.services.AdminSettingsServiceInterface;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -25,7 +22,7 @@ public class StoreSettingService implements StoreSettingServiceInterface {
             return storeSettingRepository.save(
                     new StoreSetting(
                             BigInteger.valueOf(1),
-                            StoreNotifyTarget.RegionalDepartmentDirector,
+                            NotifyTarget.RegionalDepartmentDirector,
                             null)
             );
         }
@@ -33,7 +30,7 @@ public class StoreSettingService implements StoreSettingServiceInterface {
     }
 
     @Override
-    public void setStoreNotifyTarget(StoreNotifyTarget notifyTarget) {
+    public void setStoreNotifyTarget(NotifyTarget notifyTarget) {
         StoreSetting storeSetting = getStoreSetting();
                     storeSetting.setNotifyTarget(notifyTarget);
         storeSettingRepository.save(storeSetting);
