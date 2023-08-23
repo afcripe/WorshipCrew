@@ -8,7 +8,6 @@ import net.dahliasolutions.models.campus.Campus;
 import net.dahliasolutions.models.department.DepartmentRegional;
 import net.dahliasolutions.models.user.User;
 
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -21,8 +20,7 @@ import java.util.List;
 public class Ticket {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private BigInteger id;
+    private String id;
     private LocalDateTime ticketDate;
     private LocalDateTime ticketDue;        // updates based on SLA
     private String ticketDetail;            // issue submitted

@@ -11,8 +11,11 @@ public interface SupportSettingServiceInterface {
     SupportSetting getSupportSetting();
     void setResponseHours(int hours);
     void setDefaultSLAId(BigInteger id);
+    void setIdPrefix(String prefix);
 
     void setSupportNotifyTarget(TicketNotifyTarget notifyTarget);
     void setUser(User user);
+
+    String getIdPrefix();
 
 }

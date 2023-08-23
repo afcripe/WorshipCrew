@@ -101,6 +101,9 @@ public class SupportController {
         model.addAttribute("userList", userList);
         model.addAttribute("notifyTarget", supportSetting.getNotifyTarget().toString());
         model.addAttribute("userId", userId);
+        model.addAttribute("supportSetting", supportSetting);
+        model.addAttribute("selectedSLA", "");
+
         return "support/settings";
     }
 

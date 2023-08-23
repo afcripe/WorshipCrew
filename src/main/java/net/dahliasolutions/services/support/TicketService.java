@@ -25,7 +25,7 @@ public class TicketService implements TicketServiceInterface {
     private final CampusService campusService;
     private final DepartmentRegionalService departmentService;
     private final SupportSettingService supportSettingService;
-
+private final TicketIdGenerator idGenerator;
 
     @Override
     public Ticket createTicket(TicketNewModel model, User user) {
@@ -42,7 +42,7 @@ public class TicketService implements TicketServiceInterface {
         User agent = user.getDirector();
 
         Ticket ticket = ticketRepository.save(new Ticket(
-                    null,
+                    idGenerator.generate(),
                     today,
                     dueDate,
                     model.getSummary(),
@@ -64,7 +64,7 @@ public class TicketService implements TicketServiceInterface {
     }
 
     @Override
-    public Optional<Ticket> findById(BigInteger id) {
+    public Optional<Ticket> findById(String id) {
         return Optional.empty();
     }
 
@@ -101,10 +101,5 @@ public class TicketService implements TicketServiceInterface {
     @Override
     public Ticket save(Ticket ticket) {
         return null;
-    }
-
-    @Override
-    public void deleteById(BigInteger id) {
-
     }
 }

@@ -11,7 +11,7 @@ public interface TicketNoteServiceInterface {
     TicketNote createTicketNote(TicketNote note);
     Optional<TicketNote> findById(BigInteger id);
     List<TicketNote> findAll();
-    List<TicketNote> findByTicketId(BigInteger ticketId);
+    List<TicketNote> findByTicketId(String ticketId);
     void save(TicketNote note);
     void deleteById(BigInteger id);
 

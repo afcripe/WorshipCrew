@@ -9,6 +9,6 @@ import java.util.List;
 
 public interface TicketNoteRepository extends JpaRepository<TicketNote, BigInteger> {
 
-    List<TicketNote> findByTicketId(BigInteger id);
+    List<TicketNote> findByTicketId(String id);
     List<TicketNote> findAllByUser(User user);
 }

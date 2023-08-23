@@ -12,8 +12,9 @@ import java.util.Optional;
 
 public interface TicketServiceInterface {
 
+
     Ticket createTicket(TicketNewModel model, User user);
-    Optional<Ticket> findById(BigInteger id);
+    Optional<Ticket> findById(String id);
     List<Ticket> findAll();
     List<Ticket> findAllByUser(User user);
     List<Ticket> findFirst5ByUser(User user);
@@ -21,6 +22,5 @@ public interface TicketServiceInterface {
     List<Ticket> findAllByAgentOpenOnly(User user);
     List<Ticket> findAllByMentionOpenOnly(User user);
     Ticket save(Ticket ticket);
-    void deleteById(BigInteger id);
 
 }

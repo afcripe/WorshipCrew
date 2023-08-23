@@ -13,8 +13,10 @@ import org.springframework.data.repository.query.Param;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 
 public interface TicketRepository extends JpaRepository<Ticket, BigInteger> {
+
 
     List<Ticket> findAllByUserAndTicketStatusNot(User user, TicketStatus status);
     List<Ticket> findAllByUser(User user);
@@ -23,6 +25,8 @@ public interface TicketRepository extends JpaRepository<Ticket, BigInteger> {
     List<Ticket> findAllByDepartmentAndTicketStatusNot(DepartmentRegional department, TicketStatus status);
     List<Ticket> findAllByDepartment(DepartmentRegional department);
 
+    @Query(value = "SELECT COUNT(ID) AS COUNT FROM TICKET", nativeQuery = true)
+    int countAllById();
     @Query(value = "SELECT * FROM TICKET WHERE AGENT_ID = :agentId ORDER BY TICKET_DATE DESC", nativeQuery = true)
     List<Ticket> findAllByAgentId(@Param("agentId") BigInteger agentId);
     @Query(value = "SELECT * FROM TICKET WHERE AGENT_ID = :agentId AND TICKET_STATUS <> 'Closed' ORDER BY TICKET_DATE DESC", nativeQuery = true)

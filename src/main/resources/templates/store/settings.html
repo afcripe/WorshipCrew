@@ -3,7 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/defaultLayout}">
 
-<div class="container-fluid" layout:fragment="content">
+<div class="container-fluid m-0 p-0" layout:fragment="content">
   <template id="tmpSubCat">
     <div class="m-1">
       <div style="float: right;">
@@ -35,13 +35,13 @@
                 onclick="window.location.href='/store/imageManager'">
               Manage Uploaded Images
             </li>
-            <li class="list-group-item selectableItem">
+            <li class="list-group-item">
               <label class="form-check-label">Restrict Items by Position</label>
-              <input id="inputRestrictPosition" type="checkbox" onchange="updateRestrictions('restrictStorePosition')">
+              <input id="inputRestrictPosition" class="selectableItem" type="checkbox" onchange="updateRestrictions('restrictStorePosition')">
             </li>
-            <li class="list-group-item selectableItem">
+            <li class="list-group-item">
               <label class="form-check-label">Restrict Items by Department</label>
-              <input id="inputRestrictDepartment" type="checkbox" onchange="updateRestrictions('restrictStoreDepartment')">
+              <input id="inputRestrictDepartment" class="selectableItem" type="checkbox" onchange="updateRestrictions('restrictStoreDepartment')">
             </li>
           </ul>
 

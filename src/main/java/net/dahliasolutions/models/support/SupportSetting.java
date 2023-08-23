@@ -20,6 +20,7 @@ public class SupportSetting {
     private BigInteger id;
     private int responseHours;
     private BigInteger defaultSLAId;
+    private String idPrefix;
 
     @Enumerated
     private TicketNotifyTarget notifyTarget;

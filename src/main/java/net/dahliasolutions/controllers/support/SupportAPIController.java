@@ -72,6 +72,14 @@ public class SupportAPIController {
         return ticketPriorityModel;
     }
 
+    @PostMapping("/priority/delete")
+    public TicketPriority deleteNewCategory(@ModelAttribute TicketPriority ticketPriorityModel) {
+        Optional<TicketPriority> priority = ticketPriorityService.findById(ticketPriorityModel.getId());
+        if (priority.isPresent()) {
+            ticketPriorityService.deleteById(priority.get().getId());
+        }
+        return priority.get();
+    }
 
     @PostMapping("/supportsetting/update")
     public String updateSupportNotify(@ModelAttribute SingleStringModel notifyModel, @ModelAttribute SingleBigIntegerModel userModel) {
@@ -85,4 +93,11 @@ public class SupportAPIController {
 
         return "true";
     }
+
+    @PostMapping("/prefix/update")
+    public SingleStringModel updateSupportNotify(@ModelAttribute SingleStringModel settingPrefix) {
+        supportSettingService.setIdPrefix(settingPrefix.name());
+        return settingPrefix;
+    }
+
 }

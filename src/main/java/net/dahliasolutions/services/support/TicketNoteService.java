@@ -37,7 +37,7 @@ public class TicketNoteService implements TicketNoteServiceInterface {
     }
 
     @Override
-    public List<TicketNote> findByTicketId(BigInteger ticketId) {
+    public List<TicketNote> findByTicketId(String ticketId) {
         return ticketNoteRepository.findByTicketId(ticketId);
     }
 

@@ -3,7 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/defaultLayout}">
 
-<div class="container-fluid m-0 px2" layout:fragment="content">
+<div class="container-fluid m-0 p-0" layout:fragment="content">
 
 
   <div th:replace="~{support/moduleHeader :: header}">Header</div>
@@ -16,6 +16,7 @@
 
     <div class="row">
 
+      <!-- User Determined Priority -->
         <div class="card" style="max-width: 450px;">
 
           <div class="card-title m-4">
@@ -43,15 +44,60 @@
 
         </div>
 
+      <!-- Prefix and Default SLA -->
+      <div class="card" style="max-width: 450px;">
+
+        <div class="card-title m-4">
+          <h4>Ticket Defaults</h4>
+        </div>
+
+        <div class="card-body">
+
+            <div class="pb-2 d-flex">
+              <span style="padding-right: 50px; align-self: flex-end">Prefix:</span>
+              <input id="inputTicketPrefix" class="form-control-sm" style="width: 125px; display: inline-flex;"
+                     th:value="${supportSetting.idPrefix}" onchange="notifyTargetChange()">
+              <span style="flex-grow: 1">&nbsp;</span>
+              <button id="btnUpdatePrefix" type="button" class="btn btn-sm btn-outline-support" style="float: right;"
+                      onclick="updatePrefix()">Update</button>
+            </div>
+
+            <div class="pb-2 d-flex" style="vertical-align: bottom">
+              <span style="padding-right: 5px; align-self: flex-end">Default SLA:</span>
+              <div style="flex-grow: 1;">
+                <select id="slaSelect" class="form-control w-100" onchange="slaChange()">
+                  <option value="0">None</option>
+                  <option th:each="sla : ${slaList}" th:value="*{sla.id}" th:text="*{sla.name}"
+                          th:selected="*{sla.name} == ${selectedSLA}"></option>
+                </select>
+              </div>
+
+            </div>
+          <div class="pb-2 d-flex">
+            <ul class="list-group list-group-flush" style="flex-grow: 1;">
+              <li class="list-group-item selectableItem"
+                  onclick="window.location.href='/support/slaManager'">
+                Manage Service Level Agreements
+              </li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+
+
     </div>
     <div class="row">
 
       <!-- Request targets -->
       <div class="card" style="max-width: 450px;">
+
+        <div class="card-title m-4">
+          <h4>Ticket Submission</h4>
+        </div>
+
         <div class="card-body">
 
-          <div class="pt-4 ">
-            <h4>Ticket Processing</h4>
             <p>Who receives new tickets?</p>
             <div class="pb-1">
               <select id="notificationTarget" class="form-control pb-1" onchange="notifyTargetChange()">
@@ -69,7 +115,7 @@
               <button id="btnSupportNotifyTarget" type="button" class="btn btn-sm btn-outline-support" style="float: right;"
                       onclick="updateSupportNotifyTarget()">Update</button>
             </div>
-          </div>
+
         </div>
       </div>
 
@@ -217,6 +263,8 @@
     const dialogEditPriority = document.getElementById("editPriorityDialog");
     const selectNotifyChange = document.getElementById("notificationTarget");
     const selectNotifyUser = document.getElementById("notificationUser");
+    const inputPrefix = document.getElementById("inputTicketPrefix");
+    const btnPrefixUpdate = document.getElementById("btnUpdatePrefix");
 
     function newPriority() {
       getNextDisplayOrder();
@@ -229,7 +277,19 @@
     }
 
     async function deletePriority(id) {
+      let formData = new FormData();
+          formData.set("id", inptEditId.value);
+          formData.set("priority", "");
+          formData.set("displayOrder", "");
 
+      const response = await fetch('/api/v1/support/priority/delete', {
+        method: 'POST',
+        body: formData
+      }).then(response => {
+        return response.json();
+      }).then(data => {
+        window.location.reload();
+      });
     }
 
     function notifyTargetChange() {
@@ -261,6 +321,27 @@
         debugger
         btnSettings.disabled = false;
       });
+    }
+
+    async function updatePrefix() {
+      let formData = new FormData();
+        formData.set("name", inputPrefix.value);
+
+      btnPrefixUpdate.disabled = true;
+
+      const response = await fetch('/api/v1/support/prefix/update', {
+        method: 'POST',
+        body: formData
+      }).then(response => {
+        return response.json();
+      }).then(data => {
+        console.log(data.name);
+        btnPrefixUpdate.disabled = false;
+      });
+    }
+
+    async function slaChange() {
+
     }
 
   </script>

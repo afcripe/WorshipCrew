@@ -25,6 +25,7 @@ public class SupportSettingService implements SupportSettingServiceInterface {
                             BigInteger.valueOf(1),
                             24,
                             BigInteger.valueOf(0),
+                            "ST-",
                             TicketNotifyTarget.RegionalDepartmentDirector,
                             null)
             );
@@ -47,6 +48,13 @@ public class SupportSettingService implements SupportSettingServiceInterface {
     }
 
     @Override
+    public void setIdPrefix(String prefix) {
+        SupportSetting supportSetting = getSupportSetting();
+            supportSetting.setIdPrefix(prefix);
+        supportSettingRepository.save(supportSetting);
+    }
+
+    @Override
     public void setSupportNotifyTarget(TicketNotifyTarget notifyTarget) {
         SupportSetting supportSetting = getSupportSetting();
                 supportSetting.setNotifyTarget(notifyTarget);
@@ -58,6 +66,11 @@ public class SupportSettingService implements SupportSettingServiceInterface {
         SupportSetting supportSetting = getSupportSetting();
                 supportSetting.setUser(user);
         supportSettingRepository.save(supportSetting);
+    }
+
+    @Override
+    public String getIdPrefix() {
+        return getSupportSetting().getIdPrefix();
     }
 
 }
