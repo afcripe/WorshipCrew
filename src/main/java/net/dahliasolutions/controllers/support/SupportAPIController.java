@@ -1,12 +1,11 @@
 package net.dahliasolutions.controllers.support;
 
 import lombok.RequiredArgsConstructor;
-import net.dahliasolutions.models.NotifyTarget;
 import net.dahliasolutions.models.records.SingleBigIntegerModel;
 import net.dahliasolutions.models.records.SingleIntModel;
 import net.dahliasolutions.models.records.SingleStringModel;
-import net.dahliasolutions.models.store.StoreCategory;
 import net.dahliasolutions.models.support.Ticket;
+import net.dahliasolutions.models.support.TicketNotifyTarget;
 import net.dahliasolutions.models.support.TicketPriority;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.services.support.SupportSettingService;
@@ -76,11 +75,11 @@ public class SupportAPIController {
 
     @PostMapping("/supportsetting/update")
     public String updateSupportNotify(@ModelAttribute SingleStringModel notifyModel, @ModelAttribute SingleBigIntegerModel userModel) {
-        NotifyTarget target = NotifyTarget.valueOf(notifyModel.name());
+        TicketNotifyTarget target = TicketNotifyTarget.valueOf(notifyModel.name());
         Optional<User> user = userService.findById(userModel.id());
 
         supportSettingService.setSupportNotifyTarget(target);
-        if (target.equals(NotifyTarget.User) && user.isPresent()) {
+        if (target.equals(TicketNotifyTarget.User) && user.isPresent()) {
             supportSettingService.setUser(user.get());
         }
 

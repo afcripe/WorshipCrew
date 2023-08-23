@@ -1,6 +1,6 @@
-package net.dahliasolutions.models;
+package net.dahliasolutions.models.store;
 
-public enum NotifyTarget {
+public enum RequestNotifyTarget {
     User,
     RegionalDepartmentDirector,
     CampusDepartmentDirector,

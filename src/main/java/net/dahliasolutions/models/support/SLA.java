@@ -19,8 +19,8 @@ public class SLA {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private BigInteger id;
-    private int responseLevel;
+    private int serviceLevel;
     private String name;
     private String description;
-    private int  responseDue;       // days from ticket submission to resolve
+    private int  completionDue;       // hours from ticket submission to resolve
 }

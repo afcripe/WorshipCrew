@@ -8,6 +8,8 @@ public enum EventType {
     Deleted,
     Accessed,
     ItemUpdated,
+    DeadlineApproaching,
+    DeadlinePassed,
     Periodic,
     Any
 }

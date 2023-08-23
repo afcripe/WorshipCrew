@@ -3,7 +3,7 @@ package net.dahliasolutions.models.support;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
-import net.dahliasolutions.models.NotifyTarget;
+import net.dahliasolutions.models.store.RequestNotifyTarget;
 import net.dahliasolutions.models.user.User;
 
 import java.math.BigInteger;
@@ -18,9 +18,11 @@ public class SupportSetting {
 
     @Id
     private BigInteger id;
+    private int responseHours;
+    private BigInteger defaultSLAId;
 
     @Enumerated
-    private NotifyTarget notifyTarget;
+    private TicketNotifyTarget notifyTarget;
 
     @Nullable
     @OneToOne(fetch = FetchType.EAGER)

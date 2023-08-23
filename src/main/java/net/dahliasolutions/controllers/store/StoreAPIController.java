@@ -3,7 +3,7 @@ package net.dahliasolutions.controllers.store;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.AdminSettings;
-import net.dahliasolutions.models.NotifyTarget;
+import net.dahliasolutions.models.store.RequestNotifyTarget;
 import net.dahliasolutions.models.records.SingleBigIntegerModel;
 import net.dahliasolutions.models.records.SingleStringModel;
 import net.dahliasolutions.models.store.*;
@@ -222,11 +222,11 @@ public class StoreAPIController {
 
     @PostMapping("/storesetting/update")
     public String updateSettingNotify(@ModelAttribute SingleStringModel notifyModel, @ModelAttribute SingleBigIntegerModel userModel) {
-        NotifyTarget target = NotifyTarget.valueOf(notifyModel.name());
+        RequestNotifyTarget target = RequestNotifyTarget.valueOf(notifyModel.name());
         Optional<User> user = userService.findById(userModel.id());
 
         storeSettingService.setStoreNotifyTarget(target);
-        if (target.equals(NotifyTarget.User) && user.isPresent()) {
+        if (target.equals(RequestNotifyTarget.User) && user.isPresent()) {
             storeSettingService.setUser(user.get());
         }
 

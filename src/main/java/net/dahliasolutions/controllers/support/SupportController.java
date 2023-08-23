@@ -5,12 +5,11 @@ import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.campus.Campus;
 import net.dahliasolutions.models.department.DepartmentCampus;
 import net.dahliasolutions.models.department.DepartmentRegional;
-import net.dahliasolutions.models.NotifyTarget;
-import net.dahliasolutions.models.store.StoreSetting;
+import net.dahliasolutions.models.store.RequestNotifyTarget;
 import net.dahliasolutions.models.support.SupportSetting;
 import net.dahliasolutions.models.support.Ticket;
 import net.dahliasolutions.models.support.TicketNewModel;
-import net.dahliasolutions.models.support.TicketStatus;
+import net.dahliasolutions.models.support.TicketNotifyTarget;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
 import net.dahliasolutions.services.EventService;
@@ -33,7 +32,6 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigInteger;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Controller
@@ -95,7 +93,7 @@ public class SupportController {
         if (supportSetting.getUser() != null) {
             userId = supportSetting.getUser().getId();
         }
-        List<NotifyTarget> targetList = Arrays.asList(NotifyTarget.values());
+        List<TicketNotifyTarget> targetList = Arrays.asList(TicketNotifyTarget.values());
         List<User> userList = userService.findAllByRoles("ADMIN_WRITE,SUPPORT_AGENT,SUPPORT_SUPERVISOR");
 
         model.addAttribute("priorityList", ticketPriorityService.findAll());

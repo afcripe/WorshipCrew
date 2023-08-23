@@ -2,8 +2,9 @@ package net.dahliasolutions.services.support;
 
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.data.SupportSettingRepository;
-import net.dahliasolutions.models.NotifyTarget;
+import net.dahliasolutions.models.store.RequestNotifyTarget;
 import net.dahliasolutions.models.support.SupportSetting;
+import net.dahliasolutions.models.support.TicketNotifyTarget;
 import net.dahliasolutions.models.user.User;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +23,9 @@ public class SupportSettingService implements SupportSettingServiceInterface {
             return supportSettingRepository.save(
                     new SupportSetting(
                             BigInteger.valueOf(1),
-                            NotifyTarget.RegionalDepartmentDirector,
+                            24,
+                            BigInteger.valueOf(0),
+                            TicketNotifyTarget.RegionalDepartmentDirector,
                             null)
             );
         }
@@ -30,7 +33,21 @@ public class SupportSettingService implements SupportSettingServiceInterface {
     }
 
     @Override
-    public void setSupportNotifyTarget(NotifyTarget notifyTarget) {
+    public void setResponseHours(int hours) {
+        SupportSetting supportSetting = getSupportSetting();
+            supportSetting.setResponseHours(hours);
+        supportSettingRepository.save(supportSetting);
+    }
+
+    @Override
+    public void setDefaultSLAId(BigInteger id) {
+        SupportSetting supportSetting = getSupportSetting();
+            supportSetting.setDefaultSLAId(id);
+        supportSettingRepository.save(supportSetting);
+    }
+
+    @Override
+    public void setSupportNotifyTarget(TicketNotifyTarget notifyTarget) {
         SupportSetting supportSetting = getSupportSetting();
                 supportSetting.setNotifyTarget(notifyTarget);
         supportSettingRepository.save(supportSetting);
