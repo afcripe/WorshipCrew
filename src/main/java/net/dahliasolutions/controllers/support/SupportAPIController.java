@@ -1,19 +1,28 @@
 package net.dahliasolutions.controllers.support;
 
 import lombok.RequiredArgsConstructor;
+import net.dahliasolutions.models.EventModule;
+import net.dahliasolutions.models.EventType;
+import net.dahliasolutions.models.Notification;
+import net.dahliasolutions.models.NotificationModel;
+import net.dahliasolutions.models.records.BigIntegerStringModel;
 import net.dahliasolutions.models.records.SingleBigIntegerModel;
 import net.dahliasolutions.models.records.SingleIntModel;
 import net.dahliasolutions.models.records.SingleStringModel;
+import net.dahliasolutions.models.support.SLA;
 import net.dahliasolutions.models.support.Ticket;
 import net.dahliasolutions.models.support.TicketNotifyTarget;
 import net.dahliasolutions.models.support.TicketPriority;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.services.support.SupportSettingService;
 import net.dahliasolutions.services.support.TicketPriorityService;
+import net.dahliasolutions.services.support.TicketSLAService;
 import net.dahliasolutions.services.user.UserService;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +34,7 @@ public class SupportAPIController {
     private final TicketPriorityService ticketPriorityService;
     private final UserService userService;
     private final SupportSettingService supportSettingService;
+    private final TicketSLAService slaService;
 
     @GetMapping("")
     public List<Ticket> getSupportTickets() {
@@ -94,10 +104,52 @@ public class SupportAPIController {
         return "true";
     }
 
+
+    @PostMapping("/supportsetting/updatesla")
+    public String updateSupportNotify(@ModelAttribute SingleBigIntegerModel intModel) {
+        supportSettingService.setDefaultSLAId(intModel.id());
+        return "true";
+    }
+
     @PostMapping("/prefix/update")
     public SingleStringModel updateSupportNotify(@ModelAttribute SingleStringModel settingPrefix) {
         supportSettingService.setIdPrefix(settingPrefix.name());
         return settingPrefix;
     }
 
+    @PostMapping("/sla/get")
+    public SLA getOrderNotification(@ModelAttribute SingleBigIntegerModel intModel) {
+        Optional<SLA> sla = slaService.findById(intModel.id());
+        return sla.orElseGet(SLA::new);
+    }
+
+    @PostMapping("/sla/update")
+    public SLA updateOrderNotification(@ModelAttribute SLA slaModel) {
+        Optional<SLA> sla = slaService.findById(slaModel.getId());
+
+        if (sla.isPresent()) {
+            sla.get().setName(slaModel.getName());
+            sla.get().setDescription(slaModel.getDescription());
+            sla.get().setCompletionDue(slaModel.getCompletionDue());
+
+            slaService.save(sla.get());
+            return sla.get();
+        }
+
+        return slaModel;
+    }
+
+    @PostMapping("/sla/delete")
+    public SingleBigIntegerModel deleteOrderNotification(@ModelAttribute SingleBigIntegerModel intModel) {
+        Optional<SLA> sla = slaService.findById(intModel.id());
+        sla.ifPresent(serviceLevel -> slaService.deleteById(serviceLevel.getId()));
+        return intModel;
+    }
+
+    @PostMapping("/sla/new")
+    public BigIntegerStringModel updateOrderNotification(@ModelAttribute BigIntegerStringModel slaModel) {
+        SLA sla = new SLA(null, slaModel.name(), "", 0);
+        sla = slaService.save(sla);
+        return new BigIntegerStringModel(sla.getId(), sla.getName());
+    }
 }

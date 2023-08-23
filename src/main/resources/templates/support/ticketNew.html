@@ -99,125 +99,125 @@
 
           </div>
 
-          <script>
-            function uploadImageClick() {
-              document.getElementById("uploadDialog").showModal();
-            }
-
-            function chooseImageClick() {
-              document.getElementById("chooseDialog").showModal();
-              loadImages();
-            }
-
-            function submitForm() {
-              let btnSubmit = document.getElementById("btnTicketSubmit");
-              let theForm = document.getElementById("ticketForm");
-              btnSubmit.setAttribute("disabled", "disabled")
-              theForm.submit();
-            }
-
-            function clearErrors() {
-
-            }
-
-            function updateCharRemain() {
-              let ta = document.getElementById("description");
-              let divCount = document.getElementById("taCherRemain");
-              let desc = ta.value;
-              let count = desc.length;
-              if (count > 0) {
-                divCount.innerText = 255 - Number(count);
-              } else {
-                divCount.innerText = "";
-              }
-            }
-          </script>
-
         </div>
 
     </div>
 
-    <dialog id="uploadDialog" class="upload-modal">
-      <script>
-        function doUploadImage() {
-          // disable buttons and show progress
-          document.getElementById('uploadProgress').style.display='block';
-          document.getElementById('btnUploadSubmit').setAttribute("disabled", "disabled");
-          document.getElementById('btnUploadCancel').setAttribute("disabled", "disabled");
-          postImageFile();
-        }
+  <dialog id="uploadDialog" class="upload-modal">
+    <script>
+      function doUploadImage() {
+        // disable buttons and show progress
+        document.getElementById('uploadProgress').style.display='block';
+        document.getElementById('btnUploadSubmit').setAttribute("disabled", "disabled");
+        document.getElementById('btnUploadCancel').setAttribute("disabled", "disabled");
+        postImageFile();
+      }
 
-        async function postImageFile() {
-          let formData = new FormData();
-          formData.set("fileName", document.getElementById('fileName').value)
-          formData.set("fileDescription", document.getElementById('fileDescription').value)
-          formData.set("imageFile", document.getElementById('imageFile').files[0])
+      async function postImageFile() {
+        let formData = new FormData();
+        formData.set("fileName", document.getElementById('fileName').value)
+        formData.set("fileDescription", document.getElementById('fileDescription').value)
+        formData.set("imageFile", document.getElementById('imageFile').files[0])
 
-          const response = await fetch('/api/v1/contentmanager/store/uploadimage', {
-            method: 'POST',
-            body: formData
-          }).then(response => {
-            return response.json();
-          }).then(data => {
-            console.log(data);
-            document.getElementById('image').value = data.id;
-            document.getElementById('imagePath').innerText = data.name;
-            completeImageUpload();
-          });
-        }
+        const response = await fetch('/api/v1/contentmanager/support/uploadimage', {
+          method: 'POST',
+          body: formData
+        }).then(response => {
+          return response.json();
+        }).then(data => {
+          console.log(data);
+          document.getElementById('image').value = data.id;
+          document.getElementById('imagePath').innerText = data.name;
+          completeImageUpload();
+        });
+      }
 
-        function completeImageUpload() {
-          // enable buttons and hide progress
-          document.getElementById('uploadProgress').style.display='none';
-          document.getElementById('btnUploadSubmit').removeAttribute("disabled");
-          document.getElementById('btnUploadCancel').removeAttribute("disabled");
-          // close dialog
-          document.getElementById("uploadDialog").close();
-        }
+      function completeImageUpload() {
+        // enable buttons and hide progress
+        document.getElementById('uploadProgress').style.display='none';
+        document.getElementById('btnUploadSubmit').removeAttribute("disabled");
+        document.getElementById('btnUploadCancel').removeAttribute("disabled");
+        // close dialog
+        document.getElementById("uploadDialog").close();
+      }
 
-      </script>
-      <h2>Upload Image</h2>
-      <div class="flex-column">
-        <form id="formUploadImage" method="dialog">
-          <div class="row p-2">
-            <div class="col">
-              <label for="fileName" class="form-label">Name:</label>
-            </div>
-            <div class="col">
-              <input class="form-control" id="fileName">
-            </div>
+    </script>
+    <h2>Upload Image</h2>
+    <div class="flex-column">
+      <form id="formUploadImage" method="dialog">
+        <div class="row p-2">
+          <div class="col">
+            <label for="fileName" class="form-label">Name:</label>
           </div>
-          <div class="row p-2">
-            <div class="col">
-              <label for="fileDescription" class="form-label">Description:</label>
-            </div>
-            <div class="col">
-              <input class="form-control" id="fileDescription">
-            </div>
+          <div class="col">
+            <input class="form-control" id="fileName">
           </div>
-
-          <div class="row p-2">
-            <div class="col">
-              <input class="form-control" id="imageFile" type="file">
-            </div>
+        </div>
+        <div class="row p-2">
+          <div class="col">
+            <label for="fileDescription" class="form-label">Description:</label>
           </div>
-
-          <div class="row p-2">
-            <div class="col">
-              <progress id="uploadProgress" style="display: none" />
-            </div>
+          <div class="col">
+            <input class="form-control" id="fileDescription">
           </div>
+        </div>
 
-          <div class="row p-2">
-            <div class="col">
-              <button id="btnUploadSubmit" type="button" class="btn btn-sm btn-store" onclick="doUploadImage()">Submit</button>
-              <button id="btnUploadCancel" formmethod="dialog" type="submit" class="btn btn-sm btn-outline-store">Cancel</button>
-            </div>
+        <div class="row p-2">
+          <div class="col">
+            <input class="form-control" id="imageFile" type="file">
           </div>
+        </div>
 
-        </form>
-      </div>
+        <div class="row p-2">
+          <div class="col">
+            <progress id="uploadProgress" style="display: none" />
+          </div>
+        </div>
+
+        <div class="row p-2">
+          <div class="col">
+            <button id="btnUploadSubmit" type="button" class="btn btn-sm btn-store" onclick="doUploadImage()">Submit</button>
+            <button id="btnUploadCancel" formmethod="dialog" type="submit" class="btn btn-sm btn-outline-store">Cancel</button>
+          </div>
+        </div>
+
+      </form>
+    </div>
   </dialog>
+
+  <script>
+    function uploadImageClick() {
+      document.getElementById("uploadDialog").showModal();
+    }
+
+    function chooseImageClick() {
+      document.getElementById("chooseDialog").showModal();
+      loadImages();
+    }
+
+    function submitForm() {
+      let btnSubmit = document.getElementById("btnTicketSubmit");
+      let theForm = document.getElementById("ticketForm");
+      btnSubmit.setAttribute("disabled", "disabled")
+      theForm.submit();
+    }
+
+    function clearErrors() {
+
+    }
+
+    function updateCharRemain() {
+      let ta = document.getElementById("description");
+      let divCount = document.getElementById("taCherRemain");
+      let desc = ta.value;
+      let count = desc.length;
+      if (count > 0) {
+        divCount.innerText = 255 - Number(count);
+      } else {
+        divCount.innerText = "";
+      }
+    }
+  </script>
 
   </div>
 </div>

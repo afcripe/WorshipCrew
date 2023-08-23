@@ -1,15 +1,13 @@
 package net.dahliasolutions.controllers.support;
 
+import com.fasterxml.jackson.databind.node.BigIntegerNode;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.campus.Campus;
 import net.dahliasolutions.models.department.DepartmentCampus;
 import net.dahliasolutions.models.department.DepartmentRegional;
 import net.dahliasolutions.models.store.RequestNotifyTarget;
-import net.dahliasolutions.models.support.SupportSetting;
-import net.dahliasolutions.models.support.Ticket;
-import net.dahliasolutions.models.support.TicketNewModel;
-import net.dahliasolutions.models.support.TicketNotifyTarget;
+import net.dahliasolutions.models.support.*;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
 import net.dahliasolutions.services.EventService;
@@ -18,9 +16,7 @@ import net.dahliasolutions.services.campus.CampusService;
 import net.dahliasolutions.services.department.DepartmentCampusService;
 import net.dahliasolutions.services.department.DepartmentRegionalService;
 import net.dahliasolutions.services.mail.EmailService;
-import net.dahliasolutions.services.support.SupportSettingService;
-import net.dahliasolutions.services.support.TicketPriorityService;
-import net.dahliasolutions.services.support.TicketService;
+import net.dahliasolutions.services.support.*;
 import net.dahliasolutions.services.user.UserRolesService;
 import net.dahliasolutions.services.user.UserService;
 import org.springframework.security.core.Authentication;
@@ -47,6 +43,8 @@ public class SupportController {
     private final DepartmentRegionalService departmentRegionalService;
     private final DepartmentCampusService departmentCampusService;
     private final SupportSettingService supportSettingService;
+    private final TicketSLAService slaService;
+    private final TicketImageService ticketImageService;
     private final RedirectService redirectService;
     private final EmailService emailService;
     private final EventService eventService;
@@ -79,14 +77,16 @@ public class SupportController {
     }
 
     @GetMapping("/ticket/{id}")
-    public String goTicket(@PathVariable BigInteger id, Model model, HttpSession session) {
+    public String goTicket(@PathVariable String id, Model model, HttpSession session) {
+
+        model.addAttribute("ticket", ticketService.findById(id));
 
         redirectService.setHistory(session, "/support/ticket"+id);
         return "support/ticket";
     }
 
     @GetMapping("/settings")
-    public String goSupportSettings(Model model) {
+    public String goSupportSettings(Model model, HttpSession session) {
         // Request Target
         SupportSetting supportSetting = supportSettingService.getSupportSetting();
         BigInteger userId = BigInteger.valueOf(0);
@@ -102,9 +102,20 @@ public class SupportController {
         model.addAttribute("notifyTarget", supportSetting.getNotifyTarget().toString());
         model.addAttribute("userId", userId);
         model.addAttribute("supportSetting", supportSetting);
-        model.addAttribute("selectedSLA", "");
+        model.addAttribute("slaList", slaService.findAll());
+        model.addAttribute("selectedSLA", supportSetting.getDefaultSLAId());
 
+
+        redirectService.setHistory(session, "/support/settings");
         return "support/settings";
+    }
+
+    @GetMapping("/slamanager")
+    public String goSLAManager(Model model, HttpSession session) {
+        model.addAttribute("slaList", slaService.findAll());
+
+        redirectService.setHistory(session, "/support/slamanager");
+        return "support/SLAManager";
     }
 
     @GetMapping("/new")
@@ -122,9 +133,15 @@ public class SupportController {
     @PostMapping("/create")
     public String createTicket(@ModelAttribute TicketNewModel ticketNewModel, HttpSession session) {
         User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Ticket ticket = ticketService.createTicket(ticketNewModel, currentUser);
 
-        return "redirect:/ticket/"+ticket.getId().toString();
+        TicketImage ticketImage = null;
+        if (ticketNewModel.getImage() != null) {
+            ticketImage = ticketImageService.findById(ticketNewModel.getImage()).orElse(null);
+        }
+
+        Ticket ticket = ticketService.createTicket(ticketNewModel, currentUser, ticketImage);
+
+        return "redirect:/ticket/"+ticket.getId();
     }
 
     @GetMapping("/search/{searchTerm}")
@@ -136,10 +153,8 @@ public class SupportController {
         // model.addAttribute("storeItems", itemList);
         return "support/index";
     }
-
-
-    // get edit permission
-    private boolean supportEditor(User currentUser){
+        // get edit permission
+        private boolean supportEditor(User currentUser){
         Collection<UserRoles> roles = currentUser.getUserRoles();
         for (UserRoles role : roles){
             if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("SUPPORT_AGENT")

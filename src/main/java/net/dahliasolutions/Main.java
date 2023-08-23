@@ -181,6 +181,21 @@ public class Main {
 //            userService.updateUserPosition(u5.getUsername(), "Regional Director");
 //            userService.updateUserCampus(u5.getUsername(), "Destin");
 //            userService.updateUserDepartment(u5.getUsername(), "Production");
+//
+//
+//            User u6 = new User();
+//                u6.setUsername("afcripe@live.com");
+//                u6.setPassword("password");
+//                u6.setFirstName("Andrew");
+//                u6.setLastName("Cripe");
+//                u6.setContactEmail("afcripe@live.com");
+//                u6 = userService.createDefaultUser(u6);
+//                u6.setDirector(u);
+//            userService.save(u6);
+//            userService.addRoleToUser(u6.getUsername(), "ADMIN_WRITE");
+//            userService.updateUserPosition(u6.getUsername(), "Leader");
+//            userService.updateUserCampus(u6.getUsername(), "Destin");
+//            userService.updateUserDepartment(u6.getUsername(), "Production");
 //        };
 //
 //    }

@@ -68,7 +68,7 @@
                 <select id="slaSelect" class="form-control w-100" onchange="slaChange()">
                   <option value="0">None</option>
                   <option th:each="sla : ${slaList}" th:value="*{sla.id}" th:text="*{sla.name}"
-                          th:selected="*{sla.name} == ${selectedSLA}"></option>
+                          th:selected="*{sla.id} == ${selectedSLA}"></option>
                 </select>
               </div>
 
@@ -76,7 +76,7 @@
           <div class="pb-2 d-flex">
             <ul class="list-group list-group-flush" style="flex-grow: 1;">
               <li class="list-group-item selectableItem"
-                  onclick="window.location.href='/support/slaManager'">
+                  onclick="window.location.href='/support/slamanager'">
                 Manage Service Level Agreements
               </li>
             </ul>
@@ -265,6 +265,7 @@
     const selectNotifyUser = document.getElementById("notificationUser");
     const inputPrefix = document.getElementById("inputTicketPrefix");
     const btnPrefixUpdate = document.getElementById("btnUpdatePrefix");
+    const selectSLA = document.getElementById("slaSelect");
 
     function newPriority() {
       getNextDisplayOrder();
@@ -341,7 +342,17 @@
     }
 
     async function slaChange() {
+      let formData = new FormData();
+          formData.set("id", selectSLA.value);
 
+      const response = await fetch('/api/v1/support/supportsetting/updatesla', {
+        method: 'POST',
+        body: formData
+      }).then(response => {
+        return response.json();
+      }).then(data => {
+        console.log(data.name);
+      });
     }
 
   </script>

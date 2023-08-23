@@ -16,5 +16,5 @@ public class TicketNewModel {
     private String priority;
     private BigInteger campus;
     private BigInteger department;
-    private String image;
+    private BigInteger image;
 }

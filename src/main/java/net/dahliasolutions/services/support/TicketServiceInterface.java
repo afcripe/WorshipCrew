@@ -3,6 +3,7 @@ package net.dahliasolutions.services.support;
 import net.dahliasolutions.models.order.OrderRequest;
 import net.dahliasolutions.models.store.Cart;
 import net.dahliasolutions.models.support.Ticket;
+import net.dahliasolutions.models.support.TicketImage;
 import net.dahliasolutions.models.support.TicketNewModel;
 import net.dahliasolutions.models.user.User;
 
@@ -13,7 +14,7 @@ import java.util.Optional;
 public interface TicketServiceInterface {
 
 
-    Ticket createTicket(TicketNewModel model, User user);
+    Ticket createTicket(TicketNewModel model, User user, TicketImage image);
     Optional<Ticket> findById(String id);
     List<Ticket> findAll();
     List<Ticket> findAllByUser(User user);

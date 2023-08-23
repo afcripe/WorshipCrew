@@ -55,8 +55,7 @@ public class OrderController {
 
     @GetMapping("")
     public String getSupervisorOrders(Model model, HttpSession session) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) auth.getPrincipal();
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         List<OrderItem> openItemList = orderItemService.findAllBySupervisorOpenOnly(user);
         List<OrderRequest> openOrderList = orderService.findAllBySupervisorOpenOnly(user);

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<div class="container-fluid m-0 p-0" layout:fragment="content">
+
+
+  <div th:replace="~{support/moduleHeader :: header}">Header</div>
+
+  <div class="container my-3">
+
+    <template id="slaTemplate">
+      <div class="card-section my-2">
+        <label class="form-control-label selectableItem w-100"></label>
+        <div class="pl-2">
+          <form>
+            <input name="id" type="hidden"/>
+
+            <label class="form-control-label" style="float: left">Name:</label>
+            <input name="name" class="form-control"/>
+
+            <label class="form-control-label" style="float: left">Description:</label>
+            <input name="description" class="form-control"/>
+
+            <label class="form-control-label" style="float: left">Due in Hours:</label>
+            <input name="completionDue" class="form-control"/>
+
+            <div class="pt-2">
+              <button type="button" class="btn btn-sm btn-support">Update</button>
+              <button type="button" class="btn btn-sm btn-danger">Delete</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </template>
+
+    <div class="card-title m-4">
+      <button class="btn btn-sm btn-support" style="float: right;" onclick="newSLADialog()">Add</button>
+      <h4>Service Level Agreements</h4>
+    </div>
+    <div id="notificationCards" class="card-body">
+      <div th:each="sla : ${slaList}">
+        <div th:id="'sla-'+${sla.id}" class="card-section my-2">
+          <label th:text="${sla.id}+' - '+${sla.name}" class="form-control-label selectableItem w-100" th:onclick="toggleSLA([[${sla.id}]])"></label>
+          <div class="pl-2 notification-edit" th:id="'cnt-'+${sla.id}" style="display: none;">
+            <form th:onsubmit="updateSAL([[${sla.id}]])">
+              <input name="id" type="hidden" th:value="${sla.id}"/>
+
+              <label class="form-control-label" style="float: left">Name:</label>
+              <input name="name" class="form-control" th:value="${sla.name}"/>
+
+              <label class="form-control-label" style="float: left">Description:</label>
+              <input name="description" class="form-control" th:value="${sla.Description}"/>
+
+              <label class="form-control-label" style="float: left">Due in Hours:</label>
+              <input name="completionDue" class="form-control" th:value="${sla.completionDue}"/>
+
+              <div class="pt-2">
+                <div style="display: inline-block; width: 50%;"></div>
+                <button type="button" class="btn btn-sm btn-support" th:onclick="updateSLA([[${sla.id}]])">Update</button>
+                <button type="button" class="btn btn-sm btn-danger" th:onclick="deleteSLA([[${sla.id}]])">Delete</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <dialog id="newDialog" class="upload-modal">
+      <script>
+        async function postNewSLA() {
+          let formData = new FormData();
+          formData.set("id", 0);
+          formData.set("name", document.getElementById('SLAName').value);
+
+          const response = await fetch('/api/v1/support/sla/new', {
+            method: 'POST',
+            body: formData
+          }).then(response => {
+            return response.json();
+          }).then(data => {
+            newSLA(data.id, data.name);
+            keyEscSLA();
+          });
+        }
+        function keyNewSLA(event) {
+          event.preventDefault();
+          if (event.key === "Enter" || event.keyCode === 13) {
+            postNewSLA();
+          }
+          if (event.key === "Escape") {
+            keyEscSLA();
+          }
+        }
+        function keyEscSLA() {
+          document.getElementById('SLAName').value = "";
+          document.getElementById("newDialog").close();
+        }
+      </script>
+      <h2>New Notification</h2>
+      <form onsubmit="postNewSLA()" style="width: 300px; max-width: 450px">
+        <label for="SLAName" class="form-label">Name</label>
+        <input class="form-control" id="SLAName" onkeyup="keyNewSLA(event)">
+        <div class="pt-2">
+          <button id="btnSubmit" type="button" class="btn btn-sm btn-support" onclick="postNewSLA()">Add</button>
+          <button id="btnCancel" type="button" class="btn btn-sm btn-outline-support" onclick="keyEscSLA()">Cancel</button>
+        </div>
+      </form>
+    </dialog>
+
+  </div>
+
+  <script>
+    const notifyTemplate = document.getElementById("slaTemplate");
+    const notificationList = document.getElementById("notificationCards");
+
+    function newSLADialog() {
+      document.getElementById("newDialog").showModal();
+    }
+
+    async function toggleSLA(id) {
+      // let card = document.getElementById("notificationCards");
+      let cntID = "cnt-"+id;
+      let cntDiv = document.getElementById(cntID);
+      let formData = new FormData();
+      formData.set("id", id);
+
+      if (cntDiv.style.display === "none") {
+        debugger
+        // close all notification editors before continuing
+        let divLoop = notificationList.querySelectorAll(".notification-edit");
+        for (let d in divLoop) {
+          try {
+            divLoop[d].style.display = "none";
+          } catch (e) {
+            // e
+          }
+        }
+
+        const response = await fetch('/api/v1/support/sla/get', {
+          method: 'POST',
+          body: formData
+        }).then(response => {
+          return response.json();
+        }).then(data => {
+          cntDiv.style.display = "block";
+        });
+      } else {
+        cntDiv.style.display = "none";
+      }
+
+    }
+
+    async function updateSLA(id) {
+      let cntID = "cnt-"+id;
+      let cntDiv = document.getElementById(cntID);
+      let thisForm = cntDiv.querySelectorAll("form")
+      let updateForm = thisForm[0];
+      let formData = new FormData();
+        formData.set("id", updateForm[0].value)
+        formData.set("name", updateForm[1].value)
+        formData.set("description", updateForm[2].value)
+        formData.set("completionDue", updateForm[3].value)
+      debugger
+
+      const response = await fetch('/api/v1/support/sla/update', {
+        method: 'POST',
+        body: formData
+      }).then(response => {
+        return response.json();
+      }).then(data => {
+        cntDiv.style.display = "none";
+      });
+    }
+
+    async function deleteSLA(id) {
+      let slaID = "sla-"+id;
+      let slaDiv = document.getElementById(slaID);
+      let formData = new FormData();
+        formData.set("id", id)
+
+      const response = await fetch('/api/v1/support/sla/delete', {
+        method: 'POST',
+        body: formData
+      }).then(response => {
+        return response.json();
+      }).then(data => {
+        slaDiv.remove();
+      });
+    }
+
+    async function newSLA(id, name) {
+      let newID = id;
+      let newName = name;
+      let newDescription = "";
+      let newCompletionDue = "0";
+      debugger
+      let clone = notifyTemplate.content.cloneNode(true);
+      let parentDiv = clone.querySelector("div");
+          parentDiv.id = "sla-"+newID;
+      // first label
+      let titleLabel = parentDiv.querySelector("label");
+          titleLabel.innerText = newID+' - '+newName;
+          titleLabel.addEventListener("click", function (event) {toggleSLA(newID)});
+      // hide enabled content
+      let contentDiv = parentDiv.querySelector("div");
+          contentDiv.id = "cnt-"+newID;
+      // form content
+      let contentForm = contentDiv.querySelector("form");
+          contentForm.addEventListener("submit", function (event) {updateSLA(newID)});
+
+      // inputs
+      let formInputs = contentForm.querySelectorAll("input");
+          formInputs[0].value = newID;
+          formInputs[1].value = newName;
+          formInputs[2].value = newDescription;
+          formInputs[3].value = newCompletionDue;
+
+      // buttons
+      let buttonDiv = contentForm.querySelector("div");
+      let contentBtn = buttonDiv.querySelectorAll("button");
+          contentBtn[0].addEventListener("click", function (event) {updateSLA(newID)});
+          contentBtn[1].addEventListener("click", function (event) {deleteSLA(newID)});
+
+      // add to list
+      notificationList.appendChild(clone);
+    }
+
+  </script>
+
+
+</div>
+
+</html>
