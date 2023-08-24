@@ -5,23 +5,173 @@
 
 <div class="container-fluid m-0 p-0" layout:fragment="content">
 
-  <div class="container" th:object="${ticket}">
+    <div th:replace="~{support/moduleHeader :: header}">Header</div>
 
-        <div class="card">
+    <div class="ticket-container" th:object="${ticket}">
 
-          <div class="card-title">
-            <h5>Ticket - <span th:text="*{id}"></span></h5>
-          </div>
+        <div class="mt-2 w-100">
+            <h2>
+                <span style="float: right" th:text="*{ticketStatus}"></span>
+                Ticket:
+                <span th:text="*{id}">(not found)</span>
+            </h2>
+        </div>
 
-          <div class="card-body">
+        <div class="card m-0 p-0">
 
+            <div class="card-title py-2 px-2">
+                <button class="btn btn-sm btn-outline-secondary" onclick="toggleTicketDetail()" style="max-width: 75px; float: right">
+                    <i id="btnDetailExpand" class="bi bi-arrows-expand" style="display: inline-block"></i><i id="btnDetailCollapse" class="bi bi-arrows-collapse" style="display: none"></i>
+                </button>
+                <span th:text="*{ticketDetail}"></span>
+            </div>
 
-          </div>
+            <div id="divTicketDetail" class="card-body py-0 px-1 ticket-detail">
+
+                <div class="card-section support-ticket py-2">
+                    <div class="ticket-detail-body m-0 p-0" style="flex-grow: 1">
+                        <div>
+                            Submitted: <span th:text="*{#temporals.format(ticketDate, 'MMM-dd-yyyy HH:mm')}"></span>
+                        </div>
+
+                        <div>
+                            Assigned to: <span class="ticket-assigned-person" th:text="*{agent.firstName}+' '+*{agent.lastName}"></span>
+                        </div>
+                    </div>
+                    <div class="ticket-detail-info">
+                        Due:
+                        <span class="ticket-due-date" th:text="*{#temporals.format(ticketDue, 'MMM-dd-yyyy HH:mm')}"></span>
+                    </div>
+                </div>
+
+                <div class="support-ticket py-2 px-2">
+                  <div class="ticket-detail-body">
+                      <div>
+                        Submitted by: <span th:text="*{user.firstName}+' '+*{user.lastName}"></span>
+                      </div>
+                      <div>
+                          Campus: <span th:text="*{campus.name}+' - '+*{department.name}"></span>
+                      </div>
+                  </div>
+                  <div class="ticket-detail-info">
+                      <div>
+                          SLA: <span th:text="*{sla.name}"></span>
+                      </div>
+                      <div>
+                          User Priority: <span th:text="*{priority}"></span>
+                      </div>
+                  </div>
+                </div>
+            </div>
 
         </div>
 
+        <div class="support-ticket pt-2">
+
+            <div id="ticketNotes" class="ticket-body">
+                <div class="card m-0 p-0" th:each="note : *{notes}">
+                    <div th:id="'note-'+${note.id}" class="note-container">
+                        <div class="note-address">
+                            <div th:text="${note.user.firstName}+' '+${note.user.lastName}"></div>
+                            <div th:text="${#temporals.format(note.noteDate, 'MMM-dd-yyyy HH:mm')}"></div>
+                            <div th:if="${note.notePublic}">Public</div><div th:unless="${note.notePublic}">Private</div>
+                        </div>
+
+                        <div class="note-content">
+                            <div th:text="${note.detail}"></div>
+                            <div class="card-section" th:if="${not #lists.isEmpty(note.images)}" th:each="img : ${note.images}">
+                                <img th:src="@{img.fileLocation}" alt="${img.name}}" height="50px">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+            <div id="ticketInfo" class="ticket-info">
+                <div class="card m-1">
+
+                    <div class="card-title m-2 pb-0 mb-0">
+                        <button class="btn btn-sm btn-success" style="float: right">
+                            <icon class="bi bi-plus"></icon>
+                        </button>
+                        <div class="h6 selectableItem" style="height: 100%; line-height: 2em" onclick="toggleAgentInfo()">
+                            Support Agents
+                        </div>
+                    </div>
+                    <hr>
+                    :: List of Agents ::
+                </div>
+            </div>
+
+
+            <div class="ticket-info-tab hide">
+                <div class="wiki-info-tab-title selectableItem" onclick="toggleAgentInfo()">
+                    Support Agents
+                </div>
+            </div>
+
+        </div>
+
+
     </div>
-  </div>
+
+    <script>
+        /*<![CDATA[*/
+        let hideInfo = /*[[${hideInfo}]]*/ "true";
+        /*]]>*/
+
+        const displayBtnDetailExpand = document.getElementById("btnDetailExpand");
+        const displayBtnDetailCollapse = document.getElementById("btnDetailCollapse");
+        const displayDivDetail = document.getElementById("divTicketDetail");
+
+        function toggleTicketDetail(){
+            debugger
+            if (displayDivDetail.classList.contains("ticket-detail-hide")) {
+                displayDivDetail.classList.remove("ticket-detail-hide");
+                displayBtnDetailExpand.style.display = "none";
+                displayBtnDetailCollapse.style.display = "inline-block";
+            } else {
+                displayDivDetail.classList.add("ticket-detail-hide");
+                displayBtnDetailExpand.style.display = "inline-block";
+                displayBtnDetailCollapse.style.display = "none";
+            }
+        }
+
+        function toggleAgentInfo() {
+            debugger
+            let tab = document.querySelector(".ticket-info-tab");
+            let info = document.querySelectorAll(".ticket-info");
+            if (tab.classList.contains("hide")) {
+                tab.classList.remove("hide");
+                for (let key in info) {
+                    try {
+                        info[key].classList.add("hide");
+                    } catch (e) {
+                        console.log(info[key])
+                    }
+                }
+            } else {
+                tab.classList.add("hide");
+                for (let key in info) {
+                    try {
+                        info[key].classList.remove("hide");
+                    } catch (e) {
+                        console.log(info[key])
+                    }
+                }
+            }
+        }
+
+        if (hideInfo) {
+            toggleAgentInfo();
+            toggleTicketDetail();
+        }
+    </script>
+
+</div>
+
 </div>
 
 </html>

@@ -21,6 +21,7 @@ public class TicketNote {
     private BigInteger id;
     private LocalDateTime noteDate;
     private boolean notePublic;
+    private boolean agentNote;
 
     @Enumerated(EnumType.STRING)
     private TicketStatus ticketStatus;
@@ -34,9 +35,6 @@ public class TicketNote {
 
     @ManyToOne(fetch = FetchType.EAGER)
     private User user;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    private User agent;
 
     @ManyToOne
     @JoinColumn(name = "ticketId")

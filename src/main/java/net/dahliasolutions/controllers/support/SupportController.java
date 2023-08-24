@@ -1,12 +1,10 @@
 package net.dahliasolutions.controllers.support;
 
-import com.fasterxml.jackson.databind.node.BigIntegerNode;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.campus.Campus;
 import net.dahliasolutions.models.department.DepartmentCampus;
 import net.dahliasolutions.models.department.DepartmentRegional;
-import net.dahliasolutions.models.store.RequestNotifyTarget;
 import net.dahliasolutions.models.support.*;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
@@ -54,6 +52,7 @@ public class SupportController {
         model.addAttribute("moduleTitle", "Support");
         model.addAttribute("moduleLink", "/support");
     }
+
     @GetMapping("")
     public String goSupportHome(Model model, HttpSession session) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -78,10 +77,17 @@ public class SupportController {
 
     @GetMapping("/ticket/{id}")
     public String goTicket(@PathVariable String id, Model model, HttpSession session) {
+        Optional<Ticket> ticket = ticketService.findById(id);
+        if (ticket.isEmpty()) {
+            model.addAttribute("msgError", "Ticket not found!");
+            return redirectService.pathName(session, "/support");
+        }
 
-        model.addAttribute("ticket", ticketService.findById(id));
+        ticket.get().setNotes(reverseNoteDateOrder(ticket.get().getNotes()));
 
-        redirectService.setHistory(session, "/support/ticket"+id);
+        model.addAttribute("ticket", ticket.get());
+
+        redirectService.setHistory(session, "/support/ticket" + id);
         return "support/ticket";
     }
 
@@ -141,22 +147,23 @@ public class SupportController {
 
         Ticket ticket = ticketService.createTicket(ticketNewModel, currentUser, ticketImage);
 
-        return "redirect:/ticket/"+ticket.getId();
+        return "redirect:/support/ticket/" + ticket.getId();
     }
 
     @GetMapping("/search/{searchTerm}")
     public String searchTickets(@PathVariable String searchTerm, Model model, HttpSession session) {
-        redirectService.setHistory(session, "/support/search/title/"+searchTerm);
+        redirectService.setHistory(session, "/support/search/title/" + searchTerm);
         String searcher = URLDecoder.decode(searchTerm, StandardCharsets.UTF_8);
         // List<StoreItem> itemList = storeItemService.searchAll(searcher);
 
         // model.addAttribute("storeItems", itemList);
         return "support/index";
     }
-        // get edit permission
-        private boolean supportEditor(User currentUser){
+
+    // get edit permission
+    private boolean supportEditor(User currentUser) {
         Collection<UserRoles> roles = currentUser.getUserRoles();
-        for (UserRoles role : roles){
+        for (UserRoles role : roles) {
             if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("SUPPORT_AGENT")
                     || role.getName().equals("SUPPORT_SUPERVISOR")) {
                 return true;
@@ -168,7 +175,7 @@ public class SupportController {
     private String permissionType(User currentUser) {
         Collection<UserRoles> roles = currentUser.getUserRoles();
         String typeString = "Campus Users";
-        for (UserRoles role : roles){
+        for (UserRoles role : roles) {
             if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("SUPPORT_SUPERVISOR")) {
                 typeString = "Admin";
             } else if (role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")) {
@@ -185,7 +192,7 @@ public class SupportController {
     private List<Campus> campusList(User currentUser) {
         List<Campus> campusList = new ArrayList<>();
         Collection<UserRoles> roles = currentUser.getUserRoles();
-        for (UserRoles role : roles){
+        for (UserRoles role : roles) {
             if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("SUPPORT_SUPERVISOR")
                     || role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")) {
                 campusList = campusService.findAll();
@@ -199,7 +206,7 @@ public class SupportController {
     private List<DepartmentRegional> departmentList(User currentUser) {
         List<DepartmentRegional> departmentList = new ArrayList<>();
         Collection<UserRoles> roles = currentUser.getUserRoles();
-        for (UserRoles role : roles){
+        for (UserRoles role : roles) {
             if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("SUPPORT_SUPERVISOR")
                     || role.getName().equals("CAMPUS_WRITE") || role.getName().equals("CAMPUS_READ")) {
                 departmentList = departmentRegionalService.findAll();
@@ -212,7 +219,7 @@ public class SupportController {
 
     private List<User> filteredUserList(User user, User director) {
         // init return
-        List<User> userListReturn ;
+        List<User> userListReturn;
         DepartmentRegional department = user.getDepartment().getRegionalDepartment();
         Optional<User> depDirector = userService.findById(department.getDirectorId());
 
@@ -228,7 +235,9 @@ public class SupportController {
             userListReturn = userService.findAllByDepartment(department);
         }
 
-        if (director != null) { userListReturn.add(director); }
+        if (director != null) {
+            userListReturn.add(director);
+        }
 
         Collections.sort(userListReturn, new Comparator<User>() {
             @Override
@@ -266,7 +275,9 @@ public class SupportController {
             }
         }
 
-        if (user != null) { userListReturn.add(user); }
+        if (user != null) {
+            userListReturn.add(user);
+        }
 
         Collections.sort(userListReturn, new Comparator<User>() {
             @Override
@@ -276,6 +287,17 @@ public class SupportController {
         });
 
         return userListReturn;
+    }
+
+    private List<TicketNote> reverseNoteDateOrder(List<TicketNote> notes) {
+        Collections.sort(notes,new Comparator<TicketNote>() {
+            @Override
+            public int compare (TicketNote note1, TicketNote note2){
+                return note1.getNoteDate().compareTo(note2.getNoteDate());
+            }
+        });
+        Collections.reverse(notes);
+        return notes;
     }
 
 }

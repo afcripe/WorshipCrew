@@ -18,6 +18,7 @@ import java.util.Optional;
 public interface TicketRepository extends JpaRepository<Ticket, BigInteger> {
 
 
+    Optional<Ticket> findById(String id);
     List<Ticket> findAllByUserAndTicketStatusNot(User user, TicketStatus status);
     List<Ticket> findAllByUser(User user);
     List<Ticket> findAllByCampusAndTicketStatusNot(Campus campus, TicketStatus status);

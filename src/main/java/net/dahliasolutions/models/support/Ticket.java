@@ -42,6 +42,7 @@ public class Ticket {
     @ManyToOne(fetch = FetchType.EAGER)
     private User user;
 
+    @Nullable
     @ManyToOne(fetch = FetchType.EAGER)
     private User agent;
 

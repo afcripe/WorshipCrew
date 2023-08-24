@@ -2,6 +2,7 @@ package net.dahliasolutions.services.support;
 
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.data.TicketRepository;
+import net.dahliasolutions.models.department.DepartmentRegional;
 import net.dahliasolutions.models.position.Position;
 import net.dahliasolutions.models.store.StoreSetting;
 import net.dahliasolutions.models.support.*;
@@ -61,7 +62,8 @@ public class TicketService implements TicketServiceInterface {
                 agentList = getSupervisors();
                 break;
             case RegionalDepartmentDirector:
-                agent = userService.findById(user.getDepartment().getRegionalDepartment().getDirectorId()).get();
+                BigInteger dirId = user.getDepartment().getRegionalDepartment().getDirectorId();
+                agent = userService.findById(dirId).get();
                 break;
             case CampusDepartmentDirector:
                 agent = userService.findById(user.getDepartment().getDirectorId()).get();
@@ -72,6 +74,12 @@ public class TicketService implements TicketServiceInterface {
             default:
                 agent = user.getDirector();
                 break;
+        }
+
+        // determine if user is agent for note
+        boolean noteAgent = false;
+        if (agent != null) {
+            noteAgent = agent.equals(user);
         }
 
         Ticket ticket = ticketRepository.save(new Ticket(
@@ -99,15 +107,16 @@ public class TicketService implements TicketServiceInterface {
 
         // add first note
         TicketNote note = ticketNoteService.createTicketNote(new TicketNote(null, null, true,
-                TicketStatus.Open, model.getDetails(), imageList, user, agent, ticket));
+                noteAgent, TicketStatus.Open, model.getDetails(), imageList, user, ticket));
         ticket.getNotes().add(note);
+        ticketRepository.save(ticket);
 
         return ticket;
     }
 
     @Override
     public Optional<Ticket> findById(String id) {
-        return Optional.empty();
+        return ticketRepository.findById(id);
     }
 
     @Override
