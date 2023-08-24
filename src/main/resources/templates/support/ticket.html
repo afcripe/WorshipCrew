@@ -4,6 +4,13 @@
       layout:decorate="~{layouts/defaultLayout}" xmlns="http://www.w3.org/1999/html">
 
 <div class="container-fluid m-0 p-0" layout:fragment="content">
+    <template id="imageTemplate">
+        <div class="image_upload">
+            <img src="" height="50px">
+            <div class="d-inline"></div>
+            <div class="btn-remove d-inline px-2 mr-2">X</div>
+        </div>
+    </template>
 
     <div th:replace="~{support/moduleHeader :: header}">Header</div>
 
@@ -39,8 +46,12 @@
                         </div>
                     </div>
                     <div class="ticket-detail-info">
-                        Due:
-                        <span class="ticket-due-date" th:text="*{#temporals.format(ticketDue, 'MMM-dd-yyyy HH:mm')}"></span>
+                        <div>
+                            Due: <span th:text="*{#temporals.format(ticketDue, 'MMM-dd-yyyy HH:mm')}"></span>
+                        </div>
+                        <div th:if="${closeDate == 'true'}">
+                            <span th:text="*{ticketStatus}"></span>: <span th:text="*{#temporals.format(ticketClosed, 'MMM-dd-yyyy HH:mm')}"></span>
+                        </div>
                     </div>
                 </div>
 
@@ -55,7 +66,7 @@
                   </div>
                   <div class="ticket-detail-info">
                       <div>
-                          SLA: <span th:text="*{sla.name}"></span>
+                          SLA: <span th:text="*{sla?.name}"></span>
                       </div>
                       <div>
                           User Priority: <span th:text="*{priority}"></span>
@@ -69,7 +80,35 @@
         <div class="support-ticket pt-2">
 
             <div id="ticketNotes" class="ticket-body">
-                <div class="card m-0 p-0" th:each="note : *{notes}">
+
+                <!-- New Note Form -->
+                <div class="card m-0 p-0">
+
+                    <div class="note-container">
+                        <div class="note-address">
+                            New Note: <br>
+                            Private <input class="d-inline" style="height: 1em" type="checkbox"> <br>
+                        </div>
+
+                        <div class="note-content">
+                            <textarea style="width: 100%; height: 75px"></textarea>
+                            <div class="card-section">
+                                <input type="hidden" name="image" class="w-50" id="image">
+
+                                <button class="btn btn-sm btn-success" style="float: right" onclick="postNote()">Submit</button>
+                                <input type="file" id="imageFile" style="display: none;" multiple onchange="doUploadImage()">
+                                <input type="button" class="btn btn-sm btn-support" value="Attach Image" onclick="document.getElementById('imageFile').click();" />
+
+                                <progress class="w-50" id="uploadProgress" style="display: none"></progress>
+                                <div class="pt-2" id="imagePath"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- current Notes -->
+                <div class="card m-0 p-0" th:each="note : ${noteList}">
                     <div th:id="'note-'+${note.id}" class="note-container">
                         <div class="note-address">
                             <div th:text="${note.user.firstName}+' '+${note.user.lastName}"></div>
@@ -80,7 +119,11 @@
                         <div class="note-content">
                             <div th:text="${note.detail}"></div>
                             <div class="card-section" th:if="${not #lists.isEmpty(note.images)}" th:each="img : ${note.images}">
-                                <img th:src="@{img.fileLocation}" alt="${img.name}}" height="50px">
+                                <div th:each="img : ${note.images}">
+                                    <a th:href="@{${img.fileLocation}}" target="_blank">
+                                        <img th:src="@{${img.fileLocation}}" alt="${img.name}" height="50px">
+                                    </a>
+                                </div>
                             </div>
                         </div>
 
@@ -114,7 +157,6 @@
 
         </div>
 
-
     </div>
 
     <script>
@@ -125,9 +167,15 @@
         const displayBtnDetailExpand = document.getElementById("btnDetailExpand");
         const displayBtnDetailCollapse = document.getElementById("btnDetailCollapse");
         const displayDivDetail = document.getElementById("divTicketDetail");
+        const imgProgress = document.getElementById('uploadProgress');
+        const imgNames = document.getElementById('imagePath');
+        const imageIds = document.getElementById('image');
+        const imageNames = document.getElementById('imagePath');
+        const filebrowser = document.getElementById('imageFile');
+        const template = document.getElementById("imageTemplate");
+        let filesToUpload = 0;
 
         function toggleTicketDetail(){
-            debugger
             if (displayDivDetail.classList.contains("ticket-detail-hide")) {
                 displayDivDetail.classList.remove("ticket-detail-hide");
                 displayBtnDetailExpand.style.display = "none";
@@ -140,7 +188,6 @@
         }
 
         function toggleAgentInfo() {
-            debugger
             let tab = document.querySelector(".ticket-info-tab");
             let info = document.querySelectorAll(".ticket-info");
             if (tab.classList.contains("hide")) {
@@ -168,6 +215,82 @@
             toggleAgentInfo();
             toggleTicketDetail();
         }
+
+        function doUploadImage() {
+            // disable names and show progress
+            imgProgress.style.display='inline';
+            imgNames.style.display='none';
+            postImageFile();
+        }
+
+        async function postImageFile() {
+            filesToUpload = filebrowser.files.length;
+
+            let formData = new FormData();
+            for (let i in filebrowser.files) {
+                formData.set("imageFile", filebrowser.files[i]);
+
+                const response = await fetch('/api/v1/contentmanager/support/uploadonlyimage', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    return response.json();
+                }).then(data => {
+                    let newID = "img-"+data.id;
+                    let clone = template.content.cloneNode(true);
+
+                    let parentDiv = clone.querySelector("div");
+                        parentDiv.id = newID;
+
+                    let imgIco = parentDiv.querySelector("img");
+                        imgIco.src = data.fileLocation;
+
+                    let spans = parentDiv.querySelectorAll("div");
+                        spans[0].innerText = data.name;
+                        spans[1].addEventListener("click", function (event) {removeImage(data.id)});
+                    imageNames.appendChild(clone);
+                    filesToUpload--;
+                    completeImageUpload();
+                });
+            }
+        }
+
+        function completeImageUpload() {
+            if (filesToUpload == 0) {
+                // enable names and hide progress
+                imgProgress.style.display = 'none';
+                imgNames.style.display = 'inline';
+
+                while (filebrowser.firstChild) {
+                    filebrowser.removeChild(filebrowser.firstChild);
+                }
+
+                console.log(document.getElementById('image').value);
+                console.log(document.getElementById('imagePath').value);
+            }
+        }
+
+        async function removeImage(id) {
+            let eleId = "img-"+id;
+            let imgTag = document.getElementById(eleId);
+
+            let formData = new FormData();
+                formData.set("id", id);
+
+            const response = await fetch('/api/v1/contentmanager/support/deleteonlyimage', {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                return response.json();
+            }).then(data => {
+                imgTag.remove();
+            });
+        }
+
+        async function postNote() {
+
+        }
+
     </script>
 
 </div>

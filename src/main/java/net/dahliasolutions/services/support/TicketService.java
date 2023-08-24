@@ -86,6 +86,7 @@ public class TicketService implements TicketServiceInterface {
                     idGenerator.generate(),
                     LocalDateTime.now(),
                     dueDate,
+                    null,
                     model.getSummary(),
                     model.getPriority(),
                     sla,

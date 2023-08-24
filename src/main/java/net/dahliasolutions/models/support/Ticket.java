@@ -23,6 +23,7 @@ public class Ticket {
     private String id;
     private LocalDateTime ticketDate;
     private LocalDateTime ticketDue;        // updates based on SLA
+    private LocalDateTime ticketClosed;     // date status change to closed or equivalent
     private String ticketDetail;            // issue submitted
     private String priority;                // user determined priority
 

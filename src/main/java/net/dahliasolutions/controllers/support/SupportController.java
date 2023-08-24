@@ -83,9 +83,15 @@ public class SupportController {
             return redirectService.pathName(session, "/support");
         }
 
+        String closeDate = "true";
+        if (ticket.get().getTicketClosed() == null) { closeDate="false"; }
+
         ticket.get().setNotes(reverseNoteDateOrder(ticket.get().getNotes()));
 
         model.addAttribute("ticket", ticket.get());
+        model.addAttribute("noteList", ticket.get().getNotes());
+        model.addAttribute("closeDate", closeDate);
+
 
         redirectService.setHistory(session, "/support/ticket" + id);
         return "support/ticket";
