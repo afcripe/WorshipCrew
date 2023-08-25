@@ -5,19 +5,16 @@ import net.dahliasolutions.models.EventModule;
 import net.dahliasolutions.models.EventType;
 import net.dahliasolutions.models.Notification;
 import net.dahliasolutions.models.NotificationModel;
+import net.dahliasolutions.models.position.Position;
 import net.dahliasolutions.models.records.BigIntegerStringModel;
 import net.dahliasolutions.models.records.SingleBigIntegerModel;
 import net.dahliasolutions.models.records.SingleIntModel;
 import net.dahliasolutions.models.records.SingleStringModel;
-import net.dahliasolutions.models.support.SLA;
-import net.dahliasolutions.models.support.Ticket;
-import net.dahliasolutions.models.support.TicketNotifyTarget;
-import net.dahliasolutions.models.support.TicketPriority;
+import net.dahliasolutions.models.support.*;
 import net.dahliasolutions.models.user.User;
-import net.dahliasolutions.services.support.SupportSettingService;
-import net.dahliasolutions.services.support.TicketPriorityService;
-import net.dahliasolutions.services.support.TicketSLAService;
+import net.dahliasolutions.services.support.*;
 import net.dahliasolutions.services.user.UserService;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
@@ -35,6 +32,9 @@ public class SupportAPIController {
     private final UserService userService;
     private final SupportSettingService supportSettingService;
     private final TicketSLAService slaService;
+    private final TicketService ticketService;
+    private final TicketImageService ticketImageService;
+    private final TicketNoteService noteService;
 
     @GetMapping("")
     public List<Ticket> getSupportTickets() {
@@ -151,5 +151,40 @@ public class SupportAPIController {
         SLA sla = new SLA(null, slaModel.name(), "", 0);
         sla = slaService.save(sla);
         return new BigIntegerStringModel(sla.getId(), sla.getName());
+    }
+
+    @PostMapping("/note/new")
+    public TicketNote newTicketNote(@ModelAttribute TicketNoteModel noteModel) {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<Ticket> ticket = ticketService.findById(noteModel.ticketId());
+
+        if (ticket.isEmpty()) {
+            return new TicketNote();
+        }
+        boolean isAgent = !currentUser.equals(ticket.get().getUser());
+        boolean isPrivate = noteModel.isPrivate() != null;
+
+        List<String> items = Arrays.asList(noteModel.images().split("\s"));
+        ArrayList<TicketImage> images = new ArrayList<>();
+        for (String s : items) {
+            if (!s.equals("")) {
+                try {
+                    int i = Integer.parseInt(s);
+                    Optional<TicketImage> img = ticketImageService.findById(BigInteger.valueOf(i));
+                    if (img.isPresent()) {
+                        images.add(img.get());
+                    }
+                } catch (Error e) {
+                    System.out.println(e);
+                }
+            }
+        }
+
+        TicketNote note = noteService.createTicketNote(new TicketNote(null, null, isPrivate,
+                isAgent, noteModel.detail(), images, currentUser, ticket.get()));
+        ticket.get().getNotes().add(note);
+        ticketService.save(ticket.get());
+
+        return note;
     }
 }

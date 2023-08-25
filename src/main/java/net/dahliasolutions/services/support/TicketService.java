@@ -107,8 +107,8 @@ public class TicketService implements TicketServiceInterface {
         }
 
         // add first note
-        TicketNote note = ticketNoteService.createTicketNote(new TicketNote(null, null, true,
-                noteAgent, TicketStatus.Open, model.getDetails(), imageList, user, ticket));
+        TicketNote note = ticketNoteService.createTicketNote(new TicketNote(null, null, false,
+                noteAgent, model.getDetails(), imageList, user, ticket));
         ticket.getNotes().add(note);
         ticketRepository.save(ticket);
 

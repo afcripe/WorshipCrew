@@ -20,11 +20,8 @@ public class TicketNote {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private BigInteger id;
     private LocalDateTime noteDate;
-    private boolean notePublic;
+    private boolean notePrivate;
     private boolean agentNote;
-
-    @Enumerated(EnumType.STRING)
-    private TicketStatus ticketStatus;
 
     @Lob
     @Column(name = "detail", columnDefinition="BLOB")
