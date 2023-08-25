@@ -12,16 +12,14 @@ import net.dahliasolutions.models.records.SingleIntModel;
 import net.dahliasolutions.models.records.SingleStringModel;
 import net.dahliasolutions.models.support.*;
 import net.dahliasolutions.models.user.User;
+import net.dahliasolutions.models.user.UserRoles;
 import net.dahliasolutions.services.support.*;
 import net.dahliasolutions.services.user.UserService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1/support")
@@ -161,8 +159,15 @@ public class SupportAPIController {
         if (ticket.isEmpty()) {
             return new TicketNote();
         }
-        boolean isAgent = !currentUser.equals(ticket.get().getUser());
-        boolean isPrivate = noteModel.isPrivate() != null;
+
+        boolean isPrivate = noteModel.isPrivate();
+
+        boolean isAgent = supportEditor(currentUser);
+        if (currentUser.equals(ticket.get().getUser())) {
+            // force agent and private false if ticket belongs to current user
+            isAgent = false;
+            isPrivate = false;
+        }
 
         List<String> items = Arrays.asList(noteModel.images().split("\s"));
         ArrayList<TicketImage> images = new ArrayList<>();
@@ -186,5 +191,17 @@ public class SupportAPIController {
         ticketService.save(ticket.get());
 
         return note;
+    }
+
+    // get edit permission
+    private boolean supportEditor(User currentUser) {
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+        for (UserRoles role : roles) {
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("SUPPORT_AGENT")
+                    || role.getName().equals("SUPPORT_SUPERVISOR")) {
+                return true;
+            }
+        }
+        return false;
     }
 }

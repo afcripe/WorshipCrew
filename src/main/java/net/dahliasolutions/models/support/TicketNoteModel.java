@@ -3,7 +3,7 @@ package net.dahliasolutions.models.support;
 import java.math.BigInteger;
 
 public record TicketNoteModel (
-        String isPrivate,
+        boolean isPrivate,
         String detail,
         String images,
         String ticketId){

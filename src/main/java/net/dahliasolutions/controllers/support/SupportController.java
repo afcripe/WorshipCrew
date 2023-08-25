@@ -77,6 +77,7 @@ public class SupportController {
 
     @GetMapping("/ticket/{id}")
     public String goTicket(@PathVariable String id, Model model, HttpSession session) {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Ticket> ticket = ticketService.findById(id);
         if (ticket.isEmpty()) {
             model.addAttribute("msgError", "Ticket not found!");
@@ -88,10 +89,29 @@ public class SupportController {
 
         ticket.get().setNotes(reverseNoteDateOrder(ticket.get().getNotes()));
 
-        model.addAttribute("ticket", ticket.get());
-        model.addAttribute("noteList", ticket.get().getNotes());
-        model.addAttribute("closeDate", closeDate);
+        // determine if agent
+        boolean isAgent = supportEditor(currentUser);
+        if (currentUser.getId().equals(ticket.get().getUser().getId())) {
+            // force agent and private false if ticket belongs to current user
+            isAgent = false;
+        }
 
+        // filter notes if not agent
+        List<TicketNote> noteList = new ArrayList<>();
+        if (!isAgent) {
+            for (TicketNote note : ticket.get().getNotes()) {
+                if (!note.isNotePrivate()) {
+                    noteList.add(note);
+                }
+            }
+        } else {
+            noteList = ticket.get().getNotes();
+        }
+
+        model.addAttribute("ticket", ticket.get());
+        model.addAttribute("noteList", noteList);
+        model.addAttribute("closeDate", closeDate);
+        model.addAttribute("isAgent", isAgent);
 
         redirectService.setHistory(session, "/support/ticket" + id);
         return "support/ticket";

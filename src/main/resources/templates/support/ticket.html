@@ -12,13 +12,37 @@
         </div>
     </template>
 
+    <template id="noteTemplate">
+        <div class="card my-2 mx-0 p-0">
+            <div class="note-container">
+                <div class="note-address">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+                <div class="note-content">
+                    <div></div>
+                    <div class="card-section">
+                        <div class="d-inline"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
     <div th:replace="~{support/moduleHeader :: header}">Header</div>
 
     <div class="ticket-container" th:object="${ticket}">
 
+        <!-- title -->
         <div class="mt-2 w-100">
             <h2>
-                <span style="float: right" th:text="*{ticketStatus}"></span>
+                <div style="float: right">
+                    <i id="btnStatusEdit" class="bi bi-pencil-square h5 selectableItem" th:if="${isAgent}"
+                       th:onclick="updateTicketStatus([[*{id}]])"></i>
+                    <span th:text="*{ticketStatus}"></span>
+                </div>
+
                 Ticket:
                 <span th:text="*{id}">(not found)</span>
             </h2>
@@ -66,6 +90,8 @@
                   </div>
                   <div class="ticket-detail-info">
                       <div>
+                          <i id="btnSLAEdit" class="bi bi-pencil-square selectableItem" th:if="${isAgent}"
+                             th:onclick="updateTicketSLA([[*{id}]])"></i>
                           SLA: <span th:text="*{sla?.name}"></span>
                       </div>
                       <div>
@@ -82,16 +108,19 @@
             <div id="ticketNotes" class="ticket-body">
 
                 <!-- New Note Form -->
-                <div class="card my-2 mx-0 p-0">
+                <div id="newNoteDiv" class="card my-2 mx-0 p-0" th:unless="${closeDate}">
 
                     <div class="note-container">
-                        <div class="note-address">
+                        <div class="note-address note-address-form">
                             New Note: <br>
-                            Private <input id="notePrivate" class="d-inline" style="height: 1em" type="checkbox"> <br>
+                            <div class="d-inline" th:if="${isAgent}">
+                                Private <input id="notePrivate" class="d-inline" style="height: 1em" type="checkbox">
+                            </div>
                         </div>
 
                         <div class="note-content">
                             <input id="ticketId" type="hidden" th:value="*{id}">
+                            <input id="ticketAgent" type="hidden" th:value="${isAgent}">
                             <textarea id="noteDetail" style="width: 100%; height: 75px"></textarea>
                             <div class="card-section">
                                 <input type="hidden" name="image" class="w-50" id="image">
@@ -114,7 +143,9 @@
                         <div class="note-address" th:classappend="${note.agentNote} ? note-address-agent">
                             <div th:text="${note.user.firstName}+' '+${note.user.lastName}"></div>
                             <div th:text="${#temporals.format(note.noteDate, 'MMM-dd-yyyy HH:mm')}"></div>
-                            <div th:if="${note.notePrivate}">Public</div><div th:unless="${note.notePrivate}">Private</div>
+                            <div th:if="${isAgent}">
+                                <div th:if="${note.notePrivate}">Private</div><div th:unless="${note.notePrivate}">Public</div>
+                            </div>
                         </div>
 
                         <div class="note-content">
@@ -134,7 +165,7 @@
             </div>
 
 
-            <div id="ticketInfo" class="ticket-info">
+            <div id="ticketInfo" class="ticket-info" th:if="${isAgent}">
                 <div class="card m-1">
 
                     <div class="card-title m-2 pb-0 mb-0">
@@ -150,8 +181,7 @@
                 </div>
             </div>
 
-
-            <div class="ticket-info-tab hide">
+            <div class="ticket-info-tab hide" th:if="${isAgent}">
                 <div class="wiki-info-tab-title selectableItem" onclick="toggleAgentInfo()">
                     Support Agents
                 </div>
@@ -169,16 +199,28 @@
         const displayBtnDetailExpand = document.getElementById("btnDetailExpand");
         const displayBtnDetailCollapse = document.getElementById("btnDetailCollapse");
         const displayDivDetail = document.getElementById("divTicketDetail");
+        const divNewNote = document.getElementById("newNoteDiv");
         const imgProgress = document.getElementById('uploadProgress');
         const imgNames = document.getElementById('imagePath');
         const imageIds = document.getElementById('image');
         const imageNames = document.getElementById('imagePath');
         const filebrowser = document.getElementById('imageFile');
-        const template = document.getElementById("imageTemplate");
-        let filesToUpload = 0;
         const inputDetails = document.getElementById("noteDetail");
         const inputPublic = document.getElementById("notePrivate");
         const inputId = document.getElementById("ticketId");
+        const inputIsAgent = document.getElementById("ticketAgent");
+        let filesToUpload = 0;
+
+        const template = document.getElementById("imageTemplate");
+        const templateNote = document.getElementById("noteTemplate");
+
+        async function updateTicketStatus(id) {
+
+        }
+
+        async function updateTicketSLA(id) {
+
+        }
 
         function toggleTicketDetail(){
             if (displayDivDetail.classList.contains("ticket-detail-hide")) {
@@ -216,11 +258,6 @@
             }
         }
 
-        if (hideInfo) {
-            toggleAgentInfo();
-            toggleTicketDetail();
-        }
-
         function doUploadImage() {
             // disable names and show progress
             imgProgress.style.display='inline';
@@ -233,7 +270,6 @@
 
             let formData = new FormData();
             for (let i=0; i < filebrowser.files.length; i++) {
-                debugger
                 formData.set("imageFile", filebrowser.files[i]);
 
                 const response = await fetch('/api/v1/contentmanager/support/uploadonlyimage', {
@@ -294,7 +330,6 @@
         }
 
         async function postNote() {
-            debugger
             let uploadedImages = ""
             let children = imageNames.children;
             for (let i = 0; i < children.length; i++) {
@@ -304,7 +339,7 @@
             }
 
         let formData = new FormData();
-            formData.set("isPublic", inputPublic.checked);
+            formData.set("isPrivate", inputPublic.checked);
             formData.set("detail", inputDetails.value);
             formData.set("images", uploadedImages);
             formData.set("ticketId", inputId.value);
@@ -313,16 +348,110 @@
                 method: 'POST',
                 body: formData
             }).then(response => {
-                debugger
                 return response.json();
             }).then(data => {
                 debugger
-                while(imageNames.firstChild) {
-                    imageNames.removeChild(imageNames.firstChild)
-                }
-                inputPublic.checked = false;
-                inputDetails.value = "";
+                clearForm()
+
+                let newID = "note-"+data.id;
+                let clone = templateNote.content.cloneNode(true);
+
+
+                let parentDiv = clone.querySelector("div");
+                    parentDiv.id = newID;
+                let noteDivs = parentDiv.querySelectorAll("div");
+                    if (data.agentNote) { noteDivs[1].classList.add("note-address-agent"); }
+                    noteDivs[2].innerText = data.user.firstName+" "+data.user.lastName;
+                    noteDivs[3].innerText = parseDate(data.noteDate);
+
+                    if (inputIsAgent.value === "true") {
+                        if (data.notePrivate) {
+                            noteDivs[4].innerText = "Private";
+                        } else {
+                            noteDivs[4].innerText = "Public";
+                        }
+                    }
+
+                    noteDivs[6].innerText = data.detail;
+                    let count=0;
+                    for (let i in data.images) {
+                        let linkDiv = document.createElement("a");
+                            linkDiv.href = data.images[i].fileLocation;
+                            linkDiv.target = "_bank";
+                            linkDiv.classList.add("px-2")
+                        let imgDiv = document.createElement("img");
+                            imgDiv.src = data.images[i].fileLocation;
+                            imgDiv.name = data.images[i].fileLocation;
+                            imgDiv.height = 50;
+                        linkDiv.appendChild(imgDiv);
+                        noteDivs[8].appendChild(linkDiv);
+                        count++;
+                    }
+                    if (count===0) {
+                        noteDivs[7].remove();
+                    }
+
+
+                divNewNote.parentNode.insertBefore(clone, divNewNote.nextSibling);
             });
+        }
+
+        function clearForm() {
+            while(imageNames.firstChild) {
+                imageNames.removeChild(imageNames.firstChild)
+            }
+            inputPublic.checked = false;
+            inputDetails.value = "";
+        }
+
+        function parseDate(date) {
+            let dateArray = date.split("T");
+            let lDate = dateArray[0].split("-");
+            let y = lDate[0];
+            let m = lDate[1];
+            let d = lDate[2];
+            let lTime = dateArray[1].split(":");
+            let h = lTime[0];
+            let mi = lTime[1];
+
+            return parseMonth(m)+"-"+d+"-"+y+" "+h+":"+mi;
+        }
+        function parseMonth(m){
+            switch (m) {
+                case "01":
+                    return "Jan";
+                case "02":
+                    return "Feb";
+                case "03":
+                    return "Mar";
+                case "04":
+                    return "Apr";
+                case "05":
+                    return "May";
+                case "06":
+                    return "Jun";
+                case "07":
+                    return "Jul";
+                case "08":
+                    return "Aug";
+                case "09":
+                    return "Sep";
+                case "10":
+                    return "Oct";
+                case "11":
+                    return "Nov";
+                case "12":
+                    return "Dec";
+            }
+        }
+
+        if (inputIsAgent.value === "true") {
+            if (hideInfo) {
+                toggleAgentInfo();
+            }
+        }
+        if (hideInfo) {
+            toggleTicketDetail();
         }
 
     </script>
