@@ -1,36 +1,22 @@
 package net.dahliasolutions;
 
-import jakarta.servlet.http.HttpSession;
 import net.dahliasolutions.models.*;
-import net.dahliasolutions.models.campus.Campus;
-import net.dahliasolutions.models.position.Position;
-import net.dahliasolutions.models.user.User;
-import net.dahliasolutions.models.wiki.WikiTag;
-import net.dahliasolutions.services.NotificationService;
-import net.dahliasolutions.services.campus.CampusService;
-import net.dahliasolutions.services.department.DepartmentRegionalService;
-import net.dahliasolutions.services.position.PositionService;
-import net.dahliasolutions.services.user.UserRolesService;
-import net.dahliasolutions.services.user.UserService;
-import net.dahliasolutions.services.wiki.WikiFolderService;
-import net.dahliasolutions.services.wiki.WikiTagService;
-import org.springframework.boot.CommandLineRunner;
+import net.dahliasolutions.services.AdminSettingsService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Optional;
-
 //import java.math.BigInteger;
 
 @SpringBootApplication
 public class Main {
+
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
-        System.out.println(getAppServerSingleton().getBaseURL());
+         AppServer appServer = getAppServerSingleton();
+         appServer.setStaticFiles(false);
+        System.out.println(appServer.getBaseURL());
     }
 
 //    @Bean

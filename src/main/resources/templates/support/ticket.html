@@ -169,7 +169,7 @@
                 <div class="card m-1">
 
                     <div class="card-title m-2 pb-0 mb-0">
-                        <button class="btn btn-sm btn-success" style="float: right">
+                        <button class="btn btn-sm btn-success" style="float: right" onclick="dialogIncludePerson()">
                             <icon class="bi bi-plus"></icon>
                         </button>
                         <div class="h6 selectableItem" style="height: 100%; line-height: 2em" onclick="toggleAgentInfo()">
@@ -177,7 +177,12 @@
                         </div>
                     </div>
                     <hr>
-                    :: List of Agents ::
+                    <div th:each="agent : *{agentList}">
+                        <p th:id="'agent-'+${agent.id}" class="p-2">
+                            <span th:text="${agent.firstName}+' '+${agent.lastName}"></span>
+                            <i class="bi bi-x" style="color: red" th:onclick="removeSuper([[${agent.id}]])"></i>
+                        </p>
+                    </div>
                 </div>
             </div>
 
@@ -191,11 +196,164 @@
 
     </div>
 
+    <dialog id="includePersonDialog" class="upload-modal">
+        <script>
+            async function loadPeople() {
+                let dispPersonSelect = document.getElementById('personSelect');
+                debugger
+                const response = await fetch('/api/v1/support/getsupervisors')
+                    .then(response => {
+                        return response.json();
+                    }).then(data => {
+                        debugger
+                        while (dispPersonSelect.firstChild) {
+                            dispPersonSelect.removeChild(dispPersonSelect.lastChild);
+                        }
+                        for (let key in data) {
+                            let obj = data[key];
+                            let opt = document.createElement('option');
+                            opt.value = obj.id;
+                            opt.innerHTML = obj.firstName+' '+obj.lastName;
+
+                            dispPersonSelect.appendChild(opt);
+                        }
+                    });
+            }
+            async function postInclude() {
+                document.getElementById("btnIncludeSubmit").setAttribute("disabled", "disabled");
+                let formData = new FormData();
+                    formData.set("id", inputId.value);
+                    formData.set("userId", document.getElementById('personSelect').value);
+                    formData.set("primary", document.getElementById('personPrimary').checked);
+
+                const response = await fetch('/api/v1/support/addsupervisor', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    return response.json();
+                }).then(data => {
+                    window.location.searchParams.set("showAgents","");
+                    window.location.reload();
+                });
+            }
+            function keyIncludePerson(event) {
+                event.preventDefault();
+                if (event.key === "Enter" || event.keyCode === 13) {
+                    postInclude();
+                }
+                if (event.key === "Escape") {
+                    keyEscInclude();
+                }
+            }
+            function keyEscInclude() {
+                document.getElementById("btnIncludeSubmit").removeAttribute("disabled");
+                document.getElementById("includePersonDialog").close();
+            }
+        </script>
+        <h2>Include Someone on Request</h2>
+        <form id="formIncludePerson" onsubmit="postInclude()" style="width: 300px; max-width: 450px">
+            <label for="personSelect" class="form-label">Person</label>
+            <select class="form-control" id="personSelect" onkeyup="keyIncludePerson(event)">
+                <option></option>
+            </select>
+            <label for="personPrimary" class="form-label">Set As Primary</label>
+            <input type="checkbox" id="personPrimary">
+            <div class="pt-2">
+                <button id="btnIncludeSubmit" type="button" class="btn btn-sm btn-support" onclick="postInclude()">Add</button>
+                <button id="btnIncludeCancel" type="button" class="btn btn-sm btn-outline-support" onclick="keyEscInclude()">Cancel</button>
+            </div>
+
+        </form>
+    </dialog>
+    <dialog id="changeStatusDialog" class="upload-modal">
+        <script>
+            async function loadStatusOptions() {
+                let dispStatusSelect = document.getElementById('statusSelect');
+                let dispOrderStatus = document.getElementById('orderStatus');
+                let dispStatusNote = document.getElementById('statusNote');
+                dispStatusNote.value = "";
+
+                const response = await fetch('/api/v1/support/getstatusoptions')
+                    .then(response => {
+                        return response.json();
+                    }).then(data => {
+                        while (dispStatusSelect.firstChild) {
+                            dispStatusSelect.removeChild(dispStatusSelect.lastChild);
+                        }
+                        debugger
+                        for (let key in data) {
+                            let opt = document.createElement('option');
+                            opt.value = data[key];
+                            opt.innerHTML = data[key];
+                            if (dispOrderStatus.value === data[key]) {
+                                opt.selected = true;
+                            }
+                            dispStatusSelect.appendChild(opt);
+                        }
+                    });
+            }
+            async function postStatus() {
+                document.getElementById("btnStatusSubmit").setAttribute("disabled", "disabled");
+                let dispStatusSelect = document.getElementById('statusSelect');
+                let dispStatusNote = document.getElementById('statusNote');
+                document.getElementById("btnStatusSubmit").setAttribute("disabled", "disabled");
+                debugger
+                let formData = new FormData();
+                formData.set("id", inputId.value);
+                formData.set("status", dispStatusSelect.value);
+                formData.set("note", dispStatusNote.value);
+
+                const response = await fetch('/api/v1/support/changestatus', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    return response.json();
+                }).then(data => {
+                    window.location.reload();
+                });
+            }
+            function keyStatus(event) {
+                event.preventDefault();
+                if (event.key === "Enter" || event.keyCode === 13) {
+                    postStatus();
+                }
+                if (event.key === "Escape") {
+                    keyEscStatus();
+                }
+            }
+            function keyEscStatus() {
+                document.getElementById("btnStatusSubmit").removeAttribute("disabled");
+                document.getElementById("changeStatusDialog").close();
+            }
+        </script>
+        <h2>Update Request Status</h2>
+        <form id="formChangeStatus" onsubmit="postStatus()" style="width: 300px; max-width: 450px">
+            <label for="statusSelect" class="form-control-label">Change Status</label>
+            <select class="form-control py-1" id="statusSelect" onkeyup="keyStatus(event)">
+                <option></option>
+            </select>
+            <label class="form-control-label">Note</label>
+            <textarea id="statusNote" class="form-control w-100"></textarea>
+
+            <div class="pt-2">
+                <button id="btnStatusSubmit" type="button" class="btn btn-sm btn-primary" onclick="postStatus()">Update</button>
+                <button id="btnStatusCancel" type="button" class="btn btn-sm btn-outline-primary" onclick="keyEscStatus()">Cancel</button>
+            </div>
+
+        </form>
+    </dialog>
+
     <script>
         /*<![CDATA[*/
         let hideInfo = /*[[${hideInfo}]]*/ "true";
         /*]]>*/
 
+        let params = (new URL(document.location)).searchParams;
+        let forceShowDetails = params.has("showDetails");
+        let forceShowAgents = params.has("showAgents");
+
+        const displayIncludePersonDialog = document.getElementById("includePersonDialog");
+        const displayChangeStatusDialog = document.getElementById("changeStatusDialog");
         const displayBtnDetailExpand = document.getElementById("btnDetailExpand");
         const displayBtnDetailCollapse = document.getElementById("btnDetailCollapse");
         const displayDivDetail = document.getElementById("divTicketDetail");
@@ -220,6 +378,32 @@
 
         async function updateTicketSLA(id) {
 
+        }
+
+        function dialogIncludePerson() {
+            displayIncludePersonDialog.showModal();
+            loadPeople();
+        }
+
+        async function removeSuper(superId) {
+            let formData = new FormData();
+            formData.set("requestId", document.getElementById('orderId').value);
+            formData.set("userId", superId);
+            formData.set("primary", "false");
+
+            const response = await fetch('/api/v1/request/removesupervisor', {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                return response.json();
+            }).then(data => {
+                if (data.requestId === 0) {
+                    window.location.reload();
+                } else {
+                    let elId = "super-" + superId;
+                    document.getElementById(elId).remove();
+                }
+            });
         }
 
         function toggleTicketDetail(){
@@ -445,12 +629,13 @@
             }
         }
 
-        if (inputIsAgent.value === "true") {
+        debugger
+        if (inputIsAgent.value === "true" && !forceShowAgents) {
             if (hideInfo) {
                 toggleAgentInfo();
             }
         }
-        if (hideInfo) {
+        if (hideInfo && !forceShowDetails) {
             toggleTicketDetail();
         }
 

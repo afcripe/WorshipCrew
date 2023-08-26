@@ -3,15 +3,23 @@ package net.dahliasolutions.services;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.data.AdminSettingsRepository;
 import net.dahliasolutions.models.AdminSettings;
+import net.dahliasolutions.models.AppServer;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
+import java.nio.file.*;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class AdminSettingsService implements AdminSettingsServiceInterface{
 
     private final AdminSettingsRepository adminSettingsRepository;
+    private final AppServer appServer;
 
     @Override
     public AdminSettings getAdminSettings() {
@@ -80,6 +88,5 @@ public class AdminSettingsService implements AdminSettingsServiceInterface{
         adminSettings.setRestrictStoreDepartment(bool);
         adminSettingsRepository.save(adminSettings);
     }
-
 
 }

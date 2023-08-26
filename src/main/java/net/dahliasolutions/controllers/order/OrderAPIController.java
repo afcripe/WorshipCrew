@@ -109,7 +109,6 @@ public class OrderAPIController {
     @GetMapping("/getsupervisors")
     public List<User> getSupervisors(){
         Collection<UserRoles> roles = getSupervisorCollection();
-        boolean addUser = false;
         List<User> userList = new ArrayList<>();
         List<User> allUsers = userService.findAll();
 

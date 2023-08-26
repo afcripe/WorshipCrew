@@ -1,20 +1,20 @@
 package net.dahliasolutions.controllers.support;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import net.dahliasolutions.models.EventModule;
-import net.dahliasolutions.models.EventType;
-import net.dahliasolutions.models.Notification;
-import net.dahliasolutions.models.NotificationModel;
-import net.dahliasolutions.models.position.Position;
-import net.dahliasolutions.models.records.BigIntegerStringModel;
-import net.dahliasolutions.models.records.SingleBigIntegerModel;
-import net.dahliasolutions.models.records.SingleIntModel;
-import net.dahliasolutions.models.records.SingleStringModel;
+import net.dahliasolutions.models.*;
+import net.dahliasolutions.models.order.OrderItem;
+import net.dahliasolutions.models.order.OrderNote;
+import net.dahliasolutions.models.order.OrderRequest;
+import net.dahliasolutions.models.order.OrderStatus;
+import net.dahliasolutions.models.records.*;
 import net.dahliasolutions.models.support.*;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
 import net.dahliasolutions.services.support.*;
+import net.dahliasolutions.services.user.UserRolesService;
 import net.dahliasolutions.services.user.UserService;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +33,7 @@ public class SupportAPIController {
     private final TicketService ticketService;
     private final TicketImageService ticketImageService;
     private final TicketNoteService noteService;
+    private final UserRolesService rolesService;
 
     @GetMapping("")
     public List<Ticket> getSupportTickets() {
@@ -193,6 +194,108 @@ public class SupportAPIController {
         return note;
     }
 
+    @GetMapping("/getstatusoptions")
+    public List<TicketStatus> getTicketStatusOptions(){
+        return Arrays.asList(TicketStatus.values());
+    }
+
+    @GetMapping("/getsupervisors")
+    public List<User> getSupervisors(){
+        Collection<UserRoles> roles = getSupervisorCollection();
+        List<User> userList = new ArrayList<>();
+        List<User> allUsers = userService.findAll();
+
+        for (User user : allUsers) {
+            for (UserRoles role : user.getUserRoles()) {
+                if (roles.contains(role)) {
+                    userList.add(user);
+                    break;
+                }
+            }
+        }
+        return userList;
+    }
+
+    @PostMapping("/changestatus")
+    public TicketStatusModel updateRequestStatus(@ModelAttribute TicketStatusModel statusModel) {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        TicketStatus setStatus = TicketStatus.valueOf(statusModel.status());
+        Optional<Ticket> ticket = ticketService.findById(statusModel.id());
+
+        if (ticket.isPresent()) {
+            ticket.get().setTicketStatus(TicketStatus.valueOf(statusModel.status()));
+            ticketService.save(ticket.get());
+
+            TicketNote ticketNote = noteService.createTicketNote(
+                    new TicketNote(null, null, false,
+            true, statusModel.note(), new ArrayList<>(), currentUser, ticket.get()));
+        }
+
+        return statusModel;
+    }
+
+    @PostMapping("/addsupervisor")
+    public AddTicketAgentModel addSupervisorToRequest(@ModelAttribute AddTicketAgentModel supervisorModel) {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Optional<Ticket> ticket = ticketService.findById(supervisorModel.id());
+        Optional<User> newSuper = userService.findById(supervisorModel.userId());
+        String noteDetail = "";
+        if (ticket.isPresent()) {
+            if (newSuper.isPresent()) {
+                if (supervisorModel.primary()) {
+                    noteDetail = newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+" was set as primary agent on ticket.";
+
+                    ticket.get().setAgentList(
+                            removeFromSupervisorList(newSuper.get(), ticket.get().getAgentList()));
+
+                    ticket.get().setAgent(newSuper.get());
+                    ticketService.save(ticket.get());
+                    TicketNote ticketNote = noteService.createTicketNote(
+                            new TicketNote(null, null, false,
+                        true, noteDetail, new ArrayList<>(), currentUser, ticket.get()));
+                } else {
+                    noteDetail = newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+" was add to the ticket.";
+
+                    ticket.get().setAgentList(
+                            addToSupervisorList(ticket.get().getAgent(), ticket.get().getAgentList()));
+
+                    ticketService.save(ticket.get());
+                    TicketNote ticketNote = noteService.createTicketNote(
+                            new TicketNote(null, null, true,
+                                    true, noteDetail, new ArrayList<>(), currentUser, ticket.get()));
+                }
+            }
+        }
+        return supervisorModel;
+    }
+
+    @PostMapping("/removesupervisor")
+    public AddTicketAgentModel removeSupervisorToRequest(@ModelAttribute AddTicketAgentModel supervisorModel) {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Optional<Ticket> ticket = ticketService.findById(supervisorModel.id());
+        Optional<User> newSuper = userService.findById(supervisorModel.userId());
+        boolean required = false;
+
+        String noteDetail = "";
+        if (ticket.isPresent()) {
+            if (newSuper.isPresent()) {
+                noteDetail = newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+" was removed from ticket.";
+
+                ticket.get().setAgentList(
+                        removeFromSupervisorList(ticket.get().getAgent(), ticket.get().getAgentList()));
+
+                ticketService.save(ticket.get());
+                TicketNote ticketNote = noteService.createTicketNote(
+                        new TicketNote(null, null, true,
+                true, noteDetail, new ArrayList<>(), currentUser, ticket.get()));
+            }
+        }
+        return supervisorModel;
+    }
+
     // get edit permission
     private boolean supportEditor(User currentUser) {
         Collection<UserRoles> roles = currentUser.getUserRoles();
@@ -203,5 +306,33 @@ public class SupportAPIController {
             }
         }
         return false;
+    }
+
+    private Collection<UserRoles> getSupervisorCollection() {
+        Collection<UserRoles> roles = new ArrayList<>();
+        roles.add(rolesService.findByName("ADMIN_WRITE").get());
+        roles.add(rolesService.findByName("SUPPORT_WRITE").get());
+        roles.add(rolesService.findByName("SUPPORT_SUPERVISOR").get());
+        return roles;
+    }
+
+    private List<User> removeFromSupervisorList(User user, List<User> list){
+        for (User su : list) {
+            if (su.getId().equals(user.getId())) {
+                list.remove(su);
+                break;
+            }
+        }
+        return list;
+    }
+
+    private List<User> addToSupervisorList(User user, List<User> list){
+        for (User su : list) {
+            if (su.getId().equals(user.getId())) {
+                return list;
+            }
+        }
+        list.add(user);
+        return list;
     }
 }
