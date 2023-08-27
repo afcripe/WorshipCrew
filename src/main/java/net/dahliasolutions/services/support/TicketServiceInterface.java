@@ -18,6 +18,7 @@ public interface TicketServiceInterface {
     Optional<Ticket> findById(String id);
     List<Ticket> findAll();
     List<Ticket> findAllByUser(User user);
+    List<Ticket> findAllByUserOpenOnly(User user);
     List<Ticket> findFirst5ByUser(User user);
     List<Ticket> findAllByAgent(User user);
     List<Ticket> findAllByAgentOpenOnly(User user);

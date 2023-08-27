@@ -25,6 +25,7 @@ public interface TicketRepository extends JpaRepository<Ticket, BigInteger> {
     List<Ticket> findAllByCampus(Campus campus);
     List<Ticket> findAllByDepartmentAndTicketStatusNot(DepartmentRegional department, TicketStatus status);
     List<Ticket> findAllByDepartment(DepartmentRegional department);
+    List<Ticket> findFirst5ByUserOrderByTicketDateDesc(User user);
 
     @Query(value = "SELECT COUNT(ID) AS COUNT FROM TICKET", nativeQuery = true)
     int countAllById();

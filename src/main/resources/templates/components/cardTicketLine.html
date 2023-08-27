@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+
+<div th:fragment="cardFragment(ticket)">
+  <div class="card p-2 selectableItem" th:onclick="navToTicket([[${ticket.id}]])" th:object="${ticket}">
+
+    <div class="row" >
+      <div class="col-12 col-md-4">
+        <span class="h6" th:text="*{id}"></span> - <span th:text="*{ticketStatus}"></span>
+      </div>
+      <div class="col-12 col-md-4">
+        <span th:text="*{user.firstName}+' '+*{user.lastName}"></span>
+      </div>
+      <div class="col-12 col-md-4">
+        <div>
+          <strong>Due: <span th:text="*{#temporals.format(ticketDue, 'MMM-dd-yyyy HH:mm')}"></span></strong>
+        </div>
+      </div>
+    </div>
+    <div class="row" >
+      <div class="col-12 col-md-8">
+        <span th:text="*{ticketDetail}"></span>
+      </div>
+      <div class="col-12 col-md-4">
+        <div>
+          SLA: <span th:text="*{sla?.name}"></span>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function navToTicket(id) {
+        window.location.href="/support/ticket/"+id;
+      }
+    </script>
+
+  </div>
+</div>
+
+</html>

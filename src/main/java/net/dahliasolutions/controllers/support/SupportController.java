@@ -55,24 +55,19 @@ public class SupportController {
 
     @GetMapping("")
     public String goSupportHome(Model model, HttpSession session) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) auth.getPrincipal();
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        List<Ticket> myTickets = new ArrayList<>();
-        List<Ticket> agentTickets = new ArrayList<>();
-        List<Ticket> supervisorTickets = new ArrayList<>();
-        List<Ticket> campusTickets = new ArrayList<>();
-        List<Ticket> departmentTickets = new ArrayList<>();
+        List<Ticket> openUserTicketList = ticketService.findAllByUserOpenOnly(currentUser);
+        List<Ticket> openAgentTicketList = ticketService.findAllByAgentOpenOnly(currentUser);
+        List<Ticket> ticketMentionList = ticketService.findAllByMentionOpenOnly(currentUser);
 
-
-        model.addAttribute("myTickets", myTickets);
-        model.addAttribute("agentTickets", agentTickets);
-        model.addAttribute("supervisorTickets", supervisorTickets);
-        model.addAttribute("campusTickets", campusTickets);
-        model.addAttribute("departmentTickets", departmentTickets);
+        model.addAttribute("user", currentUser);
+        model.addAttribute("openUserTicketList", openUserTicketList);
+        model.addAttribute("openAgentTicketList", openAgentTicketList);
+        model.addAttribute("ticketMentionList", ticketMentionList);
 
         redirectService.setHistory(session, "/support");
-        return "support/index";
+        return "support/ticketList";
     }
 
     @GetMapping("/ticket/{id}")

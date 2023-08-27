@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<div class="container-fluid m-0 py-0 px-2" layout:fragment="content">
+
+    <div th:replace="~{support/moduleHeader :: header}">Header</div>
+
+
+    <div class="row p-2">
+        <div class="col">
+            <div class="h3" style="float: left">
+                Open Tickets
+            </div>
+            <div class="h3" style="float: right">
+                <a th:href="'/support/user/'+${user.id}" style="text-decoration: none">All Tickets</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row pt-3 py-2" th:if="${not #lists.isEmpty(openUserTicketList)}">
+        <div class="col">
+            <h4>Tickets You Submitted</h4>
+        </div>
+    </div>
+    <div class="row pt-2 pb-5 py-2">
+        <div class="row py-1" th:if="${not #lists.isEmpty(openUserTicketList)}" th:each="userTicket : ${openUserTicketList}">
+            <div th:replace="~{components/cardTicketLine :: cardFragment(${userTicket})}">/div>
+        </div>
+    </div>
+
+    <div class="row pt-5 py-2">
+        <div class="col">
+            <h4>Tickets Sent to You</h4>
+        </div>
+    </div>
+    <div class="row pt-2 pb-5 py-2">
+        <div class="row py-1" th:if="${not #lists.isEmpty(openAgentTicketList)}" th:each="openTicket : ${openAgentTicketList}">
+            <div th:replace="~{components/cardTicketLine :: cardFragment(${openTicket})}">No Tickets to Display</div>
+        </div>
+    </div>
+
+    <div class="row pt-5 py-2">
+        <div class="col">
+            <h4>Tickets You've been Included on</h4>
+        </div>
+    </div>
+    <div class="row pt-5 pb-5 py-2">
+        <div class="py-1" th:if="${not #lists.isEmpty(ticketMentionList)}" th:each="ticketMention : ${ticketMentionList}">
+            <div th:replace="~{components/cardTicketLine :: cardFragment(${ticketMention})}">No Tickets to Display</div>
+        </div>
+    </div>
+
+</div>
+
+
+</html>

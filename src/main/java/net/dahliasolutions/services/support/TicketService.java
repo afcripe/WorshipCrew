@@ -1,8 +1,11 @@
 package net.dahliasolutions.services.support;
 
+import jakarta.persistence.Tuple;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.data.TicketRepository;
 import net.dahliasolutions.models.department.DepartmentRegional;
+import net.dahliasolutions.models.order.OrderRequest;
+import net.dahliasolutions.models.order.OrderStatus;
 import net.dahliasolutions.models.position.Position;
 import net.dahliasolutions.models.store.StoreSetting;
 import net.dahliasolutions.models.support.*;
@@ -122,37 +125,51 @@ public class TicketService implements TicketServiceInterface {
 
     @Override
     public List<Ticket> findAll() {
-        return null;
+        return ticketRepository.findAll();
     }
 
     @Override
     public List<Ticket> findAllByUser(User user) {
-        return null;
+        return ticketRepository.findAllByUser(user);
+    }
+
+    @Override
+    public List<Ticket> findAllByUserOpenOnly(User user) {
+        return ticketRepository.findAllByUserAndTicketStatusNot(user, TicketStatus.Closed);
     }
 
     @Override
     public List<Ticket> findFirst5ByUser(User user) {
-        return null;
+        return ticketRepository.findFirst5ByUserOrderByTicketDateDesc(user);
     }
 
     @Override
     public List<Ticket> findAllByAgent(User user) {
-        return null;
+        return ticketRepository.findAllByAgentId(user.getId());
     }
 
     @Override
     public List<Ticket> findAllByAgentOpenOnly(User user) {
-        return null;
+        return ticketRepository.findAllByAgentIdOpenOnly(user.getId());
     }
 
     @Override
     public List<Ticket> findAllByMentionOpenOnly(User user) {
-        return null;
+        List<Tuple> agentList = ticketRepository.findAllMentionsByAgentId(user.getId());
+        List<Ticket> ticketList = new ArrayList<>();
+        for (Tuple tuple : agentList) {
+            String ticketId = tuple.get(0).toString();
+            Ticket ticket = ticketRepository.findById(ticketId).get();
+            if (!ticket.getTicketStatus().equals(TicketStatus.Closed)) {
+                ticketList.add(ticket);
+            }
+        }
+        return ticketList;
     }
 
     @Override
     public Ticket save(Ticket ticket) {
-        return null;
+        return ticketRepository.save(ticket);
     }
 
     private List<User> getSupervisors() {
