@@ -815,7 +815,7 @@ ul, #folderTree {
     flex-direction: column;
 }
 
-@media only screen and (min-width: 1200px) {
+@media only screen and (min-width: 900px) {
     .support-ticket {
       flex-direction: row;
   }
@@ -885,7 +885,7 @@ ul, #folderTree {
 
 .note-content {
     flex-grow: 1;
-    min-width: 375;
+    min-width: 375px;
     padding: 5px;
 }
 

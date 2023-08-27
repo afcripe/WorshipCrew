@@ -167,6 +167,7 @@ public class SecurityConfig {
                         savedRequest = session.getAttribute("SPRING_SECURITY_SAVED_REQUEST").toString();
                         savedRequest = savedRequest.substring(21, savedRequest.length() - 1);
                         savedRequest = savedRequest.replace("?continue","");
+                        savedRequest = savedRequest.replace("&continue","");
                     }
                     if (savedRequest.contains("api")) {
                         savedRequest = request.getContextPath();

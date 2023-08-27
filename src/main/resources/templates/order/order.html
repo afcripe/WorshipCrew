@@ -117,7 +117,7 @@
                 <div th:each="super : *{supervisorList}">
                     <p th:id="'super-'+${super.id}" class="p-2">
                         <span th:text="${super.firstName}+' '+${super.lastName}"></span>
-                        <i class="bi bi-x" style="color: red" th:onclick="removeSuper([[${super.id}]])" th:if="${editable}"></i>
+                        <i class="bi bi-x" style="color: red; cursor: pointer" th:onclick="removeSuper([[${super.id}]])" th:if="${editable}"></i>
                     </p>
                 </div>
             </div>

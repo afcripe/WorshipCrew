@@ -19,6 +19,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
+import java.rmi.registry.LocateRegistry;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @RestController
@@ -117,13 +119,13 @@ public class SupportAPIController {
     }
 
     @PostMapping("/sla/get")
-    public SLA getOrderNotification(@ModelAttribute SingleBigIntegerModel intModel) {
+    public SLA getSLAById(@ModelAttribute SingleBigIntegerModel intModel) {
         Optional<SLA> sla = slaService.findById(intModel.id());
         return sla.orElseGet(SLA::new);
     }
 
     @PostMapping("/sla/update")
-    public SLA updateOrderNotification(@ModelAttribute SLA slaModel) {
+    public SLA updateSLA(@ModelAttribute SLA slaModel) {
         Optional<SLA> sla = slaService.findById(slaModel.getId());
 
         if (sla.isPresent()) {
@@ -139,7 +141,7 @@ public class SupportAPIController {
     }
 
     @PostMapping("/sla/delete")
-    public SingleBigIntegerModel deleteOrderNotification(@ModelAttribute SingleBigIntegerModel intModel) {
+    public SingleBigIntegerModel deleteSLA(@ModelAttribute SingleBigIntegerModel intModel) {
         Optional<SLA> sla = slaService.findById(intModel.id());
         sla.ifPresent(serviceLevel -> slaService.deleteById(serviceLevel.getId()));
         return intModel;
@@ -223,13 +225,21 @@ public class SupportAPIController {
         TicketStatus setStatus = TicketStatus.valueOf(statusModel.status());
         Optional<Ticket> ticket = ticketService.findById(statusModel.id());
 
+        String noteDetail = statusModel.note();
+        if (noteDetail.equals("")) {
+            noteDetail = "The status was updated to "+statusModel.status()+" by "+currentUser.getFirstName()+" "+currentUser.getLastName();
+        }
+
         if (ticket.isPresent()) {
             ticket.get().setTicketStatus(TicketStatus.valueOf(statusModel.status()));
+            if (setStatus.equals(TicketStatus.Closed)) {
+                ticket.get().setTicketClosed(LocalDateTime.now());
+            }
             ticketService.save(ticket.get());
 
             TicketNote ticketNote = noteService.createTicketNote(
                     new TicketNote(null, null, false,
-            true, statusModel.note(), new ArrayList<>(), currentUser, ticket.get()));
+            true, noteDetail, new ArrayList<>(), currentUser, ticket.get()));
         }
 
         return statusModel;
@@ -248,7 +258,7 @@ public class SupportAPIController {
                     noteDetail = newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+" was set as primary agent on ticket.";
 
                     ticket.get().setAgentList(
-                            removeFromSupervisorList(newSuper.get(), ticket.get().getAgentList()));
+                            addToSupervisorList(ticket.get().getAgent(), ticket.get().getAgentList()));
 
                     ticket.get().setAgent(newSuper.get());
                     ticketService.save(ticket.get());
@@ -259,7 +269,7 @@ public class SupportAPIController {
                     noteDetail = newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+" was add to the ticket.";
 
                     ticket.get().setAgentList(
-                            addToSupervisorList(ticket.get().getAgent(), ticket.get().getAgentList()));
+                            addToSupervisorList(newSuper.get(), ticket.get().getAgentList()));
 
                     ticketService.save(ticket.get());
                     TicketNote ticketNote = noteService.createTicketNote(
@@ -294,6 +304,38 @@ public class SupportAPIController {
             }
         }
         return supervisorModel;
+    }
+
+    @GetMapping("/getslaoptions")
+    public List<SLA> getSLAOptions() {
+        return slaService.findAll();
+    }
+
+    @PostMapping("/changesla")
+    public SLA updateTicketSLA(@ModelAttribute BigIntegerStringModel lsaModel) {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Optional<SLA> sla = slaService.findById(lsaModel.id());
+        Optional<Ticket> ticket = ticketService.findById(lsaModel.name());
+
+        if (sla.isPresent()) {
+            String noteDetail = "The SLA was updated to " + sla.get().getName() + " by " +
+                    currentUser.getFirstName() + " " + currentUser.getLastName();
+            if (ticket.isPresent()) {
+                LocalDateTime newDueDate = ticket.get().getTicketDate().plusHours(sla.get().getCompletionDue());
+
+                ticket.get().setSla(sla.get());
+                ticket.get().setTicketDue(newDueDate);
+                ticketService.save(ticket.get());
+
+                TicketNote ticketNote = noteService.createTicketNote(
+                        new TicketNote(null, null, true,
+                                true, noteDetail, new ArrayList<>(), currentUser, ticket.get()));
+                return sla.get();
+            }
+        }
+
+        return new SLA();
     }
 
     // get edit permission
