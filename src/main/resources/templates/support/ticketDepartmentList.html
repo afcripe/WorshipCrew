@@ -5,18 +5,18 @@
 
 <div class="container-fluid m-0 py-0 px-0" layout:fragment="content">
 
-    <div th:replace="~{order/moduleHeader :: header}">Header</div>
+    <div th:replace="~{support/moduleHeader :: header}">Header</div>
 
-    <div th:replace="~{order/moduleFilterDate :: filterDate}">Filter</div>
+    <div th:replace="~{support/moduleFilterDate :: filterDate}">Filter</div>
 
 
     <div th:each="department : ${departmentItemList}">
         <div class="row pt-5 py-2">
             <div class="col">
                 <h4>
-                    <a th:href="'/request/department/'+*{department.department.name}" style="text-decoration: none">
+                    <a th:href="'/support/department/'+*{department.department.name}" style="text-decoration: none">
                         <span th:text="*{department.department.name}" style="text-decoration: none"></span>
-                        (<span th:text="*{#lists.size(department.orderItemList)}" style="text-decoration: none"></span>)
+                        (<span th:text="*{#lists.size(department.ticketList)}" style="text-decoration: none"></span>)
                     </a>
                     <i th:id="*{department.department.name}+'CaretRight'" class="bi bi-caret-right" th:onclick="toggleDepartment([[*{department.department.name}]])"></i>
                     <i th:id="*{department.department.name}+'CaretDown'" class="bi bi-caret-down" style="display: none" th:onclick="toggleDepartment([[*{department.department.name}]])"></i>
@@ -24,8 +24,8 @@
             </div>
         </div>
         <div th:id="*{department.department.name}" class="row pt-2 pb-0 py-2" style="display: none">
-            <div class="row" th:each="orderItem : *{department.orderItemList}">
-                <div th:replace="~{components/cardOrderItemLineSummary :: cardFragment(${orderItem})}">No Items</div>
+            <div class="row" th:each="orderItem : *{department.ticketList}">
+                <div th:replace="~{components/cardTicketLine :: cardFragment(${orderItem})}">No Items</div>
             </div>
         </div>
     </div>
@@ -33,7 +33,7 @@
 
     <script th:inline="javascript">
         function navToRequest(id) {
-            window.location.href="/request/order/"+id;
+            window.location.href="/support/order/"+id;
         }
         function toggleDepartment(department) {
             let divDepartment = document.getElementById(department);

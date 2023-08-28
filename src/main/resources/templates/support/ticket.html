@@ -38,7 +38,7 @@
         <div class="mt-2 w-100">
             <h2>
                 <div style="float: right">
-                    <i id="btnStatusEdit" class="bi bi-pencil-square h5 selectableItem" th:if="${isAgent} and ${closeDate} == false"
+                    <i id="btnStatusEdit" class="bi bi-pencil-square h5 selectableItem" th:if="${isAgent} or ${closeDate} == false"
                        th:onclick="updateTicketStatus([[*{id}]])"></i>
                     <input id="ticketStatus" type="hidden" th:value="*{ticketStatus}">
                     <span th:text="*{ticketStatus}"></span>
@@ -46,6 +46,7 @@
 
                 Ticket:
                 <span th:text="*{id}">(not found)</span>
+                <input id="ticketId" type="hidden" th:value="*{id}">
             </h2>
         </div>
 
@@ -92,7 +93,7 @@
                   </div>
                   <div class="ticket-detail-info">
                       <div>
-                          <i id="btnSLAEdit" class="bi bi-pencil-square selectableItem" th:if="${isAgent} and ${closeDate} == false"
+                          <i id="btnSLAEdit" class="bi bi-pencil-square selectableItem" th:if="${isAgent} or ${closeDate} == false"
                              th:onclick="updateTicketSLA([[*{id}]])"></i>
                           SLA: <span th:text="*{sla?.name}"></span>
                           <input id="ticketSLA" type="hidden" value="*{sla}">
@@ -122,7 +123,6 @@
                         </div>
 
                         <div class="note-content">
-                            <input id="ticketId" type="hidden" th:value="*{id}">
                             <textarea id="noteDetail" style="width: 100%; height: 75px"></textarea>
                             <div class="card-section">
                                 <input type="hidden" name="image" class="w-50" id="image">
@@ -171,7 +171,7 @@
                 <div class="card m-1">
 
                     <div class="card-title m-2 pb-0 mb-0">
-                        <button class="btn btn-sm btn-success" style="float: right" th:if="${isAgent} and ${closeDate} == false"
+                        <button class="btn btn-sm btn-success" style="float: right" th:if="${isAgent} or ${closeDate} == false"
                                 onclick="dialogIncludePerson()">
                             <icon class="bi bi-plus"></icon>
                         </button>
@@ -183,7 +183,7 @@
                     <div th:each="agent : *{agentList}">
                         <p th:id="'agent-'+${agent.id}" class="p-2">
                             <span th:text="${agent.firstName}+' '+${agent.lastName}"></span>
-                            <i class="bi bi-x" style="color: red; cursor: pointer" th:if="${isAgent} and ${closeDate} == false"
+                            <i class="bi bi-x" style="color: red; cursor: pointer" th:if="${isAgent} or ${closeDate} == false"
                                th:onclick="removeSuper([[${agent.id}]])"></i>
                         </p>
                     </div>
@@ -359,7 +359,7 @@
     <dialog id="changeSLADialog" class="upload-modal">
         <script>
             async function loadSLAOptions() {
-                let displaySelectSLA = document.getSelection('slaSelect');
+                let displaySelectSLA = document.getElementById('slaSelect');
                 let dispSLA = document.getElementById('ticketSLA');
 
                 const response = await fetch('/api/v1/support/getslaoptions')
@@ -369,7 +369,7 @@
                         while (displaySelectSLA.firstChild) {
                             displaySelectSLA.removeChild(displaySelectSLA.lastChild);
                         }
-                        debugger
+
                         for (let key in data) {
                             let opt = document.createElement('option');
                             opt.value = data[key].id;
@@ -387,8 +387,8 @@
                 let dispStatusSLA = document.getElementById('slaSelect');
                 debugger
                 let formData = new FormData();
-                formData.set("id", dispStatusSLA.value);
-                formData.set("name", inputId.value);
+                    formData.set("id", dispStatusSLA.value);
+                    formData.set("name", inputId.value);
 
                 const response = await fetch('/api/v1/support/changesla', {
                     method: 'POST',

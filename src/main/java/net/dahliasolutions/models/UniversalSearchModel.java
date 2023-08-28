@@ -12,4 +12,5 @@ public class UniversalSearchModel {
     private String searchTerm;
     private String searchType;
     private BigInteger searchId;
+    private String searchStringId;
 }

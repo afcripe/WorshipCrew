@@ -312,11 +312,11 @@ public class SupportAPIController {
     }
 
     @PostMapping("/changesla")
-    public SLA updateTicketSLA(@ModelAttribute BigIntegerStringModel lsaModel) {
+    public SLA updateTicketSLA(@ModelAttribute BigIntegerStringModel slaModel) {
         User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        Optional<SLA> sla = slaService.findById(lsaModel.id());
-        Optional<Ticket> ticket = ticketService.findById(lsaModel.name());
+        Optional<SLA> sla = slaService.findById(slaModel.id());
+        Optional<Ticket> ticket = ticketService.findById(slaModel.name());
 
         if (sla.isPresent()) {
             String noteDetail = "The SLA was updated to " + sla.get().getName() + " by " +
@@ -336,6 +336,23 @@ public class SupportAPIController {
         }
 
         return new SLA();
+    }
+
+    @PostMapping("/search")
+    public List<UniversalSearchModel> searchRequests(@ModelAttribute SingleStringModel stringModel) {
+        // init return
+        List<UniversalSearchModel> searchReturn = new ArrayList<>();
+
+        List<Ticket> foundTickets = ticketService.searchAllById(stringModel.name());
+        for (Ticket ticket : foundTickets) {
+            searchReturn.add(new UniversalSearchModel(ticket.getId(), "ticket", BigInteger.valueOf(0), ticket.getId()));
+        }
+
+        List<User> foundUsers = userService.searchAllByFullName(stringModel.name());
+        for (User user : foundUsers) {
+            searchReturn.add(new UniversalSearchModel(user.getFullName(), "user", user.getId(), ""));
+        }
+        return searchReturn;
     }
 
     // get edit permission

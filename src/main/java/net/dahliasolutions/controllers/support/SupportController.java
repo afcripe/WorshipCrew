@@ -2,9 +2,12 @@ package net.dahliasolutions.controllers.support;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import net.dahliasolutions.models.UniversalSearchModel;
 import net.dahliasolutions.models.campus.Campus;
 import net.dahliasolutions.models.department.DepartmentCampus;
 import net.dahliasolutions.models.department.DepartmentRegional;
+import net.dahliasolutions.models.order.OrderItemDepartment;
+import net.dahliasolutions.models.order.OrderRequestCampus;
 import net.dahliasolutions.models.support.*;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
@@ -17,16 +20,17 @@ import net.dahliasolutions.services.mail.EmailService;
 import net.dahliasolutions.services.support.*;
 import net.dahliasolutions.services.user.UserRolesService;
 import net.dahliasolutions.services.user.UserService;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+
+import static java.lang.Math.abs;
 
 @Controller
 @RequestMapping("/support")
@@ -158,7 +162,7 @@ public class SupportController {
     }
 
     @PostMapping("/create")
-    public String createTicket(@ModelAttribute TicketNewModel ticketNewModel, HttpSession session) {
+    public String createTicket(@ModelAttribute TicketNewModel ticketNewModel) {
         User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         TicketImage ticketImage = null;
@@ -171,14 +175,153 @@ public class SupportController {
         return "redirect:/support/ticket/" + ticket.getId();
     }
 
-    @GetMapping("/search/{searchTerm}")
-    public String searchTickets(@PathVariable String searchTerm, Model model, HttpSession session) {
-        redirectService.setHistory(session, "/support/search/title/" + searchTerm);
-        String searcher = URLDecoder.decode(searchTerm, StandardCharsets.UTF_8);
-        // List<StoreItem> itemList = storeItemService.searchAll(searcher);
+    @GetMapping("/user/{id}")
+    public String getUserOrders(@RequestParam Optional<String> cycle, @PathVariable BigInteger id, Model model, HttpSession session) {
+        Integer currentCycle = Integer.parseInt(session.getAttribute("cycle").toString());
+        if (cycle.isPresent()) {
+            switch (cycle.get()) {
+                case "left":
+                    currentCycle--;
+                    session.setAttribute("cycle", currentCycle);
+                    break;
+                case "right":
+                    if (currentCycle < 0) {
+                        currentCycle++;
+                        session.setAttribute("cycle", currentCycle);
+                        break;
+                    }
+                default:
+                    currentCycle=0;
+                    session.setAttribute("cycle", 0);
+            }
+        }
 
-        // model.addAttribute("storeItems", itemList);
-        return "support/index";
+        LocalDateTime startDate = getStartDate(session.getAttribute("dateFilter").toString(), currentCycle);
+        LocalDateTime endDate = getEndDate(session.getAttribute("dateFilter").toString(), currentCycle);
+
+        Optional<User> user = userService.findById(id);
+
+        if (user.isEmpty()) {
+            session.setAttribute("msgError", "User not found.");
+            return redirectService.pathName(session, "/support");
+        }
+
+        List<Ticket> ticketList = ticketService.findAllByUserAndCycle(user.get().getId(), startDate, endDate);
+        List<Ticket> agentTicketList = ticketService.findAllByAgentAndCycle(user.get().getId(), startDate, endDate);
+        List<Ticket> ticketMentionList = ticketService.findAllByMentionOpenAndCycle(user.get().getId(), startDate, endDate);
+
+        model.addAttribute("editable", false);
+        model.addAttribute("searchedUser", user.get().getFirstName()+" "+user.get().getLastName());
+        model.addAttribute("ticketList", ticketList);
+        model.addAttribute("agentTicketList", agentTicketList);
+        model.addAttribute("ticketMentionList", ticketMentionList);
+
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+
+        redirectService.setHistory(session, "/support/user/"+id);
+        return "support/ticketUser";
+    }
+
+    @GetMapping("/campus")
+    public String getOpenByCampus(@RequestParam Optional<String> cycle, Model model, HttpSession session) {
+        Integer currentCycle = Integer.parseInt(session.getAttribute("cycle").toString());
+        if (cycle.isPresent()) {
+            switch (cycle.get()) {
+                case "left":
+                    currentCycle--;
+                    session.setAttribute("cycle", currentCycle);
+                    break;
+                case "right":
+                    if (currentCycle < 0) {
+                        currentCycle++;
+                        session.setAttribute("cycle", currentCycle);
+                        break;
+                    }
+                default:
+                    currentCycle=0;
+                    session.setAttribute("cycle", 0);
+            }
+        }
+
+        LocalDateTime startDate = getStartDate(session.getAttribute("dateFilter").toString(), currentCycle);
+        LocalDateTime endDate = getEndDate(session.getAttribute("dateFilter").toString(), currentCycle);
+
+        List<Campus> campusList = campusService.findAll();
+
+        List<TicketCampus> campusItemList = new ArrayList<>();
+        for (Campus campus : campusList) {
+            TicketCampus campusItem = new TicketCampus(campus, new ArrayList<>());
+            campusItem.setTicketList(ticketService.findAllByCampusAndCycle(campus.getId(), startDate, endDate));
+            campusItemList.add(campusItem);
+        }
+
+
+        model.addAttribute("editable", false);
+        model.addAttribute("campusItemList", campusItemList);
+
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+
+        redirectService.setHistory(session, "/support/campus");
+        return "support/ticketCampusList";
+    }
+
+    @GetMapping("/department")
+    public String getOpenByDepartment(@RequestParam Optional<String> cycle, Model model, HttpSession session) {
+        Integer currentCycle = Integer.parseInt(session.getAttribute("cycle").toString());
+        if (cycle.isPresent()) {
+            switch (cycle.get()) {
+                case "left":
+                    currentCycle--;
+                    session.setAttribute("cycle", currentCycle);
+                    break;
+                case "right":
+                    if (currentCycle < 0) {
+                        currentCycle++;
+                        session.setAttribute("cycle", currentCycle);
+                        break;
+                    }
+                default:
+                    currentCycle=0;
+                    session.setAttribute("cycle", 0);
+            }
+        }
+
+        LocalDateTime startDate = getStartDate(session.getAttribute("dateFilter").toString(), currentCycle);
+        LocalDateTime endDate = getEndDate(session.getAttribute("dateFilter").toString(), currentCycle);
+
+        List<DepartmentRegional> departmentList = departmentRegionalService.findAll();
+
+        List<TicketDepartment> departmentItemList = new ArrayList<>();
+        for (DepartmentRegional department : departmentList) {
+            TicketDepartment departmentItem = new TicketDepartment(department, new ArrayList<>());
+            departmentItem.setTicketList(ticketService.findAllByDepartmentAndCycle(department.getId(), startDate, endDate));
+            departmentItemList.add(departmentItem);
+        }
+
+
+        model.addAttribute("editable", false);
+        model.addAttribute("departmentItemList", departmentItemList);
+
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+
+        redirectService.setHistory(session, "/support/department");
+        return "support/ticketDepartmentList";
+    }
+
+    @PostMapping("/search")
+    public String searchRequests(@ModelAttribute UniversalSearchModel searchModel) {
+        // determine if search type
+        switch (searchModel.getSearchType()) {
+            case "ticket":
+                return "redirect:/support/ticket/"+searchModel.getSearchStringId();
+            case "user":
+                return "redirect:/support/user/"+searchModel.getSearchId();
+            default:
+                return "redirect:/support";
+        }
     }
 
     // get edit permission
@@ -319,6 +462,77 @@ public class SupportController {
         });
         Collections.reverse(notes);
         return notes;
+    }
+
+    private LocalDateTime getStartDate(String dateSpan, Integer cycle) {
+        // parse dateSpan
+        String span = dateSpan.substring(0,1);
+        String part = dateSpan.substring(1,2);
+        //adjust the cycle
+        int adjustment = Integer.parseInt(span);
+        int cycleAdjustment = adjustment+abs(cycle*adjustment);
+
+        // init date
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        LocalDateTime dateNow = LocalDateTime.now();
+        // add leading 0 to month
+        Integer month = dateNow.getMonthValue();
+        String monthString = month.toString();
+        if (monthString.length() < 2) {
+            monthString = "0"+monthString;
+        }
+        // create date and convert to LocalDateTime
+        String dateString = dateNow.getYear()+"-"+monthString+"-"+ dateNow.getDayOfMonth()+" 00:00";
+        LocalDateTime returnDate = LocalDateTime.parse(dateString, formatter);
+
+        // adjust date based on part
+        switch (part) {
+            case "Y":
+                returnDate = returnDate.minusYears(cycleAdjustment);
+                break;
+            case "M":
+                returnDate = returnDate.minusMonths(cycleAdjustment);
+                break;
+            case "W":
+                returnDate = returnDate.minusWeeks(cycleAdjustment);
+                break;
+        }
+        return returnDate;
+    }
+
+    private LocalDateTime getEndDate(String dateSpan, Integer cycle) {
+        // parse dateSpan
+        String part = dateSpan.substring(1,2);
+        //adjust the cycle
+        int adjustment = 0;
+        int cycleAdjustment = adjustment+abs(cycle);
+
+        // init date
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        LocalDateTime dateNow = LocalDateTime.now();
+        // add leading 0 to month
+        Integer month = dateNow.getMonthValue();
+        String monthString = month.toString();
+        if (monthString.length() < 2) {
+            monthString = "0"+monthString;
+        }
+        // create date and convert to LocalDateTime
+        String dateString = dateNow.getYear()+"-"+monthString+"-"+ dateNow.getDayOfMonth()+" 24:00";
+        LocalDateTime returnDate = LocalDateTime.parse(dateString, formatter);
+
+        // adjust date based on part
+        switch (part) {
+            case "Y":
+                returnDate = returnDate.minusYears(cycleAdjustment);
+                break;
+            case "M":
+                returnDate = returnDate.minusMonths(cycleAdjustment);
+                break;
+            case "W":
+                returnDate = returnDate.minusWeeks(cycleAdjustment);
+                break;
+        }
+        return returnDate;
     }
 
 }

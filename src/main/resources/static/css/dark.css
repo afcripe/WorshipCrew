@@ -18,6 +18,11 @@
     color: var(--dwc-body-color-dark);
     border-color: var(--dwc-border-color-dark);
 }
+.dark .upload-modal {
+    background-color: var(--dwc-body-bg-dark);
+    color: var(--dwc-body-color-dark);
+    border-radius: 5px;
+}
 .dark input {
     background-color: var(--dwc-dropdown-hover-dark);
     color: var(--dwc-body-color-dark) !important;
@@ -85,9 +90,9 @@
 .dark .nav-mod-header-link {
     color: var(--dwc-body-color-dark);
 }
-/*.dark .nav-item a{*/
-/*    color: var(--dwc-page-nav) !important;*/
-/*}*/
+.dark .nav-item a{
+    color: var(--dwc-page-nav) !important;
+}
 
 .dark .selectableItem:hover {
     background-color: var(--dwc-select-hover-dark);
@@ -96,9 +101,9 @@
 .dark .btn-outline-wiki {
     color: #fff;
 }
-.dark .btn-outline-support {
-    color: #fff;
-}
+/*.dark .btn-outline-support {*/
+/*    color: #fff;*/
+/*}*/
 
 .dark .generic-icon {
     color: var(--dwc-body-color-dark);

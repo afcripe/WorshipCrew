@@ -32,7 +32,8 @@
                     </li>
                 </ul>
                 <ul class="navbar-nav me-auto d-none d-sm-block"></ul>
-                <form autocomplete="off" method="post" th:action="@{/request/search}" class="d-flex me-auto mt-3 mt-sm-0 pl-5" style="height: 30px">
+                <form autocomplete="off" method="post" th:action="@{/request/search}" class="d-flex me-auto mt-3 mt-sm-0 pl-5"
+                      style="height: 30px" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'REQUEST_SUPERVISOR')}">
                     <div class="autocomplete" style="display: inline-block; height: 30px">
                         <input id="searchTerm" name="searchTerm" class="form-control" type="text" style="height: 30px" placeholder="Search">
                         <input id="searchId" name="searchId" type="hidden"><input id="searchType" name="searchType" type="hidden">

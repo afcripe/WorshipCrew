@@ -127,7 +127,7 @@ public class UserAPIController {
 
         List<User> foundUsers = userService.searchAllByFullName(stringModel.name());
         for (User user : foundUsers) {
-            searchReturn.add(new UniversalSearchModel(user.getFullName(), "user", user.getId()));
+            searchReturn.add(new UniversalSearchModel(user.getFullName(), "user", user.getId(), ""));
         }
 
         return searchReturn;

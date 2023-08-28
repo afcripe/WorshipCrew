@@ -491,7 +491,7 @@ public class UserController {
             return "redirect:/user/"+id.toString();
         }
 
-        model.addAttribute("user", user);
+        model.addAttribute("user", user.get());
 
         return "user/userSetPassword";
     }

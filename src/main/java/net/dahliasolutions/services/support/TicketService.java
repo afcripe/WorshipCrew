@@ -4,6 +4,7 @@ import jakarta.persistence.Tuple;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.data.TicketRepository;
 import net.dahliasolutions.models.department.DepartmentRegional;
+import net.dahliasolutions.models.order.OrderItem;
 import net.dahliasolutions.models.order.OrderRequest;
 import net.dahliasolutions.models.order.OrderStatus;
 import net.dahliasolutions.models.position.Position;
@@ -158,7 +159,7 @@ public class TicketService implements TicketServiceInterface {
         List<Tuple> agentList = ticketRepository.findAllMentionsByAgentId(user.getId());
         List<Ticket> ticketList = new ArrayList<>();
         for (Tuple tuple : agentList) {
-            String ticketId = tuple.get(0).toString();
+            String ticketId = tuple.get(1).toString();
             Ticket ticket = ticketRepository.findById(ticketId).get();
             if (!ticket.getTicketStatus().equals(TicketStatus.Closed)) {
                 ticketList.add(ticket);
@@ -170,6 +171,45 @@ public class TicketService implements TicketServiceInterface {
     @Override
     public Ticket save(Ticket ticket) {
         return ticketRepository.save(ticket);
+    }
+
+    @Override
+    public List<Ticket> searchAllById(String searchTerm) {
+        return ticketRepository.searchAllById(searchTerm);
+    }
+
+    @Override
+    public List<Ticket> findAllByCampusAndCycle(BigInteger campusId, LocalDateTime startDate, LocalDateTime endDate) {
+        return ticketRepository.findAllByCampusAndCycle(campusId, startDate, endDate);
+    }
+
+    @Override
+    public List<Ticket> findAllByUserAndCycle(BigInteger userId, LocalDateTime startDate, LocalDateTime endDate) {
+        return ticketRepository.findAllByUserAndCycle(userId, startDate, endDate);
+    }
+
+    @Override
+    public List<Ticket> findAllByAgentAndCycle(BigInteger agentId, LocalDateTime startDate, LocalDateTime endDate) {
+        return ticketRepository.findAllByAgentAndCycle(agentId, startDate, endDate);
+    }
+
+    @Override
+    public List<Ticket> findAllByMentionOpenAndCycle(BigInteger agentId, LocalDateTime startDate, LocalDateTime endDate) {
+        List<Tuple> agentList = ticketRepository.findAllMentionsByAgentId(agentId);
+        List<Ticket> ticketList = new ArrayList<>();
+        for (Tuple tuple : agentList) {
+            String ticketId = tuple.get(0).toString();
+            Optional<Ticket> ticket = ticketRepository.findAllByIdAndCycle(ticketId, startDate, endDate);
+            if (ticket.isPresent()) {
+                ticketList.add(ticket.get());
+            }
+        }
+        return ticketList;
+    }
+
+    @Override
+    public List<Ticket> findAllByDepartmentAndCycle(BigInteger departmentId, LocalDateTime startDate, LocalDateTime endDate) {
+        return ticketRepository.findAllByDepartmentAndCycle(departmentId, startDate, endDate);
     }
 
     private List<User> getSupervisors() {

@@ -438,12 +438,12 @@ public class OrderAPIController {
             BigInteger requestId = BigInteger.valueOf(i);
             List<OrderRequest> foundOrders = orderService.searchAllById(requestId);
             for (OrderRequest request : foundOrders) {
-                searchReturn.add(new UniversalSearchModel(request.getId().toString(), "request", request.getId()));
+                searchReturn.add(new UniversalSearchModel(request.getId().toString(), "request", request.getId(), ""));
             }
         } else {
             List<User> foundUsers = userService.searchAllByFullName(stringModel.name());
             for (User user : foundUsers) {
-                searchReturn.add(new UniversalSearchModel(user.getFullName(), "user", user.getId()));
+                searchReturn.add(new UniversalSearchModel(user.getFullName(), "user", user.getId(), ""));
             }
         }
         return searchReturn;

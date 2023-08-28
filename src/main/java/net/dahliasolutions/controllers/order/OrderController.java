@@ -249,7 +249,7 @@ public class OrderController {
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
 
-        redirectService.setHistory(session, "/request/department");
+        redirectService.setHistory(session, "/request/campus");
         return "order/orderCampusList";
     }
 
@@ -310,7 +310,7 @@ public class OrderController {
     }
 
     @PostMapping("/search")
-    public String searchRequests(@ModelAttribute UniversalSearchModel searchModel, HttpSession session) {
+    public String searchRequests(@ModelAttribute UniversalSearchModel searchModel) {
         // determine if search type
         switch (searchModel.getSearchType()) {
             case "request":
