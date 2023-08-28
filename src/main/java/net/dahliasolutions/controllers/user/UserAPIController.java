@@ -1,20 +1,27 @@
 package net.dahliasolutions.controllers.user;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import net.dahliasolutions.models.BrowserMessage;
 import net.dahliasolutions.models.UniversalSearchModel;
 import net.dahliasolutions.models.department.DepartmentCampus;
 import net.dahliasolutions.models.department.DepartmentRegional;
+import net.dahliasolutions.models.mail.EmailDetails;
 import net.dahliasolutions.models.order.OrderRequest;
+import net.dahliasolutions.models.records.BigIntegerStringModel;
 import net.dahliasolutions.models.records.CampusDepartmentModel;
 import net.dahliasolutions.models.records.SingleStringModel;
 import net.dahliasolutions.models.campus.Campus;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
+import net.dahliasolutions.services.AuthService;
 import net.dahliasolutions.services.campus.CampusService;
 import net.dahliasolutions.services.department.DepartmentCampusService;
 import net.dahliasolutions.services.department.DepartmentRegionalService;
+import net.dahliasolutions.services.mail.EmailService;
 import net.dahliasolutions.services.user.UserRolesService;
 import net.dahliasolutions.services.user.UserService;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.swing.text.html.Option;
@@ -31,6 +38,8 @@ public class UserAPIController {
     private final CampusService campusService;
     private final DepartmentRegionalService departmentRegionalService;
     private final DepartmentCampusService departmentCampusService;
+    private final AuthService authService;
+    private final EmailService emailService;
 
     @GetMapping("")
     public List<User> goUserHome() {
@@ -66,6 +75,32 @@ public class UserAPIController {
             return "true";
         }
         return "false";
+    }
+
+    @PostMapping("/sendPasswordChange")
+    public BigIntegerStringModel sendPasswordChangeRequest(@ModelAttribute BigIntegerStringModel userModel, HttpSession session) {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<User> user = userService.findById(userModel.id());
+        if(user.isEmpty()){
+            session.setAttribute("msgError", "No User Found!");
+            return new BigIntegerStringModel(BigInteger.valueOf(0), "");
+        }
+
+
+        // verify permission
+
+        if (!authService.verifyUserPassword(currentUser, userModel.name())) {
+            session.setAttribute("msgError", "Incorrect Admin Password!");
+            return new BigIntegerStringModel(BigInteger.valueOf(0), "");
+        }
+
+        EmailDetails emailDetails = new EmailDetails(user.get().getContactEmail(),"",
+                "Password Change Request", null);
+        BrowserMessage msg = emailService.sendPasswordResetMail(emailDetails, user.get().getId());
+
+        session.setAttribute(msg.getMsgType(), msg.getMessage());
+
+        return userModel;
     }
 
     @PostMapping("/filteredusers")
@@ -132,4 +167,5 @@ public class UserAPIController {
 
         return searchReturn;
     }
+
 }

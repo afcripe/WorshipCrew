@@ -506,7 +506,6 @@ public class UserController {
         }
 
         String pwdTemplate = "/user/"+changePasswordModel.id().toString()+"/changepassword";
-        boolean isAuth = authService.verifyUserPassword(currentUser,changePasswordModel.currentPassword());
         // verify permission
         if (!userEdit(currentUser, user.get())) {
             session.setAttribute("msgError", "Access Denied!");
@@ -535,23 +534,6 @@ public class UserController {
         eventService.dispatchEvent(e);
 
         return "redirect:/user/"+changePasswordModel.id();
-    }
-
-    @PostMapping("/{id}/sendPasswordChange")
-    public String sendPasswordChangeRequest(@PathVariable BigInteger id, HttpSession session) {
-        Optional<User> user = userService.findById(id);
-        if(user.isEmpty()){
-            session.setAttribute("msgError", "No User Found!");
-            return "redirect:/user/"+id.toString();
-        }
-
-        EmailDetails emailDetails = new EmailDetails(user.get().getContactEmail(),"",
-                "Password Change Request", null);
-        BrowserMessage msg = emailService.sendPasswordResetMail(emailDetails, user.get().getId());
-
-        session.setAttribute(msg.getMsgType(), msg.getMessage());
-
-        return "redirect:/user/"+user.get().getId().toString();
     }
 
     @GetMapping("/delete/{id}")
