@@ -38,8 +38,11 @@
         <div class="mt-2 w-100">
             <h2>
                 <div style="float: right">
-                    <i id="btnStatusEdit" class="bi bi-pencil-square h5 selectableItem" th:if="${isAgent} or ${closeDate} == false"
-                       th:onclick="updateTicketStatus([[*{id}]])"></i>
+                    <th:block th:if="${closeDate} == 'false'">
+                        <i id="btnStatusEdit" class="bi bi-pencil-square h5 selectableItem" th:if="${isAgent}"
+                           th:onclick="updateTicketStatus([[*{id}]])"></i>
+                    </th:block>
+
                     <input id="ticketStatus" type="hidden" th:value="*{ticketStatus}">
                     <span th:text="*{ticketStatus}"></span>
                 </div>
@@ -67,10 +70,13 @@
                             Submitted: <span th:text="*{#temporals.format(ticketDate, 'MMM-dd-yyyy HH:mm')}"></span>
                         </div>
 
-                        <div>
+                        <div th:if="*{agent}">
                             Assigned to: <span class="ticket-assigned-person" th:text="*{agent.firstName}+' '+*{agent.lastName}"></span>
-                            <input id="ticketAgent" type="hidden" th:value="${isAgent}">
                         </div>
+                        <div th:unless="*{agent}">
+                            Unassigned
+                        </div>
+                        <input id="ticketAgent" type="hidden" th:value="${isAgent}">
                     </div>
                     <div class="ticket-detail-info">
                         <div>
@@ -93,8 +99,10 @@
                   </div>
                   <div class="ticket-detail-info">
                       <div>
-                          <i id="btnSLAEdit" class="bi bi-pencil-square selectableItem" th:if="${isAgent} or ${closeDate} == false"
-                             th:onclick="updateTicketSLA([[*{id}]])"></i>
+                          <th:block th:if="${closeDate} == 'false'">
+                              <i id="btnSLAEdit" class="bi bi-pencil-square selectableItem" th:if="${isAgent}"
+                                 th:onclick="updateTicketSLA([[*{id}]])"></i>
+                          </th:block>
                           SLA: <span th:text="*{sla?.name}"></span>
                           <input id="ticketSLA" type="hidden" value="*{sla}">
                       </div>
@@ -112,7 +120,7 @@
             <div id="ticketNotes" class="ticket-body">
 
                 <!-- New Note Form -->
-                <div id="newNoteDiv" class="card my-2 mx-0 p-0" th:if="${closeDate} == false">
+                <div id="newNoteDiv" class="card my-2 mx-0 p-0" th:if="${closeDate} == 'false'">
 
                     <div class="note-container">
                         <div class="note-address note-address-form">
@@ -127,7 +135,7 @@
                             <div class="card-section">
                                 <input type="hidden" name="image" class="w-50" id="image">
 
-                                <button class="btn btn-sm btn-success" style="float: right" onclick="postNote()">Submit</button>
+                                <button id="btnNewNote" class="btn btn-sm btn-success" style="float: right" onclick="postNote()">Submit</button>
                                 <input type="file" id="imageFile" style="display: none;" multiple onchange="doUploadImage()">
                                 <input type="button" class="btn btn-sm btn-support" value="Attach Image" onclick="document.getElementById('imageFile').click();" />
 
@@ -447,6 +455,7 @@
         const displayBtnDetailCollapse = document.getElementById("btnDetailCollapse");
         const displayDivDetail = document.getElementById("divTicketDetail");
         const divNewNote = document.getElementById("newNoteDiv");
+        const displayNewNoteBtn = document.getElementById("btnNewNote");
         const imgProgress = document.getElementById('uploadProgress');
         const imgNames = document.getElementById('imagePath');
         const imageIds = document.getElementById('image');
@@ -606,6 +615,11 @@
         }
 
         async function postNote() {
+            displayNewNoteBtn.setAttribute("disabled", "disabled");
+
+            let pvt = "false";
+            try { pvt = inputPublic.checked } catch (e) {}
+
             let uploadedImages = ""
             let children = imageNames.children;
             for (let i = 0; i < children.length; i++) {
@@ -615,7 +629,7 @@
             }
 
         let formData = new FormData();
-            formData.set("isPrivate", inputPublic.checked);
+            formData.set("isPrivate", pvt);
             formData.set("detail", inputDetails.value);
             formData.set("images", uploadedImages);
             formData.set("ticketId", inputId.value);
@@ -626,7 +640,7 @@
             }).then(response => {
                 return response.json();
             }).then(data => {
-                debugger
+                displayNewNoteBtn.removeAttribute("disabled");
                 clearForm()
 
                 let newID = "note-"+data.id;

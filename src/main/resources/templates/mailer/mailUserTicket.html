@@ -13,7 +13,6 @@
         .float-left{float: left;}
         .float-right{float: right;}
         .emphasis{font-weight: bold;}
-        .de-emphasize{(font-size: 0.5rem;)}
         .table{width:100%;margin-bottom:1rem;vertical-align:top;}
         .table th{text-align: left;}
     </style>
@@ -31,21 +30,24 @@
 </div>
 
 </a>
-<h4 th:text="${emailSubject}">System Notification</h4>
+<h4 th:text="${emailSubject}">Support Ticket</h4>
 
 <!-- Content -->
 
-<div class="card" th:object="${notification}">
-
-    <div><span class="emphasis" th:text="*{name}"></span></div>
-
-    <div><span th:text="*{Description}"></span></div>
+<div class="card" th:object="${ticket}">
+    <div>
+        <div class="emphasis float-left">Your Ticket: <a th:href="${baseURL}+'/support/ticket/'+*{id}" th:text="*{id}"></a></div>
+        <div class="float-right">Submitted: <span th:text="*{#temporals.format(ticketDate, 'MMM-dd-yyyy')}"></span></div>
+    </div>
 
     <br><br>
 
-    <div style="padding: 2px;">
-        <div class="float-left de-emphasize">Module: <span th:text="*{module}"></span></div>
-        <div class="float-right de-emphasize">Event: <span th:text="*{type}"></span></div>
+    <div>
+        <div><span th:text="*{ticketDetail}"></span></div>
+    </div>
+
+    <div>
+        <div><span th:text="${ticketNote.detail}"></span></div>
     </div>
 
 </div>

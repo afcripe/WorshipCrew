@@ -3,6 +3,7 @@ package net.dahliasolutions.controllers.support;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.*;
+import net.dahliasolutions.models.mail.EmailDetails;
 import net.dahliasolutions.models.order.OrderItem;
 import net.dahliasolutions.models.order.OrderNote;
 import net.dahliasolutions.models.order.OrderRequest;
@@ -11,6 +12,8 @@ import net.dahliasolutions.models.records.*;
 import net.dahliasolutions.models.support.*;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
+import net.dahliasolutions.services.EventService;
+import net.dahliasolutions.services.mail.EmailService;
 import net.dahliasolutions.services.support.*;
 import net.dahliasolutions.services.user.UserRolesService;
 import net.dahliasolutions.services.user.UserService;
@@ -36,6 +39,8 @@ public class SupportAPIController {
     private final TicketImageService ticketImageService;
     private final TicketNoteService noteService;
     private final UserRolesService rolesService;
+    private final EmailService emailService;
+    private final EventService eventService;
 
     @GetMapping("")
     public List<Ticket> getSupportTickets() {
@@ -193,6 +198,27 @@ public class SupportAPIController {
         ticket.get().getNotes().add(note);
         ticketService.save(ticket.get());
 
+        if (isAgent && !isPrivate) {
+            // email note user on if public
+             EmailDetails emailDetailsUser =
+                    new EmailDetails(ticket.get().getUser().getContactEmail(),"Support Ticket "+ticket.get().getId()+" has been updated", "", null );
+            BrowserMessage returnMsg = emailService.sendUserUpdateTicket(emailDetailsUser, ticket.get(), note);
+        } else {
+            // only send if assigned to agent
+            if (ticket.get().getAgent() != null) {
+                EmailDetails emailDetailsAgent =
+                        new EmailDetails(ticket.get().getAgent().getContactEmail(),"Support Ticket "+ticket.get().getId()+" has been updated", "", null );
+                BrowserMessage returnMsg2 = emailService.sendAgentUpdateTicket(emailDetailsAgent, ticket.get(), note);
+            }
+        }
+
+        // send any additional notifications
+        String userFullName = currentUser.getFirstName()+" "+currentUser.getLastName();
+        String eventName = "Ticket "+ticket.get().getId()+" was updated by "+userFullName;
+        String eventDesc = "A note was added to Ticket "+ticket.get().getId()+" by "+userFullName+".";
+        Event e = new Event(null, eventName, eventDesc, BigInteger.valueOf(0), ticket.get().getId(), EventModule.Support, EventType.Changed);
+        eventService.dispatchEvent(e);
+
         return note;
     }
 
@@ -240,6 +266,25 @@ public class SupportAPIController {
             TicketNote ticketNote = noteService.createTicketNote(
                     new TicketNote(null, null, false,
             true, noteDetail, new ArrayList<>(), currentUser, ticket.get()));
+
+            // email ticket user
+            EmailDetails emailDetailsUser =
+                    new EmailDetails(ticket.get().getUser().getContactEmail(),
+                            "Support Ticket "+ticket.get().getId()+" status has been changed to "+statusModel.status(),
+                            "", null );
+            BrowserMessage returnMsg = emailService.sendUserUpdateTicket(emailDetailsUser, ticket.get(), ticketNote);
+
+            // send any additional notifications
+            String userFullName = currentUser.getFirstName()+" "+currentUser.getLastName();
+            String eventName = "Ticket "+ticket.get().getId()+" status was updated by "+userFullName;
+            String eventDesc = "The status of Ticket "+ticket.get().getId()+" was changed to "+statusModel.status()+" by "+userFullName+".";
+            Event e = new Event(null, eventName, eventDesc, BigInteger.valueOf(0), ticket.get().getId(), EventModule.Support, EventType.Changed);
+            eventService.dispatchEvent(e);
+            //closed
+            if (setStatus.equals(TicketStatus.Closed)) {
+                e.setType(EventType.Closed);
+                eventService.dispatchEvent(e);
+            }
         }
 
         return statusModel;
@@ -277,6 +322,13 @@ public class SupportAPIController {
                                     true, noteDetail, new ArrayList<>(), currentUser, ticket.get()));
                 }
             }
+            // send any additional notifications
+            String userFullName = currentUser.getFirstName()+" "+currentUser.getLastName();
+            String agentFullName = newSuper.get().getFirstName()+" "+newSuper.get().getLastName();
+            String eventName = agentFullName+" was added to Ticket "+ticket.get().getId();
+            String eventDesc = agentFullName+" was added as and agent to Ticket "+ticket.get().getId()+" by "+userFullName;
+            Event e = new Event(null, eventName, eventDesc, BigInteger.valueOf(0), ticket.get().getId(), EventModule.Support, EventType.Changed);
+            eventService.dispatchEvent(e);
         }
         return supervisorModel;
     }
@@ -302,6 +354,13 @@ public class SupportAPIController {
                         new TicketNote(null, null, true,
                 true, noteDetail, new ArrayList<>(), currentUser, ticket.get()));
             }
+            // send any additional notifications
+            String userFullName = currentUser.getFirstName()+" "+currentUser.getLastName();
+            String agentFullName = newSuper.get().getFirstName()+" "+newSuper.get().getLastName();
+            String eventName = agentFullName+" was removed from Ticket "+ticket.get().getId();
+            String eventDesc = "Agent "+agentFullName+" was removed from Ticket "+ticket.get().getId()+" by "+userFullName;
+            Event e = new Event(null, eventName, eventDesc, BigInteger.valueOf(0), ticket.get().getId(), EventModule.Support, EventType.Changed);
+            eventService.dispatchEvent(e);
         }
         return supervisorModel;
     }
@@ -331,6 +390,15 @@ public class SupportAPIController {
                 TicketNote ticketNote = noteService.createTicketNote(
                         new TicketNote(null, null, true,
                                 true, noteDetail, new ArrayList<>(), currentUser, ticket.get()));
+
+                // send any additional notifications
+                String userFullName = currentUser.getFirstName()+" "+currentUser.getLastName();
+                String eventName = "SLA on Ticket "+ticket.get().getId()+" was changed to "+sla.get().getName();
+                String eventDesc = "SLA on Ticket "+ticket.get().getId()+" was changed to "+sla.get().getName()+" by "+userFullName+
+                        ". The new date for completion is, "+newDueDate;
+                Event e = new Event(null, eventName, eventDesc, BigInteger.valueOf(0), ticket.get().getId(), EventModule.Support, EventType.Changed);
+                eventService.dispatchEvent(e);
+
                 return sla.get();
             }
         }

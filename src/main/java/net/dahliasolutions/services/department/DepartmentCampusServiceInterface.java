@@ -18,6 +18,6 @@ public interface DepartmentCampusServiceInterface {
     List<DepartmentCampus> findDepartmentCampusesByRegionalDepartment(DepartmentRegional department);
     List<DepartmentCampus> createByDepartmentRegional(DepartmentRegional departmentRegional);
     void deleteByDepartmentRegional(DepartmentRegional departmentRegional);
-    void updateDepartment(DepartmentCampus departmentCampus);
+    void save(DepartmentCampus departmentCampus);
     Optional<DepartmentCampus> updateDepartmentDirectorName(Optional<DepartmentCampus> department);
 }

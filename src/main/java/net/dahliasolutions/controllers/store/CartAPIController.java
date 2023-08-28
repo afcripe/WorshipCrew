@@ -202,7 +202,7 @@ public class CartAPIController {
         String superFullName = orderRequest.getSupervisor().getFirstName()+" "+orderRequest.getSupervisor().getLastName();
         String eventDesc = "A New Request has been placed by "+userFullName+
                 ", and sent to "+superFullName+" for fulfillment";
-        Event e = new Event(null, eventName, eventDesc, orderRequest.getId(), EventModule.Request, EventType.New);
+        Event e = new Event(null, eventName, eventDesc, orderRequest.getId(), "", EventModule.Request, EventType.New);
         eventService.dispatchEvent(e);
 
         cartService.emptyCart(cartModel.id());

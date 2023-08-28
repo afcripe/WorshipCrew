@@ -2,12 +2,15 @@ package net.dahliasolutions.controllers.support;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import net.dahliasolutions.models.UniversalSearchModel;
+import net.dahliasolutions.models.*;
 import net.dahliasolutions.models.campus.Campus;
 import net.dahliasolutions.models.department.DepartmentCampus;
 import net.dahliasolutions.models.department.DepartmentRegional;
+import net.dahliasolutions.models.mail.EmailDetails;
 import net.dahliasolutions.models.order.OrderItemDepartment;
+import net.dahliasolutions.models.order.OrderRequest;
 import net.dahliasolutions.models.order.OrderRequestCampus;
+import net.dahliasolutions.models.order.OrderStatus;
 import net.dahliasolutions.models.support.*;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
@@ -153,6 +156,7 @@ public class SupportController {
     public String goNewTicket(Model model, HttpSession session) {
         User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
+        model.addAttribute("user", currentUser);
         model.addAttribute("priorityList", ticketPriorityService.findAll());
         model.addAttribute("campusList", campusList(currentUser));
         model.addAttribute("departmentList", departmentList(currentUser));
@@ -171,6 +175,35 @@ public class SupportController {
         }
 
         Ticket ticket = ticketService.createTicket(ticketNewModel, currentUser, ticketImage);
+
+        EmailDetails emailDetailsUser =
+                new EmailDetails(currentUser.getContactEmail(),"Your New Support Ticket", "", null );
+        BrowserMessage returnMsg = emailService.sendUserTicket(emailDetailsUser, ticket, ticket.getNotes().get(0));
+
+        // determine if agent or agent list
+        if (ticket.getAgent() != null) {
+            EmailDetails emailDetailsAgent =
+                    new EmailDetails(ticket.getAgent().getContactEmail(),"A New Support Ticket Needs Acknowledgement", "", null );
+            BrowserMessage returnMsg2 = emailService.sendAgentTicket(emailDetailsAgent, ticket, ticket.getNotes().get(0), ticket.getAgent().getId());
+        } else {
+            for (User agent : ticket.getAgentList()) {
+                EmailDetails emailDetailsAgent =
+                        new EmailDetails(agent.getContactEmail(), "A New Support Ticket Needs Acceptance", "", null);
+                BrowserMessage returnMsg2 = emailService.sendAgentListTicket(emailDetailsAgent, ticket, ticket.getNotes().get(0), agent.getId());
+            }
+        }
+
+        // send any additional notifications
+        String userFullName = currentUser.getFirstName()+" "+currentUser.getLastName();
+        String eventName = "A New Ticket Submitted by "+userFullName;
+        String superFullName = "[not yet assigned]";
+        if (ticket.getAgent() != null) {
+            superFullName = ticket.getAgent().getFirstName()+" "+ticket.getAgent().getLastName();
+        }
+        String eventDesc = "A New Ticket has been submitted by "+userFullName+
+                ", and sent to "+superFullName+".";
+        Event e = new Event(null, eventName, eventDesc, BigInteger.valueOf(0), ticket.getId(), EventModule.Support, EventType.New);
+        eventService.dispatchEvent(e);
 
         return "redirect:/support/ticket/" + ticket.getId();
     }
@@ -224,7 +257,7 @@ public class SupportController {
     }
 
     @GetMapping("/campus")
-    public String getOpenByCampus(@RequestParam Optional<String> cycle, Model model, HttpSession session) {
+    public String getOpenTicketsByCampus(@RequestParam Optional<String> cycle, Model model, HttpSession session) {
         Integer currentCycle = Integer.parseInt(session.getAttribute("cycle").toString());
         if (cycle.isPresent()) {
             switch (cycle.get()) {
@@ -267,8 +300,63 @@ public class SupportController {
         return "support/ticketCampusList";
     }
 
+    @GetMapping("/campus/{name}")
+    public String getTicketsByCampus(@RequestParam Optional<String> cycle, @PathVariable String name, Model model, HttpSession session) {
+        Integer currentCycle = Integer.parseInt(session.getAttribute("cycle").toString());
+        if (cycle.isPresent()) {
+            switch (cycle.get()) {
+                case "left":
+                    currentCycle--;
+                    session.setAttribute("cycle", currentCycle);
+                    break;
+                case "right":
+                    if (currentCycle < 0) {
+                        currentCycle++;
+                        session.setAttribute("cycle", currentCycle);
+                        break;
+                    }
+                default:
+                    currentCycle=0;
+                    session.setAttribute("cycle", 0);
+            }
+        }
+
+        LocalDateTime startDate = getStartDate(session.getAttribute("dateFilter").toString(), currentCycle);
+        LocalDateTime endDate = getEndDate(session.getAttribute("dateFilter").toString(), currentCycle);
+
+        Optional<Campus> campus = campusService.findByName(name);
+        List<Ticket> openList = new ArrayList<>();
+        List<Ticket> closedList = new ArrayList<>();
+
+        if (campus.isEmpty()) {
+            session.setAttribute("msgError", "Campus not found!");
+            return redirectService.pathName(session, "/support");
+        }
+
+        List<Ticket> ticketList = ticketService.findAllByCampusAndCycle(campus.get().getId(), startDate, endDate);
+        for (Ticket ticket : ticketList) {
+            if (ticket.getTicketStatus().equals(TicketStatus.Closed)) {
+                closedList.add(ticket);
+            } else {
+                openList.add(ticket);
+            }
+        }
+
+
+        model.addAttribute("editable", false);
+        model.addAttribute("campus", campus.get());
+        model.addAttribute("openList", openList);
+        model.addAttribute("closedList", closedList);
+
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+
+        redirectService.setHistory(session, "/support/campus");
+        return "support/ticketCampus";
+    }
+
     @GetMapping("/department")
-    public String getOpenByDepartment(@RequestParam Optional<String> cycle, Model model, HttpSession session) {
+    public String getOpenTicketsByDepartment(@RequestParam Optional<String> cycle, Model model, HttpSession session) {
         Integer currentCycle = Integer.parseInt(session.getAttribute("cycle").toString());
         if (cycle.isPresent()) {
             switch (cycle.get()) {
@@ -309,6 +397,63 @@ public class SupportController {
 
         redirectService.setHistory(session, "/support/department");
         return "support/ticketDepartmentList";
+    }
+
+    @GetMapping("/department/{name}")
+    public String getTicketsByDepartment(@RequestParam Optional<String> cycle, @PathVariable String name, Model model, HttpSession session) {
+        Integer currentCycle = Integer.parseInt(session.getAttribute("cycle").toString());
+        if (cycle.isPresent()) {
+            switch (cycle.get()) {
+                case "left":
+                    currentCycle--;
+                    session.setAttribute("cycle", currentCycle);
+                    break;
+                case "right":
+                    if (currentCycle < 0) {
+                        currentCycle++;
+                        session.setAttribute("cycle", currentCycle);
+                        break;
+                    }
+                default:
+                    currentCycle=0;
+                    session.setAttribute("cycle", 0);
+            }
+        }
+
+        LocalDateTime startDate = getStartDate(session.getAttribute("dateFilter").toString(), currentCycle);
+        LocalDateTime endDate = getEndDate(session.getAttribute("dateFilter").toString(), currentCycle);
+
+        Optional<DepartmentRegional> department = departmentRegionalService.findByName(name);
+
+        if (department.isEmpty()) {
+            session.setAttribute("msgError", "Department not found!");
+            return redirectService.pathName(session, "/support");
+        }
+
+        List<Ticket> openList = new ArrayList<>();
+        List<Ticket> closedList = new ArrayList<>();
+
+        List<Ticket> departmentList = ticketService.findAllByDepartmentAndCycle(department.get().getId(), startDate, endDate);
+
+        for (Ticket ticket : departmentList) {
+            if (ticket.getTicketStatus().equals(TicketStatus.Closed)) {
+                closedList.add(ticket);
+            } else {
+                openList.add(ticket);
+            }
+        }
+
+
+        model.addAttribute("editable", false);
+        model.addAttribute("department", department.get());
+        model.addAttribute("openList", openList);
+        model.addAttribute("closedList", closedList);
+
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+
+        redirectService.setHistory(session, "/support/department");
+        return "support/ticketDepartment";
     }
 
     @PostMapping("/search")

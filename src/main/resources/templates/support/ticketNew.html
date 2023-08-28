@@ -41,7 +41,6 @@
                 </div>
                 <div class="col-xs-12 col-sm-8">
                   <select id="priority" name="priority" class="form-control-sm w-100">
-                    <option value="" disabled selected>Select Priority Level</option>
                     <option th:each="p : ${priorityList}" th:value="${p.priority}" th:text="${p.priority}"></option>
                   </select>
                 </div>
@@ -53,7 +52,8 @@
                 </div>
                 <div class="col-xs-12 col-sm-8">
                   <select id="campus" class="form-control-sm w-100" name="campus">
-                    <option th:each="c : ${campusList}" th:value="${c.id}" th:text="${c.name}"></option>
+                    <option th:each="c : ${campusList}" th:value="${c.id}" th:text="${c.name}"
+                        th:selected="${c.name} == ${user.campus.name}"></option>
                   </select>
                 </div>
               </div>
@@ -64,8 +64,8 @@
                 </div>
                 <div class="col-xs-12 col-sm-8">
                   <select id="department" class="form-control-sm w-100" name="department">
-                    <option th:each="d : ${departmentList}" th:value="${d.id}"
-                            th:text="${d.name}"></option>
+                    <option th:each="d : ${departmentList}" th:value="${d.id}" th:text="${d.name}"
+                            th:selected="${d.name} == ${user.department.name}"></option>
                   </select>
                 </div>
               </div>

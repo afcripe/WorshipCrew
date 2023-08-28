@@ -5,43 +5,42 @@
 
 <div class="container-fluid m-0 py-0 px-0" layout:fragment="content">
 
-    <div th:replace="~{order/moduleHeader :: header}">Header</div>
+    <div th:replace="~{support/moduleHeader :: header}">Header</div>
 
     <div th:replace="~{support/moduleFilterDate :: filterDate}">Filter</div>
 
     <div class="row pt-5 py-2">
         <div class="col align-content-center">
-            <h3><span th:text="${department.name}"></span> Department</h3>
+            <h3><span th:text="${campus.name}"></span> Campus</h3>
         </div>
     </div>
 
     <div class="row pt-5 py-2">
         <div class="col">
-            <h4>Items to Fulfill</h4>
+            <h4>Open Requests</h4>
         </div>
     </div>
     <div class="row pt-2 pb-5 py-2">
-        <div class="row" th:if="${not #lists.isEmpty(openItemList)}" th:each="openItem : ${openItemList}">
-            <div th:replace="~{components/cardOrderItemLineSummary :: cardFragment(${openItem})}">No Items</div>
+        <div class="row" th:if="${not #lists.isEmpty(openList)}" th:each="openTicket : ${openList}">
+          <div th:replace="~{components/cardTicketLine :: cardFragment(${openTicket})}">No Tickets to Display</div>
         </div>
     </div>
-
 
     <div class="row pt-5 py-2">
         <div class="col">
-            <h4>Items Fulfilled</h4>
+            <h4>Closed Requests</h4>
         </div>
     </div>
-    <div class="row pt-2 pb-5 py-2">
-        <div class="row" th:if="${not #lists.isEmpty(closedItemList)}" th:each="closedItem : ${closedItemList}">
-            <div th:replace="~{components/cardOrderItemLineSummary :: cardFragment(${closedItem})}">No Items</div>
+    <div class="row pt-5 pb-5 py-2">
+        <div class="row" th:if="${not #lists.isEmpty(closedList)}" th:each="closedTicket : ${closedList}">
+            <div th:replace="~{components/cardTicketLine :: cardFragment(${closedTicket})}">No Tickets to Display</div>
         </div>
     </div>
 
 
     <script th:inline="javascript">
         function navToRequest(id) {
-            window.location.href="/request/order/"+id;
+            window.location.href="/support/ticket/"+id;
         }
     </script>
 

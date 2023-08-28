@@ -52,7 +52,7 @@ public class Ticket {
     private List<TicketNote> notes;
 
     @JsonBackReference
-    @OneToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<User> agentList;
 
     @Override

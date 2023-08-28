@@ -42,6 +42,11 @@ public class MailerLinksService implements MailerLinksServiceInterface {
     }
 
     @Override
+    public List<MailerLinks> findAllByTicketId(String id) {
+        return mailerLinksRepository.findAllByTicketId(id);
+    }
+
+    @Override
     public List<MailerLinks> findNotExpired(LocalDateTime expiration) {
         return mailerLinksRepository.findNotExpired(LocalDateTime.now());
     }

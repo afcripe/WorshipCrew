@@ -344,7 +344,7 @@ public class UserController {
         String eventName = "User "+theUser+" has been updated";
         String eventDesc = "User "+theUser+" was updated by "+userFullName;
         // update
-        Event e = new Event(null, eventName, eventDesc, user.get().getId(), EventModule.User, EventType.Changed);
+        Event e = new Event(null, eventName, eventDesc, user.get().getId(), "", EventModule.User, EventType.Changed);
         eventService.dispatchEvent(e);
 
         return "redirect:/user/"+userModel.id().toString();
@@ -416,7 +416,7 @@ public class UserController {
         String eventName = "New User "+theUser+" has been added";
         String eventDesc = "User "+theUser+" was added by "+userFullName;
         // new
-        Event e = new Event(null, eventName, eventDesc, user.getId(), EventModule.User, EventType.New);
+        Event e = new Event(null, eventName, eventDesc, user.getId(), "", EventModule.User, EventType.New);
         eventService.dispatchEvent(e);
 
         return "redirect:/user/"+user.getId().toString();
@@ -531,7 +531,7 @@ public class UserController {
         String eventName = "User "+theUser+" password was changed";
         String eventDesc = "User "+theUser+" password was changed by "+userFullName;
         // changed
-        Event e = new Event(null, eventName, eventDesc, user.get().getId(), EventModule.User, EventType.Changed);
+        Event e = new Event(null, eventName, eventDesc, user.get().getId(), "", EventModule.User, EventType.Changed);
         eventService.dispatchEvent(e);
 
         return "redirect:/user/"+changePasswordModel.id();
@@ -572,7 +572,7 @@ public class UserController {
         String eventName = "User "+theUser+" was deleted";
         String eventDesc = "User "+theUser+" was deleted by "+userFullName;
         // changed
-        Event e = new Event(null, eventName, eventDesc, user.get().getId(), EventModule.User, EventType.Changed);
+        Event e = new Event(null, eventName, eventDesc, user.get().getId(), "", EventModule.User, EventType.Changed);
         eventService.dispatchEvent(e);
         // deleted
         e.setType(EventType.Deleted);
@@ -605,7 +605,7 @@ public class UserController {
         String eventName = "User "+theUser+" was restored";
         String eventDesc = "User "+theUser+" was restored by "+userFullName;
         // changed
-        Event e = new Event(null, eventName, eventDesc, user.get().getId(), EventModule.User, EventType.Changed);
+        Event e = new Event(null, eventName, eventDesc, user.get().getId(), "", EventModule.User, EventType.Changed);
         eventService.dispatchEvent(e);
 
         return redirectService.pathName(session, "user");

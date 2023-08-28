@@ -46,13 +46,11 @@ public class TicketService implements TicketServiceInterface {
         // create default respond days in supportSetting
         LocalDateTime dueDate = LocalDateTime.now().plusHours(supportSetting.getResponseHours());
 
-        // ToDo - create default SLA in supportSetting
         SLA sla = null;
         if (supportSetting.getDefaultSLAId().intValue() != 0) {
             sla = slaService.findById(supportSetting.getDefaultSLAId()).get();
         }
 
-        // ToDo - determine who gets the ticket base on supportSetting
         User agent;
         List<User> agentList = new ArrayList<>();
         switch (supportSetting.getNotifyTarget()) {
@@ -213,11 +211,25 @@ public class TicketService implements TicketServiceInterface {
     }
 
     private List<User> getSupervisors() {
-        Optional<UserRoles> role = rolesService.findByName("SUPPORT_SUPERVISOR");
-        if (role.isPresent()) {
-            return userService.findAllByRole(role.get());
+        Collection<UserRoles> roles = getSupervisorCollection();
+        List<User> userList = new ArrayList<>();
+        List<User> allUsers = userService.findAll();
+
+        for (User user : allUsers) {
+            for (UserRoles role : user.getUserRoles()) {
+                if (roles.contains(role)) {
+                    userList.add(user);
+                    break;
+                }
+            }
         }
-        return new ArrayList<>();
+        return userList;
+    }
+
+    private Collection<UserRoles> getSupervisorCollection() {
+        Collection<UserRoles> roles = new ArrayList<>();
+        roles.add(rolesService.findByName("SUPPORT_SUPERVISOR").get());
+        return roles;
     }
 
 }

@@ -180,7 +180,29 @@ public class OrderController {
     }
 
     @GetMapping("/department/{name}")
-    public String getDepartmentOrders(@PathVariable String name, Model model, HttpSession session) {
+    public String getDepartmentOrders(@RequestParam Optional<String> cycle, @PathVariable String name, Model model, HttpSession session) {
+        Integer currentCycle = Integer.parseInt(session.getAttribute("cycle").toString());
+        if (cycle.isPresent()) {
+            switch (cycle.get()) {
+                case "left":
+                    currentCycle--;
+                    session.setAttribute("cycle", currentCycle);
+                    break;
+                case "right":
+                    if (currentCycle < 0) {
+                        currentCycle++;
+                        session.setAttribute("cycle", currentCycle);
+                        break;
+                    }
+                default:
+                    currentCycle=0;
+                    session.setAttribute("cycle", 0);
+            }
+        }
+
+        LocalDateTime startDate = getStartDate(session.getAttribute("dateFilter").toString(), currentCycle);
+        LocalDateTime endDate = getEndDate(session.getAttribute("dateFilter").toString(), currentCycle);
+
         Optional<DepartmentRegional> department = departmentService.findByName(name);
 
         if (department.isEmpty()) {
@@ -188,7 +210,7 @@ public class OrderController {
             return redirectService.pathName(session, "/request");
         }
 
-        List<OrderItem> itemList = orderItemService.findAllByDepartment(department.get());
+        List<OrderItem> itemList = orderItemService.findAllByDepartmentAndCycle(department.get().getId(), startDate, endDate);
         List<OrderItem> openItemList = new ArrayList<>();
         List<OrderItem> closedItemList = new ArrayList<>();
 
@@ -254,7 +276,29 @@ public class OrderController {
     }
 
     @GetMapping("/campus/{name}")
-    public String getCampusOrders(@PathVariable String name, Model model, HttpSession session) {
+    public String getCampusOrders(@RequestParam Optional<String> cycle, @PathVariable String name, Model model, HttpSession session) {
+        Integer currentCycle = Integer.parseInt(session.getAttribute("cycle").toString());
+        if (cycle.isPresent()) {
+            switch (cycle.get()) {
+                case "left":
+                    currentCycle--;
+                    session.setAttribute("cycle", currentCycle);
+                    break;
+                case "right":
+                    if (currentCycle < 0) {
+                        currentCycle++;
+                        session.setAttribute("cycle", currentCycle);
+                        break;
+                    }
+                default:
+                    currentCycle=0;
+                    session.setAttribute("cycle", 0);
+            }
+        }
+
+        LocalDateTime startDate = getStartDate(session.getAttribute("dateFilter").toString(), currentCycle);
+        LocalDateTime endDate = getEndDate(session.getAttribute("dateFilter").toString(), currentCycle);
+
         Optional<Campus> campus = campusService.findByName(name);
 
         if (campus.isEmpty()) {
@@ -262,7 +306,7 @@ public class OrderController {
             return redirectService.pathName(session, "/request");
         }
 
-        List<OrderRequest> itemList = orderService.findAllByCampus(campus.get());
+        List<OrderRequest> itemList = orderService.findAllByCampusAndCycle(campus.get().getId(), startDate, endDate);
         List<OrderRequest> openOrderList = new ArrayList<>();
         List<OrderRequest> closedOrderList = new ArrayList<>();
 

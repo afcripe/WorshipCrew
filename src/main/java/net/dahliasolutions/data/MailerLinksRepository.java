@@ -14,6 +14,7 @@ public interface MailerLinksRepository extends JpaRepository<MailerLinks, BigInt
 
     Optional<MailerLinks> findByRandomLinkString(String randomString);
     List<MailerLinks> findAllByUserId(BigInteger id);
+    List<MailerLinks> findAllByTicketId(String id);
 
     @Query(value="SELECT * FROM MAILER_LINKS WHERE EXPIRATION < :expiration AND FORCE_EXPIRE = FALSE", nativeQuery = true)
     List<MailerLinks> findNotExpired(@Param("expiration") LocalDateTime expiration);

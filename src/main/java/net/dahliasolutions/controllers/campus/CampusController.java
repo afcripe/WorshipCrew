@@ -206,7 +206,7 @@ public class CampusController {
     }
 
     @PostMapping("/campus/{id}/department/update")
-    public String updateDepartment(@PathVariable BigInteger id, @ModelAttribute DepartmentCampus departmentCampusModel, Model model, HttpSession session) {
+    public String updateCampusDepartment(@PathVariable BigInteger id, @ModelAttribute DepartmentCampus departmentCampusModel, Model model, HttpSession session) {
         Optional<DepartmentCampus> department = departmentCampusService.findById(departmentCampusModel.getId());
         if (department.isEmpty()) {
             session.setAttribute("msgError", "Department Not Found!");
@@ -214,7 +214,7 @@ public class CampusController {
         }
 
         department.get().setDirectorId(departmentCampusModel.getDirectorId());
-        departmentCampusService.updateDepartment(department.get());
+        departmentCampusService.save(department.get());
 
         session.setAttribute("msgSuccess", "Department Successfully Updated.");
         return redirectService.pathName(session, "campus");

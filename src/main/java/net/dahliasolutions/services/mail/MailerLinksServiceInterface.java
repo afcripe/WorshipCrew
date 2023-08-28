@@ -14,5 +14,6 @@ public interface MailerLinksServiceInterface {
     Optional<MailerLinks> findByRandomLinkString(String randomString);
     List<MailerLinks> findAll();
     List<MailerLinks> findByUserId(BigInteger id);
+    List<MailerLinks> findAllByTicketId(String id);
     List<MailerLinks> findNotExpired(LocalDateTime expiration);
 }

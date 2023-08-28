@@ -59,7 +59,7 @@ public class DepartmentRegionalService implements DepartmentRegionalServiceInter
     }
 
     @Override
-    public void updateDepartment(DepartmentRegional departmentRegional) {
+    public void save(DepartmentRegional departmentRegional) {
         departmentRegionalRepository.save(updateDepartmentDirectorName(Optional.ofNullable(departmentRegional)).get());
     }
 

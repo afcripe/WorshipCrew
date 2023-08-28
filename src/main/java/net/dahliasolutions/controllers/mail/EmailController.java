@@ -3,19 +3,27 @@ package net.dahliasolutions.controllers.mail;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.BrowserMessage;
+import net.dahliasolutions.models.Event;
+import net.dahliasolutions.models.EventModule;
+import net.dahliasolutions.models.EventType;
 import net.dahliasolutions.models.mail.EmailDetails;
 import net.dahliasolutions.models.mail.MailerLinks;
 import net.dahliasolutions.models.order.OrderItem;
 import net.dahliasolutions.models.order.OrderNote;
 import net.dahliasolutions.models.order.OrderRequest;
 import net.dahliasolutions.models.order.OrderStatus;
+import net.dahliasolutions.models.support.Ticket;
+import net.dahliasolutions.models.support.TicketNote;
 import net.dahliasolutions.models.user.ChangePasswordModel;
 import net.dahliasolutions.models.user.User;
+import net.dahliasolutions.services.EventService;
 import net.dahliasolutions.services.mail.EmailService;
 import net.dahliasolutions.services.mail.MailerLinksService;
 import net.dahliasolutions.services.order.OrderItemService;
 import net.dahliasolutions.services.order.OrderNoteService;
 import net.dahliasolutions.services.order.OrderService;
+import net.dahliasolutions.services.support.TicketNoteService;
+import net.dahliasolutions.services.support.TicketService;
 import net.dahliasolutions.services.user.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,6 +31,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -35,7 +45,10 @@ public class EmailController {
     private final OrderService orderService;
     private final OrderItemService orderItemService;
     private final OrderNoteService orderNoteService;
+    private final TicketService ticketService;
+    private final TicketNoteService ticketNoteService;
     private final EmailService emailService;
+    private final EventService eventService;
 
     @GetMapping("")
     public String testMailer(){
@@ -47,10 +60,7 @@ public class EmailController {
     }
 
     @GetMapping("/{randomString}")
-    public String getSetPasswordForm(@PathVariable String randomString,
-                                     @RequestParam BigInteger eventId,
-                                     @RequestParam String action,
-                                     Model model) {
+    public String getSetPasswordForm(@PathVariable String randomString, Model model) {
         Optional<MailerLinks> mailerLinks = mailerLinksService.findByRandomLinkString(randomString);
         if (mailerLinks.isEmpty()) {
             model.addAttribute("errorMessage", "Link not Valid!");
@@ -75,6 +85,13 @@ public class EmailController {
             case "acknowledgeItem":
                 updateOrderRequestItem(mailerLinks.get());
                 return "mailer/acknowledge";
+            case "acknowledgeTicket":
+                updateTicketNote(mailerLinks.get());
+                return "mailer/acknowledge";
+            case "agentAcceptTicket":
+                Ticket ticket = updateTicketAgent(mailerLinks.get());
+                model.addAttribute("ticket", ticket);
+                return "mailer/acceptTicket";
             default:
                 model.addAttribute("errorMessage", "Link not Valid!");
                 return "error";
@@ -168,5 +185,74 @@ public class EmailController {
 
         mailerLinks.setForceExpire(true);
         mailerLinksService.save(mailerLinks);
+    }
+
+    private void updateTicketNote(MailerLinks mailerLinks) {
+        Optional<Ticket> ticket = ticketService.findById(mailerLinks.getTicketId());
+        Optional<User> agent = userService.findById(mailerLinks.getUserId());
+
+        if (ticket.isPresent() && agent.isPresent()) {
+            String detail = agent.get().getFullName()+" has acknowledged the ticket.";
+            TicketNote note = ticketNoteService.createTicketNote(
+                    new TicketNote(null,
+                            null,
+                            true,
+                            true,
+                            detail,
+                            new ArrayList<>(),
+                            agent.get(),
+                            ticket.get()));
+            ticket.get().getNotes().add(note);
+            ticketService.save(ticket.get());
+
+            // send any additional notifications
+            String eventName = "Ticket "+ticket.get().getId()+" was acknowledged by "+agent.get().getFullName();
+            String eventDesc = "Ticket "+ticket.get().getId()+" was acknowledged by "+agent.get().getFullName()+" via email link.";
+            Event e = new Event(null, eventName, eventDesc, BigInteger.valueOf(0), ticket.get().getId(), EventModule.Support, EventType.Changed);
+            eventService.dispatchEvent(e);
+        }
+
+        mailerLinks.setForceExpire(true);
+        mailerLinksService.save(mailerLinks);
+    }
+
+    private Ticket updateTicketAgent(MailerLinks mailerLinks) {
+        Optional<Ticket> ticket = ticketService.findById(mailerLinks.getTicketId());
+        Optional<User> agent = userService.findById(mailerLinks.getUserId());
+
+        if (ticket.isPresent() && agent.isPresent()) {
+            if (ticket.get().getAgent() == null) {
+                // set the agent
+                ticket.get().setAgent(agent.get());
+                // add a note
+                String detail = agent.get().getFullName()+" accepted the ticket and has been assigned as primary agent.";
+                TicketNote note = ticketNoteService.createTicketNote(
+                        new TicketNote(null,
+                                null,
+                                true,
+                                true,
+                                detail,
+                                new ArrayList<>(),
+                                agent.get(),
+                                ticket.get()));
+                ticket.get().getNotes().add(note);
+                ticketService.save(ticket.get());
+
+                // send any additional notifications
+                String eventName = "Ticket "+ticket.get().getId()+" was accepted by "+agent.get().getFullName();
+                String eventDesc = "Ticket "+ticket.get().getId()+" was accepted by "+agent.get().getFullName()+
+                        " via email link, and has been assigned as primary agent.";
+                Event e = new Event(null, eventName, eventDesc, BigInteger.valueOf(0), ticket.get().getId(), EventModule.Support, EventType.Changed);
+                eventService.dispatchEvent(e);
+            }
+
+            // force expire mailerLink
+            mailerLinks.setForceExpire(true);
+
+            mailerLinksService.save(mailerLinks);
+
+            return ticket.get();
+        }
+        return new Ticket();
     }
 }

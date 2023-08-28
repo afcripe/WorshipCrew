@@ -13,7 +13,7 @@ public interface DepartmentRegionalServiceInterface {
     List<DepartmentRegional> findAll();
     List<DepartmentRegional> findAllByDirectorId(BigInteger directorId);
     DepartmentRegional createDepartment(String name);
-    void updateDepartment(DepartmentRegional departmentRegional);
+    void save(DepartmentRegional departmentRegional);
     void deleteDepartmentById(BigInteger id);
     Optional<DepartmentRegional> updateDepartmentDirectorName(Optional<DepartmentRegional> department);
 }

@@ -93,7 +93,7 @@ public class DepartmentCampusService implements DepartmentCampusServiceInterface
     }
 
     @Override
-    public void updateDepartment(DepartmentCampus departmentCampus) {
+    public void save(DepartmentCampus departmentCampus) {
         departmentCampusRepository.save(updateDepartmentDirectorName(Optional.ofNullable(departmentCampus)).get());
     }
 

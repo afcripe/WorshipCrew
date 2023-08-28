@@ -169,7 +169,7 @@ public class DepartmentController {
 
         department.get().setName(departmentRegionalModel.getName());
         department.get().setDirectorId(departmentRegionalModel.getDirectorId());
-        departmentRegionalService.updateDepartment(department.get());
+        departmentRegionalService.save(department.get());
         session.setAttribute("msgSuccess", "Department Successfully Updated.");
         return "redirect:/department";
     }
@@ -212,7 +212,7 @@ public class DepartmentController {
     }
 
     @PostMapping("/department/{id}/campus/update")
-    public String updateDepartment(@PathVariable BigInteger id, @ModelAttribute DepartmentCampus departmentCampusModel, Model model, HttpSession session) {
+    public String updateDepartmentCampus(@PathVariable BigInteger id, @ModelAttribute DepartmentCampus departmentCampusModel, Model model, HttpSession session) {
         Optional<DepartmentCampus> department = departmentCampusService.findById(departmentCampusModel.getId());
         if (department.isEmpty()) {
             session.setAttribute("msgError", "Department Not Found!");
@@ -220,7 +220,7 @@ public class DepartmentController {
         }
 
         department.get().setDirectorId(departmentCampusModel.getDirectorId());
-        departmentCampusService.updateDepartment(department.get());
+        departmentCampusService.save(department.get());
 
         session.setAttribute("msgSuccess", "Department Successfully Updated.");
         return redirectService.pathName(session, "campus");

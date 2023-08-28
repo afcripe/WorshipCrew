@@ -10,6 +10,8 @@ import net.dahliasolutions.models.mail.MailerLinks;
 import net.dahliasolutions.models.order.OrderItem;
 import net.dahliasolutions.models.order.OrderNote;
 import net.dahliasolutions.models.order.OrderRequest;
+import net.dahliasolutions.models.support.Ticket;
+import net.dahliasolutions.models.support.TicketNote;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.services.AuthService;
 import net.dahliasolutions.services.user.UserService;
@@ -104,7 +106,7 @@ public class EmailService implements EmailServiceInterface{
             javaMailSender.send(message);
 
             MailerLinks mLink = new MailerLinks(
-                    null, id, id, linkString,
+                    null, id, id, "", linkString,
                     LocalDateTime.now().plusDays(14),
                     false, "setPassword");
             mailerLinksService.save(mLink);
@@ -137,7 +139,7 @@ public class EmailService implements EmailServiceInterface{
             javaMailSender.send(message);
 
             MailerLinks mLink = new MailerLinks(
-                    null, id, id, linkString,
+                    null, id, id, "", linkString,
                     LocalDateTime.now().plusDays(14),
                     false, "resetPassword");
             mailerLinksService.save(mLink);
@@ -197,7 +199,7 @@ public class EmailService implements EmailServiceInterface{
             javaMailSender.send(message);
 
             MailerLinks mLink = new MailerLinks(
-                    null, id, orderRequest.getId(), linkString,
+                    null, id, orderRequest.getId(), "", linkString,
                     LocalDateTime.now().plusDays(5),
                     false, "acknowledgeRequest");
             mLink = mailerLinksService.createLink(mLink);
@@ -232,7 +234,7 @@ public class EmailService implements EmailServiceInterface{
             javaMailSender.send(message);
 
             MailerLinks mLink = new MailerLinks(
-                    null, id, orderItem.getId(), linkString,
+                    null, id, orderItem.getId(), "", linkString,
                     LocalDateTime.now().plusDays(5),
                     false, "acknowledgeItem");
             mailerLinksService.save(mLink);
@@ -262,6 +264,161 @@ public class EmailService implements EmailServiceInterface{
             message.setSubject(emailDetails.getSubject());
             // Set the email's content to be the HTML template
             message.setContent(templateEngine.process("mailer/mailItemUpdate", context), "text/html; charset=utf-8");
+
+            javaMailSender.send(message);
+
+            return new BrowserMessage("msgSuccess", "E-mail sent.");
+        } catch (Exception e) {
+            return new BrowserMessage("msgError", e.getMessage());
+        }
+    }
+
+    @Override
+    public BrowserMessage sendUserTicket(EmailDetails emailDetails, Ticket ticket, TicketNote ticketNote) {
+        // set template variables
+        Context context = new Context();
+        context.setVariable("baseURL", appServer.getBaseURL());
+        context.setVariable("ticket", ticket);
+        context.setVariable("ticketNote", ticketNote);
+        context.setVariable("emailSubject", emailDetails.getSubject());
+
+        // create mail message
+        MimeMessage message = javaMailSender.createMimeMessage();
+
+        try {
+            message.setFrom(new InternetAddress(sender));
+            message.setRecipients(MimeMessage.RecipientType.TO, emailDetails.getRecipient());
+            message.setSubject(emailDetails.getSubject());
+            // Set the email's content to be the HTML template
+            message.setContent(templateEngine.process("mailer/mailUserTicket", context), "text/html; charset=utf-8");
+
+            javaMailSender.send(message);
+            return new BrowserMessage("msgSuccess", "E-mail sent.");
+        } catch (Exception e) {
+            return new BrowserMessage("msgError", e.getMessage());
+        }
+    }
+
+    @Override
+    public BrowserMessage sendAgentTicket(EmailDetails emailDetails, Ticket ticket, TicketNote ticketNote, BigInteger id) {
+        String linkString = authService.randomStringGenerator(30, true, true);
+
+        // set template variables
+        Context context = new Context();
+        context.setVariable("baseURL", appServer.getBaseURL());
+        context.setVariable("ticket", ticket);
+        context.setVariable("ticketNote", ticketNote);
+        context.setVariable("emailSubject", emailDetails.getSubject());
+        context.setVariable("webLink", appServer.getBaseURL()+"/mailer/"+linkString);
+
+        // create mail message
+        MimeMessage message = javaMailSender.createMimeMessage();
+
+        try {
+            message.setFrom(new InternetAddress(sender));
+            message.setRecipients(MimeMessage.RecipientType.TO, emailDetails.getRecipient());
+            message.setSubject(emailDetails.getSubject());
+            // Set the email's content to be the HTML template
+            message.setContent(templateEngine.process("mailer/mailAgentTicket", context), "text/html; charset=utf-8");
+
+            javaMailSender.send(message);
+
+            MailerLinks mLink = new MailerLinks(
+                    null, id, BigInteger.valueOf(0), ticket.getId(), linkString,
+                    LocalDateTime.now().plusDays(5),
+                    false, "acknowledgeTicket");
+            mLink = mailerLinksService.createLink(mLink);
+
+            return new BrowserMessage("msgSuccess", "E-mail sent.");
+        } catch (Exception e) {
+            return new BrowserMessage("msgError", e.getMessage());
+        }
+    }
+
+    @Override
+    public BrowserMessage sendAgentListTicket(EmailDetails emailDetails, Ticket ticket, TicketNote ticketNote, BigInteger id) {
+        String linkString = authService.randomStringGenerator(30, true, true);
+
+        // set template variables
+        Context context = new Context();
+        context.setVariable("baseURL", appServer.getBaseURL());
+        context.setVariable("ticket", ticket);
+        context.setVariable("ticketNote", ticketNote);
+        context.setVariable("agentList", ticket.getAgentList());
+        context.setVariable("emailSubject", emailDetails.getSubject());
+        context.setVariable("webLink", appServer.getBaseURL()+"/mailer/"+linkString);
+
+        // create mail message
+        MimeMessage message = javaMailSender.createMimeMessage();
+
+        try {
+            message.setFrom(new InternetAddress(sender));
+            message.setRecipients(MimeMessage.RecipientType.TO, emailDetails.getRecipient());
+            message.setSubject(emailDetails.getSubject());
+            // Set the email's content to be the HTML template
+            message.setContent(templateEngine.process("mailer/mailAgentListTicket", context), "text/html; charset=utf-8");
+
+            javaMailSender.send(message);
+
+            MailerLinks mLink = new MailerLinks(
+                    null, id, BigInteger.valueOf(0), ticket.getId(), linkString,
+                    LocalDateTime.now().plusDays(5),
+                    false, "agentAcceptTicket");
+            mLink = mailerLinksService.createLink(mLink);
+
+            return new BrowserMessage("msgSuccess", "E-mail sent.");
+        } catch (Exception e) {
+            return new BrowserMessage("msgError", e.getMessage());
+        }
+    }
+
+    @Override
+    public BrowserMessage sendUserUpdateTicket(EmailDetails emailDetails, Ticket ticket, TicketNote ticketNote) {
+
+        // set template variables
+        Context context = new Context();
+        context.setVariable("baseURL", appServer.getBaseURL());
+        context.setVariable("ticket", ticket);
+        context.setVariable("ticketNote", ticketNote);
+        context.setVariable("emailSubject", emailDetails.getSubject());
+
+        // create mail message
+        MimeMessage message = javaMailSender.createMimeMessage();
+
+        try {
+            message.setFrom(new InternetAddress(sender));
+            message.setRecipients(MimeMessage.RecipientType.TO, emailDetails.getRecipient());
+            message.setSubject(emailDetails.getSubject());
+            // Set the email's content to be the HTML template
+            message.setContent(templateEngine.process("mailer/mailUserUpdateTicket", context), "text/html; charset=utf-8");
+
+            javaMailSender.send(message);
+
+            return new BrowserMessage("msgSuccess", "E-mail sent.");
+        } catch (Exception e) {
+            return new BrowserMessage("msgError", e.getMessage());
+        }
+    }
+
+    @Override
+    public BrowserMessage sendAgentUpdateTicket(EmailDetails emailDetails, Ticket ticket, TicketNote ticketNote) {
+
+        // set template variables
+        Context context = new Context();
+        context.setVariable("baseURL", appServer.getBaseURL());
+        context.setVariable("ticket", ticket);
+        context.setVariable("ticketNote", ticketNote);
+        context.setVariable("emailSubject", emailDetails.getSubject());
+
+        // create mail message
+        MimeMessage message = javaMailSender.createMimeMessage();
+
+        try {
+            message.setFrom(new InternetAddress(sender));
+            message.setRecipients(MimeMessage.RecipientType.TO, emailDetails.getRecipient());
+            message.setSubject(emailDetails.getSubject());
+            // Set the email's content to be the HTML template
+            message.setContent(templateEngine.process("mailer/mailAgentUpdateTicket", context), "text/html; charset=utf-8");
 
             javaMailSender.send(message);
 

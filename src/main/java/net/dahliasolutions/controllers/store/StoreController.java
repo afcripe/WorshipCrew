@@ -192,7 +192,7 @@ public class StoreController {
         String userFullName = user.getFirstName()+" "+user.getLastName();
         String eventName = userFullName+"Created a new store item.";
         String eventDesc = newItem.getName()+" was added to the store by "+userFullName;
-        Event e = new Event(null, eventName, eventDesc, newItem.getId(), EventModule.Store, EventType.New);
+        Event e = new Event(null, eventName, eventDesc, newItem.getId(), "", EventModule.Store, EventType.New);
         eventService.dispatchEvent(e);
 
         return "redirect:/store/item/"+newItem.getId().toString();
@@ -323,7 +323,7 @@ public class StoreController {
         String userFullName = user.getFirstName()+" "+user.getLastName();
         String eventName = userFullName+"Updated a store item.";
         String eventDesc = storeItem.get().getName()+" was updated by "+userFullName;
-        Event e = new Event(null, eventName, eventDesc, storeItem.get().getId(), EventModule.Store, EventType.Changed);
+        Event e = new Event(null, eventName, eventDesc, storeItem.get().getId(), "", EventModule.Store, EventType.Changed);
         eventService.dispatchEvent(e);
 
         return "redirect:/store/item/"+storeItemModel.id().toString();

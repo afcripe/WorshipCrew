@@ -16,6 +16,7 @@ public class Event {
     private String name;
     private String Description;
     private BigInteger itemId;
+    private String ticketId;
 
     @Enumerated
     private EventModule module;

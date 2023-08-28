@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+
+    <link rel="icon" type="image/x-icon" href="@{/img/favicon.ico}">
+
+    <style>
+        .card{background: transparent; border: #4b5257 solid 0.1rem; border-radius: 0.3rem; padding: 1rem 1rem 1rem 1rem;}
+        .card-header{position:relative;padding:0.5rem 0.5rem;margin-bottom:1rem;border:1px solid transparent;border-radius:0.3rem; background-color: #212529; color: white;vertical-align: center}
+        .card-header-text{color: #8fcafe}
+        .float-left{float: left;}
+        .float-right{float: right;}
+        .emphasis{font-weight: bold;}
+        .table{width:100%;margin-bottom:1rem;vertical-align:top;}
+        .table th{text-align: left;}
+    </style>
+</head>
+
+<body class="container-fluid d-flex flex-column min-vh-100">
+
+<!-- Header -->
+<a th:href="${baseURL}" style="text-decoration: none;">
+<div class="card-header">
+    <h2 class="card-header-text">
+        <img th:src="${baseURL}+'/img/favicon.png'" alt="dwc" width="32" class="float-left" />
+        &nbsp;Destiny Worship Crew
+    </h2>
+</div>
+
+</a>
+<h4 th:text="${emailSubject}">Support Ticket</h4>
+
+<!-- Content -->
+
+<div class="card" th:object="${ticket}">
+    <div>
+        <div class="emphasis float-left">Ticket: <a th:href="${baseURL}+'/support/ticket/'+*{id}" th:text="*{id}"></a></div>
+        <div class="float-right">Submitted: <span th:text="*{#temporals.format(ticketDate, 'MMM-dd-yyyy')}"></span></div>
+    </div>
+
+    <br><br>
+
+    <div>
+        <div class="float-left">Submitted By: <span th:text="*{user.firstName} + ' ' + *{user.lastName}"></span></div>
+        <a class="float-right btnAcknowledge" th:href="${webLink}">Accept</a>
+    </div>
+
+    <br><br>
+
+    <div>
+        <div class="float-left">User Priority: <span th:text="*{priority}"></span></div>
+        <div class="float-right">User's Supervisor: <span th:text="*{user.director.firstName} + ' ' + *{user.director.lastName}"></span></div>
+    </div>
+
+    <br><br>
+
+    <div>
+        <div><span class="emphasis" th:text="*{ticketDetail}"></span></div>
+    </div>
+
+    <div>
+        <div><span th:text="${ticketNote.detail}"></span></div>
+    </div>
+
+    <div th:if="${not #lists.isEmpty(ticketNote.images)}">
+        <a th:href="${baseURL}+'/support/ticket/'+*{id}">Please login to view attached images.</a>
+    </div>
+
+    <br><br>
+
+    <div>
+        <div class="emphasis float-left">Service Level: <span class="emphasis" th:text="*{sla}"></span></div>
+        <div class="float-right">Ticket Due: <span class="emphasis" th:text="*{#temporals.format(ticketDue, 'MMM-dd-yyyy hh:mm')}"></span></div>
+    </div>
+
+    <br><br>
+
+    <div>
+        <div class="float-left">Campus: <span th:text="*{campus.name}"></span></div>
+        <div class="float-right">Department: <span th:text="*{department.name}"></span></div>
+    </div>
+
+    <br><br>
+
+    <div th:if="${not #lists.isEmpty(ticket.agentList)}">
+        Agents include on this ticket:
+        <div th:each="a : ${ticket.agentList}">
+            <div th:text="${a.firstName} + ' ' + ${a.lastName}"></div>
+        </div>
+    </div>
+
+</div>
+
+<br />
+
+<!-- Footer -->
+
+</body>
+
+</html>

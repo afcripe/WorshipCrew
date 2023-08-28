@@ -93,7 +93,7 @@ public class OrderAPIController {
                 String eventName = "A Request Has Been Cancelled.";
                 String eventDesc = "Request "+orderRequest.get().getId().toString()+" has been cancelled by "+userFullName;
                     // cancel
-                Event e = new Event(null, eventName, eventDesc, orderRequest.get().getId(), EventModule.Request, EventType.Cancelled);
+                Event e = new Event(null, eventName, eventDesc, orderRequest.get().getId(), "", EventModule.Request, EventType.Cancelled);
                 eventService.dispatchEvent(e);
             }
         }
@@ -151,7 +151,7 @@ public class OrderAPIController {
         String eventName = "Request "+orderRequest.get().getId()+" Status has been updated to "+setStatus;
         String eventDesc = "The Status for Request "+orderRequest.get().getId()+
                 " has been updated to ["+setStatus+"] by "+userFullName;
-        Event e = new Event(null, eventName, eventDesc, orderRequest.get().getId(), EventModule.Request, EventType.Changed);
+        Event e = new Event(null, eventName, eventDesc, orderRequest.get().getId(), "", EventModule.Request, EventType.Changed);
         eventService.dispatchEvent(e);
         //closed
         if (setStatus.equals(OrderStatus.Complete)) {
@@ -210,7 +210,7 @@ public class OrderAPIController {
             String eventName = "A Requested Item Status was changed to "+setStatus;
             String eventDesc = "An Item Status for Request ID "+requestItem.get().getOrderRequest().getId()+
                     " has been updated to ["+setStatus+"] by "+userFullName;
-            Event e = new Event(null, eventName, eventName, requestItem.get().getOrderRequest().getId(), EventModule.Request, EventType.ItemUpdated);
+            Event e = new Event(null, eventName, eventName, requestItem.get().getOrderRequest().getId(), "", EventModule.Request, EventType.ItemUpdated);
             eventService.dispatchEvent(e);
             // complete
             if (setStatus.equals(OrderStatus.Complete)) {
@@ -256,7 +256,7 @@ public class OrderAPIController {
                     String eventName = "Request "+orderRequest.get().getId()+" Supervisor was changed to "+newSuper.get().getFirstName()+" "+newSuper.get().getLastName();
                     String eventDesc = "Request ID "+orderRequest.get().getId()+" was assigned to "+
                             newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+" by "+userFullName;
-                    Event e = new Event(null, eventName, eventDesc, orderRequest.get().getId(), EventModule.Request, EventType.Changed);
+                    Event e = new Event(null, eventName, eventDesc, orderRequest.get().getId(), "", EventModule.Request, EventType.Changed);
                     eventService.dispatchEvent(e);
                 } else {
                     noteDetail = newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+" was add to the request.";
@@ -279,7 +279,7 @@ public class OrderAPIController {
                     String eventName = newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+" was added to a Request "+orderRequest.get().getId();
                     String eventDesc = newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+
                             " has been added to Request "+orderRequest.get().getId()+" by "+userFullName;
-                    Event e = new Event(null, eventName, eventDesc, orderRequest.get().getId(), EventModule.Request, EventType.Changed);
+                    Event e = new Event(null, eventName, eventDesc, orderRequest.get().getId(), "", EventModule.Request, EventType.Changed);
                     eventService.dispatchEvent(e);
                 }
             }
@@ -326,7 +326,7 @@ public class OrderAPIController {
                 String eventName = newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+" was removed from Request "+orderRequest.get().getId();
                 String eventDesc = newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+
                         " was removed from Request "+orderRequest.get().getId()+" by "+userFullName;
-                Event e = new Event(null, eventName, eventDesc, orderRequest.get().getId(), EventModule.Request, EventType.Changed);
+                Event e = new Event(null, eventName, eventDesc, orderRequest.get().getId(), "", EventModule.Request, EventType.Changed);
                 eventService.dispatchEvent(e);
             } else {
                 session.setAttribute("msgError", "Cannot remove someone who is assigned to request.");
@@ -379,7 +379,7 @@ public class OrderAPIController {
                 String eventDesc = "An item in Request "+requestItem.get().getOrderRequest().getId()+" was assigned to "+
                         newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+
                         " by "+userFullName;
-                Event e = new Event(null, eventName, eventDesc, requestItem.get().getOrderRequest().getId(), EventModule.Request, EventType.Changed);
+                Event e = new Event(null, eventName, eventDesc, requestItem.get().getOrderRequest().getId(), "", EventModule.Request, EventType.Changed);
                 eventService.dispatchEvent(e);
             }
         }
@@ -412,7 +412,7 @@ public class OrderAPIController {
             String eventName = "A Request Reason was updated by "+userFullName;
             String eventDesc = "A Request Reason for Request with ID, "+request.get().getId()+
                     ", was update to ("+requestModel.name()+") by "+userFullName;
-            Event e = new Event(null, eventName, eventDesc, request.get().getId(), EventModule.Request, EventType.Changed);
+            Event e = new Event(null, eventName, eventDesc, request.get().getId(), "", EventModule.Request, EventType.Changed);
             eventService.dispatchEvent(e);
 
             return 1;
