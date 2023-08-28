@@ -56,15 +56,17 @@ public class AppServer {
         File resStyleDark = new File(getClass().getResource("/static/css/dark.css").getFile());
         File resFavIcon = new File(getClass().getResource("/static/img/favicon.ico").getFile());
         File resFavPng = new File(getClass().getResource("/static/img/favicon.png").getFile());
+        File resVideo = new File(getClass().getResource("/static/img/home_page.mp4").getFile());
 
         // load content files
-        File cntStyleDefault = new File(getResourceDir()+"/static/css/style.css");
-        File cntStyleDark = new File(getResourceDir()+"/static/css/dark.css");
-        File cntFavIcon = new File(getResourceDir()+"/static/img/favicon.ico");
-        File cntFavPng = new File(getResourceDir()+"/static/img/favicon.png");
+        File cntStyleDefault = new File(getResourceDir()+"/site/css/style.css");
+        File cntStyleDark = new File(getResourceDir()+"/site/css/dark.css");
+        File cntFavIcon = new File(getResourceDir()+"/site/img/favicon.ico");
+        File cntFavPng = new File(getResourceDir()+"/site/img/favicon.png");
+        File cntVideo = new File(getResourceDir()+"/site/video/home_page.mp4");
 
         // create content dir if needed
-        Path contentCSSPath = Paths.get(getResourceDir()+"/static/css");
+        Path contentCSSPath = Paths.get(getResourceDir()+"/site/css");
         if (!Files.exists(contentCSSPath)) {
             try {
                 Files.createDirectories(contentCSSPath);
@@ -72,10 +74,18 @@ public class AppServer {
                 System.out.println("error creating dir");
             }
         }
-        Path contentIMGPath = Paths.get(getResourceDir()+"/static/img");
+        Path contentIMGPath = Paths.get(getResourceDir()+"/site/img");
         if (!Files.exists(contentIMGPath)) {
             try {
                 Files.createDirectories(contentIMGPath);
+            } catch (IOException e){
+                System.out.println("error creating dir");
+            }
+        }
+        Path contentVideoPath = Paths.get(getResourceDir()+"/site/video");
+        if (!Files.exists(contentVideoPath)) {
+            try {
+                Files.createDirectories(contentVideoPath);
             } catch (IOException e){
                 System.out.println("error creating dir");
             }
@@ -101,6 +111,12 @@ public class AppServer {
 
         try {
             copyStaticFile(resFavPng, cntFavPng, overWright);
+        } catch (IOException ioException) {
+            System.out.println(ioException);
+        }
+
+        try {
+            copyStaticFile(resVideo, cntVideo, overWright);
         } catch (IOException ioException) {
             System.out.println(ioException);
         }

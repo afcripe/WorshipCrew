@@ -21,7 +21,11 @@
 
   <div sec:authorize="isAnonymous()">
 
-        <iframe id="landingVideo" src="https://www.youtube-nocookie.com/embed/hoKc9k0sbG4?controls=0&autoplay=1&mute=1&webshare=0"></iframe>
+<!--    <iframe id="landingVideo" src="https://www.youtube-nocookie.com/embed/hoKc9k0sbG4?controls=0&autoplay=1&mute=1&webshare=0"></iframe>-->
+    <video id="landingVideo" autoplay muted>
+      <source src="/content/site/video/home_page.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
 <!--        <iframe id="landingVideo"></iframe>-->
 
     <div id="loginCard" class="login">
@@ -33,7 +37,6 @@
     <script>
         const logiCd = document.getElementById('loginCard');
         function showLogin() {
-            debugger
             if (logiCd.classList.contains('showLogin')) {
                 logiCd.classList.remove('showLogin');
             } else {

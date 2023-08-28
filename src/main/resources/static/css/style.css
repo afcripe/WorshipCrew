@@ -51,7 +51,7 @@
 }
 .login {
     position: fixed;
-    top: 68px;
+    top: 70px;
     right: 10px;
     z-index: 100;
     display: none;
@@ -59,11 +59,10 @@
 }
 .login-card {
     color: var(--dwc-login-color);
-    max-width: 500px;
-    min-width: 400px;
+    min-width: 330px;
     border: #0dcaf0 solid 1px;
     border-radius: 5px;
-    background-color: rgba(255, 255, 255, 0.25);
+    background-color: rgba(255, 255, 255, 0.45);
 }
 .login-card .form-control {
     color: var(--dwc-login-color);
