@@ -85,6 +85,7 @@ public class SecurityConfig {
                     auth.requestMatchers("/js/**").permitAll();
 
                     auth.requestMatchers("/app").permitAll();
+                    auth.requestMatchers("/app/**").permitAll();
                     auth.requestMatchers("/spa/**").permitAll();
 
                     auth.requestMatchers("/store").hasAnyAuthority("ADMIN_WRITE", "STORE_SUPERVISOR", "STORE_READ","STORE_WRITE");

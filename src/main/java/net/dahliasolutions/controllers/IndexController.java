@@ -59,10 +59,6 @@ public class IndexController {
     public String getApp() {
         return "app";
     }
-    @GetMapping("/app/")
-    public String getAppRoot() {
-        return "app";
-    }
     @GetMapping("/app/**")
     public String redirectToApp() {
         return "app";
