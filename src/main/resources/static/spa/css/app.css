@@ -1,0 +1,41 @@
+
+body {
+    min-width: 340px;
+}
+
+#appNav {
+    width: 100%;
+    border: black .1em solid;
+    background-color: #414141;
+    border-radius: 5px;
+    height: 3rem;
+    line-height: 3rem;
+    padding: 0;
+    margin: 0;
+}
+
+#appNav img {
+    margin: 0;
+    vertical-align: middle;
+}
+
+#appNav ul {
+    list-style: none;
+    margin: 0 0 0 0;
+    display: inline-block;
+    padding: 0;
+    vertical-align: middle;
+}
+
+#appNav li {
+    display: inline-block;
+    padding-left: 6px;
+    padding-right: 6px;
+}
+
+.nav__link {
+    color: #daeeff;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: bold;
+}

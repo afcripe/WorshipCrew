@@ -55,6 +55,19 @@ public class IndexController {
         return "index";
     }
 
+    @GetMapping("/app")
+    public String getApp() {
+        return "app";
+    }
+    @GetMapping("/app/")
+    public String getAppRoot() {
+        return "app";
+    }
+    @GetMapping("/app/**")
+    public String redirectToApp() {
+        return "app";
+    }
+
     @GetMapping("/login")
     public String loginForm(HttpServletRequest request){
         return "index";
