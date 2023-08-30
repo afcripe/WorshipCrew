@@ -9,7 +9,7 @@ export default class extends AbstractView {
     async getHtml() {
         return `
             <h1>Request</h1>
-            <p>1</p>
+            <p>`+this.params.id+`</p>
         `;
     }
 }

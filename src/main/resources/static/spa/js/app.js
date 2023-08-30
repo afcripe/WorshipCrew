@@ -6,6 +6,8 @@ import TicketView from "./TicketView.js";
 import Requests from "./Requests.js";
 import RequestView from "./RequestView.js";
 
+import { postLogin } from "./Login.js";
+
 
 let username = "";
 let firstName = "";
@@ -79,9 +81,16 @@ const router = async () => {
 
 const getLoggedIn = async () => {
     isLoggedIn =localStorage.getItem("isLoggedIn");
-    if (isLoggedIn === null) { isLoggedIn = true; }
+    if (isLoggedIn === null) { isLoggedIn = false; }
 }
 
+// Form Handlers //
+const doLogin = async () => {
+    let username = document.getElementById("formLogin-username");
+    let password = document.getElementById("formLogin-password");
+    isLoggedIn = await postLogin(username.value, password.value);
+    router();
+}
 
 window.addEventListener("popstate", router);
 
@@ -91,7 +100,14 @@ document.addEventListener("DOMContentLoaded", () => {
             e.preventDefault();
             navigateTo(e.target.href);
         }
+        if ( e.target.matches("[data-form-submit]")) {
+            const submittedForm = document.querySelector('[data-form-submit]');
+            if (submittedForm.dataset.formSubmit === "formLogin") {
+                doLogin();
+            }
+        }
     });
+
     getLoggedIn();
     router();
 });
