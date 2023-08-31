@@ -7,20 +7,39 @@ export default class extends AbstractView {
     }
 
     async getHtml() {
-        return `
-            <h1>Tickets</h1>
-            <div>
-                <a href="/app/ticket/St-000001" data-link>St-000001</a>
-            </div>
-            <div>
-                <a href="/app/ticket/St-000002" data-link>St-000002</a>
-            </div>
-            <div>
-                <a href="/app/ticket/St-000003" data-link>St-000003</a>
-            </div>
-            <div>
-                <a href="/app/ticket/St-000004" data-link>St-000004</a>
-            </div>
-        `;
+        let tickets = await getRemoteTickets()
+
+        let r = '<h1>Tickets</h1>';
+        for (let i in tickets) {
+            let obj = tickets[i];
+            let arayDate = obj.ticketDate.split("T");
+            let fmtDate = arayDate[0];
+            let arrayTime = arayDate[1].split(":");
+            let fmtTime = arrayTime[0]+":"+arrayTime[1];
+            let fmtDateTime = fmtDate+" "+fmtTime;
+
+            r = r + `<div class="list__item" data-nav-ticket="`+obj.id+`">`;
+
+            r = r + `<div class="list__Item-line">`;
+            r = r + `<div class="item-id">`+obj.id+`</div>`;
+            r = r + `<div class="item-user">`+obj.user.fullName+`</div>`;
+            r = r + `<div class="item-date">`+fmtDateTime+`</div>`;
+            r = r + `</div>`;
+
+            r = r + `<div class="list__Item-line">`;
+            r = r + `<div class="item-detail">`+obj.ticketDetail+`</div>`;
+            r = r + `</div>`;
+
+            r = r + `</div>`;
+        }
+
+        return r;
     }
+}
+
+async function getRemoteTickets() {
+    const response = await fetch('/api/v1/app/tickets');
+    const tickets = await response.json();
+    console.log(tickets);
+    return tickets;
 }

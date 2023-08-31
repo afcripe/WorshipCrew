@@ -146,6 +146,8 @@ public class SecurityConfig {
                     auth.requestMatchers("/admin/**").hasAnyAuthority("ADMIN_WRITE", "DIRECTOR_READ", "DIRECTOR_WRITE", "CAMPUS_WRITE", "CAMPUS_READ", "USER_SUPERVISOR", "USER_READ", "USER_WRITE");
 
                     auth.requestMatchers("/api/v1/admin").permitAll();
+                    auth.requestMatchers("/api/v1/app/**").permitAll();
+
                     auth.requestMatchers("/api/v1/**").authenticated();
 
                     auth.anyRequest().authenticated();

@@ -106,6 +106,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 doLogin();
             }
         }
+        if ( e.target.matches("[data-nav-ticket]")) {
+            const item = document.querySelector('[data-nav-ticket]');
+            let newURL = "/app/ticket/"+item.dataset.navTicket;
+            navigateTo(newURL);
+        }
     });
 
     getLoggedIn();
