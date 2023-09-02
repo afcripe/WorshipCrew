@@ -7,39 +7,57 @@ export default class extends AbstractView {
     }
 
     async getHtml() {
-        let tickets = await getRemoteTickets()
-
-        let r = '<h1>Tickets</h1>';
+        let tickets = await getRemoteTickets();
+        let returnHTML = `<h1>Tickets</h1>`;
         for (let i in tickets) {
-            let obj = tickets[i];
-            let arayDate = obj.ticketDate.split("T");
-            let fmtDate = arayDate[0];
-            let arrayTime = arayDate[1].split(":");
-            let fmtTime = arrayTime[0]+":"+arrayTime[1];
-            let fmtDateTime = fmtDate+" "+fmtTime;
-
-            r = r + `<div class="list__item" data-nav-ticket="`+obj.id+`">`;
-
-            r = r + `<div class="list__Item-line">`;
-            r = r + `<div class="item-id">`+obj.id+`</div>`;
-            r = r + `<div class="item-user">`+obj.user.fullName+`</div>`;
-            r = r + `<div class="item-date">`+fmtDateTime+`</div>`;
-            r = r + `</div>`;
-
-            r = r + `<div class="list__Item-line">`;
-            r = r + `<div class="item-detail">`+obj.ticketDetail+`</div>`;
-            r = r + `</div>`;
-
-            r = r + `</div>`;
+            let ticket = tickets[i];
+            returnHTML += htmlTicketLine(ticket);
         }
-
-        return r;
+        returnHTML = returnHTML.replaceAll("\n","");
+        return returnHTML.replaceAll("\n","");
     }
 }
 
 async function getRemoteTickets() {
     const response = await fetch('/api/v1/app/tickets');
     const tickets = await response.json();
-    console.log(tickets);
     return tickets;
+}
+
+async function getRemoteTicketsHTML() {
+    const response = await fetch('/api/v1/app/html/listtickets')
+        .then(response => {
+            return response.text();
+        })
+        .then(html => {
+            return html;
+            // Initialize the DOM parser
+            // let parser = new DOMParser();
+            // Parse the text
+            // return parser.parseFromString(html, "text/html");
+        });
+    let newHTML = await response;
+    return newHTML;
+}
+
+function htmlTicketLine(tkt) {
+    let r = "";
+    r+=`<div class="list__item" data-link-ticket="`+tkt.id+`">`;
+    r+=`<div class="list__Item-line" data-link-ticket="`+tkt.id+`">`;
+    r+=`<div class="item-id" data-link-ticket="`+tkt.id+`">`+tkt.id+`</div>`;
+    r+=`<div class="item-user" data-link-ticket="`+tkt.id+`">`+tkt.user.fullName+`</div>`;
+    r+=`<div class="item-date" data-link-ticket="`+tkt.id+`">`+formatDate(tkt.ticketDate)+`</div>`;
+    r+=`</div><div class="list__Item-line" data-link-ticket="`+tkt.id+`">`;
+    r+=`<div class="item-detail" data-link-ticket="`+tkt.id+`">`+tkt.ticketDetail+`</div>`;
+    r+=`</div></div>`;
+
+    return r;
+}
+
+function formatDate(dte) {
+    let strDate = dte.split("T")[0];
+    let strTime = dte.split("T")[1];
+    let partsDate = strDate.split("-");
+    let partTime = strTime.split(":");
+    return strDate + " " + partTime[0] + ":" + partTime[1];
 }

@@ -35,17 +35,20 @@ const router = async () => {
         { path: "/app", view: Dashboard },
         { path: "/app/login", view: Login },
         { path: "/app/tickets", view: Tickets },
+        { path: "/app/tickets?", view: Tickets },
         { path: "/app/ticket/:id", view: TicketView },
         { path: "/app/requests", view: Requests },
         { path: "/app/settings", view: Settings },
         { path: "/app/request/:id", view: RequestView }
     ];
 
+    let cleanPath = location.pathname.split("?")[0];
+
     // Test for location matches
     const potentialMatches = routes.map(route => {
         return {
             route: route,
-            result: location.pathname.match(pathToRegEx(route.path))
+            result: cleanPath.match(pathToRegEx(route.path))
         }
     });
     let match = potentialMatches.find( found => found.result !== null );
@@ -72,7 +75,6 @@ const router = async () => {
         });
         match = loginMatches.find( found => found.result !== null );
     }
-
     const view = new match.route.view(getParams(match));
 
     document.querySelector("#app").innerHTML = await view.getHtml();
@@ -80,15 +82,13 @@ const router = async () => {
 };
 
 const getLoggedIn = async () => {
-    isLoggedIn =localStorage.getItem("isLoggedIn");
+    isLoggedIn = localStorage.getItem("isLoggedIn");
     if (isLoggedIn === null) { isLoggedIn = false; }
 }
 
 // Form Handlers //
-const doLogin = async () => {
-    let username = document.getElementById("formLogin-username");
-    let password = document.getElementById("formLogin-password");
-    isLoggedIn = await postLogin(username.value, password.value);
+const doLogin = async (u, p) => {
+    isLoggedIn = await postLogin(u, p);
     router();
 }
 
@@ -100,16 +100,18 @@ document.addEventListener("DOMContentLoaded", () => {
             e.preventDefault();
             navigateTo(e.target.href);
         }
+        if ( e.target.matches("[data-link-ticket]")) {
+            let url = "/app/ticket/"+e.target.dataset.linkTicket;
+            navigateTo(url);
+        }
         if ( e.target.matches("[data-form-submit]")) {
+            e.preventDefault();
             const submittedForm = document.querySelector('[data-form-submit]');
             if (submittedForm.dataset.formSubmit === "formLogin") {
+                let username = document.getElementById("formLogin-username").value;
+                let password = document.getElementById("formLogin-password").value;
                 doLogin();
             }
-        }
-        if ( e.target.matches("[data-nav-ticket]")) {
-            const item = document.querySelector('[data-nav-ticket]');
-            let newURL = "/app/ticket/"+item.dataset.navTicket;
-            navigateTo(newURL);
         }
     });
 

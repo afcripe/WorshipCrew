@@ -79,6 +79,11 @@ body {
     font-weight: bold;
 }
 
+.app__link {
+    color: var(--dwc-body-color);
+    text-decoration: none;
+}
+
 /* Form Fields */
 /* ----------- */
 .form-content {
@@ -365,7 +370,6 @@ body {
 .list__Item-line {
     display: flex;
     flex-direction: row;
-    flex: 1 2 auto;
     font-size: 1rem;
 }
 
@@ -382,6 +386,7 @@ body {
 .item-user {
     display: inline-block;
     font-size: 1rem;
+    flex-grow: 1;
 }
 
 .item-detail {

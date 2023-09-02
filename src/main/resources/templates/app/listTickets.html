@@ -1,0 +1,23 @@
+<div xmlns:th="http://thymeleaf.org">
+    
+    <h1>Tickets</h1>
+    
+    <div th:if="${not #lists.isEmpty(agentTickets)}" th:each="agentTicket : ${agentTickets}">
+        <div class="list__item" th:data-link-ticket="${agentTicket.Id}">
+            <div class="list__Item-line" th:data-link-ticket="${agentTicket.Id}">
+                <div class="item-id" th:text="${agentTicket.id}" th:data-link-ticket="${agentTicket.Id}"></div>
+                <div class="item-user" th:text="${agentTicket.user.fullName}" th:data-link-ticket="${agentTicket.Id}"></div>
+                <div class="item-date" th:text="${#temporals.format(ticketDate, 'MMM-dd-yyyy HH:mm')}" th:data-link-ticket="${agentTicket.Id}"></div>
+            </div>
+
+            <div class="list__Item-line" th:data-link-ticket="${agentTicket.Id}">
+                <div class="item-detail" th:text="${agentTicket.ticketDetail}" th:data-link-ticket="${agentTicket.Id}"></div>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(agentTickets)}">
+        There are no tickets to display.
+    </div>
+
+</div>
