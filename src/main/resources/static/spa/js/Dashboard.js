@@ -10,6 +10,36 @@ export default class extends AbstractView {
         return `
             <h1>Dashboard</h1>
             <p>Lorem Ispum.</p>
+            <p>Lorem Ispum.</p>
+            <p>Lorem Ispum.</p>
+            <p>Lorem Ispum.</p>
+            <p>Lorem Ispum.</p>
+            <p>Lorem Ispum.</p>
+            <p>Lorem Ispum.</p>
+            <p>Lorem Ispum.</p>
+            <p>Lorem Ispum.</p>
+            <p>Lorem Ispum.</p>
+            <p>Lorem Ispum.</p>
+            <p>Lorem Ispum.</p>
+            <p>Lorem Ispum.</p>
+            <p>Lorem Ispum.</p>
+            <p>Lorem Ispum.</p>
+            <p>Lorem Ispum.</p>
+            <p>Lorem Ispum.</p>
+            <p>Lorem Ispum.</p>
+            <p>Lorem Ispum.</p>
+            <p>Lorem Ispum.</p>
+            <p>Lorem Ispum.</p>
+            <p>Lorem Ispum.</p>
+            <p>Lorem Ispum.</p>
+            <p>Lorem Ispum.</p>
+            <p>Lorem Ispum.</p>
+            <p>Lorem Ispum.</p>
+            <p>Lorem Ispum.</p>
+            <p>Lorem Ispum.</p>
+            <p>Lorem Ispum.</p>
+            <p>Lorem Ispum.</p>
+            <p>Lorem Ispum.</p>
         `;
     }
 }

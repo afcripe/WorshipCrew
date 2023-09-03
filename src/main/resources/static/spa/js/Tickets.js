@@ -24,22 +24,6 @@ async function getRemoteTickets() {
     return tickets;
 }
 
-async function getRemoteTicketsHTML() {
-    const response = await fetch('/api/v1/app/html/listtickets')
-        .then(response => {
-            return response.text();
-        })
-        .then(html => {
-            return html;
-            // Initialize the DOM parser
-            // let parser = new DOMParser();
-            // Parse the text
-            // return parser.parseFromString(html, "text/html");
-        });
-    let newHTML = await response;
-    return newHTML;
-}
-
 function htmlTicketLine(tkt) {
     let r = "";
     r+=`<div class="list__item" data-link-ticket="`+tkt.id+`">`;
