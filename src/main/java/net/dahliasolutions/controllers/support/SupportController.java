@@ -623,11 +623,16 @@ public class SupportController {
         // add leading 0 to month
         Integer month = dateNow.getMonthValue();
         String monthString = month.toString();
+        Integer day = dateNow.getDayOfMonth();
+        String dayString = day.toString();
         if (monthString.length() < 2) {
             monthString = "0"+monthString;
         }
+        if (dayString.length() < 2) {
+            dayString = "0"+dayString;
+        }
         // create date and convert to LocalDateTime
-        String dateString = dateNow.getYear()+"-"+monthString+"-"+ dateNow.getDayOfMonth()+" 00:00";
+        String dateString = dateNow.getYear()+"-"+monthString+"-"+ dayString+" 00:00";
         LocalDateTime returnDate = LocalDateTime.parse(dateString, formatter);
 
         // adjust date based on part
@@ -658,11 +663,16 @@ public class SupportController {
         // add leading 0 to month
         Integer month = dateNow.getMonthValue();
         String monthString = month.toString();
+        Integer day = dateNow.getDayOfMonth();
+        String dayString = day.toString();
         if (monthString.length() < 2) {
             monthString = "0"+monthString;
         }
+        if (dayString.length() < 2) {
+            dayString = "0"+dayString;
+        }
         // create date and convert to LocalDateTime
-        String dateString = dateNow.getYear()+"-"+monthString+"-"+ dateNow.getDayOfMonth()+" 24:00";
+        String dateString = dateNow.getYear()+"-"+monthString+"-"+ dayString+" 00:00";
         LocalDateTime returnDate = LocalDateTime.parse(dateString, formatter);
 
         // adjust date based on part

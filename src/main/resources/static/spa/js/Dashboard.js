@@ -9,37 +9,7 @@ export default class extends AbstractView {
     async getHtml() {
         return `
             <h1>Dashboard</h1>
-            <p>Lorem Ispum.</p>
-            <p>Lorem Ispum.</p>
-            <p>Lorem Ispum.</p>
-            <p>Lorem Ispum.</p>
-            <p>Lorem Ispum.</p>
-            <p>Lorem Ispum.</p>
-            <p>Lorem Ispum.</p>
-            <p>Lorem Ispum.</p>
-            <p>Lorem Ispum.</p>
-            <p>Lorem Ispum.</p>
-            <p>Lorem Ispum.</p>
-            <p>Lorem Ispum.</p>
-            <p>Lorem Ispum.</p>
-            <p>Lorem Ispum.</p>
-            <p>Lorem Ispum.</p>
-            <p>Lorem Ispum.</p>
-            <p>Lorem Ispum.</p>
-            <p>Lorem Ispum.</p>
-            <p>Lorem Ispum.</p>
-            <p>Lorem Ispum.</p>
-            <p>Lorem Ispum.</p>
-            <p>Lorem Ispum.</p>
-            <p>Lorem Ispum.</p>
-            <p>Lorem Ispum.</p>
-            <p>Lorem Ispum.</p>
-            <p>Lorem Ispum.</p>
-            <p>Lorem Ispum.</p>
-            <p>Lorem Ispum.</p>
-            <p>Lorem Ispum.</p>
-            <p>Lorem Ispum.</p>
-            <p>Lorem Ispum.</p>
+            <p>Welcome, Caleb.</p>
         `;
     }
 }

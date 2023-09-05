@@ -47,14 +47,6 @@ public class AppTicket {
     @ManyToOne(fetch = FetchType.EAGER)
     private User agent;
 
-    @JsonBackReference
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "ticket")
-    private List<TicketNote> notes;
-
-    @JsonBackReference
-    @ManyToMany(fetch = FetchType.EAGER)
-    private List<User> agentList;
-
     @Override
     public String toString() {
         return "Ticket{" +

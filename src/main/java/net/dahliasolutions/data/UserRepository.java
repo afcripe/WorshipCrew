@@ -25,7 +25,7 @@ public interface UserRepository extends JpaRepository<User, BigInteger> {
     List<User> findAllByActivated(boolean activated);
     List<User> findAllByDeleted(boolean deleted);
 
-    @Query(value="SELECT * FROM USER_DETAILS WHERE CONCAT(UPPER(FIRST_NAME), ' ', UPPER(LAST_NAME)) LIKE CONCAT(UPPER(:searchTerm),'%')", nativeQuery = true)
+    @Query(value="SELECT * FROM USER_DETAILS WHERE CONCAT(UPPER(FIRST_NAME), ' ', UPPER(LAST_NAME)) LIKE CONCAT('%',UPPER(:searchTerm),'%')", nativeQuery = true)
     List<User> searchAllByFullName(@Param("searchTerm") String searchTerm);
 
     @Modifying

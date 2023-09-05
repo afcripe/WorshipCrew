@@ -5,8 +5,11 @@ import Tickets from "./Tickets.js";
 import TicketView from "./TicketView.js";
 import Requests from "./Requests.js";
 import RequestView from "./RequestView.js";
+import SearchView from "./SearchView.js";
 
 import { postLogin } from "./Login.js";
+import { toggleDetail } from "./TicketView.js";
+import { imageDialog } from "./ImageView.js";
 
 
 let username = "";
@@ -34,6 +37,7 @@ const router = async () => {
     const routes = [
         { path: "/app", view: Dashboard },
         { path: "/app/login", view: Login },
+        { path: "/app/search/:id", view: SearchView },
         { path: "/app/tickets", view: Tickets },
         { path: "/app/tickets?", view: Tickets },
         { path: "/app/ticket/:id", view: TicketView },
@@ -91,18 +95,49 @@ const doLogin = async (u, p) => {
     isLoggedIn = await postLogin(u, p);
     router();
 }
+const toggleSearch = () => {
+    let srch = document.querySelector(".nav__search");
+    if (isLoggedIn) {
+        if (srch.classList.contains("nav__search-hide")) {
+            srch.classList.remove("nav__search-hide");
+            srch.querySelector("input").focus();
+        } else {
+            srch.classList.add("nav__search-hide");
+        }
+    }
+}
+const submitSearch = () => {
+    let inputSearch = document.getElementById("searchInput");
+    let searchString = inputSearch.value;
+    inputSearch.value = "";
+    navigateTo("/app/search/"+searchString);
+}
 
 window.addEventListener("popstate", router);
 
 document.addEventListener("DOMContentLoaded", () => {
     document.body.addEventListener("click", e => {
+        if ( e.target.matches("[data-search]")) {
+            toggleSearch();
+        }
         if ( e.target.matches("[data-nav-link]")) {
             let loc = "/app/"+e.target.dataset.navLink;
             navigateTo(loc);
         }
+        if ( e.target.matches("[data-link-search]")) {
+            const tgt = document.querySelector('[data-link-search]');
+            let url = e.target.dataset.linkSearch;
+            navigateTo(url);
+        }
         if ( e.target.matches("[data-link-ticket]")) {
             let url = "/app/ticket/"+e.target.dataset.linkTicket;
             navigateTo(url);
+        }
+        if ( e.target.matches("[data-ticket-detail-toggle]")) {
+            toggleDetail();
+        }
+        if ( e.target.matches("[data-nav-image]")) {
+            imageDialog(e.target.dataset.navImage);
         }
         if ( e.target.matches("[data-form-submit]")) {
             e.preventDefault();
@@ -113,6 +148,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 doLogin();
             }
         }
+    });
+
+    document.getElementById("searchButton").addEventListener("click", () => {
+        submitSearch();
     });
 
     getLoggedIn();

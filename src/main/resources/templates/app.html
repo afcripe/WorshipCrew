@@ -9,53 +9,35 @@
   </head>
   <body>
 
-    <nav id="appNav" style="display: flex; flex-direction: row">
-      <div style="flex-grow: 1; text-align: center">
-          <img src="/img/favicon.png" alt="Exchange Logo" width="32" />
+    <nav id="appNav">
+      <div class="nav__search nav__search-hide">
+        <div class="nav__search-input">
+          <input id="searchInput" type="text" class="form-control" autocomplete="false" placeholder="Search">
+        </div>
+        <div class="nav__search-button">
+          <button id="searchButton" type="button" class="btn btn-sm btn-wiki">Search</button>
+        </div>
       </div>
-      <div style="flex-grow: 1; text-align: center">
-          <i class="bi bi-house nav__icon color-icon" data-nav-link=""></i>
+      <div class="nav__links">
+        <div style="flex-grow: 1; text-align: center">
+            <img src="/img/favicon.png" alt="Exchange Logo" width="32" />
+        </div>
+        <div style="flex-grow: 1; text-align: center">
+            <i class="bi bi-house nav__icon color-icon" data-nav-link=""></i>
+        </div>
+        <div style="flex-grow: 1; text-align: center">
+            <i class="bi bi-life-preserver nav__icon color-support" data-nav-link="tickets"></i>
+        </div>
+        <div style="flex-grow: 1; text-align: center">
+            <i class="bi bi-cart4 nav__icon color-store" data-nav-link="requests"></i>
+        </div>
+        <div style="flex-grow: 1; text-align: center">
+            <i class="bi bi-gear nav__icon color-icon" data-nav-link="settings"></i>
+        </div>
+        <div style="flex-grow: 1; text-align: center">
+            <i class="bi bi-search nav__icon color-icon" data-search="search"></i>
+        </div>
       </div>
-      <div style="flex-grow: 1; text-align: center">
-          <i class="bi bi-life-preserver nav__icon color-support" data-nav-link="tickets"></i>
-      </div>
-      <div style="flex-grow: 1; text-align: center">
-          <i class="bi bi-cart4 nav__icon color-store" data-nav-link="requests"></i>
-      </div>
-      <div style="flex-grow: 1; text-align: center">
-          <i class="bi bi-gear nav__icon color-icon" data-nav-link="settings"></i>
-      </div>
-      <div style="flex-grow: 1; text-align: center">
-          <i class="bi bi-search nav__icon color-icon" data-nav-link="search"></i>
-      </div>
-
-<!--      <ul>-->
-<!--        <li>-->
-<!--          <a href="/app" class="nav__link" data-link>-->
-<!--            <i class="bi bi-house nav__icon color-icon"></i>-->
-<!--          </a>-->
-<!--        </li>-->
-<!--        <li>-->
-<!--          <a href="/app/tickets" class="nav__link" data-link>-->
-<!--            <i class="bi bi-life-preserver nav__icon color-support"></i>-->
-<!--          </a>-->
-<!--        </li>-->
-<!--        <li>-->
-<!--          <a href="/app/requests" class="nav__link" data-link>-->
-<!--            <i class="bi bi-cart4 nav__icon color-store"></i>-->
-<!--          </a>-->
-<!--        </li>-->
-<!--        <li>-->
-<!--          <a href="/app/settings" class="nav__link" data-link>-->
-<!--            <i class="bi bi-gear nav__icon color-icon"></i>-->
-<!--          </a>-->
-<!--        </li>-->
-<!--        <li>-->
-<!--          <a href="/app/settings" class="nav__search" data-link>-->
-<!--            <i class="bi bi-search nav__icon color-icon"></i>-->
-<!--          </a>-->
-<!--        </li>-->
-<!--      </ul>-->
     </nav>
 
     <div id="app"></div>
