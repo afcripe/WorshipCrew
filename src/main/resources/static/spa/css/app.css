@@ -418,6 +418,12 @@ body {
     background-color: transparent;
 }
 
+.btn-mobile {
+    height: 1.5rem;
+    line-height: 0.8rem;
+    font-size: 0.8rem;
+}
+
 .generic-icon {
     color: var(--dwc-body-color);
 }
@@ -535,10 +541,18 @@ body {
     display: flex;
     flex-direction: row;
     background-color: rgba(225, 171, 250, 0.3);
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
 }
 
 .ticket__note-title-agent {
     background-color: rgba(144, 144, 144, 0.4);
+}
+
+.ticket__note-header {
+    font-size: 1.25rem;
+    padding-left: 0.1rem;
+    padding-right: 0.1rem;
 }
 
 .ticket__note-user {
@@ -567,6 +581,52 @@ body {
     padding-right: 0.1rem;
 }
 
+/* Requests */
+
+.request__item {
+    border: 2px solid gray;
+    border-radius: 0.25rem;
+}
+
+.request__item-detail {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    padding: 0.25rem;
+}
+
+.request__item-images {
+    padding-left: 0.1rem;
+    padding-right: 0.1rem;
+}
+
+.request__item-field-header {
+    font-size: 1.25rem;
+    padding-left: 0.1rem;
+    padding-right: 0.1rem;
+}
+
+.request__item-field-left {
+    font-size: 1rem;
+    flex-grow: 1;
+    text-align: left;
+    padding-left: 0.1rem;
+    padding-right: 0.1rem;
+}
+
+.request__item-field-right {
+    font-size: 1rem;
+    text-align: right;
+    padding-left: 0.1rem;
+    padding-right: 0.5rem;
+}
+
+.request__item-top-right {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
+
 /* Settings */
 .settings__container {
     width: calc(100% - 5px);
@@ -591,10 +651,4 @@ body {
     font-size: 1rem;
     margin: 0.25rem;
     padding: 0;
-}
-
-.settings__btn {
-    height: 1.5rem;
-    line-height: 0.8rem;
-    font-size: 0.8rem;
 }

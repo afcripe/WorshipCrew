@@ -46,11 +46,10 @@ const router = async () => {
         { path: "/app/login", view: Login },
         { path: "/app/search/:id", view: SearchView },
         { path: "/app/tickets", view: Tickets },
-        { path: "/app/tickets?", view: Tickets },
         { path: "/app/ticket/:id", view: TicketView },
         { path: "/app/requests", view: Requests },
-        { path: "/app/settings", view: Settings },
-        { path: "/app/request/:id", view: RequestView }
+        { path: "/app/request/:id", view: RequestView },
+        { path: "/app/settings", view: Settings }
     ];
 
     let cleanPath = location.pathname.split("?")[0];
@@ -137,6 +136,7 @@ const submitSearch = () => {
     let inputSearch = document.getElementById("searchInput");
     let searchString = inputSearch.value;
     inputSearch.value = "";
+    toggleSearch();
     navigateTo("/app/search/"+searchString);
 }
 
@@ -158,6 +158,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         if ( e.target.matches("[data-link-ticket]")) {
             let url = "/app/ticket/"+e.target.dataset.linkTicket;
+            navigateTo(url);
+        }
+        if ( e.target.matches("[data-link-request]")) {
+            let url = "/app/request/"+e.target.dataset.linkRequest;
             navigateTo(url);
         }
         if ( e.target.matches("[data-ticket-detail-toggle]")) {

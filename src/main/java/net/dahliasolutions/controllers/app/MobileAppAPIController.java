@@ -6,6 +6,7 @@ import net.dahliasolutions.controllers.AuthenticationResponse;
 import net.dahliasolutions.models.APIUser;
 import net.dahliasolutions.models.LoginModel;
 import net.dahliasolutions.models.UniversalAppSearchModel;
+import net.dahliasolutions.models.order.OrderItem;
 import net.dahliasolutions.models.order.OrderRequest;
 import net.dahliasolutions.models.order.OrderStatus;
 import net.dahliasolutions.models.support.*;
@@ -13,6 +14,7 @@ import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
 import net.dahliasolutions.services.AuthService;
 import net.dahliasolutions.services.JwtService;
+import net.dahliasolutions.services.order.OrderItemService;
 import net.dahliasolutions.services.order.OrderService;
 import net.dahliasolutions.services.support.TicketService;
 import net.dahliasolutions.services.user.UserService;
@@ -37,6 +39,7 @@ public class MobileAppAPIController {
     private final UserService userService;
     private final TicketService ticketService;
     private final OrderService orderService;
+    private final OrderItemService orderItemService;
 
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> getAuthUser(@ModelAttribute LoginModel loginModel) {
@@ -196,6 +199,52 @@ public class MobileAppAPIController {
 
         return new ResponseEntity<>(ticket.get().getAgentList(), HttpStatus.OK);
     }
+
+    @GetMapping("/requests")
+    public ResponseEntity<List<OrderRequest>> getUserRequests(HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
+        }
+
+        List<OrderRequest> openSuperRequestList = orderService.findAllBySupervisorOpenOnly(apiUser.getUser());
+        return new ResponseEntity<>(openSuperRequestList, HttpStatus.OK);
+    }
+
+    @GetMapping("/request/{id}")
+    public ResponseEntity<OrderRequest> getRequestById(@PathVariable BigInteger id, HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new OrderRequest(), HttpStatus.FORBIDDEN);
+        }
+
+        Optional<OrderRequest> req = orderService.findById(id);
+        if (req.isEmpty()) {
+            return new ResponseEntity<>(new OrderRequest(), HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(req.get(), HttpStatus.OK);
+    }
+
+    @GetMapping("/itemlist/{id}")
+    public ResponseEntity<List<OrderItem>> getRequestItemsById(@PathVariable BigInteger id, HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
+        }
+
+        Optional<OrderRequest> req = orderService.findById(id);
+        if (req.isEmpty()) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.BAD_REQUEST);
+        }
+
+        List<OrderItem> items = req.get().getRequestItems();
+
+
+        return new ResponseEntity<>(items, HttpStatus.OK);
+    }
+
+
 
     @GetMapping("/search/{searchTerm}")
     public ResponseEntity<List<UniversalAppSearchModel>> getSearchResults(@PathVariable String searchTerm, HttpServletRequest request) {

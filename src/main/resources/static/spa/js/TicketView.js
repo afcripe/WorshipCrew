@@ -74,8 +74,8 @@ function htmlTicket(tkt) {
     r+=`<div class="ticket__detail">`+tkt.ticketDetail+`</div>`;
 
     r+=`<div class="ticket__detail-group">`;
-    r+=`<i id="btnDetailExpand" class="bi bi-arrows-expand ticket__detail-expand" style="display: none" data-ticket-detail-toggle></i>`;
-    r+=`<i id="btnDetailCollapse" class="bi bi-arrows-collapse ticket__detail-expand" data-ticket-detail-toggle></i>`;
+    r+=`<i id="btnDetailExpand" class="bi bi-arrows-expand ticket__detail-expand" data-ticket-detail-toggle></i>`;
+    r+=`<i id="btnDetailCollapse" class="bi bi-arrows-collapse ticket__detail-expand" style="display: none" data-ticket-detail-toggle></i>`;
     r+=`<div class="ticket__detail">Date Due: `+formatDate(tkt.ticketDue)+`</div>`;
     r+=`<div id="groupDetailExpand" class="ticket__expand-group ticket__collapse-group ticket__hide-group">`;
     r+=`<div class="ticket__detail">Date Sbmitted: `+formatDate(tkt.ticketDate)+`</div>`;
