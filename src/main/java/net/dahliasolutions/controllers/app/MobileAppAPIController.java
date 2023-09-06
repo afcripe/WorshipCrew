@@ -2,13 +2,16 @@ package net.dahliasolutions.controllers.app;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import net.dahliasolutions.controllers.AuthenticationResponse;
 import net.dahliasolutions.models.APIUser;
+import net.dahliasolutions.models.LoginModel;
 import net.dahliasolutions.models.UniversalAppSearchModel;
 import net.dahliasolutions.models.order.OrderRequest;
 import net.dahliasolutions.models.order.OrderStatus;
 import net.dahliasolutions.models.support.*;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
+import net.dahliasolutions.services.AuthService;
 import net.dahliasolutions.services.JwtService;
 import net.dahliasolutions.services.order.OrderService;
 import net.dahliasolutions.services.support.TicketService;
@@ -18,10 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
 import java.net.http.HttpRequest;
@@ -32,14 +32,32 @@ import java.util.*;
 @RequestMapping("/api/v1/app")
 public class MobileAppAPIController {
 
+    private final AuthService authService;
     private final JwtService jwtService;
     private final UserService userService;
     private final TicketService ticketService;
     private final OrderService orderService;
 
-    @GetMapping("/login")
-    public boolean getAppLogin() {
-        return true;
+    @PostMapping("/login")
+    public ResponseEntity<AuthenticationResponse> getAuthUser(@ModelAttribute LoginModel loginModel) {
+        AuthenticationResponse response = authService.authenticate(loginModel);
+        if (response.isLoggedIn()) {
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    }
+
+    @GetMapping("/renewtoken")
+    public ResponseEntity<AuthenticationResponse> getAuthUser(HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new AuthenticationResponse(), HttpStatus.FORBIDDEN);
+        }
+
+        LoginModel loginModel = new LoginModel(apiUser.getUser().getUsername(), apiUser.getUser().getPassword());
+
+        AuthenticationResponse response = authService.renewAuth(loginModel);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/tickets")

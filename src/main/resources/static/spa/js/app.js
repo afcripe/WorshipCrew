@@ -7,7 +7,7 @@ import Requests from "./Requests.js";
 import RequestView from "./RequestView.js";
 import SearchView from "./SearchView.js";
 
-import { postLogin } from "./Login.js";
+import { postLogin, renewToken } from "./Login.js";
 import { toggleDetail } from "./TicketView.js";
 import { imageDialog } from "./ImageView.js";
 
@@ -92,14 +92,20 @@ const router = async () => {
 
 };
 
-const getLoggedIn = () => {
-    username = localStorage.getItem("username");
-    firstName = localStorage.getItem("firstName");
-    lastName = localStorage.getItem("lastName");
+const getLoggedIn = async () => {
     token = localStorage.getItem("token");
+    username = localStorage.getItem("username");
     if (token !== "") {
-        isLoggedIn = true;
+        let auth = await renewToken(token);
+        localStorage.setItem("token", auth.token);
+        localStorage.setItem("firstName", auth.firstName);
+        localStorage.setItem("lastName", auth.lastName);
+        firstName = auth.firstName;
+        lastName = auth.lastName;
+        token = auth.token;
+        isLoggedIn = auth.loggedIn;
     }
+    router();
 }
 
 // Form Handlers //
@@ -113,7 +119,7 @@ const doLogin = async (u, p) => {
     firstName = auth.firstName;
     lastName = auth.lastName;
     token = auth.token;
-    isLoggedIn = true;
+    isLoggedIn = auth.loggedIn;
     router();
 }
 const toggleSearch = () => {
@@ -164,7 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
             localStorage.setItem("token", "");
             localStorage.setItem("firstName", "");
             localStorage.setItem("lastName", "");
-            localStorage.setItem("userName", "");
+            localStorage.setItem("username", "");
             username = "";
             firstName = "";
             lastName = "";
@@ -188,5 +194,4 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     getLoggedIn();
-    router();
 });

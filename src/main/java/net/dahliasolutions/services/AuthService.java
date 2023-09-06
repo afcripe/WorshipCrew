@@ -12,6 +12,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service@RequiredArgsConstructor
 public class AuthService {
 
@@ -43,7 +45,7 @@ public class AuthService {
     }
 
     public boolean verifyUserPassword(User user, String password) {
-
+        boolean match = passwordEncoder.matches(password, user.getPassword());
         return passwordEncoder.matches(password, user.getPassword());
     }
 
@@ -52,16 +54,44 @@ public class AuthService {
     }
 
     public AuthenticationResponse authenticate(LoginModel loginModel) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginModel.getUsername(), loginModel.getPassword()));
+        Optional<User> user = userService.findByUsername(loginModel.getUsername());
+        if (user.isPresent()) {
+            boolean success = verifyUserPassword(user.get(), loginModel.getPassword());
+            if (verifyUserPassword(user.get(), loginModel.getPassword())) {
+                var jwtToken = jwtService.generateToken(user.get());
 
-        var user = userService.findByUsername(loginModel.getUsername()).orElseThrow();
-        var jwtToken = jwtService.generateToken(user);
-
+                return AuthenticationResponse.builder()
+                        .token(jwtToken)
+                        .firstName(user.get().getFirstName())
+                        .lastName(user.get().getLastName())
+                        .loggedIn(true)
+                        .build();
+            }
+        }
         return AuthenticationResponse.builder()
-                .token(jwtToken)
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
+                .token("")
+                .firstName("")
+                .lastName("")
+                .loggedIn(false)
+                .build();
+    }
+
+    public AuthenticationResponse renewAuth(LoginModel loginModel) {
+        Optional<User> user = userService.findByUsername(loginModel.getUsername());
+        if (user.isPresent()) {
+            var jwtToken = jwtService.generateToken(user.get());
+            return AuthenticationResponse.builder()
+                    .token(jwtToken)
+                    .firstName(user.get().getFirstName())
+                    .lastName(user.get().getLastName())
+                    .loggedIn(true)
+                    .build();
+        }
+        return AuthenticationResponse.builder()
+                .token("")
+                .firstName("")
+                .lastName("")
+                .loggedIn(false)
                 .build();
     }
 

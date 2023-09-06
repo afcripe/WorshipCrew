@@ -566,3 +566,35 @@ body {
     padding-left: 0.1rem;
     padding-right: 0.1rem;
 }
+
+/* Settings */
+.settings__container {
+    width: calc(100% - 5px);
+    border: 2px solid gray;
+    border-radius: 0.25rem;
+    margin: 0;
+    padding-right: 0;
+}
+
+.settings__container-label {
+    display: inline-block;
+    width: 30%;
+    border-right: 2px solid gray;
+    font-size: 1.15rem;
+    margin: 0.25rem;
+    padding: 0;
+}
+
+.settings__container-field {
+    display: inline-block;
+    width: 60%;
+    font-size: 1rem;
+    margin: 0.25rem;
+    padding: 0;
+}
+
+.settings__btn {
+    height: 1.5rem;
+    line-height: 0.8rem;
+    font-size: 0.8rem;
+}
