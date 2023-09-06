@@ -7,9 +7,8 @@ export default class extends AbstractView {
     }
 
     async getHtml() {
-        return `
-            <h1>Dashboard</h1>
-            <p>Welcome, Caleb.</p>
-        `;
+        let r=`<h1>Dashboard</h1>`;
+        r+=`<p>Welcome, `+this.params.firstName+`.</p>`;
+        return r;
     }
 }

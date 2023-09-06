@@ -7,7 +7,7 @@ export default class extends AbstractView {
     }
 
     async getHtml() {
-        let tickets = await getRemoteTickets();
+        let tickets = await getRemoteTickets(this.params.token);
         let returnHTML = `<h1>Tickets</h1>`;
         for (let i in tickets) {
             let ticket = tickets[i];
@@ -18,9 +18,14 @@ export default class extends AbstractView {
     }
 }
 
-async function getRemoteTickets() {
-    const response = await fetch('/api/v1/app/tickets');
+async function getRemoteTickets(token) {
+    const response = await fetch('/api/v1/app/tickets', {
+        headers: {
+            authorization: "Bearer "+token
+        }
+    });
     const tickets = await response.json();
+    const status = response.status;
     return tickets;
 }
 

@@ -16,9 +16,21 @@ export default class extends AbstractView {
 
 
 async function postLogin(username, password) {
-    console.log("username: "+username);
-    console.log("password: "+password);
-    return true;
+    let formData = new FormData;
+        formData.set("username", username);
+        formData.set("password", password);
+
+    const response = await fetch('/api/v1/auth/login', {
+        method: 'POST',
+        body: formData
+    });
+    const rsp = await response.json();
+    const status = response.status;
+    if (status === 200) {
+        return rsp;
+    } else {
+        return {"token": "", "firstName": "", "lastName": ""};
+    }
 }
 
 function formatHTML() {

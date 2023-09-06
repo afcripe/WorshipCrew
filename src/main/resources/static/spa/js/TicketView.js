@@ -7,8 +7,8 @@ export default class extends AbstractView {
     }
 
     async getHtml() {
-        let ticket = await getRemoteTicket(this.params.id);
-        let notes = await getRemoteTicketNotes(this.params.id);
+        let ticket = await getRemoteTicket(this.params.id, this.params.token);
+        let notes = await getRemoteTicketNotes(this.params.id, this.params.token);
         let returnHTML = htmlTicket(ticket);
         for (let n in notes) {
             let noteObj = notes[n];
@@ -19,22 +19,31 @@ export default class extends AbstractView {
     }
 }
 
-async function getRemoteTicket(id) {
-    const response = await fetch('/api/v1/app/ticket/'+id);
-    const ticket = await response.json();
-    return ticket;
+async function getRemoteTicket(id, token) {
+    const response = await fetch('/api/v1/app/ticket/'+id, {
+        headers: {
+            authorization: "Bearer "+token
+        }
+    });
+    return await response.json();
 }
 
-async function getRemoteTicketNotes(id) {
-    const response = await fetch('/api/v1/app/notelist/'+id);
-    const notes = await response.json();
-    return notes;
+async function getRemoteTicketNotes(id, token) {
+    const response = await fetch('/api/v1/app/notelist/'+id, {
+        headers: {
+            authorization: "Bearer "+token
+        }
+    });
+    return await response.json();
 }
 
-async function getRemoteTicketAgents(id) {
-    const response = await fetch('/api/v1/app/agentlist/'+id);
-    const agents = await response.json();
-    return agents;
+async function getRemoteTicketAgents(id, token) {
+    const response = await fetch('/api/v1/app/agentlist/'+id, {
+        headers: {
+            authorization: "Bearer "+token
+        }
+    });
+    return await response.json();
 }
 
 function toggleDetail() {

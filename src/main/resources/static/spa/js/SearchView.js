@@ -7,7 +7,7 @@ export default class extends AbstractView {
     }
 
     async getHtml() {
-        let searchResults = await getRemoteSearch(this.params.id);
+        let searchResults = await getRemoteSearch(this.params.id, this.params.token);
         let returnHTML = `<h1>Search Results</h1>`;
         for (let i in searchResults) {
             let searchResult = searchResults[i];
@@ -18,10 +18,13 @@ export default class extends AbstractView {
     }
 }
 
-async function getRemoteSearch(searchTerm) {
-    const response = await fetch('/api/v1/app/search/'+searchTerm);
-    const searchResults = await response.json();
-    return searchResults;
+async function getRemoteSearch(searchTerm, token) {
+    const response = await fetch('/api/v1/app/search/'+searchTerm, {
+        headers: {
+            authorization: "Bearer "+token
+        }
+    });
+    return await response.json();
 }
 
 function htmlResultLine(rst) {

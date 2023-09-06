@@ -1,21 +1,30 @@
 package net.dahliasolutions.controllers.app;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import net.dahliasolutions.models.APIUser;
 import net.dahliasolutions.models.UniversalAppSearchModel;
 import net.dahliasolutions.models.order.OrderRequest;
 import net.dahliasolutions.models.order.OrderStatus;
 import net.dahliasolutions.models.support.*;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
+import net.dahliasolutions.services.JwtService;
 import net.dahliasolutions.services.order.OrderService;
 import net.dahliasolutions.services.support.TicketService;
 import net.dahliasolutions.services.user.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigInteger;
+import java.net.http.HttpRequest;
 import java.util.*;
 
 @RestController
@@ -23,6 +32,7 @@ import java.util.*;
 @RequestMapping("/api/v1/app")
 public class MobileAppAPIController {
 
+    private final JwtService jwtService;
     private final UserService userService;
     private final TicketService ticketService;
     private final OrderService orderService;
@@ -33,18 +43,26 @@ public class MobileAppAPIController {
     }
 
     @GetMapping("/tickets")
-    public List<Ticket> getUserTickets() {
-        User currentUser = userService.findByUsername("caleb@destinyworship.com").get();
-        List<Ticket> openAgentTicketList = ticketService.findAllByAgentOpenOnly(currentUser);
-        return openAgentTicketList;
+    public ResponseEntity<List<Ticket>> getUserTickets(HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
+        }
+
+        List<Ticket> openAgentTicketList = ticketService.findAllByAgentOpenOnly(apiUser.getUser());
+        return new ResponseEntity<>(openAgentTicketList, HttpStatus.OK);
     }
 
     @GetMapping("/ticket/{id}")
-    public AppTicket getTicketById(@PathVariable String id) {
-        User currentUser = userService.findByUsername("caleb@destinyworship.com").get();
+    public ResponseEntity<AppTicket> getTicketById(@PathVariable String id, HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new AppTicket(), HttpStatus.FORBIDDEN);
+        }
+
         Optional<Ticket> ticket = ticketService.findById(id);
         if (ticket.isEmpty()) {
-            return new AppTicket();
+            return new ResponseEntity<>(new AppTicket(), HttpStatus.BAD_REQUEST);
         }
 
         String closeDate = "true";
@@ -53,8 +71,8 @@ public class MobileAppAPIController {
         ticket.get().setNotes(reverseNoteDateOrder(ticket.get().getNotes()));
 
         // determine if agent
-        boolean isAgent = supportEditor(currentUser);
-        if (currentUser.getId().equals(ticket.get().getUser().getId())) {
+        boolean isAgent = supportEditor(apiUser.getUser());
+        if (apiUser.getUser().getId().equals(ticket.get().getUser().getId())) {
             // force agent and private false if ticket belongs to current user
             isAgent = false;
         }
@@ -89,22 +107,26 @@ public class MobileAppAPIController {
 
         );
 
-        return t;
+        return new ResponseEntity<>(t, HttpStatus.OK);
     }
 
     @GetMapping("/notelist/{id}")
-    public List<AppTicketNote> getTicketNotesById(@PathVariable String id) {
-        User currentUser = userService.findByUsername("caleb@destinyworship.com").get();
+    public ResponseEntity<List<AppTicketNote>> getTicketNotesById(@PathVariable String id, HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
+        }
+
         Optional<Ticket> ticket = ticketService.findById(id);
         if (ticket.isEmpty()) {
-            return new ArrayList<>();
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.BAD_REQUEST);
         }
 
         ticket.get().setNotes(reverseNoteDateOrder(ticket.get().getNotes()));
 
         // determine if agent
-        boolean isAgent = supportEditor(currentUser);
-        if (currentUser.getId().equals(ticket.get().getUser().getId())) {
+        boolean isAgent = supportEditor(apiUser.getUser());
+        if (apiUser.getUser().getId().equals(ticket.get().getUser().getId())) {
             // force agent and private false if ticket belongs to current user
             isAgent = false;
         }
@@ -139,26 +161,33 @@ public class MobileAppAPIController {
             }
         }
 
-        return noteList;
+        return new ResponseEntity<>(noteList, HttpStatus.OK);
     }
 
     @GetMapping("/agentlist/{id}")
-    public List<User> getTicketAgentsById(@PathVariable String id) {
-        User currentUser = userService.findByUsername("caleb@destinyworship.com").get();
-        Optional<Ticket> ticket = ticketService.findById(id);
-        if (ticket.isEmpty()) {
-            return new ArrayList<>();
+    public ResponseEntity<List<User>> getTicketAgentsById(@PathVariable String id, HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
         }
 
-        return ticket.get().getAgentList();
+        Optional<Ticket> ticket = ticketService.findById(id);
+        if (ticket.isEmpty()) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(ticket.get().getAgentList(), HttpStatus.OK);
     }
 
     @GetMapping("/search/{searchTerm}")
-    public List<UniversalAppSearchModel> getSearchResults(@PathVariable String searchTerm) {
-        User currentUser = userService.findByUsername("caleb@destinyworship.com").get();
+    public ResponseEntity<List<UniversalAppSearchModel>> getSearchResults(@PathVariable String searchTerm, HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
+        }
 
         if (searchTerm.equals("")) {
-            return new ArrayList<>();
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.BAD_REQUEST);
         }
 
         List<UniversalAppSearchModel> r = new ArrayList<>();
@@ -187,12 +216,27 @@ public class MobileAppAPIController {
         if (isNumber) {
             BigInteger orderId = new BigInteger(searchTerm);
             List<OrderRequest> requests = orderService.searchAllById(orderId);
-            for (OrderRequest request : requests) {
-                r.add(new UniversalAppSearchModel("request", request.getId().toString(), request.getUser().getFullName(), request.getRequestNote()));
+            for (OrderRequest req : requests) {
+                r.add(new UniversalAppSearchModel("request", req.getId().toString(), req.getUser().getFullName(), req.getRequestNote()));
             }
         }
 
-        return r;
+        return new ResponseEntity<>(r, HttpStatus.OK);
+    }
+
+    private APIUser getUserFromToken(HttpServletRequest request) {
+        final String authHeader = request.getHeader("Authorization");
+        final String token;
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7);
+            Optional<User> currentUser = userService.findByUsername(jwtService.extractUsername(token));
+            if (currentUser.isPresent()) {
+                if (jwtService.isTokenValid(token, currentUser.get())) {
+                    return new APIUser(true, currentUser.get());
+                }
+            }
+        }
+        return new APIUser(false, new User());
     }
 
     private boolean supportEditor(User currentUser) {
