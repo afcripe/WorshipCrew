@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.controllers.AuthenticationResponse;
 import net.dahliasolutions.models.APIUser;
+import net.dahliasolutions.models.AppItem;
 import net.dahliasolutions.models.LoginModel;
 import net.dahliasolutions.models.UniversalAppSearchModel;
 import net.dahliasolutions.models.order.OrderItem;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
 import java.net.http.HttpRequest;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @RestController
@@ -63,17 +65,133 @@ public class MobileAppAPIController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/tickets")
-    public ResponseEntity<List<Ticket>> getUserTickets(HttpServletRequest request) {
+    @GetMapping("/ticketsbyuser")
+    public ResponseEntity<List<AppItem>> getTicketsByUser(HttpServletRequest request) {
         APIUser apiUser = getUserFromToken(request);
         if (!apiUser.isValid()) {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
         }
 
-        List<Ticket> openAgentTicketList = ticketService.findAllByAgentOpenOnly(apiUser.getUser());
-        return new ResponseEntity<>(openAgentTicketList, HttpStatus.OK);
+        List<AppItem> appItemList = new ArrayList<>();
+        List<Ticket> openAgentTicketList = ticketService.findAllByUser(apiUser.getUser());
+
+        for (Ticket tkt : openAgentTicketList) {
+            if (!tkt.getTicketStatus().equals(TicketStatus.Closed)) {
+                appItemList.add(new AppItem(
+                        tkt.getId(),
+                        tkt.getTicketStatus().toString(),
+                        tkt.getTicketDetail(),
+                        tkt.getTicketDate(),
+                        0,
+                        tkt.getUser().getFullName(),
+                        "tickets"));
+            }
+        }
+
+        return new ResponseEntity<>(appItemList, HttpStatus.OK);
     }
 
+    @GetMapping("/tickets")
+    public ResponseEntity<List<AppItem>> getUserTickets(HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
+        }
+
+        List<AppItem> appItemList = new ArrayList<>();
+        List<Ticket> openAgentTicketList = ticketService.findAllByAgentOpenOnly(apiUser.getUser());
+
+        for (Ticket tkt : openAgentTicketList) {
+            appItemList.add(new AppItem(
+                    tkt.getId(),
+                    tkt.getTicketStatus().toString(),
+                    tkt.getTicketDetail(),
+                    tkt.getTicketDate(),
+                    0,
+                    tkt.getUser().getFullName(),
+                    "tickets"));
+        }
+
+        return new ResponseEntity<>(appItemList, HttpStatus.OK);
+    }
+
+    @GetMapping("/ticketincludes")
+    public ResponseEntity<List<AppItem>> getUserTicketMentions(HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
+        }
+
+        List<AppItem> appItemList = new ArrayList<>();
+        List<Ticket> openAgentTicketList = ticketService.findAllByMentionOpenOnly(apiUser.getUser());
+
+        for (Ticket tkt : openAgentTicketList) {
+            appItemList.add(new AppItem(
+                    tkt.getId(),
+                    tkt.getTicketStatus().toString(),
+                    tkt.getTicketDetail(),
+                    tkt.getTicketDate(),
+                    0,
+                    tkt.getUser().getFullName(),
+                    "tickets"));
+        }
+
+        return new ResponseEntity<>(appItemList, HttpStatus.OK);
+    }
+
+    @GetMapping("/dashboard")
+    public ResponseEntity<List<AppItem>> getUserDashboardCounts(HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
+        }
+
+        List<AppItem> itemList = new ArrayList<>();
+        int counter;
+
+        List<OrderRequest> orderRequestList = orderService.findAllBySupervisorOpenOnly(apiUser.getUser());
+        counter = 0;
+        for (OrderRequest order : orderRequestList) {
+            counter++;
+        }
+        itemList.add(new AppItem("0", "Open Requests", "Requests to Fulfill",
+                LocalDateTime.now(), counter, apiUser.getUser().getFullName(), "requests"));
+
+        List<OrderItem> orderItemList = orderItemService.findAllBySupervisorOpenOnly(apiUser.getUser());
+        counter = 0;
+        for (OrderItem orderItem : orderItemList) {
+            counter++;
+        }
+        itemList.add(new AppItem("1", "Open Request Items", "Items in to Fulfill",
+                LocalDateTime.now(), counter, apiUser.getUser().getFullName(), "requests"));
+
+        List<Ticket> ticketList = ticketService.findAllByAgentOpenOnly(apiUser.getUser());
+        counter = 0;
+        for (OrderRequest order : orderRequestList) {
+            counter++;
+        }
+        itemList.add(new AppItem("2", "Open Tickets", "Trouble Tickets to Address",
+                LocalDateTime.now(), counter, apiUser.getUser().getFullName(), "tickets"));
+
+
+        List<OrderRequest> includedRequestList = orderService.findAllByMentionOpenOnly(apiUser.getUser());
+        counter = 0;
+        for (OrderRequest order : orderRequestList) {
+            counter++;
+        }
+        itemList.add(new AppItem("3", "Requests Included On", "Requests to Monitor",
+                LocalDateTime.now(), counter, apiUser.getUser().getFullName(), "requests"));
+
+        List<Ticket> includedTicketList = ticketService.findAllByMentionOpenOnly(apiUser.getUser());
+        counter = 0;
+        for (OrderRequest order : orderRequestList) {
+            counter++;
+        }
+        itemList.add(new AppItem("4", "Tickets Included On", "Trouble Tickets to Monitor",
+                LocalDateTime.now(), counter, apiUser.getUser().getFullName(), "tickets"));
+
+        return new ResponseEntity<>(itemList, HttpStatus.OK);
+    }
     @GetMapping("/ticket/{id}")
     public ResponseEntity<AppTicket> getTicketById(@PathVariable String id, HttpServletRequest request) {
         APIUser apiUser = getUserFromToken(request);
@@ -200,16 +318,100 @@ public class MobileAppAPIController {
         return new ResponseEntity<>(ticket.get().getAgentList(), HttpStatus.OK);
     }
 
+    @GetMapping("/requestsbyuser")
+    public ResponseEntity<List<AppItem>> getRequestsByUser(HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
+        }
+
+        List<AppItem> appItemList = new ArrayList<>();
+        for (OrderRequest item : orderService.findAllByUser(apiUser.getUser())) {
+            if (!item.getOrderStatus().equals(OrderStatus.Complete) || !item.getOrderStatus().equals(OrderStatus.Cancelled)) {
+                appItemList.add(new AppItem(
+                        item.getId().toString(),
+                        item.getOrderStatus().toString(),
+                        item.getRequestNote(),
+                        item.getRequestDate(),
+                        item.getItemCount(),
+                        item.getUser().getFullName(),
+                        "requests"));
+            }
+        }
+
+        return new ResponseEntity<>(appItemList, HttpStatus.OK);
+    }
+
     @GetMapping("/requests")
-    public ResponseEntity<List<OrderRequest>> getUserRequests(HttpServletRequest request) {
+    public ResponseEntity<List<AppItem>> getUserRequests(HttpServletRequest request) {
         APIUser apiUser = getUserFromToken(request);
         if (!apiUser.isValid()) {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
         }
 
         List<OrderRequest> openSuperRequestList = orderService.findAllBySupervisorOpenOnly(apiUser.getUser());
-        return new ResponseEntity<>(openSuperRequestList, HttpStatus.OK);
+
+        List<AppItem> appItemList = new ArrayList<>();
+        for (OrderRequest item : orderService.findAllBySupervisorOpenOnly(apiUser.getUser())) {
+            appItemList.add(new AppItem(
+                    item.getId().toString(),
+                    item.getOrderStatus().toString(),
+                    item.getRequestNote(),
+                    item.getRequestDate(),
+                    item.getItemCount(),
+                    item.getUser().getFullName(),
+                    "requests"));
+        }
+
+        return new ResponseEntity<>(appItemList, HttpStatus.OK);
     }
+
+    @GetMapping("/requestitems")
+    public ResponseEntity<List<AppItem>> getRequestItemsById(HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
+        }
+
+        List<AppItem> appItemList = new ArrayList<>();
+        for (OrderItem item : orderItemService.findAllBySupervisorOpenOnly(apiUser.getUser())) {
+            appItemList.add(new AppItem(
+                    item.getOrderRequest().getId().toString(),
+                    item.getProductName(),
+                    item.getOrderRequest().getRequestNote(),
+                    item.getOrderRequest().getRequestDate(),
+                    item.getCount(),
+                    item.getOrderRequest().getUser().getFullName(),
+                    "requests"));
+        }
+
+
+        return new ResponseEntity<>(appItemList, HttpStatus.OK);
+    }
+
+    @GetMapping("/requestmentions")
+    public ResponseEntity<List<AppItem>> getRequestMentions(HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
+        }
+
+        List<AppItem> appItemList = new ArrayList<>();
+        for (OrderRequest item : orderService.findAllByMentionOpenOnly(apiUser.getUser())) {
+            appItemList.add(new AppItem(
+                    item.getId().toString(),
+                    item.getOrderStatus().toString(),
+                    item.getRequestNote(),
+                    item.getRequestDate(),
+                    item.getItemCount(),
+                    item.getUser().getFullName(),
+                    "requests"));
+        }
+
+
+        return new ResponseEntity<>(appItemList, HttpStatus.OK);
+    }
+
 
     @GetMapping("/request/{id}")
     public ResponseEntity<OrderRequest> getRequestById(@PathVariable BigInteger id, HttpServletRequest request) {
@@ -239,7 +441,6 @@ public class MobileAppAPIController {
         }
 
         List<OrderItem> items = req.get().getRequestItems();
-
 
         return new ResponseEntity<>(items, HttpStatus.OK);
     }

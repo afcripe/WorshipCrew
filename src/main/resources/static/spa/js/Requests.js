@@ -7,15 +7,49 @@ export default class extends AbstractView {
     }
 
     async getHtml() {
+        let myRequests = await getRemoteUserRequests(this.params.token);
         let requests = await getRemoteRequests(this.params.token);
+        let requestItems = await getRemoteRequestItems(this.params.token);
         let returnHTML = `<h1>Requests</h1>`;
-        for (let i in requests) {
-            let req = requests[i];
-            returnHTML += htmlRequestLine(req);
+
+        if (myRequests.length > 0) {
+            returnHTML += `<h2>My Requests</h2>`;
+            for (let m in myRequests) {
+                let mr = myRequests[m];
+                returnHTML += htmlRequestLine(mr);
+            }
         }
+
+        if (requestItems.length > 0) {
+            returnHTML += `<h2>Items to Fulfill</h2>`;
+            for (let i in requestItems) {
+                let itm = requestItems[i];
+                returnHTML += htmlItemLine(itm);
+            }
+        }
+
+        if (requests.length > 0) {
+            returnHTML += `<h2>Requests</h2>`;
+            for (let r in requests) {
+                let req = requests[r];
+                returnHTML += htmlRequestLine(req);
+            }
+        }
+
         returnHTML = returnHTML.replaceAll("\n","");
         return returnHTML.replaceAll("\n","");
     }
+}
+
+async function getRemoteUserRequests(token) {
+    const response = await fetch('/api/v1/app/requestsbyuser', {
+        headers: {
+            authorization: "Bearer "+token
+        }
+    });
+    const tickets = await response.json();
+    const status = response.status;
+    return tickets;
 }
 
 async function getRemoteRequests(token) {
@@ -29,15 +63,41 @@ async function getRemoteRequests(token) {
     return tickets;
 }
 
+async function getRemoteRequestItems(token) {
+    const response = await fetch('/api/v1/app/requestitems', {
+        headers: {
+            authorization: "Bearer "+token
+        }
+    });
+    const tickets = await response.json();
+    const status = response.status;
+    return tickets;
+}
+
 function htmlRequestLine(req) {
     let r = "";
     r+=`<div class="list__item" data-link-request="`+req.id+`">`;
     r+=`<div class="list__Item-line" data-link-request="`+req.id+`">`;
-    r+=`<div class="item-id" data-link-request="`+req.id+`">Request: `+req.id+`</div>`;
-    r+=`<div class="item-user" data-link-request="`+req.id+`">`+req.user.fullName+`</div>`;
-    r+=`<div class="item-date" data-link-request="`+req.id+`">`+formatDate(req.requestDate)+`</div>`;
+    r+=`<div class="appList__item-id" data-link-request="`+req.id+`">Request: `+req.id+`</div>`;
+    r+=`<div class="appList__item-name" data-link-request="`+req.id+`">`+req.user+`</div>`;
+    r+=`<div class="appList__item-right" data-link-request="`+req.id+`">`+formatDate(req.date)+`</div>`;
     r+=`</div><div class="list__Item-line" data-link-request="`+req.id+`">`;
-    r+=`<div class="item-detail" data-link-request="`+req.id+`">`+req.requestNote+`</div>`;
+    r+=`<div class="appList__item-detail" data-link-request="`+req.id+`">`+req.detail+`</div>`;
+    r+=`<div class="appList__item-right" data-link-request="`+req.id+`">Items: `+req.itemCount+`</div>`;
+    r+=`</div></div>`;
+
+    return r;
+}
+
+function htmlItemLine(req) {
+    let r = "";
+    r+=`<div class="list__item" data-link-request="`+req.id+`">`;
+    r+=`<div class="list__Item-line" data-link-request="`+req.id+`">`;
+    r+=`<div class="appList__item-id" data-link-request="`+req.id+`">`+req.name+`</div>`;
+    r+=`<div class="appList__item-right" data-link-request="`+req.id+`">`+formatDate(req.date)+`</div>`;
+    r+=`</div><div class="list__Item-line" data-link-request="`+req.id+`">`;
+    r+=`<div class="appList__item-detail" data-link-request="`+req.id+`">`+req.detail+`</div>`;
+    r+=`<div class="appList__item-right" data-link-request="`+req.id+`">Items: `+req.itemCount+`</div>`;
     r+=`</div></div>`;
 
     return r;
