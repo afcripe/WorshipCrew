@@ -50,14 +50,15 @@ body {
 }
 
 #app {
-    /*height: calc(100% - 2rem);*/
     position: fixed;
     top: 0;
     bottom: 3.25rem;
     left: 0;
     right: 0;
     margin: 0.25rem;
-    overflow: scroll;
+    padding: 10px;
+    overflow-x: hidden;
+    overflow-y: scroll;
     overflow-scrolling: auto;
 }
 
@@ -511,10 +512,6 @@ body {
     font-size: 1rem;
 }
 
-.page__group {
-    width: calc(100% - 8px);
-}
-
 /* ticket styles */
 .ticket__group {
     display: flex;
@@ -678,6 +675,28 @@ body {
     position: absolute;
     top: 5px;
     right: 5px;
+}
+
+.image-viewer__dialog {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: calc(100vw);
+    height: calc(100vh);
+}
+
+.image-viewer__div {
+    padding: 0;
+    margin: 0;
+    background-color: var(--dwc-body-bg);
+    vertical-align: middle;
+    text-align: center;
+}
+
+.image-viewer__image {
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
 }
 
 /* Settings */

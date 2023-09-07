@@ -9,15 +9,13 @@ export default class extends AbstractView {
     async getHtml() {
         let req = await getRemoteRequest(this.params.id, this.params.token);
         let items = await getRemoteRequestItems(this.params.id, this.params.token);
-        let returnHTML = `<div class="page__group">`;
-        returnHTML += htmlRequest(req);
+        let returnHTML = htmlRequest(req);
 
         for (let i in items) {
             let itemObj = items[i];
             returnHTML += htmlRequestItems(itemObj);
         }
 
-        returnHTML += `</div>`;
         returnHTML = returnHTML.replaceAll("\n","");
         return returnHTML.replaceAll("\n","");
     }
