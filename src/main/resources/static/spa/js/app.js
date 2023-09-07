@@ -11,7 +11,7 @@ import { postLogin, renewToken } from "./Login.js";
 import { toggleDetail } from "./TicketView.js";
 import { imageDialog } from "./ImageView.js";
 
-
+let appTheme = "dark";
 let username = "";
 let firstName = "";
 let lastName = "";
@@ -52,7 +52,11 @@ const router = async () => {
         { path: "/app/settings", view: Settings }
     ];
 
+    // clea the path
     let cleanPath = location.pathname.split("?")[0];
+
+    // force hide search
+    toggleSearch(true);
 
     // Test for location matches
     const potentialMatches = routes.map(route => {
@@ -92,9 +96,24 @@ const router = async () => {
 };
 
 const getLoggedIn = async () => {
-    token = localStorage.getItem("token");
-    username = localStorage.getItem("username");
-    if (token !== "") {
+    if (!token) {
+        token = "";
+        localStorage.setItem("token", "");
+    }
+    if (!username) {
+        username = "";
+        localStorage.setItem("username", "");
+    }
+    if (!firstName) {
+        firstName = "";
+        localStorage.setItem("firstName", "");
+    }
+    if (!lastName) {
+        lastName = "";
+        localStorage.setItem("lastName", "");
+    }
+
+    if (token && token !== "") {
         let auth = await renewToken(token);
         localStorage.setItem("token", auth.token);
         localStorage.setItem("firstName", auth.firstName);
@@ -103,6 +122,15 @@ const getLoggedIn = async () => {
         lastName = auth.lastName;
         token = auth.token;
         isLoggedIn = auth.loggedIn;
+    } else {
+        localStorage.setItem("token", "");
+        localStorage.setItem("firstName", "");
+        localStorage.setItem("lastName", "");
+        username = ""
+        firstName = "";
+        lastName = "";
+        token = "";
+        isLoggedIn = false;
     }
     router();
 }
@@ -121,10 +149,10 @@ const doLogin = async (u, p) => {
     isLoggedIn = auth.loggedIn;
     router();
 }
-const toggleSearch = () => {
+const toggleSearch = (hide = false) => {
     let srch = document.querySelector(".nav__search");
     if (isLoggedIn) {
-        if (srch.classList.contains("nav__search-hide")) {
+        if (srch.classList.contains("nav__search-hide") && !hide) {
             srch.classList.remove("nav__search-hide");
             srch.querySelector("input").focus();
         } else {
@@ -138,6 +166,46 @@ const submitSearch = () => {
     inputSearch.value = "";
     toggleSearch();
     navigateTo("/app/search/"+searchString);
+}
+
+const toggleTheme = () => {
+    if (appTheme === "dark") {
+        appTheme = "light";
+        localStorage.setItem("appTheme", "light");
+    } else {
+        appTheme = "dark";
+        localStorage.setItem("appTheme", "dark");
+    }
+    setAppTheme();
+}
+
+const setAppTheme = () => {
+    if (!appTheme) {
+        appTheme ="dark";
+        localStorage.setItem("appTheme", "");
+    }
+    let pageBody = document.querySelector("body");
+    if (appTheme === 'dark') {
+        try {
+            pageBody.classList.add("dark");
+        } catch (e) {
+            console.log("dark mode is enabled")
+        }
+    } else {
+        try {
+            pageBody.classList.remove("dark");
+        } catch (e) {
+            console.log("dark mode is not enabled")
+        }
+    }
+}
+
+const clearLocalStorage = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    localStorage.removeItem("firstName");
+    localStorage.removeItem("lastName");
+    localStorage.removeItem("lastName");
 }
 
 window.addEventListener("popstate", router);
@@ -170,6 +238,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if ( e.target.matches("[data-nav-image]")) {
             imageDialog(e.target.dataset.navImage);
         }
+        if ( e.target.matches("[data-settings-theme]")) {
+            // toggleTheme(e.target.dataset.settingsTheme);
+            toggleTheme(e.target.dataset.settingsTheme);
+        }
         if ( e.target.matches("[data-settings-logout]")) {
             localStorage.setItem("token", "");
             localStorage.setItem("firstName", "");
@@ -196,6 +268,16 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("searchButton").addEventListener("click", () => {
         submitSearch();
     });
+
+    // clearLocalStorage();
+    // try to load vars from storage
+    token = localStorage.getItem("token");
+    username = localStorage.getItem("username");
+    firstName = localStorage.getItem("firstName");
+    lastName = localStorage.getItem("lastName");
+    appTheme = localStorage.getItem("appTheme");
+
+    setAppTheme();
 
     getLoggedIn();
 });

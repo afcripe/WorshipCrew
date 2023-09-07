@@ -1,0 +1,15 @@
+
+:root {
+    --dwc-body-color-dark: #e6e6e6;
+    --dwc-body-bg-dark: #363636;
+    --dwc-border-color-dark: #b0b0b0;
+    --dwc-nav-dark: #414141;
+    --dwc-nav-link-color-dark: #fff;
+}
+
+dark,
+.dark {
+    background-color: var(--dwc-body-bg-dark);
+    color: var(--dwc-body-color-dark);
+    border-color: var(--dwc-border-color-dark);
+}

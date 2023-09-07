@@ -165,22 +165,22 @@ public class MobileAppAPIController {
         itemList.add(new AppItem("1", "Open Request Items", "Items in to Fulfill",
                 LocalDateTime.now(), counter, apiUser.getUser().getFullName(), "requests"));
 
-        List<Ticket> ticketList = ticketService.findAllByAgentOpenOnly(apiUser.getUser());
-        counter = 0;
-        for (OrderRequest order : orderRequestList) {
-            counter++;
-        }
-        itemList.add(new AppItem("2", "Open Tickets", "Trouble Tickets to Address",
-                LocalDateTime.now(), counter, apiUser.getUser().getFullName(), "tickets"));
-
 
         List<OrderRequest> includedRequestList = orderService.findAllByMentionOpenOnly(apiUser.getUser());
         counter = 0;
         for (OrderRequest order : orderRequestList) {
             counter++;
         }
-        itemList.add(new AppItem("3", "Requests Included On", "Requests to Monitor",
+        itemList.add(new AppItem("2", "Requests Included On", "Requests to Monitor",
                 LocalDateTime.now(), counter, apiUser.getUser().getFullName(), "requests"));
+
+        List<Ticket> ticketList = ticketService.findAllByAgentOpenOnly(apiUser.getUser());
+        counter = 0;
+        for (OrderRequest order : orderRequestList) {
+            counter++;
+        }
+        itemList.add(new AppItem("3", "Open Tickets", "Trouble Tickets to Address",
+                LocalDateTime.now(), counter, apiUser.getUser().getFullName(), "tickets"));
 
         List<Ticket> includedTicketList = ticketService.findAllByMentionOpenOnly(apiUser.getUser());
         counter = 0;
@@ -188,6 +188,35 @@ public class MobileAppAPIController {
             counter++;
         }
         itemList.add(new AppItem("4", "Tickets Included On", "Trouble Tickets to Monitor",
+                LocalDateTime.now(), counter, apiUser.getUser().getFullName(), "tickets"));
+
+        return new ResponseEntity<>(itemList, HttpStatus.OK);
+    }
+
+    @GetMapping("/dashboarduseritems")
+    public ResponseEntity<List<AppItem>> getUserDashboardItemsCount(HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
+        }
+
+        List<AppItem> itemList = new ArrayList<>();
+        int counter;
+
+        List<OrderRequest> orderRequestList = orderService.findAllByUser(apiUser.getUser());
+        counter = 0;
+        for (OrderRequest order : orderRequestList) {
+            counter++;
+        }
+        itemList.add(new AppItem("0", "My Requests", "Open Requests",
+                LocalDateTime.now(), counter, apiUser.getUser().getFullName(), "requests"));
+
+        List<Ticket> ticketList = ticketService.findAllByUser(apiUser.getUser());
+        counter = 0;
+        for (OrderRequest order : orderRequestList) {
+            counter++;
+        }
+        itemList.add(new AppItem("1", "My Tickets", "Open Tickets",
                 LocalDateTime.now(), counter, apiUser.getUser().getFullName(), "tickets"));
 
         return new ResponseEntity<>(itemList, HttpStatus.OK);
@@ -444,8 +473,6 @@ public class MobileAppAPIController {
 
         return new ResponseEntity<>(items, HttpStatus.OK);
     }
-
-
 
     @GetMapping("/search/{searchTerm}")
     public ResponseEntity<List<UniversalAppSearchModel>> getSearchResults(@PathVariable String searchTerm, HttpServletRequest request) {

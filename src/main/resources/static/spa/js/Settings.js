@@ -12,12 +12,24 @@ export default class extends AbstractView {
         r+=`<div class="settings__container"><div>`;
         r+=`<div class="settings__container-label">Account</div>`;
         r+=`<div class="settings__container-field">`+this.params.username+`</div>`;
-
-        r+=`<div class="settings__container-label">Notifications</div>`;
-        r+=`<div class="settings__container-field"><button class="btn btn-sm btn-wiki btn-mobile" disabled>Subscribe</button></div>`;
+        r+=`<div class="settings__container-label">&nbsp;</div>`;
+        r+=`<div class="settings__container-field"><button class="btn btn-sm btn-wiki" data-settings-logout>Logout</button></div>`;
 
         r+=`<div class="settings__container-label">&nbsp;</div>`;
-        r+=`<div class="settings__container-field"><button class="btn btn-sm btn-wiki btn-mobile" data-settings-logout>Logout</button></div>`;
+        r+=`<div class="settings__container-field">&nbsp;</div>`;
+
+        r+=`<div class="settings__container-label">Theme</div>`;
+        r+=`<div class="settings__container-field"><button class="btn btn-sm btn-wiki" data-settings-theme>Toggle</button></div>`;
+
+        r+=`<div class="settings__container-label">&nbsp;</div>`;
+        r+=`<div class="settings__container-field">&nbsp;</div>`;
+
+        r+=`<div class="settings__container-label">Notifications</div>`;
+        r+=`<div class="settings__container-field"><button class="btn btn-sm btn-wiki" disabled>Subscribe</button></div>`;
+
+        r+=`<div class="settings__container-label">&nbsp;</div>`;
+        r+=`<div class="settings__container-field">&nbsp;</div>`;
+
 
         r+=`</div></div>`;
         return r;

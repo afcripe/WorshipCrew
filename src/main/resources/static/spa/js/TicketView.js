@@ -9,11 +9,15 @@ export default class extends AbstractView {
     async getHtml() {
         let ticket = await getRemoteTicket(this.params.id, this.params.token);
         let notes = await getRemoteTicketNotes(this.params.id, this.params.token);
-        let returnHTML = htmlTicket(ticket);
+        let returnHTML = `<div class="page__group">`;
+        returnHTML += htmlTicket(ticket);
+
         for (let n in notes) {
             let noteObj = notes[n];
             returnHTML += htmlTicketNotes(noteObj);
         }
+
+        returnHTML += `</div>`;
         returnHTML = returnHTML.replaceAll("\n","");
         return returnHTML.replaceAll("\n","");
     }

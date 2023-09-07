@@ -9,11 +9,15 @@ export default class extends AbstractView {
     async getHtml() {
         let req = await getRemoteRequest(this.params.id, this.params.token);
         let items = await getRemoteRequestItems(this.params.id, this.params.token);
-        let returnHTML = htmlRequest(req);
+        let returnHTML = `<div class="page__group">`;
+        returnHTML += htmlRequest(req);
+
         for (let i in items) {
             let itemObj = items[i];
             returnHTML += htmlRequestItems(itemObj);
         }
+
+        returnHTML += `</div>`;
         returnHTML = returnHTML.replaceAll("\n","");
         return returnHTML.replaceAll("\n","");
     }
@@ -38,7 +42,7 @@ async function getRemoteRequestItems(id, token) {
 }
 
 function htmlRequest(req) {
-    let r = `<div class="ticket__group">`;
+    let r = `<div class="request__group">`;
     r+=`<div class="ticket__left ticket__title">Request: `+req.id+`</div>`;
     r+=`<div class="ticket__right ticket__title">`+req.orderStatus+`</div>`;
     r+=`</div>`;
@@ -46,7 +50,7 @@ function htmlRequest(req) {
     r+=`<div class="ticket__detail">Reason: `+req.requestNote+`</div>`;
 
     r+=`<div class="ticket__detail-group">`;
-    r+=`<div class="request__item-top-right"><button class="btn btn-sm btn-store btn-mobile" disabled>Update</button></div>`;
+    r+=`<div class="request__item-top-right"><button class="btn btn-sm btn-store" disabled>Update</button></div>`;
     r+=`<div class="ticket__detail">Date: `+formatDate(req.requestDate)+`</div>`;
     r+=`<div id="groupDetailExpand" class="ticket__expand-group">`;
     r+=`<div class="ticket__detail">Submitted By: `+req.user.fullName+`</div>`;
@@ -78,7 +82,7 @@ function htmlRequestItems(item) {
 
     r+=`<div class="request__item-detail">`;
     r+=`<div class="request__item-field-left">`+item.supervisor.fullName+`</div>`;
-    r+=`<div class="request__item-field-right"><button class="btn btn-sm btn-store btn-mobile" disabled>Update</button></div>`;
+    r+=`<div class="request__item-field-right"><button class="btn btn-sm btn-store" disabled>Update</button></div>`;
     r+=`</div>`;
 
     r+=`</div>`;
