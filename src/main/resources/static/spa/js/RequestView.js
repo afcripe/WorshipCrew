@@ -57,7 +57,7 @@ function htmlRequest(req) {
 
     r+=`<div class="request__item-detail">`;
     r+=`<div class="request__item-field-header">Requested Items</div>`;
-    r+=`<div class="request__item-field-left"><hr></div>`;
+    r+=`<div class="request__item-field-grow"><hr class="item__hr"></div>`;
     r+=`</div>`;
 
     return r;

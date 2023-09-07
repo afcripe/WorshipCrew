@@ -512,6 +512,10 @@ body {
     font-size: 1rem;
 }
 
+.item__hr {
+    width: calc(100% - 20px);
+}
+
 /* ticket styles */
 .ticket__group {
     display: flex;
@@ -616,7 +620,7 @@ body {
 }
 
 .ticket__note-detail {
-    width: 100%;
+    width: calc(100% - 28px);
     padding: 0.25rem;
 }
 
@@ -639,7 +643,7 @@ body {
 }
 
 .request__item-detail {
-    width: 100%;
+    width: calc(100% - 28px);
     display: flex;
     flex-direction: row;
     padding: 0.25rem;
@@ -669,6 +673,16 @@ body {
     text-align: right;
     padding-left: 0.1rem;
     padding-right: 0.5rem;
+}
+
+.request__item-field-grow {
+    font-size: 1rem;
+    flex-grow: 1;
+    text-align: center;
+    padding-left: 0.1rem;
+    padding-right: 0.1rem;
+    margin-left: 0.1rem;
+    margin-right: 0.1rem;
 }
 
 .request__item-top-right {
