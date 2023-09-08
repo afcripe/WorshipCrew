@@ -5,6 +5,8 @@
     --dwc-border-color-dark: #b0b0b0;
     --dwc-nav-dark: #414141;
     --dwc-nav-link-color-dark: #fff;
+
+    --dwc-popup-body-bg-dark: #656565;
 }
 
 dark,
@@ -14,5 +16,26 @@ dark,
     border-color: var(--dwc-border-color-dark);
 }
 .dark .image-viewer__dialog {
-    background-color: var(--dwc-body-bg-dark)
+    background-color: var(--dwc-body-bg-dark);
+}
+
+.dark dialog {
+    background-color: var(--dwc-body-bg-dark);
+}
+
+.dark .btn-generic {
+    color: var(--dwc-body-color-dark);
+    border: 1px solid var(--dwc-border-color-dark);
+}
+
+.dark .form__popup {
+    background-color: rgba(101, 101, 101, 0.5);
+}
+
+.dark .form__popup-content {
+    background-color: var(--dwc-popup-body-bg-dark);
+}
+
+.dark .btn-outline-cancel {
+    color:  var(--dwc-btn-color);
 }

@@ -262,7 +262,7 @@ public class OrderAPIController {
                     noteDetail = newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+" was add to the request.";
 
                     orderRequest.get().setSupervisorList(
-                            addToSupervisorList(orderRequest.get().getSupervisor(), orderRequest.get().getSupervisorList()));
+                            addToSupervisorList(newSuper.get(), orderRequest.get().getSupervisorList()));
 
                     orderService.save(orderRequest.get());
                     orderNoteService.createOrderNote(new OrderNote(

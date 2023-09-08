@@ -1,5 +1,6 @@
 package net.dahliasolutions.controllers.app;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.controllers.AuthenticationResponse;
@@ -7,27 +8,22 @@ import net.dahliasolutions.models.APIUser;
 import net.dahliasolutions.models.AppItem;
 import net.dahliasolutions.models.LoginModel;
 import net.dahliasolutions.models.UniversalAppSearchModel;
-import net.dahliasolutions.models.order.OrderItem;
-import net.dahliasolutions.models.order.OrderRequest;
-import net.dahliasolutions.models.order.OrderStatus;
+import net.dahliasolutions.models.order.*;
 import net.dahliasolutions.models.support.*;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
 import net.dahliasolutions.services.AuthService;
 import net.dahliasolutions.services.JwtService;
 import net.dahliasolutions.services.order.OrderItemService;
+import net.dahliasolutions.services.order.OrderNoteService;
 import net.dahliasolutions.services.order.OrderService;
 import net.dahliasolutions.services.support.TicketService;
 import net.dahliasolutions.services.user.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
-import java.net.http.HttpRequest;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -42,6 +38,7 @@ public class MobileAppAPIController {
     private final TicketService ticketService;
     private final OrderService orderService;
     private final OrderItemService orderItemService;
+    private final OrderNoteService orderNoteService;
 
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> getAuthUser(@ModelAttribute LoginModel loginModel) {
@@ -441,24 +438,51 @@ public class MobileAppAPIController {
         return new ResponseEntity<>(appItemList, HttpStatus.OK);
     }
 
-
     @GetMapping("/request/{id}")
-    public ResponseEntity<OrderRequest> getRequestById(@PathVariable BigInteger id, HttpServletRequest request) {
+    public ResponseEntity<AppRequest> getRequestById(@PathVariable BigInteger id, HttpServletRequest request) {
         APIUser apiUser = getUserFromToken(request);
+        AppRequest appRequest = new AppRequest();
         if (!apiUser.isValid()) {
-            return new ResponseEntity<>(new OrderRequest(), HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(appRequest, HttpStatus.FORBIDDEN);
         }
 
         Optional<OrderRequest> req = orderService.findById(id);
         if (req.isEmpty()) {
-            return new ResponseEntity<>(new OrderRequest(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(appRequest, HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<>(req.get(), HttpStatus.OK);
+        appRequest.setAppRequestByRequest(req.get());
+        appRequest.setEditable(allowRequestEdit(apiUser.getUser(), req.get()));
+
+        return new ResponseEntity<>(appRequest, HttpStatus.OK);
     }
 
     @GetMapping("/itemlist/{id}")
-    public ResponseEntity<List<OrderItem>> getRequestItemsById(@PathVariable BigInteger id, HttpServletRequest request) {
+    public ResponseEntity<List<AppRequestItem>> getRequestItemsById(@PathVariable BigInteger id, HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        List<AppRequestItem> items = new ArrayList<>();
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(items, HttpStatus.FORBIDDEN);
+        }
+
+        Optional<OrderRequest> req = orderService.findById(id);
+        if (req.isEmpty()) {
+            return new ResponseEntity<>(items, HttpStatus.BAD_REQUEST);
+        }
+
+        for (OrderItem item : req.get().getRequestItems()) {
+            AppRequestItem appItem = new AppRequestItem();
+            appItem.setAppItemByRequestItem(item);
+            appItem.setEditable(allowRequestItemEdit(apiUser.getUser(), item));
+            items.add(appItem);
+        }
+
+
+        return new ResponseEntity<>(items, HttpStatus.OK);
+    }
+
+    @GetMapping("/requestsupervisores/{id}")
+    public ResponseEntity<List<User>> getRequestSupersById(@PathVariable BigInteger id, HttpServletRequest request) {
         APIUser apiUser = getUserFromToken(request);
         if (!apiUser.isValid()) {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
@@ -469,9 +493,41 @@ public class MobileAppAPIController {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.BAD_REQUEST);
         }
 
-        List<OrderItem> items = req.get().getRequestItems();
+        return new ResponseEntity<>(req.get().getSupervisorList(), HttpStatus.OK);
+    }
 
-        return new ResponseEntity<>(items, HttpStatus.OK);
+    @GetMapping("/requesthistory/{id}")
+    public ResponseEntity<List<OrderNote>> getRequestHistoryById(@PathVariable BigInteger id, HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
+        }
+        return new ResponseEntity<>(orderNoteService.findByOrderId(id), HttpStatus.OK);
+    }
+
+    @GetMapping("/itemorderstatus/{id}")
+    public ResponseEntity<OrderItem> getRequestItemById(@PathVariable BigInteger id, HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new OrderItem(), HttpStatus.FORBIDDEN);
+        }
+
+        Optional<OrderItem> item = orderItemService.findById(id);
+        if (item.isEmpty()) {
+            return new ResponseEntity<>(new OrderItem(), HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(item.get(), HttpStatus.OK);
+    }
+
+    @GetMapping("/orderstatusoptions")
+    public ResponseEntity<List<OrderStatus>> getRequestItemById(HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
+        }
+
+        return new ResponseEntity<>(Arrays.asList(OrderStatus.values()), HttpStatus.OK);
     }
 
     @GetMapping("/search/{searchTerm}")
@@ -524,14 +580,48 @@ public class MobileAppAPIController {
         final String token;
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
-            Optional<User> currentUser = userService.findByUsername(jwtService.extractUsername(token));
-            if (currentUser.isPresent()) {
-                if (jwtService.isTokenValid(token, currentUser.get())) {
-                    return new APIUser(true, currentUser.get());
+            try {
+                Optional<User> currentUser = userService.findByUsername(jwtService.extractUsername(token));
+                if (currentUser.isPresent()) {
+                    if (jwtService.isTokenValid(token, currentUser.get())) {
+                        return new APIUser(true, currentUser.get());
+                    }
                 }
+            } catch (ExpiredJwtException e) {
+                System.out.println("Token Expired");
             }
         }
         return new APIUser(false, new User());
+    }
+
+    private boolean allowRequestEdit(User user, OrderRequest request){
+        Collection<UserRoles> roles = user.getUserRoles();
+
+        for (UserRoles role : roles) {
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("REQUEST_SUPERVISOR")) {
+                return true;
+            }
+        }
+        if ( request.getSupervisor().getId().equals(user.getId()) ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean allowRequestItemEdit(User user, OrderItem item){
+        Collection<UserRoles> roles = user.getUserRoles();
+
+        for (UserRoles role : roles) {
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("REQUEST_SUPERVISOR")) {
+                return true;
+            }
+        }
+        if ( item.getSupervisor().getId().equals(user.getId()) ) {
+            return true;
+        }
+
+        return false;
     }
 
     private boolean supportEditor(User currentUser) {
@@ -544,6 +634,7 @@ public class MobileAppAPIController {
         }
         return false;
     }
+
     private List<TicketNote> reverseNoteDateOrder(List<TicketNote> notes) {
         Collections.sort(notes,new Comparator<TicketNote>() {
             @Override

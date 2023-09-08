@@ -10,6 +10,7 @@ import SearchView from "./SearchView.js";
 import { postLogin, renewToken } from "./Login.js";
 import { toggleDetail } from "./TicketView.js";
 import { imageDialog } from "./ImageView.js";
+import { updateRequest, updateRequestItem, showRequestHistory } from "./RequestView.js";
 
 let appTheme = "dark";
 let username = "";
@@ -57,6 +58,9 @@ const router = async () => {
 
     // force hide search
     toggleSearch(true);
+
+    // force close popups
+    hidePopForms();
 
     // Test for location matches
     const potentialMatches = routes.map(route => {
@@ -168,6 +172,15 @@ const submitSearch = () => {
     navigateTo("/app/search/"+searchString);
 }
 
+const hidePopForms = () => {
+    let pops = document.querySelectorAll(".form__popup");
+    if (pops.length > 0) {
+        for (let p in pops) {
+            pops[p].remove();
+        }
+    }
+}
+
 const toggleTheme = () => {
     if (appTheme === "dark") {
         appTheme = "light";
@@ -254,6 +267,37 @@ document.addEventListener("DOMContentLoaded", () => {
             isLoggedIn = false;
             router();
         }
+        if ( e.target.matches("[data-request]")) {
+            e.preventDefault();
+            updateRequest(e.target.dataset.request, token);
+        }
+        if ( e.target.matches("[data-form-request]")) {
+            e.preventDefault();
+            if (e.target.dataset.formRequest === "update") {
+                console.log("Update Request");
+            } else {
+                console.log("Cancelled Request Edit");
+            }
+            document.querySelector(".form__popup").remove();
+        }
+        if ( e.target.matches("[data-request-item]")) {
+            e.preventDefault();
+            updateRequestItem(e.target.dataset.requestItem, token);
+        }
+        if ( e.target.matches("[data-form-request-item]")) {
+            e.preventDefault();
+            if (e.target.dataset.formRequestItem === "update") {
+                console.log("Update Request Item");
+            } else {
+                console.log("Cancelled Item Edit");
+            }
+            document.querySelector(".form__popup").remove();
+        }
+
+        if ( e.target.matches("[data-request-history]")) {
+            showRequestHistory(e.target.dataset.requestHistory, token);
+        }
+
         if ( e.target.matches("[data-form-submit]")) {
             e.preventDefault();
             const submittedForm = document.querySelector('[data-form-submit]');

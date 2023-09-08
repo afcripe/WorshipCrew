@@ -32,6 +32,12 @@
     --dwc-support-title-1: rgba(225, 171, 250, 0.3);
     --dwc-support-title-2: rgba(144, 144, 144, 0.4);
 
+    --dwc-cancel: #f82105;
+    --dwc-cancel-focus: #d0210a;
+    --dwc-cancel-active: #b21b07;
+    --dwc-cancel-disable: #f3351c;
+    --dwc-cancel-selected: #de4430;
+
     --dwc-form-bg: #fff;
     --dwc-form-border: #86b7fe;
 
@@ -42,11 +48,16 @@
     --dwc-nav: #414141;
     --dwc-nav-link-color: #fff;
     --dwc-login-color: #daeeff;
+
+    --dwc-popup-body-bg: #c7c7c7;
 }
 
 body {
     min-width: 340px;
     font-size: 1.15rem;
+}
+dialog {
+    background-color: var(--dwc-body-bg);
 }
 
 #app {
@@ -74,7 +85,6 @@ body {
     padding: 0;
     margin: 0;
     z-index: 100;
-    /*height: 3rem;*/
 }
 
 #appNav img {
@@ -232,6 +242,11 @@ body {
     padding: 0.25rem 0.5rem;
     font-size: 0.875rem;
     border-radius: 0.2rem;
+}
+
+.btn-generic {
+    color: var(--dwc-body-color);
+    border: 1px solid var(--dwc-border-color);
 }
 
 .color-icon {
@@ -424,6 +439,62 @@ body {
 }
 .btn-outline-store:disabled, .btn-outline-store.disabled {
     color: var(--dwc-store);
+    background-color: transparent;
+}
+
+.btn-cancel {
+    color:  var(--dwc-btn-color);
+    background-color: var(--dwc-cancel);
+    border-color:  var(--dwc-cancel);
+}
+.btn-cancel:hover {
+    color:  var(--dwc-btn-color);
+    background-color: var(--dwc-cancel-focus);
+    border-color: var(--dwc-cancel-active);
+}
+.btn-check:focus + .btn-cancel, .btn-cancel:focus {
+    color:  var(--dwc-btn-color);
+    background-color: var(--dwc-cancel-focus);
+    border-color: var(--dwc-cancel-active);
+    box-shadow: 0 0 0 0.25rem  rgba(var(--dwc-cancel), 0.5);
+}
+.btn-check:checked + .btn-cancel, .btn-check:active + .btn-cancel, .btn-cancel:active, .btn-cancel.active, .show > .btn-cancel.dropdown-toggle {
+    color:  var(--dwc-btn-color);
+    background-color: var(--dwc-cancel-active);
+    border-color: var(--dwc-cancel-focus);
+}
+.btn-check:checked + .btn-cancel:focus, .btn-check:active + .btn-cancel:focus, .btn-cancel:active:focus, .btn-cancel.active:focus, .show > .btn-cancel.dropdown-toggle:focus {
+    box-shadow: 0 0 0 0.25rem rgba(var(--dwc-cancel), 0.5);
+}
+.btn-cancel:disabled, .btn-cancel.disabled {
+    color:  var(--dwc-btn-color);
+    background-color: var(--dwc-cancel-active);
+    border-color: var(--dwc-cancel-active);
+}
+
+
+.btn-outline-cancel {
+    color: var(--dwc-cancel-active);
+    border-color: var(--dwc-cancel-active);
+}
+.btn-outline-cancel:hover {
+    color:  var(--dwc-btn-color);
+    background-color: var(--dwc-cancel-active);
+    border-color: var(--dwc-cancel-active);
+}
+.btn-check:focus + .btn-outline-cancel, .btn-outline-cancel:focus {
+    box-shadow: 0 0 0 0.25rem rgba(var(--dwc-cancel-active), 0.5);
+}
+.btn-check:checked + .btn-outline-cancel, .btn-check:active + .btn-outline-cancel, .btn-outline-cancel:active, .btn-outline-cancel.active, .btn-outline-cancel.dropdown-toggle.show {
+    color:  var(--dwc-btn-color);
+    background-color: var(--dwc-cancel-active);
+    border-color: var(--dwc-cancel-active);
+}
+.btn-check:checked + .btn-outline-cancel:focus, .btn-check:active + .btn-outline-cancel:focus, .btn-outline-cancel:active:focus, .btn-outline-cancel.active:focus, .btn-outline-cancel.dropdown-toggle.show:focus {
+    box-shadow: 0 0 0 0.25rem rgba(var(--dwc-cancel-active), 0.5);
+}
+.btn-outline-cancel:disabled, .btn-outline-cancel.disabled {
+    color: var(--dwc-cancel-active);
     background-color: transparent;
 }
 
@@ -672,7 +743,7 @@ body {
     font-size: 1rem;
     text-align: right;
     padding-left: 0.1rem;
-    padding-right: 0.5rem;
+    /*padding-right: 0.1rem;*/
 }
 
 .request__item-field-grow {
@@ -691,12 +762,19 @@ body {
     right: 5px;
 }
 
+.request__item-bottom-right {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+}
+
 .image-viewer__dialog {
     position: absolute;
     top: 0;
     left: 0;
     width: calc(100vw);
     height: calc(100vh);
+    border-radius: 0.25rem;
 }
 
 .image-viewer__div {
@@ -709,6 +787,19 @@ body {
 
 .image-viewer__image {
     max-width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+.history-viewer__dialog {
+    position: absolute;
+    border-radius: 0.25rem;
+    width: calc(100vw - 1rem);
+    height: calc(100vh - 6rem);
+    transform: translateY(-1.75rem);
+}
+
+.history-viewer__div {
     padding: 0;
     margin: 0;
 }
@@ -737,4 +828,40 @@ body {
     font-size: 1rem;
     margin: 0.25rem;
     padding: 0;
+}
+
+.form__popup {
+    position: fixed;
+    top: 0;
+    bottom: 3.4rem;
+    left: 0;
+    right: 0;
+    vertical-align: middle;
+    background-color: rgba(199, 199, 199, 0.5);
+    z-index: 101;
+}
+
+.form__popup-content {
+    position: absolute;
+    top: 50%;
+    margin: 0;
+    width: calc(100% - .35rem);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    background-color: var(--dwc-popup-body-bg);
+    border: 2px solid var(--dwc-border-color);
+    border-radius: 0.25rem;
+}
+
+.request__item-field-center {
+    flex-grow: 1;
+    text-align: center;
+}
+
+.detail-padding-top {
+    padding-top: 1rem;
+}
+
+.detail-padding-bottom {
+    padding-bottom: 1rem;
 }
