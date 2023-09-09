@@ -68,17 +68,14 @@ async function showRequestHistory(reqID, token) {
     let dialog=document.createElement("dialog");
         dialog.id="historyViewer";
         dialog.classList.add("history-viewer__dialog");
-        dialog.addEventListener("click", (event) => {
-            event.preventDefault();
-            document.getElementById("historyViewer").remove();
-        });
 
-    let hstDiv = document.createElement("div");
-        hstDiv.classList.add("history-viewer__div");
-        hstDiv.innerHTML = returnHTML;
+    dialog.innerHTML = returnHTML;
 
-    dialog.appendChild(hstDiv);
     document.getElementById("app").appendChild(dialog);
+    document.getElementById("btnViewerClose").addEventListener("click", (event) => {
+        event.preventDefault();
+        document.getElementById("historyViewer").remove();
+    });
 
     dialog.showModal();
 }
@@ -184,7 +181,7 @@ function htmlRequestAgents(agents, editable) {
     r+=`<div class="request__item-field-grow"><hr></div>`;
     r+=`<div class="request__item-field-right">`;
             if (editable) {
-                r+=`<button class="btn btn-sm btn-outline-store">+</button>`;
+                r+=`<button class="btn btn-sm btn-outline-store"> + </button>`;
             }
     r+=`</div></div>`;
 
@@ -196,7 +193,7 @@ function htmlRequestAgents(agents, editable) {
             r += `<div class="request__item-field-left">` + agent.fullName + `</div>`;
             r += `<div class="request__item-field-right">`;
             if (editable) {
-                r+=`<button class="btn btn-sm btn-outline-store">x</button>`;
+                r+=`<button class="btn btn-sm btn-outline-store"> x </button>`;
             }
             r += `</div></div>`;
         }
@@ -205,7 +202,7 @@ function htmlRequestAgents(agents, editable) {
     return r;
 }
 function htmlHistory(notes) {
-    let r= "";
+    let r=`<div class="history-viewer__div"><div class="history-viewer__content">`;
     if ( notes.length > 0) {
         for (let n in notes) {
             let note = notes[n];
@@ -227,6 +224,14 @@ function htmlHistory(notes) {
             r+=`</div>`;
         }
     }
+
+    r+=`</div>`;
+
+    r+=`<div class="history-viewer__close">`;
+    r+=`<div class="request__item-field-grow"></div>`;
+    r+=`<div class="request__item-field-right"><button id="btnViewerClose" class="btn btn-sm btn-outline-store">close</button>&nbsp;</div>`;
+    r+=`</div></div>`;
+
     return r;
 }
 

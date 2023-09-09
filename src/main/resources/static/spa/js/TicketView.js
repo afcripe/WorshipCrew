@@ -21,6 +21,26 @@ export default class extends AbstractView {
     }
 }
 
+async function showTicketAgents(ticketID, token) {
+    let agents = await getRemoteTicketAgents(ticketID, token);
+    let returnHTML = htmlAgents(agents);
+    returnHTML = returnHTML.replaceAll("\n","");
+
+    let dialog=document.createElement("dialog");
+    dialog.id="agentViewer";
+    dialog.classList.add("history-viewer__dialog");
+
+    dialog.innerHTML = returnHTML;
+
+    document.getElementById("app").appendChild(dialog);
+    document.getElementById("btnViewerClose").addEventListener("click", (event) => {
+        event.preventDefault();
+        document.getElementById("agentViewer").remove();
+    });
+
+    dialog.showModal();
+}
+
 async function getRemoteTicket(id, token) {
     const response = await fetch('/api/v1/app/ticket/'+id, {
         headers: {
@@ -79,17 +99,23 @@ function htmlTicket(tkt) {
     r+=`<i id="btnDetailExpand" class="bi bi-arrows-expand ticket__detail-expand" data-ticket-detail-toggle></i>`;
     r+=`<i id="btnDetailCollapse" class="bi bi-arrows-collapse ticket__detail-expand" style="display: none" data-ticket-detail-toggle></i>`;
     r+=`<div class="ticket__detail">Date Due: `+formatDate(tkt.ticketDue)+`</div>`;
+    r+=`<div class="ticket__detail">SLA: `+tkt.sla.name+`</div>`;
+
     r+=`<div id="groupDetailExpand" class="ticket__expand-group ticket__collapse-group ticket__hide-group">`;
     r+=`<div class="ticket__detail">Date Sbmitted: `+formatDate(tkt.ticketDate)+`</div>`;
     if (tkt.closeDate) {
         r += `<div class="ticket__detail">` + formatDate(tkt.ticketDate) + `</div>`;
     }
     r+=`<div class="ticket__detail">Assigned To: `+tkt.agent.fullName+`</div>`;
-    r+=`<div class="ticket__detail">SLA: `+tkt.sla.name+`</div>`;
     r+=`<div class="ticket__detail">Sbmitted By: `+tkt.user.fullName+`</div>`;
     r+=`<div class="ticket__detail">User Priority: `+tkt.priority+`</div>`;
     r+=`<div class="ticket__detail">Campus: `+tkt.campus.name+` - `+tkt.department.name+`</div>`;
     r+=`</div></div>`;
+
+    r+=`<div class="ticket__group-2">`;
+    r+=`<div class="ticket__grow"><button class="btn btn-sm btn-support" data-ticket-note="` + tkt.id + `">New Note</button></div>`;
+    r+=`<div class="ticket__grow"><button class="btn btn-sm btn-outline-support" data-ticket-agents="` + tkt.id + `">Agents</button></div>`;
+    r+=`</div>`;
 
     return r;
 }
@@ -131,6 +157,32 @@ function htmlTicketNotes(note) {
     return r;
 }
 
+function htmlAgents(agents) {
+    let r=`<div class="history-viewer__div"><div class="history-viewer__content">`;
+    if ( agents.length > 0) {
+        for (let a in agents) {
+            let agnet = agents[a];
+            r+=`<div class="request__item">`;
+
+            r+=`<div class="request__item-detail">`;
+            r+=`<div class="request__item-field-left">` + agnet.fullName + `</div>`;
+            r+=`<div class="request__item-field-right">Remove Agent</div>`;
+            r+=`</div>`;
+
+            r+=`</div>`;
+        }
+    }
+
+    r+=`</div></div>`;
+
+    r+=`<div class="history-viewer__close">`;
+    r+=`<div class="request__item-field-grow"><button id="btnAddAgent" class="btn btn-sm btn-support">Add Agent</button></div>`;
+    r+=`<div class="request__item-field-right"><button id="btnViewerClose" class="btn btn-sm btn-outline-support">close</button></div>`;
+    r+=`</div></div>`;
+
+    return r;
+}
+
 function formatDate(dte) {
     let strDate = dte.split("T")[0];
     let strTime = dte.split("T")[1];
@@ -139,4 +191,4 @@ function formatDate(dte) {
     return strDate + " " + partTime[0] + ":" + partTime[1];
 }
 
-export { toggleDetail };
+export { toggleDetail, showTicketAgents };

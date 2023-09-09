@@ -18,6 +18,13 @@ dark,
 .dark .image-viewer__dialog {
     background-color: var(--dwc-body-bg-dark);
 }
+.dark .history-viewer__dialog {
+    color: var(--dwc-body-color-dark);
+}
+
+.dark .history-viewer__close {
+    background-color: var(--dwc-body-bg-dark);
+}
 
 .dark dialog {
     background-color: var(--dwc-body-bg-dark);
@@ -26,6 +33,7 @@ dark,
 .dark .btn-generic {
     color: var(--dwc-body-color-dark);
     border: 1px solid var(--dwc-border-color-dark);
+    background-color: var(--dwc-body-bg-dark);
 }
 
 .dark .form__popup {
@@ -38,4 +46,8 @@ dark,
 
 .dark .btn-outline-cancel {
     color:  var(--dwc-btn-color);
+}
+
+.dark .btn-outline-support {
+    color: var(--dwc-btn-color);
 }

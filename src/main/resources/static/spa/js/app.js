@@ -8,7 +8,7 @@ import RequestView from "./RequestView.js";
 import SearchView from "./SearchView.js";
 
 import { postLogin, renewToken } from "./Login.js";
-import { toggleDetail } from "./TicketView.js";
+import { toggleDetail, showTicketAgents} from "./TicketView.js";
 import { imageDialog } from "./ImageView.js";
 import { updateRequest, updateRequestItem, showRequestHistory } from "./RequestView.js";
 
@@ -247,6 +247,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         if ( e.target.matches("[data-ticket-detail-toggle]")) {
             toggleDetail();
+        }
+        if ( e.target.matches("[data-ticket-agents]")) {
+            showTicketAgents(e.target.dataset.ticketAgents, token);
         }
         if ( e.target.matches("[data-nav-image]")) {
             imageDialog(e.target.dataset.navImage);
