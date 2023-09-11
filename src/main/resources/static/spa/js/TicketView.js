@@ -23,7 +23,7 @@ export default class extends AbstractView {
 
 async function showTicketAgents(ticketID, token) {
     let agents = await getRemoteTicketAgents(ticketID, token);
-    let returnHTML = htmlAgents(agents);
+    let returnHTML = htmlAgents(agents, ticketID);
     returnHTML = returnHTML.replaceAll("\n","");
 
     let dialog=document.createElement("dialog");
@@ -41,6 +41,49 @@ async function showTicketAgents(ticketID, token) {
     dialog.showModal();
 }
 
+async function updateAgent(ticketID, token) {
+    let users = await getAgentOptions(token);
+    let returnHTML = htmlDialogAddAgent(users, ticketID);
+    let dialogHTML =  document.createElement("div");
+    dialogHTML.id = "formRequest";
+    dialogHTML.classList.add("form__popup");
+    dialogHTML.innerHTML = returnHTML;
+    document.body.appendChild(dialogHTML);
+}
+
+async function updateNote(ticketID, token) {
+    let ticket = await getRemoteTicket(ticketID, token);
+    let returnHTML = htmlDialogAddNote(ticket);
+    let dialogHTML =  document.createElement("div");
+        dialogHTML.id = "formRequest";
+        dialogHTML.classList.add("form__popup");
+        dialogHTML.innerHTML = returnHTML;
+
+    document.body.appendChild(dialogHTML);
+}
+
+async function updateTicketStatus(ticketID, token) {
+    let options = await getTicketStatusOptions(token);
+    let tkt = await getRemoteTicket(ticketID, token);
+    let returnHTML = htmlDialogUpdateStatus(tkt, options);
+    let dialogHTML =  document.createElement("div");
+    dialogHTML.id = "formRequest";
+    dialogHTML.classList.add("form__popup");
+    dialogHTML.innerHTML = returnHTML;
+    document.body.appendChild(dialogHTML);
+}
+
+async function updateTicketSLA(ticketID, token) {
+    let options = await getTicketSLAOptions(token);
+    let tkt = await getRemoteTicket(ticketID, token);
+    let returnHTML = htmlDialogUpdateSLA(tkt, options);
+    let dialogHTML =  document.createElement("div");
+    dialogHTML.id = "formRequest";
+    dialogHTML.classList.add("form__popup");
+    dialogHTML.innerHTML = returnHTML;
+    document.body.appendChild(dialogHTML);
+}
+
 async function getRemoteTicket(id, token) {
     const response = await fetch('/api/v1/app/ticket/'+id, {
         headers: {
@@ -51,7 +94,7 @@ async function getRemoteTicket(id, token) {
 }
 
 async function getRemoteTicketNotes(id, token) {
-    const response = await fetch('/api/v1/app/notelist/'+id, {
+    const response = await fetch('/api/v1/app/ticket/notelist/'+id, {
         headers: {
             authorization: "Bearer "+token
         }
@@ -60,12 +103,42 @@ async function getRemoteTicketNotes(id, token) {
 }
 
 async function getRemoteTicketAgents(id, token) {
-    const response = await fetch('/api/v1/app/agentlist/'+id, {
+    const response = await fetch('/api/v1/app/ticket/agentlist/'+id, {
         headers: {
             authorization: "Bearer "+token
         }
     });
     return await response.json();
+}
+
+async function getAgentOptions(token) {
+    const response = await fetch('/api/v1/app/ticket/agentoptions', {
+        headers: {
+            authorization: "Bearer "+token
+        }
+    });
+    return await response.json();
+
+}
+
+async function getTicketStatusOptions(token) {
+    const response = await fetch('/api/v1/app/ticket/ticketstatusoptions', {
+        headers: {
+            authorization: "Bearer "+token
+        }
+    });
+    return await response.json();
+
+}
+
+async function getTicketSLAOptions(token) {
+    const response = await fetch('/api/v1/app/ticket/slaoptions', {
+        headers: {
+            authorization: "Bearer "+token
+        }
+    });
+    return await response.json();
+
 }
 
 function toggleDetail() {
@@ -86,6 +159,103 @@ function toggleDetail() {
     }
 
 }
+
+async function postTicketNote(token) {
+    let uploadedImages = ""
+    let children = document.getElementById('imagePath').children;
+    for (let i = 0; i < children.length; i++) {
+        let idArray = children[i].id.split("-");
+        let pic = idArray[idArray.length-1];
+        uploadedImages = uploadedImages+pic+" ";
+    }
+
+    let pvt = "false";
+    try { pvt = document.getElementById("ticketPrivate").checked } catch (e) {}
+
+    let formData = new FormData();
+        formData.set("isPrivate", pvt);
+        formData.set("detail", document.getElementById("ticketNote").value);
+        formData.set("images", uploadedImages);
+        formData.set("ticketId", document.getElementById("ticketNoteId").value);
+
+    const response = await fetch('/api/v1/app/ticket/postnote', {
+        method: 'POST',
+        headers: {
+            authorization: "Bearer "+token
+        },
+        body: formData
+    });
+
+    return await response.json();
+}
+
+async function postTicketStatus(token) {
+    let formData = new FormData();
+    formData.set("id", document.getElementById("ticketStatusId").value);
+    formData.set("status", document.getElementById("statusTicketSelect").value);
+    formData.set("note", "");
+
+    const response = await fetch('/api/v1/app/ticket/poststatus', {
+        method: 'POST',
+        headers: {
+            authorization: "Bearer "+token
+        },
+        body: formData
+    });
+    return await response.json();
+}
+
+async function postTicketSLA(token) {
+    let formData = new FormData();
+    formData.set("id", document.getElementById("slaTicketSelect").value);
+    formData.set("name", document.getElementById("ticketSLAId").value);
+
+    const response = await fetch('/api/v1/app/ticket/postsla', {
+        method: 'POST',
+        headers: {
+            authorization: "Bearer "+token
+        },
+        body: formData
+    });
+    return await response.json();
+}
+
+async function postTicketAddAgent(token) {
+    let formData = new FormData();
+    formData.set("id", document.getElementById("ticketAgentId").value);
+    formData.set("userId", document.getElementById('agentSelect').value);
+    formData.set("primary", document.getElementById('agentPrimary').checked);
+
+    const response = await fetch('/api/v1/app/ticket/addagent', {
+        method: 'POST',
+        headers: {
+            authorization: "Bearer "+token
+        },
+        body: formData
+    });
+    return await response.json();
+}
+
+async function postTicketRemoveAgent(ticketId, userId, token) {
+    let formData = new FormData();
+    formData.set("id", ticketId);
+    formData.set("userId", userId);
+    formData.set("primary", "false");
+
+    const response = await fetch('/api/v1/app/ticket/removeagent', {
+        method: 'POST',
+        headers: {
+            authorization: "Bearer "+token
+        },
+        body: formData
+    });
+    let rsp = await response.json();
+
+    document.getElementById("agentViewer").remove();
+    await showTicketAgents(ticketId, token);
+}
+
+// HTML //
 
 function htmlTicket(tkt) {
     let r = `<div class="ticket__group">`;
@@ -114,7 +284,11 @@ function htmlTicket(tkt) {
 
     r+=`<div class="ticket__group-2">`;
     r+=`<div class="ticket__grow"><button class="btn btn-sm btn-support" data-ticket-note="` + tkt.id + `">New Note</button></div>`;
-    r+=`<div class="ticket__grow"><button class="btn btn-sm btn-outline-support" data-ticket-agents="` + tkt.id + `">Agents</button></div>`;
+    if (tkt.ticketAgent) {
+        r += `<div class="ticket__grow"><button class="btn btn-sm btn-support" data-ticket-status="` + tkt.id + `">Status</button></div>`;
+        r += `<div class="ticket__grow"><button class="btn btn-sm btn-support" data-ticket-sla="` + tkt.id + `">SLA</button></div>`;
+        r += `<div class="ticket__grow"><button class="btn btn-sm btn-outline-support" data-ticket-agents="` + tkt.id + `">Agents</button></div>`;
+    }
     r+=`</div>`;
 
     return r;
@@ -157,16 +331,86 @@ function htmlTicketNotes(note) {
     return r;
 }
 
-function htmlAgents(agents) {
+function htmlDialogUpdateStatus(tkt, options) {
+    let r=`<div>`;
+    r+=`<form><div class="form-content form__popup-content">`;
+
+    r+=`<div class="request__item-detail">`;
+    r+=`<h4>Update Ticket Status</h4>`;
+    r+=`<input type="hidden" id="ticketStatusId" value="`+tkt.id+`">`;
+    r+=`</div>`;
+
+    r+=`<div class="request__item-detail detail-padding-bottom">`;
+    r+=`<select id="statusTicketSelect" class="form-control">`;
+    for (let o in options) {
+        if (tkt.ticketStatus === options[o]) {
+            r+=`<option value="`+options[o]+`" selected>`+options[o]+`</option>`;
+        }else {
+            r+=`<option value="`+options[o]+`">`+options[o]+`</option>`;
+        }
+    }
+    r+=`</select>`;
+    r+=`</div>`;
+
+    r+=`<div class="request__item-detail detail-padding-bottom">`;
+    r+=`<div class="request__item-field-center">`;
+    r+=`<button type="button" class="btn btn-sm btn-support" data-form-ticket-status="update">Update</button>`;
+    r+=`</div>`;
+    r+=`<div class="request__item-field-center">`;
+    r+=`<button type="button" class="btn btn-sm btn-outline-cancel" data-form-ticket-status="cancel">Cancel</button>`;
+    r+=`</div>`;
+    r+=`</div>`;
+
+    r+=`</div></form></div>`;
+    return r;
+}
+
+function htmlDialogUpdateSLA(tkt, options) {
+    let r=`<div>`;
+    r+=`<form><div class="form-content form__popup-content">`;
+
+    r+=`<div class="request__item-detail">`;
+    r+=`<h4>Update Ticket SLA</h4>`;
+    r+=`<input type="hidden" id="ticketSLAId" value="`+tkt.id+`">`;
+    r+=`</div>`;
+
+    r+=`<div class="request__item-detail detail-padding-bottom">`;
+    r+=`<select id="slaTicketSelect" class="form-control">`;
+    for (let s in options) {
+        let tktSLA = options[s]
+        if (tkt.sla.id === tktSLA.id) {
+            r+=`<option value="`+tktSLA.id+`" selected>`+tktSLA.name+`</option>`;
+        }else {
+            r+=`<option value="`+tktSLA.id+`">`+tktSLA.name+`</option>`;
+        }
+    }
+    r+=`</select>`;
+    r+=`</div>`;
+
+    r+=`<div class="request__item-detail detail-padding-bottom">`;
+    r+=`<div class="request__item-field-center">`;
+    r+=`<button type="button" class="btn btn-sm btn-support" data-form-ticket-sla="update">Update</button>`;
+    r+=`</div>`;
+    r+=`<div class="request__item-field-center">`;
+    r+=`<button type="button" class="btn btn-sm btn-outline-cancel" data-form-ticket-sla="cancel">Cancel</button>`;
+    r+=`</div>`;
+    r+=`</div>`;
+
+    r+=`</div></form></div>`;
+    return r;
+}
+
+function htmlAgents(agents, ticketID) {
     let r=`<div class="history-viewer__div"><div class="history-viewer__content">`;
     if ( agents.length > 0) {
         for (let a in agents) {
-            let agnet = agents[a];
+            let agent = agents[a];
             r+=`<div class="request__item">`;
 
             r+=`<div class="request__item-detail">`;
-            r+=`<div class="request__item-field-left">` + agnet.fullName + `</div>`;
-            r+=`<div class="request__item-field-right">Remove Agent</div>`;
+            r+=`<div class="request__item-field-left">` + agent.fullName + `</div>`;
+            r+=`<button class="btn btn-sm btn-outline-support" data-ticket-id="`+ticketID+`" 
+                        data-ticket-agent-remove="`+agent.id+`"> x </button>`;
             r+=`</div>`;
 
             r+=`</div>`;
@@ -176,10 +420,89 @@ function htmlAgents(agents) {
     r+=`</div></div>`;
 
     r+=`<div class="history-viewer__close">`;
-    r+=`<div class="request__item-field-grow"><button id="btnAddAgent" class="btn btn-sm btn-support">Add Agent</button></div>`;
+    r+=`<div class="request__item-field-grow">`;
+    r+=`<button id="btnAddAgent" class="btn btn-sm btn-support" data-ticket-agent="`+ticketID+`">Add Agent</button></div>`;
     r+=`<div class="request__item-field-right"><button id="btnViewerClose" class="btn btn-sm btn-outline-support">close</button></div>`;
     r+=`</div></div>`;
 
+    return r;
+}
+
+function htmlDialogAddNote(tkt) {
+    let r=`<div>`;
+    r+=`<form><div class="form-content form__popup-content">`;
+
+    r+=`<div class="request__item-detail">`;
+    r+=`<h4>Add Note</h4>`;
+    r+=`<input type="hidden" id="ticketNoteId" value="`+tkt.id+`">`;
+    r+=`</div>`;
+
+    if (tkt.ticketAgent) {
+        r+=`<div class="request__item-detail detail-padding-bottom">`;
+        r+=`Private Note: <input type="checkbox" id="ticketPrivate">`;
+        r+=`</div>`;
+    } else {
+        r+=`<div class="request__item-detail detail-padding-bottom" style="display: none">`;
+        r+=`Private Note: <input type="checkbox" id="ticketPrivate">`;
+        r+=`</div>`;
+    }
+
+    r+=`<div class="request__item-detail detail-padding-bottom">`;
+    r+=`<textArea id="ticketNote" class="form-control""></textArea>`;
+    r+=`</div>`;
+
+    r+=`<div class="request__item-detail detail-padding-bottom">`;
+    r+=`<input type="hidden" name="image" id="image">`;
+    r+=`<input type="file" id="imageFile" style="display: none;" multiple data-ticket-image-upload="`+tkt.id+`">`;
+    r+=`<button type="button" class="btn btn-sm btn-support" onclick="document.getElementById('imageFile').click();">Attach Image</button>`;
+    r+=`<div id="imagePath"></div>`;
+    r+=`</div>`;
+
+    r+=`<div class="request__item-detail detail-padding-bottom">`;
+    r+=`<div class="request__item-field-center">`;
+    r+=`<button type="button" class="btn btn-sm btn-support" data-form-ticket-note="update" data-ticket-id="`+tkt.id+`">Add</button>`;
+    r+=`</div>`;
+    r+=`<div class="request__item-field-center">`;
+    r+=`<button type="button" class="btn btn-sm btn-outline-cancel" data-form-ticket-note="cancel">Cancel</button>`;
+    r+=`</div>`;
+    r+=`</div>`;
+
+    r+=`</div></form></div>`;
+    return r;
+}
+
+function htmlDialogAddAgent(users, ticketID) {
+    let r=`<div>`;
+    r+=`<form><div class="form-content form__popup-content">`;
+
+    r+=`<div class="request__item-detail">`;
+    r+=`<h4>Add Agent</h4>`;
+    r+=`<input type="hidden" id="ticketAgentId" value="`+ticketID+`">`;
+    r+=`</div>`;
+
+    r+=`<div class="request__item-detail detail-padding-bottom">`;
+    r+=`<select id="agentSelect" class="form-control">`;
+    for (let u in users) {
+        let user = users[u];
+        r+=`<option value="`+user.id+`">`+user.fullName+`</option>`;
+    }
+    r+=`</select>`;
+    r+=`</div>`;
+
+    r+=`<div class="request__item-detail detail-padding-bottom">`;
+    r+=`Set As Primary: <input type="checkbox" id="agentPrimary">`;
+    r+=`</div>`;
+
+    r+=`<div class="request__item-detail detail-padding-bottom">`;
+    r+=`<div class="request__item-field-center">`;
+    r+=`<button type="button" class="btn btn-sm btn-support" data-form-ticket-agent="update">Update</button>`;
+    r+=`</div>`;
+    r+=`<div class="request__item-field-center">`;
+    r+=`<button type="button" class="btn btn-sm btn-outline-cancel" data-form-ticket-agent="cancel">Cancel</button>`;
+    r+=`</div>`;
+    r+=`</div>`;
+
+    r+=`</div></form></div>`;
     return r;
 }
 
@@ -191,4 +514,5 @@ function formatDate(dte) {
     return strDate + " " + partTime[0] + ":" + partTime[1];
 }
 
-export { toggleDetail, showTicketAgents };
+export { toggleDetail, showTicketAgents, updateAgent, updateNote, updateTicketSLA, postTicketSLA,
+    updateTicketStatus, postTicketNote, postTicketStatus, postTicketAddAgent, postTicketRemoveAgent };

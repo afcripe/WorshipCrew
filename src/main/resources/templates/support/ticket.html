@@ -53,7 +53,7 @@
             </h2>
         </div>
 
-        <div class="card m-0 p-0">
+        <div class="card m-0 p-0 card-hide-overflow">
 
             <div class="card-title py-2 px-2">
                 <button class="btn btn-sm btn-outline-secondary" onclick="toggleTicketDetail()" style="max-width: 75px; float: right">
@@ -148,7 +148,7 @@
                 </div>
 
                 <!-- current Notes -->
-                <div class="card my-2 mx-0 p-0" th:each="note : ${noteList}">
+                <div class="card my-2 mx-0 p-0 card-hide-overflow" th:each="note : ${noteList}">
                     <div th:id="'note-'+${note.id}" class="note-container">
                         <div class="note-address" th:classappend="${note.agentNote} ? note-address-agent">
                             <div th:text="${note.user.firstName}+' '+${note.user.lastName}"></div>

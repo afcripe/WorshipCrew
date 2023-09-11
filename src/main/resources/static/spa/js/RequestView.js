@@ -17,7 +17,7 @@ export default class extends AbstractView {
             returnHTML += htmlRequestItems(itemObj);
         }
 
-        returnHTML += htmlRequestAgents(agents, req.editable);
+        returnHTML += htmlRequestAgents(agents, req);
 
         returnHTML = returnHTML.replaceAll("\n","");
         return returnHTML.replaceAll("\n","");
@@ -34,7 +34,7 @@ async function getRemoteRequest(id, token) {
 }
 
 async function getRemoteRequestItems(id, token) {
-    const response = await fetch('/api/v1/app/itemlist/'+id, {
+    const response = await fetch('/api/v1/app/request/itemlist/'+id, {
         headers: {
             authorization: "Bearer "+token
         }
@@ -43,7 +43,7 @@ async function getRemoteRequestItems(id, token) {
 }
 
 async function getRemoteSupervisors(id, token) {
-    const response = await fetch('/api/v1/app/requestsupervisores/'+id, {
+    const response = await fetch('/api/v1/app/request/supervisorlist/'+id, {
         headers: {
             authorization: "Bearer "+token
         }
@@ -52,7 +52,7 @@ async function getRemoteSupervisors(id, token) {
 }
 
 async function getRemoteRequestHistory(id, token) {
-    const response = await fetch('/api/v1/app/requesthistory/'+id, {
+    const response = await fetch('/api/v1/app/request/history/'+id, {
         headers: {
             authorization: "Bearer "+token
         }
@@ -102,8 +102,18 @@ async function updateRequestItem(itemID, token) {
     document.body.appendChild(dialogHTML);
 }
 
+async function updateSupervisor(reqID, token) {
+    let users = await getOrderSupervisorOptions(token);
+    let returnHTML = htmlDialogUpdateSupervisors(users);
+    let dialogHTML =  document.createElement("div");
+        dialogHTML.id = "formRequest";
+        dialogHTML.classList.add("form__popup");
+        dialogHTML.innerHTML = returnHTML;
+    document.body.appendChild(dialogHTML);
+}
+
 async function getOrderStatusOptions(token) {
-    const response = await fetch('/api/v1/app/orderstatusoptions', {
+    const response = await fetch('/api/v1/app/request/orderstatusoptions', {
         headers: {
             authorization: "Bearer "+token
         }
@@ -113,12 +123,22 @@ async function getOrderStatusOptions(token) {
 }
 
 async function getItemOrderStatus(itemId, token) {
-    const response = await fetch('/api/v1/app/itemorderstatus/'+itemId, {
+    const response = await fetch('/api/v1/app/request/itemorderstatus/'+itemId, {
         headers: {
             authorization: "Bearer "+token
         }
     });
     return await response.json();
+}
+
+async function getOrderSupervisorOptions(token) {
+    const response = await fetch('/api/v1/app/request/supervisoroptions', {
+        headers: {
+            authorization: "Bearer "+token
+        }
+    });
+    return await response.json();
+
 }
 
 function htmlRequest(req) {
@@ -175,13 +195,13 @@ function htmlRequestItems(item) {
     r+=`</div>`;
     return r;
 }
-function htmlRequestAgents(agents, editable) {
+function htmlRequestAgents(agents, req) {
     let r=`<div class="request__item-detail detail-padding-top">`;
     r+=`<div class="request__item-field-header">Supervisors</div>`;
     r+=`<div class="request__item-field-grow"><hr></div>`;
     r+=`<div class="request__item-field-right">`;
-            if (editable) {
-                r+=`<button class="btn btn-sm btn-outline-store"> + </button>`;
+            if (req.editable) {
+                r+=`<button class="btn btn-sm btn-store" data-request-supervisor="`+req.id+`"> + </button>`;
             }
     r+=`</div></div>`;
 
@@ -192,8 +212,9 @@ function htmlRequestAgents(agents, editable) {
             r += `<div class="request__item-detail">`;
             r += `<div class="request__item-field-left">` + agent.fullName + `</div>`;
             r += `<div class="request__item-field-right">`;
-            if (editable) {
-                r+=`<button class="btn btn-sm btn-outline-store"> x </button>`;
+            if (req.editable) {
+                r+=`<button class="btn btn-sm btn-outline-store" data-request-id="`+req.id+`" 
+                        data-request-supervisor-remove="`+agent.id+`"> x </button>`;
             }
             r += `</div></div>`;
         }
@@ -261,7 +282,7 @@ function htmlDialogUpdateRequest(req, options) {
 
     r+=`<div class="request__item-detail detail-padding-bottom">`;
     r+=`<div class="request__item-field-center">`;
-    r+=`<button type="button" class="btn btn-sm btn-wiki" data-form-request="update">Update</button>`;
+    r+=`<button type="button" class="btn btn-sm btn-store" data-form-request="update">Update</button>`;
     r+=`</div>`;
     r+=`<div class="request__item-field-center">`;
     r+=`<button type="button" class="btn btn-sm btn-outline-cancel" data-form-request="cancel">Cancel</button>`;
@@ -297,10 +318,44 @@ function htmlDialogUpdateRequestItem(item, options) {
 
     r+=`<div class="request__item-detail detail-padding-bottom">`;
     r+=`<div class="request__item-field-center">`;
-    r+=`<button type="button" class="btn btn-sm btn-wiki" data-form-request-item="update">Update</button>`;
+    r+=`<button type="button" class="btn btn-sm btn-store" data-form-request-item="update">Update</button>`;
     r+=`</div>`;
     r+=`<div class="request__item-field-center">`;
     r+=`<button type="button" class="btn btn-sm btn-outline-cancel" data-form-request-item="cancel">Cancel</button>`;
+    r+=`</div>`;
+    r+=`</div>`;
+
+    r+=`</div></form></div>`;
+    return r;
+}
+
+function htmlDialogUpdateSupervisors(users) {
+    let r=`<div>`;
+    r+=`<form><div class="form-content form__popup-content">`;
+
+    r+=`<div class="request__item-detail">`;
+    r+=`<h4>Add Supervisor</h4>`;
+    r+=`</div>`;
+
+    r+=`<div class="request__item-detail detail-padding-bottom">`;
+    r+=`<select id="supervisorSelect" class="form-control">`;
+    for (let u in users) {
+        let user = users[u];
+        r+=`<option value="`+user.id+`">`+user.fullName+`</option>`;
+    }
+    r+=`</select>`;
+    r+=`</div>`;
+
+    r+=`<div class="request__item-detail detail-padding-bottom">`;
+    r+=`Set As Primary: <input type="checkbox" id="supervisorPrimary">`;
+    r+=`</div>`;
+
+    r+=`<div class="request__item-detail detail-padding-bottom">`;
+    r+=`<div class="request__item-field-center">`;
+    r+=`<button type="button" class="btn btn-sm btn-store" data-form-request-supervisor="update">Update</button>`;
+    r+=`</div>`;
+    r+=`<div class="request__item-field-center">`;
+    r+=`<button type="button" class="btn btn-sm btn-outline-cancel" data-form-request-supervisor="cancel">Cancel</button>`;
     r+=`</div>`;
     r+=`</div>`;
 
@@ -316,4 +371,4 @@ function formatDate(dte) {
     return strDate + " " + partTime[0] + ":" + partTime[1];
 }
 
-export { updateRequest, updateRequestItem, showRequestHistory };
+export { updateRequest, updateRequestItem, showRequestHistory, updateSupervisor };

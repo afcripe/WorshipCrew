@@ -147,7 +147,7 @@ public class SupportFileAPIController {
     }
 
     @PostMapping("/deleteonlyimage")
-    public SingleBigIntegerModel removeStoredIamge(@ModelAttribute SingleBigIntegerModel image){
+    public SingleBigIntegerModel removeStoredImage(@ModelAttribute SingleBigIntegerModel image){
         Optional<TicketImage> ticketImage = ticketImageService.findById(image.id());
         if (ticketImage.isPresent()) {
             ticketImageService.deleteById(ticketImage.get().getId());

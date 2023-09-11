@@ -772,6 +772,10 @@ ul, #folderTree {
 
 /* Support Ticket Styling */
 
+.card-hide-overflow {
+    overflow-x: hidden;
+}
+
 .ticket-container {
     display: flex;
     flex-direction: column;
@@ -885,7 +889,7 @@ ul, #folderTree {
 
 .note-content {
     flex-grow: 1;
-    min-width: 375px;
+    /*min-width: 375px;*/
     padding: 5px;
 }
 

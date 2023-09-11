@@ -42,7 +42,7 @@ export default class extends AbstractView {
 }
 
 async function getRemoteTicketsByUser(token) {
-    const response = await fetch('/api/v1/app/ticketsbyuser', {
+    const response = await fetch('/api/v1/app/ticket/listbyuser', {
         headers: {
             authorization: "Bearer "+token
         }
@@ -53,7 +53,7 @@ async function getRemoteTicketsByUser(token) {
 }
 
 async function getRemoteTickets(token) {
-    const response = await fetch('/api/v1/app/tickets', {
+    const response = await fetch('/api/v1/app/ticket/listbyagent', {
         headers: {
             authorization: "Bearer "+token
         }
@@ -64,7 +64,7 @@ async function getRemoteTickets(token) {
 }
 
 async function getRemoteTicketsIncluded(token) {
-    const response = await fetch('/api/v1/app/ticketincludes', {
+    const response = await fetch('/api/v1/app/ticket/listbyincluded', {
         headers: {
             authorization: "Bearer "+token
         }

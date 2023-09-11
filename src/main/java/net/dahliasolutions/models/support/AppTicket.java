@@ -25,7 +25,8 @@ public class AppTicket {
     private LocalDateTime ticketClosed;     // date status change to closed or equivalent
     private String ticketDetail;            // issue submitted
     private String priority;                // user determined priority
-    private boolean isAgent;
+    private boolean ticketAgent;             // user determined priority
+    private boolean closeDate;
 
     @Nullable
     @ManyToOne(fetch = FetchType.EAGER)

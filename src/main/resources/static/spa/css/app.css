@@ -518,6 +518,14 @@ dialog {
     width: 2rem;
 }
 
+.removable-image {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    font-size: 1rem;
+    color: red;
+}
+
 /* Dashboard */
 
 .appList__item {
@@ -712,6 +720,7 @@ dialog {
 }
 
 .ticket__note-images {
+    position: relative;
     padding-left: 0.1rem;
     padding-right: 0.1rem;
 }

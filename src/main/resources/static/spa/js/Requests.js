@@ -42,7 +42,7 @@ export default class extends AbstractView {
 }
 
 async function getRemoteUserRequests(token) {
-    const response = await fetch('/api/v1/app/requestsbyuser', {
+    const response = await fetch('/api/v1/app/request/listbyuser', {
         headers: {
             authorization: "Bearer "+token
         }
@@ -53,7 +53,7 @@ async function getRemoteUserRequests(token) {
 }
 
 async function getRemoteRequests(token) {
-    const response = await fetch('/api/v1/app/requests', {
+    const response = await fetch('/api/v1/app/request/listbysupervisor', {
         headers: {
             authorization: "Bearer "+token
         }
@@ -64,7 +64,7 @@ async function getRemoteRequests(token) {
 }
 
 async function getRemoteRequestItems(token) {
-    const response = await fetch('/api/v1/app/requestitems', {
+    const response = await fetch('/api/v1/app/request/listitems', {
         headers: {
             authorization: "Bearer "+token
         }

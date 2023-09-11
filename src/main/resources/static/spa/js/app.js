@@ -8,9 +8,9 @@ import RequestView from "./RequestView.js";
 import SearchView from "./SearchView.js";
 
 import { postLogin, renewToken } from "./Login.js";
-import { toggleDetail, showTicketAgents} from "./TicketView.js";
+import { toggleDetail, showTicketAgents, updateAgent, updateNote, updateTicketStatus, postTicketNote, postTicketStatus, postTicketAddAgent, postTicketRemoveAgent, updateTicketSLA, postTicketSLA} from "./TicketView.js";
 import { imageDialog } from "./ImageView.js";
-import { updateRequest, updateRequestItem, showRequestHistory } from "./RequestView.js";
+import { updateRequest, updateRequestItem, showRequestHistory, updateSupervisor } from "./RequestView.js";
 
 let appTheme = "dark";
 let username = "";
@@ -18,6 +18,8 @@ let firstName = "";
 let lastName = "";
 let token = "";
 let isLoggedIn = false;
+
+let filesToUpload;
 
 const navigateTo = url => {
     history.pushState(null, null, url);
@@ -153,6 +155,7 @@ const doLogin = async (u, p) => {
     isLoggedIn = auth.loggedIn;
     router();
 }
+
 const toggleSearch = (hide = false) => {
     let srch = document.querySelector(".nav__search");
     if (isLoggedIn) {
@@ -164,6 +167,7 @@ const toggleSearch = (hide = false) => {
         }
     }
 }
+
 const submitSearch = () => {
     let inputSearch = document.getElementById("searchInput");
     let searchString = inputSearch.value;
@@ -181,6 +185,104 @@ const hidePopForms = () => {
     }
 }
 
+const postTicketImageFile = async (ticketId) => {
+    let filebrowser = document.getElementById("imageFile");
+    filesToUpload = filebrowser.files.length;
+
+    let formData = new FormData();
+    for (let i=0; i < filebrowser.files.length; i++) {
+        formData.set("imageFile", document.getElementById("imageFile").files[i]);
+
+        const response = await fetch('/api/v1/app/ticket/uploadticketimage', {
+            method: 'POST',
+            body: formData
+        }).then(response => {
+            return response.json();
+        }).then(data => {
+            let imageDiv = document.createElement("div");
+                imageDiv.classList.add("ticket__note-images");
+                imageDiv.id = "img-"+data.id;
+                imageDiv.addEventListener("click", function (event) {
+                    removeTicketImage(data.id)
+                });
+
+            let imageImg = document.createElement("img");
+                imageImg.classList.add("selectable-image");
+                imageImg.src = data.fileLocation;
+                imageImg.alt = data.fileLocation;
+
+            let rmDiv = document.createElement("div");
+                rmDiv.innerText = "X";
+                rmDiv.classList.add("removable-image");
+
+            imageDiv.appendChild(imageImg);
+            imageDiv.appendChild(rmDiv);
+            document.getElementById("imagePath").appendChild(imageDiv);
+            filesToUpload--;
+            completeTicketImageUpload();
+        });
+    }
+}
+
+const completeTicketImageUpload = () => {
+    if (filesToUpload == 0) {
+        let filebrowser = document.getElementById("imageFile");
+        while (filebrowser.firstChild) {
+            filebrowser.removeChild(filebrowser.firstChild);
+        }
+    }
+}
+
+const removeTicketImage = async (id) => {
+    let eleId = "img-"+id;
+    let imgTag = document.getElementById(eleId);
+
+    let formData = new FormData();
+    formData.set("id", id);
+
+    const response = await fetch('/api/v1/app/ticket/removeticketimage', {
+        method: 'POST',
+        body: formData
+    }).then(response => {
+        return response.json();
+    }).then(data => {
+        imgTag.remove();
+    });
+}
+
+const postNewTicketNote = async (ticketId) => {
+    let response = await postTicketNote(token);
+    document.querySelector(".form__popup").remove();
+    let url = "/app/ticket/"+ticketId;
+    navigateTo(url);
+}
+
+const postNewTicketStatus = async (ticketId) => {
+    let response = await postTicketStatus(token);
+    document.querySelector(".form__popup").remove();
+    let url = "/app/ticket/"+ticketId;
+    navigateTo(url);
+}
+
+const postNewTicketSLA = async (ticketId) => {
+    let response = await postTicketSLA(token);
+    document.querySelector(".form__popup").remove();
+    let url = "/app/ticket/"+ticketId;
+    navigateTo(url);
+}
+
+const postNewTicketAgent = async (ticketId) => {
+    let response = await postTicketAddAgent(token);
+    document.querySelector(".form__popup").remove();
+    let url = "/app/ticket/"+ticketId;
+    navigateTo(url);
+}
+
+const postRemoveTicketAgent = async (ticketId, userId) => {
+    await postTicketRemoveAgent(ticketId, userId, token);
+}
+
+// App Theming //
 const toggleTheme = () => {
     if (appTheme === "dark") {
         appTheme = "light";
@@ -270,6 +372,9 @@ document.addEventListener("DOMContentLoaded", () => {
             isLoggedIn = false;
             router();
         }
+
+        // Requests
+
         if ( e.target.matches("[data-request]")) {
             e.preventDefault();
             updateRequest(e.target.dataset.request, token);
@@ -297,9 +402,94 @@ document.addEventListener("DOMContentLoaded", () => {
             document.querySelector(".form__popup").remove();
         }
 
+        if ( e.target.matches("[data-request-supervisor]")) {
+            e.preventDefault();
+            updateSupervisor(e.target.dataset.requestSupervisor, token);
+        }
+        if ( e.target.matches("[data-form-request-supervisor]")) {
+            e.preventDefault();
+            if (e.target.dataset.formRequestSupervisor === "update") {
+                console.log("Update Request Supervisor");
+            } else {
+                console.log("Cancelled Supervisor");
+            }
+            document.querySelector(".form__popup").remove();
+        }
+
+        if ( e.target.matches("[data-request-supervisor-remove]")) {
+            e.preventDefault();
+            console.log("Remove Supervisor "+e.target.dataset.requestSupervisorRemove+" from "+e.target.dataset.requestId);
+        }
+
         if ( e.target.matches("[data-request-history]")) {
             showRequestHistory(e.target.dataset.requestHistory, token);
         }
+
+        // Tickets
+
+        if ( e.target.matches("[data-ticket-agent-remove]")) {
+            e.preventDefault();
+            postRemoveTicketAgent(e.target.dataset.ticketId, e.target.dataset.ticketAgentRemove)
+        }
+
+        if ( e.target.matches("[data-ticket-agent]")) {
+            e.preventDefault();
+            document.getElementById("agentViewer").remove();
+            updateAgent(e.target.dataset.ticketAgent, token);
+        }
+        if ( e.target.matches("[data-form-ticket-agent]")) {
+            e.preventDefault();
+            if (e.target.dataset.formTicketAgent === "update") {
+                postNewTicketAgent(document.getElementById("ticketAgentId").value)
+            } else {
+                console.log("Cancelled Agent");
+                document.querySelector(".form__popup").remove();
+            }
+        }
+
+        if ( e.target.matches("[data-ticket-status]")) {
+            e.preventDefault();
+            updateTicketStatus(e.target.dataset.ticketStatus, token);
+        }
+        if ( e.target.matches("[data-form-ticket-status]")) {
+            e.preventDefault();
+            if (e.target.dataset.formTicketStatus === "update") {
+                postNewTicketStatus(document.getElementById("ticketStatusId").value);
+            } else {
+                console.log("Cancelled ticket status");
+                document.querySelector(".form__popup").remove();
+            }
+        }
+
+        if ( e.target.matches("[data-ticket-note]")) {
+            e.preventDefault();
+            updateNote(e.target.dataset.ticketNote, token);
+        }
+        if ( e.target.matches("[data-form-ticket-note]")) {
+            e.preventDefault();
+            if (e.target.dataset.formTicketNote === "update") {
+                postNewTicketNote(document.getElementById("ticketNoteId").value);
+            } else {
+                console.log("Cancelled New Note");
+                document.querySelector(".form__popup").remove();
+            }
+        }
+
+        if ( e.target.matches("[data-ticket-sla]")) {
+            e.preventDefault();
+            updateTicketSLA(e.target.dataset.ticketSla, token);
+        }
+        if ( e.target.matches("[data-form-ticket-sla]")) {
+            e.preventDefault();
+            if (e.target.dataset.formTicketSla === "update") {
+                postNewTicketSLA(document.getElementById("ticketSLAId").value);
+            } else {
+                console.log("Cancelled Update SLA");
+                document.querySelector(".form__popup").remove();
+            }
+        }
+
+        // login
 
         if ( e.target.matches("[data-form-submit]")) {
             e.preventDefault();
@@ -312,6 +502,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    document.body.addEventListener("change", e => {
+        if ( e.target.matches("[data-ticket-image-upload]")) {
+            postTicketImageFile(e.target.dataset.ticketImageUpload);
+        }
+    });
     document.getElementById("searchButton").addEventListener("click", () => {
         submitSearch();
     });
@@ -328,3 +523,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
     getLoggedIn();
 });
+

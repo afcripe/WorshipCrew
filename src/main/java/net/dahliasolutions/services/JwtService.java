@@ -9,6 +9,8 @@ import net.dahliasolutions.models.user.User;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,12 +35,16 @@ public class JwtService {
     }
 
     public String generateToken(Map<String, Object> extraClaims, User user) {
+        // set expiration date
+        LocalDateTime d = LocalDateTime.now().plusDays(30);
+        Date dJava = Date.from(d.atZone(ZoneId.systemDefault()).toInstant());
+
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
                 .setSubject(user.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24 * 30))
+                .setExpiration(dJava)
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

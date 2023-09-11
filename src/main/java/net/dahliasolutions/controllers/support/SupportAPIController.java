@@ -347,7 +347,7 @@ public class SupportAPIController {
                 noteDetail = newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+" was removed from ticket.";
 
                 ticket.get().setAgentList(
-                        removeFromSupervisorList(ticket.get().getAgent(), ticket.get().getAgentList()));
+                        removeFromSupervisorList(newSuper.get(), ticket.get().getAgentList()));
 
                 ticketService.save(ticket.get());
                 TicketNote ticketNote = noteService.createTicketNote(

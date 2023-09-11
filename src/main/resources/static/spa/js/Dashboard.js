@@ -7,7 +7,7 @@ export default class extends AbstractView {
     }
 
     async getHtml() {
-        let myItems = await getRemoteRequstTicketsByUser(this.params.token);
+        let myItems = await getRemoteRequestTicketsByUser(this.params.token);
         let items = await getRemoteDashboard(this.params.token);
         let returnHTML = `<h1>Dashboard</h1>`;
 
@@ -28,7 +28,7 @@ export default class extends AbstractView {
     }
 }
 
-async function getRemoteRequstTicketsByUser(token) {
+async function getRemoteRequestTicketsByUser(token) {
     const response = await fetch('/api/v1/app/dashboarduseritems', {
         headers: {
             authorization: "Bearer "+token
