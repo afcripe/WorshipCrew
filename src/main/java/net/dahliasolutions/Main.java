@@ -123,7 +123,6 @@ public class Main {
 //                u.setContactEmail("afcripe@live.com");
 //                u = userService.createDefaultUser(u);
 //            u.setDirector(u1);
-//            u.setNotificationEndPoint(NotificationEndPoint.Push);
 //            userService.save(u);
 //            userService.addRoleToUser(u.getUsername(), "ADMIN_WRITE");
 //            userService.updateUserPosition(u.getUsername(), "Regional Director");

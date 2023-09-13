@@ -1,3 +1,4 @@
+
 {
   "name": "Destiny Worship Crew",
   "short_name": "DW Crew",
@@ -6,7 +7,8 @@
   "background_color": "#363636",
   "display": "standalone",
   "orientation": "portrait",
-  "start_url": "https://www.destinyworshipexchange.com/app",
+  "start_url": "/app",
+  "splash_pages": null,
   "icons": [
     {
         "src": "/img/app-images/128.png",
@@ -28,6 +30,5 @@
         "sizes": "1024x1024",
         "type": "image/png"
     }
-  ],
-  "splash_pages": null
+  ]
 }

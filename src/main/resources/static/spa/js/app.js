@@ -23,6 +23,7 @@ let isLoggedIn = false;
 
 let filesToUpload;
 
+// FirebaseConfig
 const firebaseConfig = {
     apiKey: "AIzaSyBws-XgELWSv0q_T6aEbngn9n8sGbjO2TI",
     authDomain: "destinyworshipexchange.firebaseapp.com",
@@ -375,15 +376,120 @@ const clearLocalStorage = () => {
     localStorage.removeItem("lastName");
 }
 
-const subscribe = async () => {
-    console.log('Requesting permission...');
+const browserInfo = () => {
+    let thisOs = "Unknown OS";
+    let thisBsr = "Unknown Browser";
+    if (navigator.userAgent.indexOf("Win") !== -1) thisOs = "Windows";
+    if (navigator.userAgent.indexOf("Mac") !== -1) thisOs = "Mac";
+    if (navigator.userAgent.indexOf("Linux") !== -1) thisOs = "Linux";
+    if (navigator.userAgent.indexOf("Android") !== -1) thisOs = "Android";
+    if (navigator.userAgent.indexOf("iPhone") !== -1) thisOs = "iPhone";
+    if (navigator.userAgent.indexOf("iPad") !== -1) thisOs = "iPad";
+
+    if (navigator.userAgent.indexOf("Chrome") !== -1) thisBsr = "Chrome";
+    if (navigator.userAgent.indexOf("Edg") !== -1) thisBsr = "Edge";
+    if (navigator.userAgent.indexOf("Firefox") !== -1) thisBsr = "Firefox";
+    if (navigator.userAgent.indexOf("Safari") !== -1) thisBsr = "Safari";
+    if (navigator.userAgent.indexOf("OPR") !== -1) thisBsr = "Opera";
+
+    return thisOs+" - "+thisBsr;
+}
+
+const subscribe = async() => {
+    // Add the public key generated from the console here.
+    getToken(messaging, {vapidKey: "BPkHKoGBXYuuTEfyty0lBzi1RruJbGobRImxy9Jl008QPmgNxeo7Hj2BYaDb-AJD4hOraF6ZHirFl_VtxeMKiZk"})
+    .then(async (currentToken) => {
+        if (currentToken) {
+            // Send token to server
+            // navigator.serviceWorker.register("/firebase-messaging-sw.js");
+            let appInst = browserInfo();
+            let formData = new FormData();
+            formData.set("id", "0");
+            formData.set("name", appInst);
+            formData.set("token", currentToken);
+
+            const response = await fetch('/api/v1/app/swtoken', {
+                method: 'POST',
+                headers: {
+                    authorization: "Bearer " + token
+                },
+                body: formData
+            });
+            let rsp = await response.json();
+            console.log(rsp.name);
+            navigateTo("/app/settings");
+        } else {
+            // Show permission request UI
+            Notification.requestPermission()
+                .then((perm) => {
+                    if (perm === 'granted') {
+                        console.log("Permission Granted");
+                    } else {
+                        console.log("Permission Denied");
+                    }
+                });
+        }
+    })
+    .catch((err) => {
+        console.log(err);
+    });
+};
+
+const unsubscribe = () =>{
+    getToken(messaging, {vapidKey: "BPkHKoGBXYuuTEfyty0lBzi1RruJbGobRImxy9Jl008QPmgNxeo7Hj2BYaDb-AJD4hOraF6ZHirFl_VtxeMKiZk"})
+        .then(async (currentToken) => {
+            if (currentToken) {
+                // Send token to server
+                // navigator.serviceWorker.register("/firebase-messaging-sw.js");
+                let appInst = browserInfo();
+                let formData = new FormData();
+                    formData.set("id", "0");
+                    formData.set("name", appInst);
+                    formData.set("token", currentToken);
+
+                const response = await fetch('/api/v1/app/removetoken', {
+                    method: 'POST',
+                    headers: {
+                        authorization: "Bearer " + token
+                    },
+                    body: formData
+                });
+                let rsp = await response.json();
+                console.log(rsp.name);
+            }
+
+            let regs = await navigator.serviceWorker.getRegistrations();
+            for(let reg of regs) {
+                await reg.unregister();
+            }
+            navigateTo("/app/settings");
+        })
+        .catch((err) => {
+            console.log(err);
+        });
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+// Initialize Firebase Cloud Messaging and get a reference to the service
+const messaging = getMessaging(app);
+
+// Message Handling
+onMessage((payload) => {
+    console.log("Message Received");
     Notification.requestPermission()
-        .then((permission) => {
-            if (permission === 'granted') {
-                console.log('Notification permission granted.');
+        .then(perm => {
+            if (perm === 'granted') {
+                let notify = new Notification(
+                    "Notification",
+                    {
+                        body: "New Notification Received"
+                    }
+                );
             }
         });
-}
+});
 
 window.addEventListener("popstate", router);
 
@@ -584,9 +690,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // settings
 
-        if ( e.target.matches("[data-settings-notify]")) {
+        if ( e.target.matches("[data-settings-notify-true]")) {
             e.preventDefault();
             subscribe();
+        }
+        if ( e.target.matches("[data-settings-notify-false]")) {
+            e.preventDefault();
+            unsubscribe();
         }
 
         // login
@@ -624,11 +734,5 @@ document.addEventListener("DOMContentLoaded", () => {
     setAppTheme();
 
     getLoggedIn();
-});
-
-// load service worker for push notifications
-document.addEventListener("load", async () => {
-    let sw = await navigator.serviceWorker.register("./firebase-messaging-sw.js");
-    console.log(sw);
 });
 

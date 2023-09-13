@@ -5,6 +5,8 @@ import net.dahliasolutions.data.NotificationMessageRepository;
 import net.dahliasolutions.models.*;
 import net.dahliasolutions.models.mail.EmailDetails;
 import net.dahliasolutions.models.order.OrderRequest;
+import net.dahliasolutions.models.user.UserEndpoint;
+import net.dahliasolutions.services.FirebaseMessagingService;
 import net.dahliasolutions.services.PushService;
 import net.dahliasolutions.services.order.OrderItemService;
 import net.dahliasolutions.services.order.OrderService;
@@ -21,6 +23,7 @@ public class NotificationMessageService implements NotificationMessageServiceInt
 
     private final NotificationMessageRepository messageRepository;
     private final PushService pushService;
+    private final FirebaseMessagingService firebaseMessagingService;
     private final EmailService emailService;
     private final OrderService orderService;
     private final OrderItemService orderItemService;
@@ -33,34 +36,43 @@ public class NotificationMessageService implements NotificationMessageServiceInt
 
     @Override
     public BrowserMessage sendMessage(NotificationMessage message) {
-        // get user and determine endpoint
-        if (message.getUser().getNotificationEndPoint().equals(NotificationEndPoint.Push)) {
-            // send Push
-            // determine module for id parsing
-            if (message.getModule().equals(EventModule.Request)) {
-                    BigInteger orderId = new BigInteger(message.getModuleId());
-                    new PushMessage("request", message.getModuleId(), message.getSubject());
-                    pushService.sendPushMessageToUser(
-                            new PushMessage("request", message.getModuleId(), message.getSubject()),
-                            message.getUser().getUsername());
-            }
-        } else {
-            // send Email
-            // determine module for id parsing
-            if (message.getModule().equals(EventModule.Request)) {
-                // determine if Request or Item
-                if (message.getType().equals(NotificationType.New)) {
-                    BigInteger orderId = new BigInteger(message.getModuleId());
-                    OrderRequest newRequest = orderService.findById(orderId).get();
-                    // send Email
-                    EmailDetails emailDetailsSupervisor =
-                            new EmailDetails(message.getUser().getContactEmail(), "A New Request", "", null);
-                    emailService.sendSupervisorRequest(emailDetailsSupervisor, newRequest, message.getUser().getId());
-                } else if (message.getType().equals(NotificationType.NewItem)) {
 
-                }
+        // send Push
+        // determine module for id parsing
+        if (message.getModule().equals(EventModule.Request)) {
+            // Websocket
+                BigInteger orderId = new BigInteger(message.getModuleId());
+                new PushMessage("request", message.getModuleId(), message.getSubject());
+                pushService.sendPushMessageToUser(
+                        new PushMessage("request", message.getModuleId(), message.getSubject()),
+                        message.getUser().getUsername());
+
+            // Firebase
+            for (UserEndpoint ep : message.getUser().getEndpoints()) {
+                FirebaseMessage fireMessage = new FirebaseMessage();
+                fireMessage.setRecipientToken(ep.getToken());
+                fireMessage.setTitle("DWC Notification");
+                fireMessage.setBody(message.getSubject());
+                firebaseMessagingService.sendNotificationByToken(fireMessage);
             }
         }
+
+        // send Email
+        // determine module for id parsing
+        if (message.getModule().equals(EventModule.Request)) {
+            // determine if Request or Item
+            if (message.getType().equals(NotificationType.New)) {
+                BigInteger orderId = new BigInteger(message.getModuleId());
+                OrderRequest newRequest = orderService.findById(orderId).get();
+                // send Email
+                EmailDetails emailDetailsSupervisor =
+                        new EmailDetails(message.getUser().getContactEmail(), "A New Request", "", null);
+                emailService.sendSupervisorRequest(emailDetailsSupervisor, newRequest, message.getUser().getId());
+            } else if (message.getType().equals(NotificationType.NewItem)) {
+
+            }
+        }
+
 
         message.setDateSent(LocalDateTime.now());
         message.setSent(true);
@@ -87,3 +99,47 @@ public class NotificationMessageService implements NotificationMessageServiceInt
         }
     }
 }
+
+
+//    @Override
+//    public BrowserMessage sendMessage(NotificationMessage message) {
+//        // get user and determine endpoint
+//        if (message.getUser().getNotificationEndPoint().equals(NotificationEndPoint.Push)) {
+//            // send Push
+//            // determine module for id parsing
+//            if (message.getModule().equals(EventModule.Request)) {
+//                BigInteger orderId = new BigInteger(message.getModuleId());
+//                new PushMessage("request", message.getModuleId(), message.getSubject());
+//                pushService.sendPushMessageToUser(
+//                        new PushMessage("request", message.getModuleId(), message.getSubject()),
+//                        message.getUser().getUsername());
+//                FirebaseMessage fireMessage = new FirebaseMessage();
+//                fireMessage.setRecipientToken(message.getUser().getSwToken());
+//                fireMessage.setTitle("DWC Notification");
+//                fireMessage.setBody(message.getSubject());
+//                firebaseMessagingService.sendNotificationByToken(fireMessage);
+//            }
+//        } else {
+//            // send Email
+//            // determine module for id parsing
+//            if (message.getModule().equals(EventModule.Request)) {
+//                // determine if Request or Item
+//                if (message.getType().equals(NotificationType.New)) {
+//                    BigInteger orderId = new BigInteger(message.getModuleId());
+//                    OrderRequest newRequest = orderService.findById(orderId).get();
+//                    // send Email
+//                    EmailDetails emailDetailsSupervisor =
+//                            new EmailDetails(message.getUser().getContactEmail(), "A New Request", "", null);
+//                    emailService.sendSupervisorRequest(emailDetailsSupervisor, newRequest, message.getUser().getId());
+//                } else if (message.getType().equals(NotificationType.NewItem)) {
+//
+//                }
+//            }
+//        }
+//
+//        message.setDateSent(LocalDateTime.now());
+//        message.setSent(true);
+//        messageRepository.save(message);
+//
+//        return null;
+//    }

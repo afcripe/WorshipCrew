@@ -4,18 +4,19 @@ import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.controllers.AuthenticationResponse;
-import net.dahliasolutions.models.APIUser;
-import net.dahliasolutions.models.AppItem;
-import net.dahliasolutions.models.LoginModel;
-import net.dahliasolutions.models.UniversalAppSearchModel;
+import net.dahliasolutions.models.*;
 import net.dahliasolutions.models.order.*;
+import net.dahliasolutions.models.records.SingleStringModel;
 import net.dahliasolutions.models.support.*;
+import net.dahliasolutions.models.user.EndpointModel;
 import net.dahliasolutions.models.user.User;
+import net.dahliasolutions.models.user.UserEndpoint;
 import net.dahliasolutions.services.AuthService;
 import net.dahliasolutions.services.JwtService;
 import net.dahliasolutions.services.order.OrderItemService;
 import net.dahliasolutions.services.order.OrderService;
 import net.dahliasolutions.services.support.TicketService;
+import net.dahliasolutions.services.user.EndpointService;
 import net.dahliasolutions.services.user.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +37,7 @@ public class MobileAppAPIController {
     private final TicketService ticketService;
     private final OrderService orderService;
     private final OrderItemService orderItemService;
+    private final EndpointService endpointService;
 
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> getAuthUser(@ModelAttribute LoginModel loginModel) {
@@ -57,6 +59,41 @@ public class MobileAppAPIController {
 
         AuthenticationResponse response = authService.renewAuth(loginModel);
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/swtoken")
+    public ResponseEntity<SingleStringModel> setSWToken(@ModelAttribute EndpointModel endpoint, HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new SingleStringModel(""), HttpStatus.FORBIDDEN);
+        }
+
+        Optional<UserEndpoint> existingEP = endpointService.findByToken(endpoint.token());
+        if (existingEP.isPresent()) {
+            return new ResponseEntity<>(new SingleStringModel("exists"), HttpStatus.OK);
+        }
+
+        UserEndpoint newEP = endpointService.save(new UserEndpoint(null, endpoint.name(), endpoint.token(), apiUser.getUser()));
+        apiUser.getUser().getEndpoints().add(newEP);
+        userService.save(apiUser.getUser());
+
+        System.out.println(endpoint.token());
+        return new ResponseEntity<>(new SingleStringModel("success"), HttpStatus.OK);
+    }
+
+    @PostMapping("/removetoken")
+    public ResponseEntity<SingleStringModel> setRemoveToken(@ModelAttribute EndpointModel endpoint, HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new SingleStringModel(""), HttpStatus.FORBIDDEN);
+        }
+
+        Optional<UserEndpoint> existingEP = endpointService.findByToken(endpoint.token());
+        if (existingEP.isPresent()) {
+            apiUser.getUser().getEndpoints().remove(existingEP.get());
+            userService.save(apiUser.getUser());
+        }
+        return new ResponseEntity<>(new SingleStringModel("success"), HttpStatus.OK);
     }
 
     @GetMapping("/dashboard")

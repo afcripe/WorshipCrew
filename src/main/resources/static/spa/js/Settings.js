@@ -7,6 +7,13 @@ export default class extends AbstractView {
     }
 
     async getHtml() {
+        let showSubscribe = true;
+        let workers = await navigator.serviceWorker.getRegistrations();
+        console.log(workers.length);
+        if (workers.length > 0) {
+            showSubscribe = false;
+        }
+
         let r = `<h1>Settings</h1>`;
 
         r+=`<div class="settings__container"><div>`;
@@ -25,7 +32,11 @@ export default class extends AbstractView {
         r+=`<div class="settings__container-field">&nbsp;</div>`;
 
         r+=`<div class="settings__container-label">Notifications</div>`;
-        r+=`<div class="settings__container-field"><button class="btn btn-sm btn-wiki" data-settings-notify>Subscribe</button></div>`;
+        if (showSubscribe) {
+            r += `<div class="settings__container-field"><button class="btn btn-sm btn-wiki" data-settings-notify-true>Subscribe</button></div>`;
+        } else {
+            r += `<div class="settings__container-field"><button class="btn btn-sm btn-wiki" data-settings-notify-false>Unsubscribe</button></div>`;
+        }
 
         r+=`<div class="settings__container-label">&nbsp;</div>`;
         r+=`<div class="settings__container-field">&nbsp;</div>`;

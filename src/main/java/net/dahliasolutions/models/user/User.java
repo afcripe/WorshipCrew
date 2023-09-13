@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Getter
 @Setter
@@ -56,6 +57,9 @@ public class User implements UserDetails {
 
     @ManyToOne
     private Campus campus;
+
+    @OneToMany
+    private List<UserEndpoint> endpoints;
 
     @ManyToMany(fetch = FetchType.EAGER)
     private Collection<UserRoles> userRoles = new ArrayList<>();

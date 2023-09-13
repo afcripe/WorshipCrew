@@ -255,7 +255,6 @@ public class UserService implements UserServiceInterface{
     @Override
     public UserDetails loadUserByUsername(String username) {
         Optional<User> user = userRepository.findByUsernameIgnoreCase(username);
-
         return user.orElse(null);
     }
 }
