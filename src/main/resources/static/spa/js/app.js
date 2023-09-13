@@ -620,40 +620,15 @@ document.addEventListener("DOMContentLoaded", () => {
     lastName = localStorage.getItem("lastName");
     appTheme = localStorage.getItem("appTheme");
 
-    // Firebase Messaging
-    const fcmApp = initializeApp(firebaseConfig);
-    const messaging = getMessaging(fcmApp);
-    // Add the public key generated from the console here.
-    getToken(messaging, {vapidKey: "BPkHKoGBXYuuTEfyty0lBzi1RruJbGobRImxy9Jl008QPmgNxeo7Hj2BYaDb-AJD4hOraF6ZHirFl_VtxeMKiZk"})
-        .then((currentToken) => {
-            // ToDo - send token to server
-            console.log(currentToken);
-            debugger
-        });
-    onMessage(messaging, (payload) => {
-        console.log("receiveing Message", payload);
-    });
-    // onBackgroundMessage(messaging, (payload) => {
-    //     console.log('[firebase-messaging-sw.js] Received background message ', payload);
-    //     // Customize notification here
-    //     const notificationTitle = 'Background Message Title';
-    //     const notificationOptions = {
-    //         body: 'Background Message body.',
-    //         icon: '/firebase-logo.png'
-    //     };
-    //
-    //     self.registration.showNotification(notificationTitle,
-    //         notificationOptions);
-    // });
-
-    // load service worker for push notifications
-    document.addEventListener("load", async () => {
-        let sw = await navigator.serviceWorker.register("./firebase-messaging-sw.js");
-        console.log(sw);
-    })
 
     setAppTheme();
 
     getLoggedIn();
+});
+
+// load service worker for push notifications
+document.addEventListener("load", async () => {
+    let sw = await navigator.serviceWorker.register("./firebase-messaging-sw.js");
+    console.log(sw);
 });
 

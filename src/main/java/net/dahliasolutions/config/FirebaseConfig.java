@@ -28,6 +28,6 @@ public class FirebaseConfig {
 
     @Bean
     GoogleCredentials credentials() throws IOException {
-        return GoogleCredentials.fromStream(new ClassPathResource("destinyworshipexchange-firebase-admin.json").getInputStream());
+        return GoogleCredentials.fromStream(new ClassPathResource("destinyworshipexchange-firebase.json").getInputStream());
     }
 }
