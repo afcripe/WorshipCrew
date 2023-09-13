@@ -2,10 +2,14 @@ package net.dahliasolutions.controllers.app;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import net.dahliasolutions.models.APIUser;
-import net.dahliasolutions.models.AppItem;
+import net.dahliasolutions.models.*;
+import net.dahliasolutions.models.mail.EmailDetails;
 import net.dahliasolutions.models.order.*;
+import net.dahliasolutions.models.records.AddSupervisorModel;
+import net.dahliasolutions.models.records.ChangeStatusModel;
+import net.dahliasolutions.models.records.SingleStringModel;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
 import net.dahliasolutions.services.JwtService;
@@ -16,6 +20,8 @@ import net.dahliasolutions.services.user.UserRolesService;
 import net.dahliasolutions.services.user.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
@@ -146,6 +152,28 @@ public class MobileAppAPIRequestController {
         return new ResponseEntity<>(appRequest, HttpStatus.OK);
     }
 
+    @GetMapping("/item/{id}")
+    public ResponseEntity<AppRequestItem> getRequestItemById(@PathVariable BigInteger id, HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        List<AppRequestItem> items = new ArrayList<>();
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new AppRequestItem(), HttpStatus.FORBIDDEN);
+        }
+
+        Optional<OrderItem> item = orderItemService.findById(id);
+        if (item.isEmpty()) {
+            return new ResponseEntity<>(new AppRequestItem(), HttpStatus.BAD_REQUEST);
+        }
+
+        AppRequestItem appItem = new AppRequestItem();
+        appItem.setAppItemByRequestItem(item.get());
+        appItem.setEditable(allowRequestItemEdit(apiUser.getUser(), item.get()));
+
+
+
+        return new ResponseEntity<>(appItem, HttpStatus.OK);
+    }
+
     @GetMapping("/itemlist/{id}")
     public ResponseEntity<List<AppRequestItem>> getRequestItemsById(@PathVariable BigInteger id, HttpServletRequest request) {
         APIUser apiUser = getUserFromToken(request);
@@ -195,18 +223,21 @@ public class MobileAppAPIRequestController {
     }
 
     @GetMapping("/itemorderstatus/{id}")
-    public ResponseEntity<OrderItem> getRequestItemById(@PathVariable BigInteger id, HttpServletRequest request) {
+    public ResponseEntity<AppRequestItem> getRequestItemStatusById(@PathVariable BigInteger id, HttpServletRequest request) {
         APIUser apiUser = getUserFromToken(request);
         if (!apiUser.isValid()) {
-            return new ResponseEntity<>(new OrderItem(), HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(new AppRequestItem(), HttpStatus.FORBIDDEN);
         }
 
         Optional<OrderItem> item = orderItemService.findById(id);
         if (item.isEmpty()) {
-            return new ResponseEntity<>(new OrderItem(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new AppRequestItem(), HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<>(item.get(), HttpStatus.OK);
+        AppRequestItem appItem = new AppRequestItem();
+        appItem.setAppItemByRequestItem(item.get());
+
+        return new ResponseEntity<>(appItem, HttpStatus.OK);
     }
 
     @GetMapping("/orderstatusoptions")
@@ -239,6 +270,222 @@ public class MobileAppAPIRequestController {
         }
 
         return new ResponseEntity<>(userList, HttpStatus.OK);
+    }
+
+    @PostMapping("/changerequeststatus")
+    public ResponseEntity<SingleStringModel> updateRequestStatus(@ModelAttribute ChangeStatusModel statusModel, HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new SingleStringModel(""), HttpStatus.FORBIDDEN);
+        }
+
+        OrderStatus setStatus = OrderStatus.valueOf(statusModel.requestStatus());
+        Optional<OrderRequest> orderRequest = orderService.findById(statusModel.requestId());
+
+        if (orderRequest.isEmpty()) {
+            return new ResponseEntity<>(new SingleStringModel(""), HttpStatus.BAD_REQUEST);
+        }
+
+        if (orderRequest.isPresent()) {
+            orderRequest.get().setOrderStatus(OrderStatus.valueOf(statusModel.requestStatus()));
+            orderService.save(orderRequest.get());
+            OrderNote orderNote = orderNoteService.createOrderNote(new OrderNote(
+                    null,
+                    orderRequest.get().getId(),
+                    null,
+                    statusModel.requestNote(),
+                    BigInteger.valueOf(0),
+                    setStatus,
+                    apiUser.getUser()));
+        }
+
+        return new ResponseEntity<>(new SingleStringModel(setStatus.toString()), HttpStatus.OK);
+    }
+
+    @PostMapping("/changeitemstatus")
+    public ResponseEntity<SingleStringModel> updateItemStatus(@ModelAttribute ChangeStatusModel statusModel, HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new SingleStringModel(""), HttpStatus.FORBIDDEN);
+        }
+
+        OrderStatus setStatus = OrderStatus.valueOf(statusModel.requestStatus());
+        Optional<OrderItem> requestItem = orderItemService.findById(statusModel.requestId());
+
+        if (requestItem.isEmpty()) {
+            return new ResponseEntity<>(new SingleStringModel(""), HttpStatus.BAD_REQUEST);
+        }
+
+        String noteDetail = statusModel.requestNote();
+        if (requestItem.isPresent()) {
+            // update item status
+            requestItem.get().setItemStatus(setStatus);
+            orderItemService.save(requestItem.get());
+            // add new note to order
+            if (noteDetail.equals("")) {
+                noteDetail = requestItem.get().getSupervisor().getFirstName() + " " + requestItem.get().getSupervisor().getLastName() +
+                        " updated the status of " + requestItem.get().getProductName() + " to " + statusModel.requestStatus() + ".";
+            }
+            OrderNote orderNote = orderNoteService.createOrderNote(new OrderNote(
+                    null,
+                    requestItem.get().getOrderRequest().getId(),
+                    null,
+                    noteDetail,
+                    requestItem.get().getId(),
+                    requestItem.get().getItemStatus(),
+                    apiUser.getUser()));
+
+        }
+
+        return new ResponseEntity<>(new SingleStringModel(setStatus.toString()), HttpStatus.OK);
+    }
+
+    @PostMapping("/addsupervisor")
+    public ResponseEntity<SingleStringModel> addSupervisorToRequest(@ModelAttribute AddSupervisorModel supervisorModel, HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new SingleStringModel(""), HttpStatus.FORBIDDEN);
+        }
+
+        Optional<OrderRequest> orderRequest = orderService.findById(supervisorModel.requestId());
+        Optional<User> newSuper = userService.findById(supervisorModel.userId());
+
+        if (orderRequest.isEmpty()) {
+            return new ResponseEntity<>(new SingleStringModel(""), HttpStatus.BAD_REQUEST);
+        }
+
+        String noteDetail = "";
+        if (orderRequest.isPresent()) {
+            if (newSuper.isPresent()) {
+                if (supervisorModel.primary()) {
+                    noteDetail = newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+" was set as supervisor of the request.";
+
+                    orderRequest.get().setSupervisorList(
+                            removeFromSupervisorList(newSuper.get(), orderRequest.get().getSupervisorList()));
+                    orderRequest.get().setSupervisorList(
+                            addToSupervisorList(orderRequest.get().getSupervisor(), orderRequest.get().getSupervisorList()));
+
+                    orderRequest.get().setSupervisor(newSuper.get());
+                    orderService.save(orderRequest.get());
+                    orderNoteService.createOrderNote(new OrderNote(
+                            null,
+                            orderRequest.get().getId(),
+                            null,
+                            noteDetail,
+                            BigInteger.valueOf(0),
+                            orderRequest.get().getOrderStatus(),
+                            apiUser.getUser()));
+                } else {
+                    noteDetail = newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+" was add to the request.";
+
+                    orderRequest.get().setSupervisorList(
+                            addToSupervisorList(newSuper.get(), orderRequest.get().getSupervisorList()));
+
+                    orderService.save(orderRequest.get());
+                    orderNoteService.createOrderNote(new OrderNote(
+                            null,
+                            orderRequest.get().getId(),
+                            null,
+                            noteDetail,
+                            BigInteger.valueOf(0),
+                            orderRequest.get().getOrderStatus(),
+                            apiUser.getUser()));
+                }
+            }
+        }
+        return new ResponseEntity<>(new SingleStringModel(newSuper.get().getFullName()), HttpStatus.OK);
+    }
+
+    @PostMapping("/removesupervisor")
+    public ResponseEntity<SingleStringModel> removeSupervisorToRequest(@ModelAttribute AddSupervisorModel supervisorModel, HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new SingleStringModel(""), HttpStatus.FORBIDDEN);
+        }
+
+        Optional<OrderRequest> orderRequest = orderService.findById(supervisorModel.requestId());
+        Optional<User> newSuper = userService.findById(supervisorModel.userId());
+
+        if (orderRequest.isEmpty()) {
+            return new ResponseEntity<>(new SingleStringModel(""), HttpStatus.BAD_REQUEST);
+        }
+
+        boolean required = false;
+
+        String noteDetail = "";
+        if (orderRequest.isPresent()) {
+            // determine if user is required
+            for (OrderItem item : orderRequest.get().getRequestItems()) {
+                if (item.getSupervisor().equals(newSuper.get())) {
+                    required = true;
+                }
+            }
+
+            if (newSuper.isPresent() && !required) {
+                noteDetail = newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+" was removed from request.";
+
+                orderRequest.get().setSupervisorList(
+                        removeFromSupervisorList(newSuper.get(), orderRequest.get().getSupervisorList()));
+
+                orderService.save(orderRequest.get());
+                orderNoteService.createOrderNote(new OrderNote(
+                        null,
+                        orderRequest.get().getId(),
+                        null,
+                        noteDetail,
+                        BigInteger.valueOf(0),
+                        orderRequest.get().getOrderStatus(),
+                        apiUser.getUser()));
+                return new ResponseEntity<>(new SingleStringModel(newSuper.get().getFullName()), HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity<>(new SingleStringModel(newSuper.get().getFullName()), HttpStatus.BAD_REQUEST);
+    }
+
+    @PostMapping("/changeitemsupervisor")
+    public ResponseEntity<SingleStringModel> addSupervisorToItem(@ModelAttribute AddSupervisorModel supervisorModel, HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new SingleStringModel(""), HttpStatus.FORBIDDEN);
+        }
+
+        Optional<OrderItem> requestItem = orderItemService.findById(supervisorModel.requestId());
+        Optional<User> newSuper = userService.findById(supervisorModel.userId());
+
+        if (requestItem.isEmpty()) {
+            return new ResponseEntity<>(new SingleStringModel(""), HttpStatus.BAD_REQUEST);
+        }
+
+        String noteDetail = "";
+        if (requestItem.isPresent()) {
+            if (newSuper.isPresent()) {
+                // save new super to request item and change item status to submitted
+                requestItem.get().setSupervisor(newSuper.get());
+                requestItem.get().setItemStatus(OrderStatus.Submitted);
+                orderItemService.save(requestItem.get());
+                // add new super to list if not primary
+                if (!requestItem.get().getOrderRequest().getSupervisor().equals(newSuper.get())) {
+                    requestItem.get().getOrderRequest().setSupervisorList(
+                            addToSupervisorList(newSuper.get(), requestItem.get().getOrderRequest().getSupervisorList()));
+                }
+                // save request with updated super list
+                orderService.save(requestItem.get().getOrderRequest());
+                // create new note for request
+                noteDetail = newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+
+                        " was assigned to fulfill "+requestItem.get().getProductName()+".";
+                orderNoteService.createOrderNote(new OrderNote(
+                        null,
+                        requestItem.get().getOrderRequest().getId(),
+                        null,
+                        noteDetail,
+                        requestItem.get().getId(),
+                        requestItem.get().getItemStatus(),
+                        apiUser.getUser()));
+
+                return new ResponseEntity<>(new SingleStringModel(newSuper.get().getFullName()), HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity<>(new SingleStringModel(newSuper.get().getFullName()), HttpStatus.BAD_REQUEST);
     }
 
     private APIUser getUserFromToken(HttpServletRequest request) {
@@ -296,6 +543,26 @@ public class MobileAppAPIRequestController {
         roles.add(rolesService.findByName("REQUEST_WRITE").get());
         roles.add(rolesService.findByName("REQUEST_SUPERVISOR").get());
         return roles;
+    }
+
+    private List<User> removeFromSupervisorList(User user, List<User> list){
+        for (User su : list) {
+            if (su.getId().equals(user.getId())) {
+                list.remove(su);
+                break;
+            }
+        }
+        return list;
+    }
+
+    private List<User> addToSupervisorList(User user, List<User> list){
+        for (User su : list) {
+            if (su.getId().equals(user.getId())) {
+                return list;
+            }
+        }
+        list.add(user);
+        return list;
     }
 
 }

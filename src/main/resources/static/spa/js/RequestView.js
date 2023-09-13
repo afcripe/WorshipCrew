@@ -42,6 +42,15 @@ async function getRemoteRequestItems(id, token) {
     return await response.json();
 }
 
+async function getRemoteRequestItem(id, token) {
+    const response = await fetch('/api/v1/app/request/item/'+id, {
+        headers: {
+            authorization: "Bearer "+token
+        }
+    });
+    return await response.json();
+}
+
 async function getRemoteSupervisors(id, token) {
     const response = await fetch('/api/v1/app/request/supervisorlist/'+id, {
         headers: {
@@ -102,13 +111,36 @@ async function updateRequestItem(itemID, token) {
     document.body.appendChild(dialogHTML);
 }
 
+async function updateRequestAgent(reqID, token) {
+    let users = await getOrderSupervisorOptions(token);
+    let req = await getRemoteRequest(reqID, token);
+    let returnHTML = htmlDialogRequestAgent(users, req);
+    let dialogHTML =  document.createElement("div");
+    dialogHTML.id = "formRequest";
+    dialogHTML.classList.add("form__popup");
+    dialogHTML.innerHTML = returnHTML;
+    document.body.appendChild(dialogHTML);
+}
+
+async function updateRequestItemAgent(itemID, token) {
+    let users = await getOrderSupervisorOptions(token);
+    let item = await getRemoteRequestItem(itemID, token);
+    let returnHTML = htmlDialogRequestItemAgent(users, item);
+    let dialogHTML =  document.createElement("div");
+    dialogHTML.id = "formRequest";
+    dialogHTML.classList.add("form__popup");
+    dialogHTML.innerHTML = returnHTML;
+    document.body.appendChild(dialogHTML);
+}
+
 async function updateSupervisor(reqID, token) {
     let users = await getOrderSupervisorOptions(token);
-    let returnHTML = htmlDialogUpdateSupervisors(users);
+    let req = await getRemoteRequest(reqID, token);
+    let returnHTML = htmlDialogUpdateSupervisors(users, req);
     let dialogHTML =  document.createElement("div");
-        dialogHTML.id = "formRequest";
-        dialogHTML.classList.add("form__popup");
-        dialogHTML.innerHTML = returnHTML;
+    dialogHTML.id = "formRequest";
+    dialogHTML.classList.add("form__popup");
+    dialogHTML.innerHTML = returnHTML;
     document.body.appendChild(dialogHTML);
 }
 
@@ -141,6 +173,109 @@ async function getOrderSupervisorOptions(token) {
 
 }
 
+async function postRequestStatus(token) {
+    let formData = new FormData();
+    formData.set("requestId", document.getElementById("requestStatusId").value);
+    formData.set("requestStatus", document.getElementById("statusOrderSelect").value);
+    formData.set("requestNote", document.getElementById("statusOrderNote").value);
+
+    const response = await fetch('/api/v1/app/request/changerequeststatus', {
+        method: 'POST',
+        headers: {
+            authorization: "Bearer "+token
+        },
+        body: formData
+    });
+    return await response.json();
+}
+
+async function postRequestItemStatus(token) {
+    let formData = new FormData();
+    formData.set("requestId", document.getElementById("requestItemStatusId").value);
+    formData.set("requestStatus", document.getElementById("statusItemSelect").value);
+    formData.set("requestNote", document.getElementById("statusItemNote").value);
+
+    const response = await fetch('/api/v1/app/request/changeitemstatus', {
+        method: 'POST',
+        headers: {
+            authorization: "Bearer "+token
+        },
+        body: formData
+    });
+    return await response.json();
+}
+
+async function postRequestAddAgent(token) {
+    let formData = new FormData();
+    formData.set("requestId", document.getElementById("requestAgentId").value);
+    formData.set("userId", document.getElementById('requestAgentSelect').value);
+    formData.set("primary", "true");
+
+    const response = await fetch('/api/v1/app/request/addsupervisor', {
+        method: 'POST',
+        headers: {
+            authorization: "Bearer "+token
+        },
+        body: formData
+    });
+    return await response.json();
+}
+
+async function postRequestItemAddAgent(token) {
+    let formData = new FormData();
+    formData.set("requestId", document.getElementById("requestItemAgentId").value);
+    formData.set("userId", document.getElementById('requestItemAgentSelect').value);
+    formData.set("primary", "true");
+
+    const response = await fetch('/api/v1/app/request/changeitemsupervisor', {
+        method: 'POST',
+        headers: {
+            authorization: "Bearer "+token
+        },
+        body: formData
+    });
+    return await response.json();
+}
+
+async function postRequestAddSupervisor(token) {
+    let formData = new FormData();
+    formData.set("requestId", document.getElementById("requestSuperId").value);
+    formData.set("userId", document.getElementById('supervisorSelect').value);
+    formData.set("primary", "false");
+
+    const response = await fetch('/api/v1/app/request/addsupervisor', {
+        method: 'POST',
+        headers: {
+            authorization: "Bearer "+token
+        },
+        body: formData
+    });
+    return await response.json();
+}
+
+async function postRequestRemoveSupervisor(requestId, userId, token) {
+    let formData = new FormData();
+        formData.set("requestId", requestId);
+        formData.set("userId", userId);
+        formData.set("primary", "false");
+
+    const response = await fetch('/api/v1/app/request/removesupervisor', {
+        method: 'POST',
+        headers: {
+            authorization: "Bearer "+token
+        },
+        body: formData
+    });
+    let rsp = await response.json();
+    const status = response.status;
+    if (status === 200) {
+        let aId = "agent-"+userId;
+        document.getElementById(aId).remove();
+    } else {
+        console.log("cannot remove required Supervisor")
+    }
+}
+
 function htmlRequest(req) {
     let r = `<div class="request__group">`;
     r+=`<div class="ticket__left ticket__title">Request: `+req.id+`</div>`;
@@ -151,7 +286,10 @@ function htmlRequest(req) {
 
     r+=`<div class="ticket__detail-group">`;
     if ( req.editable ) {
-        r += `<div class="request__item-top-right"><button class="btn btn-sm btn-store" data-request="` + req.id + `">Update</button></div>`;
+        r+=`<div class="request__item-top-right">`;
+        r+=`<button class="btn btn-sm btn-store btn-space" data-request-status="` + req.id + `"><i class="bi bi-info-lg" data-request-status="` + req.id + `"></i></button>`;
+        r+=`<button class="btn btn-sm btn-store btn-space" data-request-agent="` + req.id + `"><i class="bi bi-person-fill-add" data-request-agent="` + req.id + `"></i></button>`;
+        r+=`</div>`;
     }
     r+=`<div class="ticket__detail">Date: `+formatDate(req.requestDate)+`</div>`;
     r+=`<div id="groupDetailExpand" class="ticket__expand-group">`;
@@ -188,7 +326,10 @@ function htmlRequestItems(item) {
     r+=`<div class="request__item-detail">`;
     r+=`<div class="request__item-field-left">`+item.supervisor.fullName+`</div>`;
     if ( item.editable ) {
-        r += `<div class="request__item-field-right"><button class="btn btn-sm btn-store" data-request-item="` + item.id + `">Update</button></div>`;
+        r+=`<div class="request__item-field-right">`;
+        r+=`<button class="btn btn-sm btn-store btn-space" data-request-item-status="` + item.id + `"><i class="bi bi-info-lg" data-request-item-status="` + item.id + `"></i></button>`;
+        r+=`<button class="btn btn-sm btn-store btn-space" data-request-item-agent="` + item.id + `"><i class="bi bi-person-fill-add" data-request-item-agent="` + item.id + `"></i></button>`;
+        r+=`</div>`;
     }
     r+=`</div>`;
 
@@ -209,7 +350,7 @@ function htmlRequestAgents(agents, req) {
     if ( agents.length > 0) {
         for (let a in agents) {
             let agent = agents[a];
-            r += `<div class="request__item-detail">`;
+            r += `<div class="request__item-detail" id="agent-`+agent.id+`">`;
             r += `<div class="request__item-field-left">` + agent.fullName + `</div>`;
             r += `<div class="request__item-field-right">`;
             if (req.editable) {
@@ -262,6 +403,7 @@ function htmlDialogUpdateRequest(req, options) {
 
     r+=`<div class="request__item-detail">`;
     r+=`<h4>Update Request Status</h4>`;
+    r+=`<input type="hidden" id="requestStatusId" value="`+req.id+`">`;
     r+=`</div>`;
 
     r+=`<div class="request__item-detail detail-padding-bottom">`;
@@ -282,10 +424,10 @@ function htmlDialogUpdateRequest(req, options) {
 
     r+=`<div class="request__item-detail detail-padding-bottom">`;
     r+=`<div class="request__item-field-center">`;
-    r+=`<button type="button" class="btn btn-sm btn-store" data-form-request="update">Update</button>`;
+    r+=`<button type="button" class="btn btn-sm btn-store" data-form-request-status="update">Update</button>`;
     r+=`</div>`;
     r+=`<div class="request__item-field-center">`;
-    r+=`<button type="button" class="btn btn-sm btn-outline-cancel" data-form-request="cancel">Cancel</button>`;
+    r+=`<button type="button" class="btn btn-sm btn-outline-cancel" data-form-request-status="cancel">Cancel</button>`;
     r+=`</div>`;
     r+=`</div>`;
 
@@ -298,6 +440,8 @@ function htmlDialogUpdateRequestItem(item, options) {
 
     r+=`<div class="request__item-detail">`;
     r+=`<h4>Update Item Status</h4>`;
+    r+=`<input type="hidden" id="requestItemStatusRequestId" value="`+item.requestId+`">`;
+    r+=`<input type="hidden" id="requestItemStatusId" value="`+item.id+`">`;
     r+=`</div>`;
 
     r+=`<div class="request__item-detail detail-padding-bottom">`;
@@ -318,10 +462,10 @@ function htmlDialogUpdateRequestItem(item, options) {
 
     r+=`<div class="request__item-detail detail-padding-bottom">`;
     r+=`<div class="request__item-field-center">`;
-    r+=`<button type="button" class="btn btn-sm btn-store" data-form-request-item="update">Update</button>`;
+    r+=`<button type="button" class="btn btn-sm btn-store" data-form-request-item-status="update">Update</button>`;
     r+=`</div>`;
     r+=`<div class="request__item-field-center">`;
-    r+=`<button type="button" class="btn btn-sm btn-outline-cancel" data-form-request-item="cancel">Cancel</button>`;
+    r+=`<button type="button" class="btn btn-sm btn-outline-cancel" data-form-request-item-status="cancel">Cancel</button>`;
     r+=`</div>`;
     r+=`</div>`;
 
@@ -329,12 +473,74 @@ function htmlDialogUpdateRequestItem(item, options) {
     return r;
 }
 
-function htmlDialogUpdateSupervisors(users) {
+function htmlDialogRequestAgent(users, req) {
+    let r=`<div>`;
+    r+=`<form><div class="form-content form__popup-content">`;
+
+    r+=`<div class="request__item-detail">`;
+    r+=`<h4>Re-assign Request</h4>`;
+    r+=`<input type="hidden" id="requestAgentId" value="`+req.id+`">`;
+    r+=`</div>`;
+
+    r+=`<div class="request__item-detail detail-padding-bottom">`;
+    r+=`<select id="requestAgentSelect" class="form-control">`;
+    for (let u in users) {
+        let user = users[u];
+        r+=`<option value="`+user.id+`">`+user.fullName+`</option>`;
+    }
+    r+=`</select>`;
+    r+=`</div>`;
+
+    r+=`<div class="request__item-detail detail-padding-bottom">`;
+    r+=`<div class="request__item-field-center">`;
+    r+=`<button type="button" class="btn btn-sm btn-store" data-form-request-agent="update">Update</button>`;
+    r+=`</div>`;
+    r+=`<div class="request__item-field-center">`;
+    r+=`<button type="button" class="btn btn-sm btn-outline-cancel" data-form-request-agent="cancel">Cancel</button>`;
+    r+=`</div>`;
+    r+=`</div>`;
+
+    r+=`</div></form></div>`;
+    return r;
+}
+function htmlDialogRequestItemAgent(users, item) {
+    let r=`<div>`;
+    r+=`<form><div class="form-content form__popup-content">`;
+
+    r+=`<div class="request__item-detail">`;
+    r+=`<h4>Re-assign Request Item</h4>`;
+    r+=`<input type="hidden" id="requestAgentAddId" value="`+item.requestId+`">`;
+    r+=`<input type="hidden" id="requestItemAgentId" value="`+item.id+`">`;
+    r+=`</div>`;
+
+    r+=`<div class="request__item-detail detail-padding-bottom">`;
+    r+=`<select id="requestItemAgentSelect" class="form-control">`;
+    for (let u in users) {
+        let user = users[u];
+        r+=`<option value="`+user.id+`">`+user.fullName+`</option>`;
+    }
+    r+=`</select>`;
+    r+=`</div>`;
+
+    r+=`<div class="request__item-detail detail-padding-bottom">`;
+    r+=`<div class="request__item-field-center">`;
+    r+=`<button type="button" class="btn btn-sm btn-store" data-form-request-item-agent="update">Update</button>`;
+    r+=`</div>`;
+    r+=`<div class="request__item-field-center">`;
+    r+=`<button type="button" class="btn btn-sm btn-outline-cancel" data-form-request-item-agent="cancel">Cancel</button>`;
+    r+=`</div>`;
+    r+=`</div>`;
+
+    r+=`</div></form></div>`;
+    return r;
+}
+function htmlDialogUpdateSupervisors(users, req) {
     let r=`<div>`;
     r+=`<form><div class="form-content form__popup-content">`;
 
     r+=`<div class="request__item-detail">`;
     r+=`<h4>Add Supervisor</h4>`;
+    r+=`<input type="hidden" id="requestSuperId" value="`+req.id+`">`;
     r+=`</div>`;
 
     r+=`<div class="request__item-detail detail-padding-bottom">`;
@@ -344,10 +550,6 @@ function htmlDialogUpdateSupervisors(users) {
         r+=`<option value="`+user.id+`">`+user.fullName+`</option>`;
     }
     r+=`</select>`;
-    r+=`</div>`;
-
-    r+=`<div class="request__item-detail detail-padding-bottom">`;
-    r+=`Set As Primary: <input type="checkbox" id="supervisorPrimary">`;
     r+=`</div>`;
 
     r+=`<div class="request__item-detail detail-padding-bottom">`;
@@ -371,4 +573,5 @@ function formatDate(dte) {
     return strDate + " " + partTime[0] + ":" + partTime[1];
 }
 
-export { updateRequest, updateRequestItem, showRequestHistory, updateSupervisor };
+export { updateRequest, updateRequestItem, showRequestHistory, updateSupervisor, updateRequestAgent, updateRequestItemAgent,
+    postRequestStatus, postRequestItemStatus, postRequestAddAgent, postRequestItemAddAgent, postRequestAddSupervisor, postRequestRemoveSupervisor};

@@ -250,6 +250,11 @@ dialog {
     background-color: var(--dwc-body-bg);
 }
 
+.btn-space {
+    margin-right: 0.2rem;
+    margin-left: 0.2rem;
+}
+
 .color-icon {
     color: var(--dwc-highlight);
 }

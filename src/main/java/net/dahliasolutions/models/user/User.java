@@ -3,6 +3,7 @@ package net.dahliasolutions.models.user;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import net.dahliasolutions.models.NotificationEndPoint;
 import net.dahliasolutions.models.campus.Campus;
 import net.dahliasolutions.models.department.DepartmentCampus;
 import net.dahliasolutions.models.position.Position;
@@ -35,6 +36,9 @@ public class User implements UserDetails {
     private String contactEmail;
     private boolean activated;
     private boolean deleted;
+
+    @Enumerated
+    private NotificationEndPoint notificationEndPoint;
 
     public String getFullName() {
          return firstName+" "+lastName;

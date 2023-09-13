@@ -3,6 +3,7 @@ package net.dahliasolutions.services.user;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.data.*;
+import net.dahliasolutions.models.NotificationEndPoint;
 import net.dahliasolutions.models.campus.Campus;
 import net.dahliasolutions.models.department.DepartmentCampus;
 import net.dahliasolutions.models.department.DepartmentRegional;
@@ -36,6 +37,7 @@ public class UserService implements UserServiceInterface{
     public User createDefaultUser(User user) {
         user.setActivated(true);
         user.setDeleted(false);
+        user.setNotificationEndPoint(NotificationEndPoint.Email);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         User newUser = userRepository.save(user);
         profileService.createDefaultProfile(user);
@@ -46,6 +48,7 @@ public class UserService implements UserServiceInterface{
     public User createUser(User user) {
         user.setActivated(false);
         user.setDeleted(false);
+        user.setNotificationEndPoint(NotificationEndPoint.Email);
         user.setPassword("-UserMustChangeThisByClickingOnTheEmailedLink-");
         User newUser = userRepository.save(user);
         profileService.createDefaultProfile(user);

@@ -8,9 +8,11 @@ import RequestView from "./RequestView.js";
 import SearchView from "./SearchView.js";
 
 import { postLogin, renewToken } from "./Login.js";
-import { toggleDetail, showTicketAgents, updateAgent, updateNote, updateTicketStatus, postTicketNote, postTicketStatus, postTicketAddAgent, postTicketRemoveAgent, updateTicketSLA, postTicketSLA} from "./TicketView.js";
+import { toggleDetail, showTicketAgents, updateAgent, updateNote, updateTicketStatus, postTicketNote, postTicketStatus, postTicketAddAgent, postTicketRemoveAgent, updateTicketSLA, postTicketSLA } from "./TicketView.js";
 import { imageDialog } from "./ImageView.js";
-import { updateRequest, updateRequestItem, showRequestHistory, updateSupervisor } from "./RequestView.js";
+import { updateRequest, updateRequestItem, showRequestHistory, updateSupervisor, updateRequestAgent, updateRequestItemAgent, postRequestStatus, postRequestItemStatus, postRequestAddAgent, postRequestItemAddAgent, postRequestAddSupervisor, postRequestRemoveSupervisor } from "./RequestView.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
+import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-messaging.js";
 
 let appTheme = "dark";
 let username = "";
@@ -20,6 +22,16 @@ let token = "";
 let isLoggedIn = false;
 
 let filesToUpload;
+
+const firebaseConfig = {
+    apiKey: "AIzaSyBws-XgELWSv0q_T6aEbngn9n8sGbjO2TI",
+    authDomain: "destinyworshipexchange.firebaseapp.com",
+    projectId: "destinyworshipexchange",
+    storageBucket: "destinyworshipexchange.appspot.com",
+    messagingSenderId: "395754529346",
+    appId: "1:395754529346:web:a4f5652adb957aa04643db",
+    measurementId: "G-NV2FY9N210"
+};
 
 const navigateTo = url => {
     history.pushState(null, null, url);
@@ -225,7 +237,7 @@ const postTicketImageFile = async (ticketId) => {
 }
 
 const completeTicketImageUpload = () => {
-    if (filesToUpload == 0) {
+    if (filesToUpload === 0) {
         let filebrowser = document.getElementById("imageFile");
         while (filebrowser.firstChild) {
             filebrowser.removeChild(filebrowser.firstChild);
@@ -282,6 +294,46 @@ const postRemoveTicketAgent = async (ticketId, userId) => {
     await postTicketRemoveAgent(ticketId, userId, token);
 }
 
+const postNewRequestStatus = async (requestId) => {
+    let response = await postRequestStatus(token);
+    document.querySelector(".form__popup").remove();
+    let url = "/app/request/"+requestId;
+    navigateTo(url);
+}
+
+const postNewRequestItemStatus = async (requestId) => {
+    let response = await postRequestItemStatus(token);
+    document.querySelector(".form__popup").remove();
+    let url = "/app/request/"+requestId;
+    navigateTo(url);
+}
+
+const postNewRequestAgent = async (requestId) => {
+    let response = await postRequestAddAgent(token);
+    document.querySelector(".form__popup").remove();
+    let url = "/app/request/"+requestId;
+    navigateTo(url);
+}
+
+const postNewRequestItemAgent = async (requestId) => {
+    let response = await postRequestItemAddAgent(token);
+    document.querySelector(".form__popup").remove();
+    let url = "/app/request/"+requestId;
+    navigateTo(url);
+}
+
+const postNewRequestSupervisor = async (requestId) => {
+    let response = await postRequestAddSupervisor(token);
+    document.querySelector(".form__popup").remove();
+    let url = "/app/request/"+requestId;
+    navigateTo(url);
+}
+
+const postRemoveRequestAgent = async (requestId, userId) => {
+    let response = await postRequestRemoveSupervisor(requestId, userId, token);
+}
+
+
 // App Theming //
 const toggleTheme = () => {
     if (appTheme === "dark") {
@@ -323,9 +375,20 @@ const clearLocalStorage = () => {
     localStorage.removeItem("lastName");
 }
 
+const subscribe = async () => {
+    console.log('Requesting permission...');
+    Notification.requestPermission()
+        .then((permission) => {
+            if (permission === 'granted') {
+                console.log('Notification permission granted.');
+            }
+        });
+}
+
 window.addEventListener("popstate", router);
 
 document.addEventListener("DOMContentLoaded", () => {
+
     document.body.addEventListener("click", e => {
         if ( e.target.matches("[data-search]")) {
             toggleSearch();
@@ -375,31 +438,60 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Requests
 
-        if ( e.target.matches("[data-request]")) {
+        if ( e.target.matches("[data-request-status]")) {
             e.preventDefault();
-            updateRequest(e.target.dataset.request, token);
+            updateRequest(e.target.dataset.requestStatus, token);
         }
-        if ( e.target.matches("[data-form-request]")) {
+        if ( e.target.matches("[data-form-request-status]")) {
             e.preventDefault();
-            if (e.target.dataset.formRequest === "update") {
-                console.log("Update Request");
+            if (e.target.dataset.formRequestStatus === "update") {
+                postNewRequestStatus(document.getElementById("requestStatusId").value);
             } else {
                 console.log("Cancelled Request Edit");
+                document.querySelector(".form__popup").remove();
             }
-            document.querySelector(".form__popup").remove();
         }
-        if ( e.target.matches("[data-request-item]")) {
+
+        if ( e.target.matches("[data-request-agent]")) {
             e.preventDefault();
-            updateRequestItem(e.target.dataset.requestItem, token);
+            updateRequestAgent(e.target.dataset.requestAgent, token);
         }
-        if ( e.target.matches("[data-form-request-item]")) {
+        if ( e.target.matches("[data-form-request-agent]")) {
             e.preventDefault();
-            if (e.target.dataset.formRequestItem === "update") {
-                console.log("Update Request Item");
+            if (e.target.dataset.formRequestAgent === "update") {
+                postNewRequestAgent(document.getElementById("requestAgentId").value);
+            } else {
+                console.log("Cancelled Request Include");
+                document.querySelector(".form__popup").remove();
+            }
+        }
+
+        if ( e.target.matches("[data-request-item-status]")) {
+            e.preventDefault();
+            updateRequestItem(e.target.dataset.requestItemStatus, token);
+        }
+        if ( e.target.matches("[data-form-request-item-status]")) {
+            e.preventDefault();
+            if (e.target.dataset.formRequestItemStatus === "update") {
+                postNewRequestItemStatus(document.getElementById("requestItemStatusRequestId").value);
             } else {
                 console.log("Cancelled Item Edit");
+                document.querySelector(".form__popup").remove();
             }
-            document.querySelector(".form__popup").remove();
+        }
+
+        if ( e.target.matches("[data-request-item-agent]")) {
+            e.preventDefault();
+            updateRequestItemAgent(e.target.dataset.requestItemAgent, token);
+        }
+        if ( e.target.matches("[data-form-request-item-agent]")) {
+            e.preventDefault();
+            if (e.target.dataset.formRequestItemAgent === "update") {
+                postNewRequestItemAgent(document.getElementById("requestAgentAddId").value);
+            } else {
+                console.log("Cancelled Item Assigned");
+                document.querySelector(".form__popup").remove();
+            }
         }
 
         if ( e.target.matches("[data-request-supervisor]")) {
@@ -409,15 +501,16 @@ document.addEventListener("DOMContentLoaded", () => {
         if ( e.target.matches("[data-form-request-supervisor]")) {
             e.preventDefault();
             if (e.target.dataset.formRequestSupervisor === "update") {
-                console.log("Update Request Supervisor");
+                postNewRequestSupervisor(document.getElementById("requestSuperId").value);
             } else {
                 console.log("Cancelled Supervisor");
+                document.querySelector(".form__popup").remove();
             }
-            document.querySelector(".form__popup").remove();
         }
 
         if ( e.target.matches("[data-request-supervisor-remove]")) {
             e.preventDefault();
+            postRemoveRequestAgent(e.target.dataset.requestId, e.target.dataset.requestSupervisorRemove)
             console.log("Remove Supervisor "+e.target.dataset.requestSupervisorRemove+" from "+e.target.dataset.requestId);
         }
 
@@ -489,6 +582,13 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
+        // settings
+
+        if ( e.target.matches("[data-settings-notify]")) {
+            e.preventDefault();
+            subscribe();
+        }
+
         // login
 
         if ( e.target.matches("[data-form-submit]")) {
@@ -507,6 +607,7 @@ document.addEventListener("DOMContentLoaded", () => {
             postTicketImageFile(e.target.dataset.ticketImageUpload);
         }
     });
+
     document.getElementById("searchButton").addEventListener("click", () => {
         submitSearch();
     });
@@ -518,6 +619,38 @@ document.addEventListener("DOMContentLoaded", () => {
     firstName = localStorage.getItem("firstName");
     lastName = localStorage.getItem("lastName");
     appTheme = localStorage.getItem("appTheme");
+
+    // Firebase Messaging
+    const fcmApp = initializeApp(firebaseConfig);
+    const messaging = getMessaging(fcmApp);
+    // Add the public key generated from the console here.
+    getToken(messaging, {vapidKey: "BPkHKoGBXYuuTEfyty0lBzi1RruJbGobRImxy9Jl008QPmgNxeo7Hj2BYaDb-AJD4hOraF6ZHirFl_VtxeMKiZk"})
+        .then((currentToken) => {
+            // ToDo - send token to server
+            console.log(currentToken);
+            debugger
+        });
+    onMessage(messaging, (payload) => {
+        console.log("receiveing Message", payload);
+    });
+    // onBackgroundMessage(messaging, (payload) => {
+    //     console.log('[firebase-messaging-sw.js] Received background message ', payload);
+    //     // Customize notification here
+    //     const notificationTitle = 'Background Message Title';
+    //     const notificationOptions = {
+    //         body: 'Background Message body.',
+    //         icon: '/firebase-logo.png'
+    //     };
+    //
+    //     self.registration.showNotification(notificationTitle,
+    //         notificationOptions);
+    // });
+
+    // load service worker for push notifications
+    document.addEventListener("load", async () => {
+        let sw = await navigator.serviceWorker.register("./firebase-messaging-sw.js");
+        console.log(sw);
+    })
 
     setAppTheme();
 

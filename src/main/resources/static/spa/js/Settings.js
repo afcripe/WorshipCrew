@@ -25,7 +25,7 @@ export default class extends AbstractView {
         r+=`<div class="settings__container-field">&nbsp;</div>`;
 
         r+=`<div class="settings__container-label">Notifications</div>`;
-        r+=`<div class="settings__container-field"><button class="btn btn-sm btn-wiki" disabled>Subscribe</button></div>`;
+        r+=`<div class="settings__container-field"><button class="btn btn-sm btn-wiki" data-settings-notify>Subscribe</button></div>`;
 
         r+=`<div class="settings__container-label">&nbsp;</div>`;
         r+=`<div class="settings__container-field">&nbsp;</div>`;

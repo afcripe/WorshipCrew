@@ -21,6 +21,7 @@ public class AppRequestItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private BigInteger id;
+    private BigInteger requestId;
     private BigInteger productId;
     private String productName;
     private String details;
@@ -43,6 +44,7 @@ public class AppRequestItem {
 
     public void setAppItemByRequestItem(OrderItem item) {
         this.id = item.getId();
+        this.requestId = item.getOrderRequest().getId();
         this.productId = item.getProductId();
         this.productName = item.getProductName();
         this.details = item.getDetails();

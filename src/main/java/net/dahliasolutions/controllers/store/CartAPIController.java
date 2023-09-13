@@ -12,6 +12,7 @@ import net.dahliasolutions.models.store.*;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.services.EventService;
 import net.dahliasolutions.services.mail.EmailService;
+import net.dahliasolutions.services.mail.NotificationMessageService;
 import net.dahliasolutions.services.order.OrderService;
 import net.dahliasolutions.services.store.CartItemService;
 import net.dahliasolutions.services.store.CartService;
@@ -35,6 +36,7 @@ public class CartAPIController {
     private final OrderService orderService;
     private final UserService userService;
     private final EmailService emailService;
+    private final NotificationMessageService messageService;
     private final StoreSettingService storeSettingService;
     private final EventService eventService;
 
@@ -192,9 +194,23 @@ public class CartAPIController {
                 new EmailDetails(user.get().getContactEmail(),"Your Request", "", null );
         BrowserMessage returnMsg = emailService.sendUserRequest(emailDetailsUser, orderRequest);
 
-        EmailDetails emailDetailsSupervisor =
-                new EmailDetails(orderRequest.getSupervisor().getContactEmail(),"A New Request", "", null );
-        BrowserMessage returnMsg2 = emailService.sendSupervisorRequest(emailDetailsSupervisor, orderRequest, orderRequest.getSupervisor().getId());
+        NotificationMessage returnMsg2 = messageService.createMessage(
+                new NotificationMessage(
+                        null,
+                        "A New Request",
+                        orderRequest.getId().toString(),
+                        null,
+                        false,
+                        null,
+                        EventModule.Request,
+                        NotificationType.New,
+                        orderRequest.getSupervisor()
+
+                ));
+
+//        EmailDetails emailDetailsSupervisor =
+//                new EmailDetails(orderRequest.getSupervisor().getContactEmail(),"A New Request", "", null );
+//        BrowserMessage returnMsg2 = emailService.sendSupervisorRequest(emailDetailsSupervisor, orderRequest, orderRequest.getSupervisor().getId());
 
         // send any additional notifications
         String userFullName = user.get().getFirstName()+" "+user.get().getLastName();

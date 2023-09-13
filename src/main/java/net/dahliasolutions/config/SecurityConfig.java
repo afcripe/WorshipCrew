@@ -94,6 +94,7 @@ public class SecurityConfig {
                     auth.requestMatchers("/js/**").permitAll();
 
                     auth.requestMatchers("/app").permitAll();
+                    auth.requestMatchers("/manifest.json").permitAll();
                     auth.requestMatchers("/app/**").permitAll();
                     auth.requestMatchers("/spa/**").permitAll();
 
@@ -157,6 +158,7 @@ public class SecurityConfig {
                     auth.requestMatchers("/api/v1/admin").permitAll();
                     auth.requestMatchers("/api/v1/auth/**").permitAll();
                     auth.requestMatchers("/api/v1/app/**").permitAll();
+                    auth.requestMatchers("/api/v1/messaging/**").permitAll();
 
                     auth.requestMatchers("/api/v1/**").authenticated();
 
