@@ -106,6 +106,21 @@ dialog {
     padding-right: 6px;
 }
 
+#appProgress {
+    position: fixed;
+    top: 2px;
+    left: 2px;
+    right: 2px;
+    width: calc(100vw - 8px);
+    height: 0.4rem;
+    border: black .1em solid;
+    background-color: var(--dwc-nav);
+    border-radius: 5px;
+    padding: 0;
+    margin: 0;
+    z-index: 120;
+}
+
 .nav__search {
     display: flex;
     flex-direction: row;

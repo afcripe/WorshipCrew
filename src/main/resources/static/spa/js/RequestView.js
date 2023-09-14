@@ -7,20 +7,44 @@ export default class extends AbstractView {
     }
 
     async getHtml() {
+        this.setAppProgress(20);
         let req = await getRemoteRequest(this.params.id, this.params.token);
         let items = await getRemoteRequestItems(this.params.id, this.params.token);
         let agents = await getRemoteSupervisors(this.params.id, this.params.token);
         let returnHTML = htmlRequest(req);
 
+        this.setAppProgress(40);
         for (let i in items) {
             let itemObj = items[i];
             returnHTML += htmlRequestItems(itemObj);
         }
 
+        this.setAppProgress(60);
         returnHTML += htmlRequestAgents(agents, req);
 
+        this.setAppProgress(80);
         returnHTML = returnHTML.replaceAll("\n","");
         return returnHTML.replaceAll("\n","");
+    }
+}
+
+function setAppProgress(prg) {
+    try {
+        if (prg < 0) {
+            document.getElementById("appProgress").value = 1;
+            document.getElementById("appProgress").style.display = "none";
+        } else if (prg > 100) {
+            document.getElementById("appProgress").value = 100;
+            document.getElementById("appProgress").style.display = "none";
+        } else if (prg === 0) {
+            document.getElementById("appProgress").style.display = "block";
+            document.getElementById("appProgress").removeAttribute("value");
+        } else {
+            document.getElementById("appProgress").style.display = "block";
+            document.getElementById("appProgress").value = prg;
+        }
+    } catch (e) {
+        document.getElementById("appProgress").style.display = "none";
     }
 }
 
@@ -72,11 +96,11 @@ async function getRemoteRequestHistory(id, token) {
 async function showRequestHistory(reqID, token) {
     let notes = await getRemoteRequestHistory(reqID, token);
     let returnHTML = htmlHistory(notes);
-        returnHTML = returnHTML.replaceAll("\n","");
+    returnHTML = returnHTML.replaceAll("\n","");
 
     let dialog=document.createElement("dialog");
-        dialog.id="historyViewer";
-        dialog.classList.add("history-viewer__dialog");
+    dialog.id="historyViewer";
+    dialog.classList.add("history-viewer__dialog");
 
     dialog.innerHTML = returnHTML;
 
@@ -94,9 +118,9 @@ async function updateRequest(reqID, token) {
     let req = await getRemoteRequest(reqID, token);
     let returnHTML = htmlDialogUpdateRequest(req, options);
     let dialogHTML =  document.createElement("div");
-        dialogHTML.id = "formRequest";
-        dialogHTML.classList.add("form__popup");
-        dialogHTML.innerHTML = returnHTML;
+    dialogHTML.id = "formRequest";
+    dialogHTML.classList.add("form__popup");
+    dialogHTML.innerHTML = returnHTML;
     document.body.appendChild(dialogHTML);
 }
 
@@ -105,9 +129,9 @@ async function updateRequestItem(itemID, token) {
     let item = await getItemOrderStatus(itemID, token);
     let returnHTML = htmlDialogUpdateRequestItem(item, options);
     let dialogHTML =  document.createElement("div");
-        dialogHTML.id = "formRequestItem";
-        dialogHTML.classList.add("form__popup");
-        dialogHTML.innerHTML = returnHTML;
+    dialogHTML.id = "formRequestItem";
+    dialogHTML.classList.add("form__popup");
+    dialogHTML.innerHTML = returnHTML;
     document.body.appendChild(dialogHTML);
 }
 
@@ -255,9 +279,9 @@ async function postRequestAddSupervisor(token) {
 
 async function postRequestRemoveSupervisor(requestId, userId, token) {
     let formData = new FormData();
-        formData.set("requestId", requestId);
-        formData.set("userId", userId);
-        formData.set("primary", "false");
+    formData.set("requestId", requestId);
+    formData.set("userId", userId);
+    formData.set("primary", "false");
 
     const response = await fetch('/api/v1/app/request/removesupervisor', {
         method: 'POST',
@@ -341,9 +365,9 @@ function htmlRequestAgents(agents, req) {
     r+=`<div class="request__item-field-header">Supervisors</div>`;
     r+=`<div class="request__item-field-grow"><hr></div>`;
     r+=`<div class="request__item-field-right">`;
-            if (req.editable) {
-                r+=`<button class="btn btn-sm btn-store" data-request-supervisor="`+req.id+`"> + </button>`;
-            }
+    if (req.editable) {
+        r+=`<button class="btn btn-sm btn-store" data-request-supervisor="`+req.id+`"> + </button>`;
+    }
     r+=`</div></div>`;
 
     r+=`<div class="request__item">`;

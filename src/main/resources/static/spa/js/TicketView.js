@@ -7,17 +7,40 @@ export default class extends AbstractView {
     }
 
     async getHtml() {
+        this.setAppProgress(20);
         let ticket = await getRemoteTicket(this.params.id, this.params.token);
         let notes = await getRemoteTicketNotes(this.params.id, this.params.token);
         let returnHTML = htmlTicket(ticket);
 
+        this.setAppProgress(60);
         for (let n in notes) {
             let noteObj = notes[n];
             returnHTML += htmlTicketNotes(noteObj);
         }
 
+        this.setAppProgress(80);
         returnHTML = returnHTML.replaceAll("\n","");
         return returnHTML.replaceAll("\n","");
+    }
+}
+
+function setAppProgress(prg) {
+    try {
+        if (prg < 0) {
+            document.getElementById("appProgress").value = 1;
+            document.getElementById("appProgress").style.display = "none";
+        } else if (prg > 100) {
+            document.getElementById("appProgress").value = 100;
+            document.getElementById("appProgress").style.display = "none";
+        } else if (prg === 0) {
+            document.getElementById("appProgress").style.display = "block";
+            document.getElementById("appProgress").removeAttribute("value");
+        } else {
+            document.getElementById("appProgress").style.display = "block";
+            document.getElementById("appProgress").value = prg;
+        }
+    } catch (e) {
+        document.getElementById("appProgress").style.display = "none";
     }
 }
 
@@ -42,46 +65,58 @@ async function showTicketAgents(ticketID, token) {
 }
 
 async function updateAgent(ticketID, token) {
+    setAppProgress(20);
     let users = await getAgentOptions(token);
     let returnHTML = htmlDialogAddAgent(users, ticketID);
     let dialogHTML =  document.createElement("div");
+    setAppProgress(60);
     dialogHTML.id = "formRequest";
     dialogHTML.classList.add("form__popup");
     dialogHTML.innerHTML = returnHTML;
     document.body.appendChild(dialogHTML);
+    setAppProgress(101);
 }
 
 async function updateNote(ticketID, token) {
+    setAppProgress(20);
     let ticket = await getRemoteTicket(ticketID, token);
     let returnHTML = htmlDialogAddNote(ticket);
     let dialogHTML =  document.createElement("div");
-        dialogHTML.id = "formRequest";
-        dialogHTML.classList.add("form__popup");
-        dialogHTML.innerHTML = returnHTML;
+    setAppProgress(60);
+    dialogHTML.id = "formRequest";
+    dialogHTML.classList.add("form__popup");
+    dialogHTML.innerHTML = returnHTML;
+    setAppProgress(101);
 
     document.body.appendChild(dialogHTML);
 }
 
 async function updateTicketStatus(ticketID, token) {
+    setAppProgress(20);
     let options = await getTicketStatusOptions(token);
     let tkt = await getRemoteTicket(ticketID, token);
     let returnHTML = htmlDialogUpdateStatus(tkt, options);
     let dialogHTML =  document.createElement("div");
+    setAppProgress(60);
     dialogHTML.id = "formRequest";
     dialogHTML.classList.add("form__popup");
     dialogHTML.innerHTML = returnHTML;
     document.body.appendChild(dialogHTML);
+    setAppProgress(101);
 }
 
 async function updateTicketSLA(ticketID, token) {
+    setAppProgress(20);
     let options = await getTicketSLAOptions(token);
     let tkt = await getRemoteTicket(ticketID, token);
     let returnHTML = htmlDialogUpdateSLA(tkt, options);
     let dialogHTML =  document.createElement("div");
+    setAppProgress(60);
     dialogHTML.id = "formRequest";
     dialogHTML.classList.add("form__popup");
     dialogHTML.innerHTML = returnHTML;
     document.body.appendChild(dialogHTML);
+    setAppProgress(101);
 }
 
 async function getRemoteTicket(id, token) {
@@ -161,6 +196,7 @@ function toggleDetail() {
 }
 
 async function postTicketNote(token) {
+    setAppProgress(20);
     let uploadedImages = ""
     let children = document.getElementById('imagePath').children;
     for (let i = 0; i < children.length; i++) {
@@ -169,15 +205,17 @@ async function postTicketNote(token) {
         uploadedImages = uploadedImages+pic+" ";
     }
 
+    setAppProgress(40);
     let pvt = "false";
     try { pvt = document.getElementById("ticketPrivate").checked } catch (e) {}
 
     let formData = new FormData();
-        formData.set("isPrivate", pvt);
-        formData.set("detail", document.getElementById("ticketNote").value);
-        formData.set("images", uploadedImages);
-        formData.set("ticketId", document.getElementById("ticketNoteId").value);
+    formData.set("isPrivate", pvt);
+    formData.set("detail", document.getElementById("ticketNote").value);
+    formData.set("images", uploadedImages);
+    formData.set("ticketId", document.getElementById("ticketNoteId").value);
 
+    setAppProgress(60);
     const response = await fetch('/api/v1/app/ticket/postnote', {
         method: 'POST',
         headers: {
@@ -186,10 +224,12 @@ async function postTicketNote(token) {
         body: formData
     });
 
+    setAppProgress(80);
     return await response.json();
 }
 
 async function postTicketStatus(token) {
+    setAppProgress(20);
     let formData = new FormData();
     formData.set("id", document.getElementById("ticketStatusId").value);
     formData.set("status", document.getElementById("statusTicketSelect").value);
@@ -202,10 +242,12 @@ async function postTicketStatus(token) {
         },
         body: formData
     });
+    setAppProgress(80);
     return await response.json();
 }
 
 async function postTicketSLA(token) {
+    setAppProgress(20);
     let formData = new FormData();
     formData.set("id", document.getElementById("slaTicketSelect").value);
     formData.set("name", document.getElementById("ticketSLAId").value);
@@ -217,10 +259,12 @@ async function postTicketSLA(token) {
         },
         body: formData
     });
+    setAppProgress(80);
     return await response.json();
 }
 
 async function postTicketAddAgent(token) {
+    setAppProgress(20);
     let formData = new FormData();
     formData.set("id", document.getElementById("ticketAgentId").value);
     formData.set("userId", document.getElementById('agentSelect').value);
@@ -233,6 +277,7 @@ async function postTicketAddAgent(token) {
         },
         body: formData
     });
+    setAppProgress(80);
     return await response.json();
 }
 

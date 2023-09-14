@@ -7,11 +7,13 @@ export default class extends AbstractView {
     }
 
     async getHtml() {
+        this.setAppProgress(20);
         let myRequests = await getRemoteUserRequests(this.params.token);
         let requests = await getRemoteRequests(this.params.token);
         let requestItems = await getRemoteRequestItems(this.params.token);
         let returnHTML = `<h1>Requests</h1>`;
 
+        this.setAppProgress(40);
         if (myRequests.length > 0) {
             returnHTML += `<h2>My Requests</h2>`;
             for (let m in myRequests) {
@@ -20,6 +22,7 @@ export default class extends AbstractView {
             }
         }
 
+        this.setAppProgress(60);
         if (requestItems.length > 0) {
             returnHTML += `<h2>Items to Fulfill</h2>`;
             for (let i in requestItems) {
@@ -28,6 +31,7 @@ export default class extends AbstractView {
             }
         }
 
+        this.setAppProgress(80);
         if (requests.length > 0) {
             returnHTML += `<h2>Requests</h2>`;
             for (let r in requests) {
@@ -36,8 +40,29 @@ export default class extends AbstractView {
             }
         }
 
+        this.setAppProgress(90);
         returnHTML = returnHTML.replaceAll("\n","");
         return returnHTML.replaceAll("\n","");
+    }
+}
+
+function setAppProgress(prg) {
+    try {
+        if (prg < 0) {
+            document.getElementById("appProgress").value = 1;
+            document.getElementById("appProgress").style.display = "none";
+        } else if (prg > 100) {
+            document.getElementById("appProgress").value = 100;
+            document.getElementById("appProgress").style.display = "none";
+        } else if (prg === 0) {
+            document.getElementById("appProgress").style.display = "block";
+            document.getElementById("appProgress").removeAttribute("value");
+        } else {
+            document.getElementById("appProgress").style.display = "block";
+            document.getElementById("appProgress").value = prg;
+        }
+    } catch (e) {
+        document.getElementById("appProgress").style.display = "none";
     }
 }
 

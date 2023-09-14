@@ -23,6 +23,7 @@ public class NotificationMessage {
     private String subject;
     private String moduleId;
     private BigInteger itemId;
+    private boolean sendNow;
     private boolean sent;
     private LocalDateTime dateSent;
 

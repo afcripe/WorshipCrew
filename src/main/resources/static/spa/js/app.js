@@ -23,6 +23,8 @@ let isLoggedIn = false;
 
 let filesToUpload;
 
+const appProgress = document.getElementById("appProgress");
+
 // FirebaseConfig
 const firebaseConfig = {
     apiKey: "AIzaSyBws-XgELWSv0q_T6aEbngn9n8sGbjO2TI",
@@ -33,6 +35,26 @@ const firebaseConfig = {
     appId: "1:395754529346:web:a4f5652adb957aa04643db",
     measurementId: "G-NV2FY9N210"
 };
+
+const updateAppProgress = (val) => {
+    try {
+        if (val < 0) {
+            document.getElementById("appProgress").value = 1;
+            document.getElementById("appProgress").style.display = "none";
+        } else if (val > 100) {
+            document.getElementById("appProgress").value = 100;
+            document.getElementById("appProgress").style.display = "none";
+        } else if (val === 0) {
+            document.getElementById("appProgress").style.display = "block";
+            document.getElementById("appProgress").removeAttribute("value");
+        } else {
+            document.getElementById("appProgress").style.display = "block";
+            document.getElementById("appProgress").value = val;
+        }
+    } catch (e) {
+        document.getElementById("appProgress").style.display = "none";
+    }
+}
 
 const navigateTo = url => {
     history.pushState(null, null, url);
@@ -68,6 +90,8 @@ const router = async () => {
         { path: "/app/settings", view: Settings }
     ];
 
+    updateAppProgress(1);
+debugger
     // clea the path
     let cleanPath = location.pathname.split("?")[0];
 
@@ -112,6 +136,7 @@ const router = async () => {
 
     document.querySelector("#app").innerHTML = await view.getHtml();
 
+    updateAppProgress(101);
 };
 
 const getLoggedIn = async () => {
@@ -156,6 +181,7 @@ const getLoggedIn = async () => {
 
 // Form Handlers //
 const doLogin = async (u, p) => {
+    updateAppProgress(1);
     let auth = await postLogin(u, p);
     localStorage.setItem("token", auth.token);
     localStorage.setItem("firstName", auth.firstName);
@@ -166,6 +192,7 @@ const doLogin = async (u, p) => {
     lastName = auth.lastName;
     token = auth.token;
     isLoggedIn = auth.loggedIn;
+    updateAppProgress(101);
     router();
 }
 
@@ -182,10 +209,12 @@ const toggleSearch = (hide = false) => {
 }
 
 const submitSearch = () => {
+    updateAppProgress(1);
     let inputSearch = document.getElementById("searchInput");
     let searchString = inputSearch.value;
     inputSearch.value = "";
     toggleSearch();
+    updateAppProgress(101);
     navigateTo("/app/search/"+searchString);
 }
 
@@ -199,6 +228,7 @@ const hidePopForms = () => {
 }
 
 const postTicketImageFile = async (ticketId) => {
+    updateAppProgress(0);
     let filebrowser = document.getElementById("imageFile");
     filesToUpload = filebrowser.files.length;
 
@@ -213,20 +243,20 @@ const postTicketImageFile = async (ticketId) => {
             return response.json();
         }).then(data => {
             let imageDiv = document.createElement("div");
-                imageDiv.classList.add("ticket__note-images");
-                imageDiv.id = "img-"+data.id;
-                imageDiv.addEventListener("click", function (event) {
-                    removeTicketImage(data.id)
-                });
+            imageDiv.classList.add("ticket__note-images");
+            imageDiv.id = "img-"+data.id;
+            imageDiv.addEventListener("click", function (event) {
+                removeTicketImage(data.id)
+            });
 
             let imageImg = document.createElement("img");
-                imageImg.classList.add("selectable-image");
-                imageImg.src = data.fileLocation;
-                imageImg.alt = data.fileLocation;
+            imageImg.classList.add("selectable-image");
+            imageImg.src = data.fileLocation;
+            imageImg.alt = data.fileLocation;
 
             let rmDiv = document.createElement("div");
-                rmDiv.innerText = "X";
-                rmDiv.classList.add("removable-image");
+            rmDiv.innerText = "X";
+            rmDiv.classList.add("removable-image");
 
             imageDiv.appendChild(imageImg);
             imageDiv.appendChild(rmDiv);
@@ -244,9 +274,11 @@ const completeTicketImageUpload = () => {
             filebrowser.removeChild(filebrowser.firstChild);
         }
     }
+    updateAppProgress(101);
 }
 
 const removeTicketImage = async (id) => {
+    updateAppProgress(1);
     let eleId = "img-"+id;
     let imgTag = document.getElementById(eleId);
 
@@ -260,78 +292,101 @@ const removeTicketImage = async (id) => {
         return response.json();
     }).then(data => {
         imgTag.remove();
+        updateAppProgress(101);
     });
 }
 
 const postNewTicketNote = async (ticketId) => {
+    updateAppProgress(1);
     let response = await postTicketNote(token);
     document.querySelector(".form__popup").remove();
     let url = "/app/ticket/"+ticketId;
+    updateAppProgress(101);
     navigateTo(url);
 }
 
 const postNewTicketStatus = async (ticketId) => {
+    updateAppProgress(1);
     let response = await postTicketStatus(token);
     document.querySelector(".form__popup").remove();
     let url = "/app/ticket/"+ticketId;
+    updateAppProgress(101);
     navigateTo(url);
 }
 
 const postNewTicketSLA = async (ticketId) => {
+    updateAppProgress(1);
     let response = await postTicketSLA(token);
     document.querySelector(".form__popup").remove();
     let url = "/app/ticket/"+ticketId;
+    updateAppProgress(101);
     navigateTo(url);
 }
 
 const postNewTicketAgent = async (ticketId) => {
+    updateAppProgress(1);
     let response = await postTicketAddAgent(token);
     document.querySelector(".form__popup").remove();
     let url = "/app/ticket/"+ticketId;
+    updateAppProgress(101);
     navigateTo(url);
 }
 
 const postRemoveTicketAgent = async (ticketId, userId) => {
-    await postTicketRemoveAgent(ticketId, userId, token);
+    updateAppProgress(0);
+    let rsp = await postTicketRemoveAgent(ticketId, userId, token);
+    updateAppProgress(101);
 }
 
 const postNewRequestStatus = async (requestId) => {
+    updateAppProgress(1);
     let response = await postRequestStatus(token);
     document.querySelector(".form__popup").remove();
     let url = "/app/request/"+requestId;
+    updateAppProgress(101);
     navigateTo(url);
 }
 
 const postNewRequestItemStatus = async (requestId) => {
+    updateAppProgress(1);
     let response = await postRequestItemStatus(token);
     document.querySelector(".form__popup").remove();
     let url = "/app/request/"+requestId;
+    updateAppProgress(101);
     navigateTo(url);
 }
 
 const postNewRequestAgent = async (requestId) => {
+    updateAppProgress(1);
     let response = await postRequestAddAgent(token);
     document.querySelector(".form__popup").remove();
     let url = "/app/request/"+requestId;
+    updateAppProgress(101);
     navigateTo(url);
 }
 
 const postNewRequestItemAgent = async (requestId) => {
+    updateAppProgress(1);
     let response = await postRequestItemAddAgent(token);
     document.querySelector(".form__popup").remove();
     let url = "/app/request/"+requestId;
+    updateAppProgress(101);
     navigateTo(url);
 }
 
 const postNewRequestSupervisor = async (requestId) => {
+    updateAppProgress(1);
     let response = await postRequestAddSupervisor(token);
     document.querySelector(".form__popup").remove();
     let url = "/app/request/"+requestId;
+    updateAppProgress(101);
     navigateTo(url);
 }
 
 const postRemoveRequestAgent = async (requestId, userId) => {
+    updateAppProgress(0);
     let response = await postRequestRemoveSupervisor(requestId, userId, token);
+    updateAppProgress(101);
 }
 
 
@@ -398,41 +453,41 @@ const browserInfo = () => {
 const subscribe = async() => {
     // Add the public key generated from the console here.
     getToken(messaging, {vapidKey: "BPkHKoGBXYuuTEfyty0lBzi1RruJbGobRImxy9Jl008QPmgNxeo7Hj2BYaDb-AJD4hOraF6ZHirFl_VtxeMKiZk"})
-    .then(async (currentToken) => {
-        if (currentToken) {
-            // Send token to server
-            // navigator.serviceWorker.register("/firebase-messaging-sw.js");
-            let appInst = browserInfo();
-            let formData = new FormData();
-            formData.set("id", "0");
-            formData.set("name", appInst);
-            formData.set("token", currentToken);
+        .then(async (currentToken) => {
+            if (currentToken) {
+                // Send token to server
+                // navigator.serviceWorker.register("/firebase-messaging-sw.js");
+                let appInst = browserInfo();
+                let formData = new FormData();
+                formData.set("id", "0");
+                formData.set("name", appInst);
+                formData.set("token", currentToken);
 
-            const response = await fetch('/api/v1/app/swtoken', {
-                method: 'POST',
-                headers: {
-                    authorization: "Bearer " + token
-                },
-                body: formData
-            });
-            let rsp = await response.json();
-            console.log(rsp.name);
-            navigateTo("/app/settings");
-        } else {
-            // Show permission request UI
-            Notification.requestPermission()
-                .then((perm) => {
-                    if (perm === 'granted') {
-                        console.log("Permission Granted");
-                    } else {
-                        console.log("Permission Denied");
-                    }
+                const response = await fetch('/api/v1/app/swtoken', {
+                    method: 'POST',
+                    headers: {
+                        authorization: "Bearer " + token
+                    },
+                    body: formData
                 });
-        }
-    })
-    .catch((err) => {
-        console.log(err);
-    });
+                let rsp = await response.json();
+                console.log(rsp.name);
+                navigateTo("/app/settings");
+            } else {
+                // Show permission request UI
+                Notification.requestPermission()
+                    .then((perm) => {
+                        if (perm === 'granted') {
+                            console.log("Permission Granted");
+                        } else {
+                            console.log("Permission Denied");
+                        }
+                    });
+            }
+        })
+        .catch((err) => {
+            console.log(err);
+        });
 };
 
 const unsubscribe = () =>{
@@ -443,9 +498,9 @@ const unsubscribe = () =>{
                 // navigator.serviceWorker.register("/firebase-messaging-sw.js");
                 let appInst = browserInfo();
                 let formData = new FormData();
-                    formData.set("id", "0");
-                    formData.set("name", appInst);
-                    formData.set("token", currentToken);
+                formData.set("id", "0");
+                formData.set("name", appInst);
+                formData.set("token", currentToken);
 
                 const response = await fetch('/api/v1/app/removetoken', {
                     method: 'POST',
@@ -735,4 +790,3 @@ document.addEventListener("DOMContentLoaded", () => {
 
     getLoggedIn();
 });
-

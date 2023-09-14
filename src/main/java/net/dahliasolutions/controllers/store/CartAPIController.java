@@ -190,16 +190,19 @@ public class CartAPIController {
         }
         orderService.save(orderRequest);
 
+        // E-mail User
         EmailDetails emailDetailsUser =
                 new EmailDetails(user.get().getContactEmail(),"Your Request", "", null );
         BrowserMessage returnMsg = emailService.sendUserRequest(emailDetailsUser, orderRequest);
 
+        // Notify supervisor
         NotificationMessage returnMsg2 = messageService.createMessage(
                 new NotificationMessage(
                         null,
                         "A New Request",
                         orderRequest.getId().toString(),
                         null,
+                        false,
                         false,
                         null,
                         EventModule.Request,

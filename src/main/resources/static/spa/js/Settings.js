@@ -7,9 +7,11 @@ export default class extends AbstractView {
     }
 
     async getHtml() {
+        this.setAppProgress(20);
         let showSubscribe = true;
         let workers = await navigator.serviceWorker.getRegistrations();
         console.log(workers.length);
+        this.setAppProgress(60);
         if (workers.length > 0) {
             showSubscribe = false;
         }
@@ -43,6 +45,28 @@ export default class extends AbstractView {
 
 
         r+=`</div></div>`;
+
+        this.setAppProgress(80);
         return r;
+    }
+}
+
+function setAppProgress(prg) {
+    try {
+        if (prg < 0) {
+            document.getElementById("appProgress").value = 1;
+            document.getElementById("appProgress").style.display = "none";
+        } else if (prg > 100) {
+            document.getElementById("appProgress").value = 100;
+            document.getElementById("appProgress").style.display = "none";
+        } else if (prg === 0) {
+            document.getElementById("appProgress").style.display = "block";
+            document.getElementById("appProgress").removeAttribute("value");
+        } else {
+            document.getElementById("appProgress").style.display = "block";
+            document.getElementById("appProgress").value = prg;
+        }
+    } catch (e) {
+        document.getElementById("appProgress").style.display = "none";
     }
 }
