@@ -25,7 +25,7 @@ export default class DashboardClass extends AbstractView {
             let item = items[i];
             returnHTML += htmlItemLine(item);
         }
-debugger
+
         this.setAppProgress(80);
         returnHTML = returnHTML.replaceAll("\n","");
         return returnHTML.replaceAll("\n","");

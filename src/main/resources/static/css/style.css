@@ -29,6 +29,8 @@
     --dwc-support-selected: #835acc;
     --dwc-support-accent: #e5d7fd;
 
+    --dwc-edit-color: #198754;
+
     --dwc-body-color: #212529;
     --dwc-body-bg: #fff;
     --dwc-border-color: #bebebe;
@@ -320,6 +322,10 @@
     background-color: transparent;
 }
 
+.btn-edit {
+    color: var(--dwc-edit-color);
+}
+
 
 .color-wiki {
     color: var(--dwc-wiki);
@@ -518,9 +524,9 @@
      transition: transform 1s;
 }
 .caret-right-open {
-    transform: rotate(90deg);
     -webkit-transform:rotate(90deg);
     -moz-transform:rotate(90deg);
+    transform: rotate(90deg);
 }
 
 .alert-support {
@@ -742,6 +748,7 @@ ul, #folderTree {
 /* Style the caret/arrow */
 .caret {
     cursor: pointer;
+    -webkit-user-select: none; /* Safari */
     user-select: none; /* Prevent text selection */
 }
 
@@ -810,6 +817,7 @@ ul, #folderTree {
 .ticket-detail.ticket-detail-hide {
     opacity: 0;
     max-height: 0;
+    overflow-y: clip;
 }
 
 /* Notes Body */

@@ -114,7 +114,10 @@ public class StoreController {
     }
 
     @GetMapping("/new")
-    public String getNewItem(Model model) {
+    public String getNewItem(Model model, HttpSession session) {
+        if (!allowByEditor()) {
+            redirectService.pathName(session, "/store");
+        }
 
         StoreItem storeItem = new StoreItem();
         List<User> userList = userService.findAll();
@@ -131,6 +134,10 @@ public class StoreController {
 
     @PostMapping("/create")
     public String createStoreItem(@ModelAttribute StoreItemModel storeItemModel, Model model, HttpSession session) {
+        if (!allowByEditor()) {
+            redirectService.pathName(session, "/store");
+        }
+
         if (storeItemModel.name().equals("")) {
             List<User> userList = userService.findAll();
             List<DepartmentRegional> departmentRegionalList = departmentService.findAll();
@@ -214,6 +221,10 @@ public class StoreController {
 
     @GetMapping("/edit/{id}")
     public String getItemToEdit(@PathVariable BigInteger id, Model model, HttpSession session) {
+        if (!allowByEditor()) {
+            redirectService.pathName(session, "/store");
+        }
+
         BigInteger catId = BigInteger.valueOf(0);
         BigInteger subCatId = BigInteger.valueOf(0);
 
@@ -429,12 +440,23 @@ public class StoreController {
 
     /*  Determine Edit Permissions */
     private boolean allowByAdmin(){
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) auth.getPrincipal();
-        Collection<UserRoles> roles = user.getUserRoles();
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Collection<UserRoles> roles = currentUser.getUserRoles();
 
         for (UserRoles role : roles){
             if (role.getName().equals("ADMIN_WRITE")) {
+                return true;
+            }
+        }
+        return false;
+    }
+    private boolean allowByEditor(){
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+
+        for (UserRoles role : roles){
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("STORE_WRITE")
+                    || role.getName().equals("STORE_SUPERVISOR")) {
                 return true;
             }
         }

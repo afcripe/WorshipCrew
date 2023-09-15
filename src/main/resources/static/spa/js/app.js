@@ -91,7 +91,7 @@ const router = async () => {
     ];
 
     updateAppProgress(1);
-debugger
+
     // clea the path
     let cleanPath = location.pathname.split("?")[0];
 

@@ -624,7 +624,7 @@ public class UserController {
                 return true;
             }
             if (role.getName().equals("USER_WRITE")) {
-                if (userList.contains(user) && user.getPosition().getLevel() <= currentUser.getPosition().getLevel()) {
+                if (userList.contains(user) && user.getPosition().getLevel() > currentUser.getPosition().getLevel()) {
                     return true;
                 }
             }
@@ -635,15 +635,28 @@ public class UserController {
     private String permissionType(User currentUser) {
         Collection<UserRoles> roles = currentUser.getUserRoles();
         String typeString = "Campus Users";
-        for (UserRoles role : roles){
-            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_SUPERVISOR")) {
-                typeString = "All Users";
-            } else if (role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")) {
-                typeString = "Department Users";
+        int priority = 0;
+        for (UserRoles role : roles) {
+            if (role.getName().equals("USER_WRITE") || role.getName().equals("USER_READ")) {
+                if (priority < 1) {
+                    typeString = "Campus Department Users";
+                    priority = 1;
+                }
             } else if (role.getName().equals("CAMPUS_WRITE") || role.getName().equals("CAMPUS_READ")) {
-                typeString = "Campus Users";
-            } else if (role.getName().equals("USER_WRITE") || role.getName().equals("USER_READ")) {
-                typeString = "Campus Department Users";
+                if (priority < 2) {
+                    typeString = "Campus Users";
+                    priority = 2;
+                }
+            }   else if (role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")) {
+                if (priority < 3) {
+                    typeString = "Department Users";
+                    priority = 3;
+                }
+            } else if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_SUPERVISOR")) {
+                if (priority < 4) {
+                    typeString = "All Users";
+                    priority = 4;
+                }
             }
         }
         return typeString;

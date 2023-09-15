@@ -14,7 +14,8 @@
             </a>
           </div>
           <div class="navbar-nav mx-2">
-            <a class="btn btn-sm btn-store" onclick="newItemDialog()">
+            <a class="btn btn-sm btn-store" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'STORE_SUPERVISOR')
+                                             or #lists.contains(userRoles,'STORE_WRITE')}" onclick="newItemDialog()">
               <i class="bi bi-cart-plus"></i>
             </a>
           </div>

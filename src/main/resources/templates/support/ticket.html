@@ -38,10 +38,8 @@
         <div class="mt-2 w-100">
             <h2>
                 <div style="float: right">
-                    <th:block th:if="${closeDate} == 'false'">
-                        <i id="btnStatusEdit" class="bi bi-pencil-square h5 selectableItem" th:if="${isAgent}"
-                           th:onclick="updateTicketStatus([[*{id}]])"></i>
-                    </th:block>
+                    <i id="btnStatusEdit" class="bi bi-pencil-square h5 selectableItem btn-edit" th:if="${isAgent}"
+                       th:onclick="updateTicketStatus([[*{id}]])"></i>
 
                     <input id="ticketStatus" type="hidden" th:value="*{ticketStatus}">
                     <span th:text="*{ticketStatus}"></span>
@@ -100,7 +98,7 @@
                   <div class="ticket-detail-info">
                       <div>
                           <th:block th:if="${closeDate} == 'false'">
-                              <i id="btnSLAEdit" class="bi bi-pencil-square selectableItem" th:if="${isAgent}"
+                              <i id="btnSLAEdit" class="bi bi-pencil-square selectableItem btn-edit" th:if="${isAgent}"
                                  th:onclick="updateTicketSLA([[*{id}]])"></i>
                           </th:block>
                           SLA: <span th:text="*{sla?.name}"></span>
@@ -148,18 +146,25 @@
                 </div>
 
                 <!-- current Notes -->
-                <div class="card my-2 mx-0 p-0 card-hide-overflow" th:each="note : ${noteList}">
+                <div th:id="'noteBox-'+${note.id}" class="card my-2 mx-0 p-0 card-hide-overflow" th:each="note : ${noteList}">
                     <div th:id="'note-'+${note.id}" class="note-container">
                         <div class="note-address" th:classappend="${note.agentNote} ? note-address-agent">
                             <div th:text="${note.user.firstName}+' '+${note.user.lastName}"></div>
                             <div th:text="${#temporals.format(note.noteDate, 'MMM-dd-yyyy HH:mm')}"></div>
                             <div th:if="${isAgent}">
-                                <div th:if="${note.notePrivate}">Private</div><div th:unless="${note.notePrivate}">Public</div>
+                                <th:block th:if="${closeDate} == 'false'">
+                                    <i id="btnNoteEdit" class="bi bi-pencil-square selectableItem btn-edit"
+                                       th:onclick="updateTicketNote([[${note.id}]])" style="float: right;"></i>
+                                </th:block>
+                                <div th:id="'noteP-'+${note.id}">
+                                    <span th:if="${note.notePrivate}">Private</span>
+                                    <span th:unless="${note.notePrivate}">Public</span>
+                                </div>
                             </div>
                         </div>
 
                         <div class="note-content">
-                            <div th:text="${note.detail}"></div>
+                            <div th:id="'noteT-'+${note.id}" th:text="${note.detail}"></div>
                             <div class="card-section" th:if="${not #lists.isEmpty(note.images)}">
                                 <div th:each="img : ${note.images}" class="d-inline">
                                     <a th:href="@{${img.fileLocation}}" target="_blank" class="px-2">
@@ -179,10 +184,12 @@
                 <div class="card m-1">
 
                     <div class="card-title m-2 pb-0 mb-0">
-                        <button class="btn btn-sm btn-success" style="float: right" th:if="${isAgent} or ${closeDate} == false"
+                        <th:block th:if="${closeDate == 'false'}">
+                        <button class="btn btn-sm btn-success" style="float: right" th:if="${isAgent}"
                                 onclick="dialogIncludePerson()">
                             <icon class="bi bi-plus"></icon>
                         </button>
+                        </th:block>
                         <div class="h6 selectableItem" style="height: 100%; line-height: 2em" onclick="toggleAgentInfo()">
                             Support Agents
                         </div>
@@ -191,8 +198,11 @@
                     <div th:each="agent : *{agentList}">
                         <p th:id="'agent-'+${agent.id}" class="p-2">
                             <span th:text="${agent.firstName}+' '+${agent.lastName}"></span>
-                            <i class="bi bi-x" style="color: red; cursor: pointer" th:if="${isAgent} or ${closeDate} == false"
+
+                            <th:block th:if="${closeDate == 'false'}">
+                            <i class="bi bi-x" style="color: red; cursor: pointer" th:if="${isAgent}"
                                th:onclick="removeSuper([[${agent.id}]])"></i>
+                            </th:block>
                         </p>
                     </div>
                 </div>
@@ -212,12 +222,10 @@
         <script>
             async function loadPeople() {
                 let dispPersonSelect = document.getElementById('personSelect');
-                debugger
                 const response = await fetch('/api/v1/support/getsupervisors')
                     .then(response => {
                         return response.json();
                     }).then(data => {
-                        debugger
                         while (dispPersonSelect.firstChild) {
                             dispPersonSelect.removeChild(dispPersonSelect.lastChild);
                         }
@@ -303,7 +311,6 @@
                         while (dispStatusSelect.firstChild) {
                             dispStatusSelect.removeChild(dispStatusSelect.lastChild);
                         }
-                        debugger
                         for (let key in data) {
                             let opt = document.createElement('option');
                             opt.value = data[key];
@@ -393,7 +400,6 @@
             async function postSLA() {
                 document.getElementById("btnSLASubmit").setAttribute("disabled", "disabled");
                 let dispStatusSLA = document.getElementById('slaSelect');
-                debugger
                 let formData = new FormData();
                     formData.set("id", dispStatusSLA.value);
                     formData.set("name", inputId.value);
@@ -438,6 +444,94 @@
 
         </form>
     </dialog>
+    <dialog id="changeNoteDialog" class="upload-modal">
+        <script>
+
+            async function loadTicketNote(id) {
+                let formData = new FormData();
+                    formData.set("id", id);
+
+                const response = await fetch('/api/v1/support/getnote', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    return response.json();
+                }).then(data => {
+                    document.getElementById("editNoteId").value = id;
+                    document.getElementById('editNotePrivate').checked = data.notePrivate;
+                    document.getElementById('editNoteDetail').value = data.detail;
+                });
+            }
+
+            async function postEditNote() {
+                document.getElementById("btnEditeNoteSubmit").setAttribute("disabled", "disabled");
+                document.getElementById("btnEditeNoteDelete").setAttribute("disabled", "disabled");
+
+                let formData = new FormData();
+                    formData.set("id", document.getElementById("editNoteId").value);
+                    formData.set("isPrivate", document.getElementById('editNotePrivate').checked);
+                    formData.set("detail", document.getElementById('editNoteDetail').value);
+
+                const response = await fetch('/api/v1/support/editnote', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    return response.json();
+                }).then(data => {
+                    let notePId = "noteP-"+document.getElementById("editNoteId").value;
+                    let noteTId = "noteT-"+document.getElementById("editNoteId").value;
+                    if (data.notePrivate) {
+                        document.getElementById(notePId).innerText = "Private";
+                    } else {
+                        document.getElementById(notePId).innerText = "Public";
+                    }
+                    document.getElementById(noteTId).innerText = data.detail;
+                    keyEscNote();
+                });
+            }
+
+            async function deleteNote() {
+                document.getElementById("btnEditeNoteSubmit").setAttribute("disabled", "disabled");
+                document.getElementById("btnEditeNoteDelete").setAttribute("disabled", "disabled");
+
+                let formData = new FormData();
+                    formData.set("id", document.getElementById("editNoteId").value);
+
+                const response = await fetch('/api/v1/support/deletenote', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    return response.json();
+                }).then(data => {
+                    let oldId = "noteBox-"+document.getElementById("editNoteId").value;
+                    document.getElementById(oldId).remove();
+                    keyEscNote();
+                });
+            }
+
+            function keyEscNote() {
+                document.getElementById("editNoteId").value = "";
+                document.getElementById('editNotePrivate').checked = false;
+                document.getElementById('editNoteDetail').value = "";
+                document.getElementById("btnEditeNoteSubmit").removeAttribute("disabled");
+                document.getElementById("btnEditeNoteDelete").removeAttribute("disabled");
+                document.getElementById("changeNoteDialog").close();
+            }
+        </script>
+        <h2>Update Ticket Status</h2>
+        <form id="formEditNote" onsubmit="postEditNote()" style="width: 300px; max-width: 450px">
+            <input id="editNoteId" type="hidden">
+            Private <input id="editNotePrivate" class="d-inline" style="height: 1em" type="checkbox">
+            <textarea id="editNoteDetail" style="width: 100%; height: 75px"></textarea>
+
+            <div class="pt-2">
+                <button id="btnEditeNoteSubmit" type="button" class="btn btn-sm btn-support" onclick="postEditNote()">Update</button>
+                <button id="btnEditeNoteDelete" type="button" class="btn btn-sm btn-outline-danger" onclick="deleteNote()">Delete</button>
+                <button id="btnEditeNoteCancel" type="button" class="btn btn-sm btn-outline-support" onclick="keyEscNote()">Cancel</button>
+            </div>
+
+        </form>
+    </dialog>
 
     <script>
         /*<![CDATA[*/
@@ -451,6 +545,7 @@
         const displayIncludePersonDialog = document.getElementById("includePersonDialog");
         const displayChangeStatusDialog = document.getElementById("changeStatusDialog");
         const displayChangeSLADialog = document.getElementById("changeSLADialog");
+        const displayChangeNoteDialog = document.getElementById("changeNoteDialog");
         const displayBtnDetailExpand = document.getElementById("btnDetailExpand");
         const displayBtnDetailCollapse = document.getElementById("btnDetailCollapse");
         const displayDivDetail = document.getElementById("divTicketDetail");
@@ -480,13 +575,17 @@
             loadSLAOptions();
         }
 
+        function updateTicketNote(id) {
+            displayChangeNoteDialog.showModal();
+            loadTicketNote(id);
+        }
+
         function dialogIncludePerson() {
             displayIncludePersonDialog.showModal();
             loadPeople();
         }
 
         async function removeSuper(id) {
-            debugger
             let formData = new FormData();
                 formData.set("id", inputId.value);
                 formData.set("userId", id);
@@ -528,7 +627,7 @@
                     try {
                         info[key].classList.add("hide");
                     } catch (e) {
-                        console.log(info[key])
+                        // console.log(info[key])
                     }
                 }
             } else {
@@ -537,7 +636,7 @@
                     try {
                         info[key].classList.remove("hide");
                     } catch (e) {
-                        console.log(info[key])
+                        // console.log(info[key])
                     }
                 }
             }
@@ -592,8 +691,8 @@
                     filebrowser.removeChild(filebrowser.firstChild);
                 }
 
-                console.log(document.getElementById('image').value);
-                console.log(document.getElementById('imagePath').value);
+                // console.log(document.getElementById('image').value);
+                // console.log(document.getElementById('imagePath').value);
             }
         }
 
@@ -633,13 +732,15 @@
             formData.set("detail", inputDetails.value);
             formData.set("images", uploadedImages);
             formData.set("ticketId", inputId.value);
-
+debugger
             const response = await fetch('/api/v1/support/note/new', {
                 method: 'POST',
                 body: formData
             }).then(response => {
+                debugger
                 return response.json();
             }).then(data => {
+                debugger
                 displayNewNoteBtn.removeAttribute("disabled");
                 clearForm()
 

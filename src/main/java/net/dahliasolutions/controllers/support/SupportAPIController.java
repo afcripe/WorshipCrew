@@ -17,11 +17,16 @@ import net.dahliasolutions.services.mail.EmailService;
 import net.dahliasolutions.services.support.*;
 import net.dahliasolutions.services.user.UserRolesService;
 import net.dahliasolutions.services.user.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.rmi.registry.LocateRegistry;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -162,6 +167,7 @@ public class SupportAPIController {
     @PostMapping("/note/new")
     public TicketNote newTicketNote(@ModelAttribute TicketNoteModel noteModel) {
         User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
         Optional<Ticket> ticket = ticketService.findById(noteModel.ticketId());
 
         if (ticket.isEmpty()) {
@@ -200,7 +206,7 @@ public class SupportAPIController {
 
         if (isAgent && !isPrivate) {
             // email note user on if public
-             EmailDetails emailDetailsUser =
+            EmailDetails emailDetailsUser =
                     new EmailDetails(ticket.get().getUser().getContactEmail(),"Support Ticket "+ticket.get().getId()+" has been updated", "", null );
             BrowserMessage returnMsg = emailService.sendUserUpdateTicket(emailDetailsUser, ticket.get(), note);
         } else {
@@ -220,6 +226,53 @@ public class SupportAPIController {
         eventService.dispatchEvent(e);
 
         return note;
+    }
+
+    @PostMapping("/getnote")
+    public TicketNote getTicketNote(@ModelAttribute SingleBigIntegerModel idModel) {
+        Optional<TicketNote> note = noteService.findById(idModel.id());
+
+        if (note.isEmpty()){
+            return new TicketNote();
+        }
+
+        return note.get();
+    }
+
+    @PostMapping("/editnote")
+    public TicketNote editTicketNote(@ModelAttribute TicketNoteEditModel noteModel) {
+        Optional<TicketNote> note = noteService.findById(noteModel.id());
+
+        if (note.isEmpty()){
+            return new TicketNote();
+        }
+
+        note.get().setDetail(noteModel.detail());
+        note.get().setNotePrivate(noteModel.isPrivate());
+        noteService.save(note.get());
+
+        return note.get();
+    }
+
+    @PostMapping("/deletenote")
+    public TicketNote deleteTicketNote(@ModelAttribute SingleBigIntegerModel intModel) {
+        Optional<TicketNote> note = noteService.findById(intModel.id());
+
+        if (note.isPresent()){
+            List<TicketImage> images = note.get().getImages();
+            noteService.deleteById(intModel.id());
+            for (TicketImage image : images) {
+//                try {
+//                    Files.deleteIfExists(Paths.get(image.getFileLocation()));
+//                } catch (IOException e) {
+//                    System.out.println("File not Deleted");
+//                }
+                ticketImageService.deleteById(image.getId());
+            }
+
+        }
+
+            return new TicketNote();
     }
 
     @GetMapping("/getstatusoptions")
@@ -260,6 +313,8 @@ public class SupportAPIController {
             ticket.get().setTicketStatus(TicketStatus.valueOf(statusModel.status()));
             if (setStatus.equals(TicketStatus.Closed)) {
                 ticket.get().setTicketClosed(LocalDateTime.now());
+            } else {
+                ticket.get().setTicketClosed(null);
             }
             ticketService.save(ticket.get());
 

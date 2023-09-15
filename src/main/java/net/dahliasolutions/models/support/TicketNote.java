@@ -27,7 +27,7 @@ public class TicketNote {
     @Column(name = "detail", columnDefinition="BLOB")
     private String detail;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.EAGER)
     private List<TicketImage> images;
 
     @ManyToOne(fetch = FetchType.EAGER)

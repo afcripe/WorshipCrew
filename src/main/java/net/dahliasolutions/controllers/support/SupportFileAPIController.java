@@ -150,6 +150,11 @@ public class SupportFileAPIController {
     public SingleBigIntegerModel removeStoredImage(@ModelAttribute SingleBigIntegerModel image){
         Optional<TicketImage> ticketImage = ticketImageService.findById(image.id());
         if (ticketImage.isPresent()) {
+            try {
+                Files.deleteIfExists(Paths.get(ticketImage.get().getFileLocation()));
+            } catch (IOException e) {
+                System.out.println("File not Delted");
+            }
             ticketImageService.deleteById(ticketImage.get().getId());
         }
         return image;

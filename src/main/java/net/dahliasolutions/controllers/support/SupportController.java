@@ -73,6 +73,7 @@ public class SupportController {
         model.addAttribute("openAgentTicketList", openAgentTicketList);
         model.addAttribute("ticketMentionList", ticketMentionList);
 
+
         redirectService.setHistory(session, "/support");
         return "support/ticketList";
     }
@@ -493,6 +494,8 @@ public class SupportController {
                 typeString = "Campus";
             } else if (role.getName().equals("SUPPORT_AGENT")) {
                 typeString = "Assigned";
+            } else if (role.getName().equals("SUPPORT_WRITE")) {
+                typeString = "Submitted";
             }
         }
         return typeString;
@@ -672,7 +675,7 @@ public class SupportController {
             dayString = "0"+dayString;
         }
         // create date and convert to LocalDateTime
-        String dateString = dateNow.getYear()+"-"+monthString+"-"+ dayString+" 00:00";
+        String dateString = dateNow.getYear()+"-"+monthString+"-"+ dayString+" 24:00";
         LocalDateTime returnDate = LocalDateTime.parse(dateString, formatter);
 
         // adjust date based on part
@@ -687,6 +690,7 @@ public class SupportController {
                 returnDate = returnDate.minusWeeks(cycleAdjustment);
                 break;
         }
+//        returnDate = returnDate.plusDays(1);
         return returnDate;
     }
 

@@ -58,7 +58,7 @@ public class User implements UserDetails {
     @ManyToOne
     private Campus campus;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     private List<UserEndpoint> endpoints;
 
     @ManyToMany(fetch = FetchType.EAGER)

@@ -30,7 +30,7 @@
         </div>
     </div>
 
-    <div class="row pt-5 py-2">
+    <div class="row pt-5 py-2" th:if="${not #lists.isEmpty(openAgentTicketList)}">
         <div class="col">
             <h4>Tickets Sent to You</h4>
         </div>
@@ -41,7 +41,7 @@
         </div>
     </div>
 
-    <div class="row pt-5 py-2">
+    <div class="row pt-5 py-2" th:if="${not #lists.isEmpty(ticketMentionList)}">
         <div class="col">
             <h4>Tickets You've been Included on</h4>
         </div>

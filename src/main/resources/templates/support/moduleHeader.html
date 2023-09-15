@@ -14,8 +14,9 @@
           </a>
         </div>
         <div class="navbar-nav mx-2">
-          <a class="btn btn-sm btn-support" href="/support/new">
-            <i class="bi bi-ticket-detailed"></i>
+          <a class="btn btn-sm btn-support" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'SUPPORT_SUPERVISOR')
+                                    or #lists.contains(userRoles,'SUPPORT_AGENT') or #lists.contains(userRoles,'SUPPORT_WRITE')}" href="/support/new">
+            <i class="bi bi-plus-square"></i>
           </a>
         </div>
         <div class="navbar-nav mt-2 mx-2 flex-grow-1 d-block d-none d-sm-block text-center">

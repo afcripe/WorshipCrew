@@ -137,8 +137,8 @@
       let departmentVal = departmentSelect.options[departmentSelect.selectedIndex].text;
       debugger
       let formData = new FormData();
-      formData.set("campus", campusVal;
-      formData.set("department", departmentVal;
+      formData.set("campus", campusVal);
+      formData.set("department", departmentVal);
       formData.set("userId", userID);
 
       const response = await fetch('/api/v1/user/filteredusers', {

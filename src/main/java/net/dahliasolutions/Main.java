@@ -76,7 +76,7 @@ public class Main {
 //            roleService.createRole("USER_WRITE", "Create and edite users for assigned campus");
 //            roleService.createRole("USER_SUPERVISOR", "Has full access to view, manage, and assign support tickets");
 //            roleService.createRole("CAMPUS_READ", "View all information for assigned campus");
-//            roleService.createRole("CAMPUS_WRITE", "Edite information for assigned campus");
+//            roleService.createRole("CAMPUS_WRITE", "Edit information for assigned campus");
 //            roleService.createRole("DIRECTOR_READ", "View all information regionally for assigned department");
 //            roleService.createRole("DIRECTOR_WRITE", "Edit all information regionally for assigned department, and manage positions");
 //            roleService.createRole("ADMIN_WRITE", "Has full access");
@@ -90,11 +90,11 @@ public class Main {
 //            Position regionalDirector = positionService.createPosition("Regional Director");
 //                regionalDirector.setLevel(1);
 //                positionService.save(regionalDirector);
-//            Position director = positionService.createPosition("Director");
+//            Position director = positionService.createPosition("Campus Director");
 //                director.setLevel(2);
 //                positionService.save(director);
 //            positionService.save(director);
-//            positionService.createPosition("Leader");
+//            positionService.createPosition("Campus Department Leader");
 //            positionService.createPosition("Volunteer");
 //
 //            departmentRegionalService.createDepartment("Worship");
@@ -130,16 +130,16 @@ public class Main {
 //            userService.updateUserDepartment(u.getUsername(), "Production");
 //
 //            User u2 = new User();
-//                u2.setUsername("aiden@destinyworship.com");
+//                u2.setUsername("aidan@destinyworship.com");
 //                u2.setPassword("password");
-//                u2.setFirstName("Aiden");
-//                u2.setLastName("Vaughn");
+//                u2.setFirstName("Aidan");
+//                u2.setLastName("Vaughan");
 //                u2.setContactEmail("afcripe@live.com");
 //                u2 = userService.createDefaultUser(u2);
 //                u2.setDirector(u);
 //            userService.save(u2);
 //            userService.addRoleToUser(u2.getUsername(), "CAMPUS_WRITE");
-//            userService.updateUserPosition(u2.getUsername(), "Director");
+//            userService.updateUserPosition(u2.getUsername(), "Campus Director");
 //            userService.updateUserCampus(u2.getUsername(), "Destin");
 //            userService.updateUserDepartment(u2.getUsername(), "Production");
 //
@@ -153,7 +153,7 @@ public class Main {
 //                u4.setDirector(u1);
 //            userService.save(u4);
 //            userService.addRoleToUser(u4.getUsername(), "CAMPUS_WRITE");
-//            userService.updateUserPosition(u4.getUsername(), "Director");
+//            userService.updateUserPosition(u4.getUsername(), "Campus Director");
 //            userService.updateUserCampus(u4.getUsername(), "Destin");
 //            userService.updateUserDepartment(u4.getUsername(), "Worship");
 //
@@ -167,7 +167,7 @@ public class Main {
 //                u5.setDirector(u1);
 //            userService.save(u5);
 //            userService.addRoleToUser(u5.getUsername(), "CAMPUS_WRITE");
-//            userService.updateUserPosition(u5.getUsername(), "Director");
+//            userService.updateUserPosition(u5.getUsername(), "Campus Director");
 //            userService.updateUserCampus(u5.getUsername(), "FWB");
 //            userService.updateUserDepartment(u5.getUsername(), "Production");
 //
@@ -181,7 +181,7 @@ public class Main {
 //                u6.setDirector(u);
 //            userService.save(u6);
 //            userService.addRoleToUser(u6.getUsername(), "ADMIN_WRITE");
-//            userService.updateUserPosition(u6.getUsername(), "Leader");
+//            userService.updateUserPosition(u6.getUsername(), "Campus Department Leader");
 //            userService.updateUserCampus(u6.getUsername(), "Destin");
 //            userService.updateUserDepartment(u6.getUsername(), "Production");
 //
