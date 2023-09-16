@@ -11,7 +11,9 @@ public interface PermissionTemplateServiceInterface {
 
     Optional<PermissionTemplate> findById(BigInteger id);
     Optional<PermissionTemplate> findByName(String name);
+    List<PermissionTemplate> findAllByPosition(Position position);
     Optional<PermissionTemplate> findFirstByPosition(Position position);
+    Optional<PermissionTemplate> findDefaultByPosition(Position position);
     List<PermissionTemplate> findAll();
     void save(PermissionTemplate permissionTemplate);
     void deletePermissionTemplateById(BigInteger id);

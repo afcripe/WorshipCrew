@@ -22,6 +22,7 @@ public class PermissionTemplate {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private BigInteger id;
     private String name;
+    private boolean defaultTemplate;
 
     @ManyToOne
     private Position position;

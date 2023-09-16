@@ -55,6 +55,21 @@
             </div>
           </div>
 
+          <div class="card mt-2" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') || #lists.contains(userRoles,'USER_WRITE')}">
+            <div class="card-title alert alert-primary bg-faded">
+              <h5>Reset Permissions to Template</h5>
+            </div>
+            <div class="card-body">
+              <select id="positionTemplate" name="positionTemplate" class="form-control" onchange="templateChange()">
+                <option value="0">Choose a Template</option>
+                <option th:each="t : ${templateList}" th:value="${t.id}">
+                  <span th:text="${t.name}"></span><span th:if="${t.defaultTemplate}"> (Default)</span>
+                </option>
+              </select>
+              <button id="btnTemplateUpdate" type="button" class="btn btn-sm btn-success" onclick="assignTemplate()" disabled>Update</button>
+            </div>
+          </div>
+
           <div class="card mt-2" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')}">
             <div class="card-title alert alert-primary bg-faded">
               <button class="btn btn-sm btn-success small" style="float: right" th:unless="*{deleted}"
@@ -101,10 +116,30 @@
       document.getElementById("inputAuthSupportWrite").disabled = false;
     }
 
+    function templateChange() {
+      document.getElementById("btnTemplateUpdate").removeAttribute("disabled");
+    }
+
+    async function assignTemplate() {
+      document.getElementById("btnTemplateUpdate").disabled;
+      let userId = document.getElementById("inputUserId");
+      let templateId = document.getElementById("positionTemplate");
+      let formData = new FormData();
+          formData.set("userId", userId.value)
+          formData.set("templateId", templateId.value)
+
+      const response = await fetch('/api/v1/user/settemplate', {
+        method: 'POST',
+        body: formData
+      }).then(() => {
+        window.location.reload();
+      });
+    }
+
     async function updateAuth(auth) {
       let userId = document.getElementById("inputUserId");
       let formData = new FormData();
-          formData.set("name", auth)
+      formData.set("name", auth)
 
       const response = await fetch('/api/v1/user/setrole/'+userId.value, {
         method: 'POST',
@@ -118,6 +153,7 @@
         } catch (e) { console.log("no authRefresh available") }
       });
     }
+
   </script>
 
 </div>

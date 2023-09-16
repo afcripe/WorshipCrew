@@ -50,8 +50,8 @@
       <tbody>
       <tr th:each="temp : ${templateList}" class="selectableItem" style="cursor: pointer"
           th:onclick="window.location.href='/permissiontemplate/edit/[[${temp.id}]]';">
-        <td><span th:text="${temp.name}"/></td>
-        <td><span th:text="${temp.position.name}"/></td>
+        <td><span th:text="${temp.name}"></span><span th:if="${temp.defaultTemplate}"> (Default)</span></td>
+        <td><span th:text="${temp.position.name}"></span></td>
         <td>
           <div th:each="role : ${temp.userRoles}" style="font-size: small; display: inline-block">
             <span th:text="${role.name}"></span> |

@@ -8,6 +8,8 @@ import net.dahliasolutions.models.department.DepartmentCampus;
 import net.dahliasolutions.models.department.DepartmentRegional;
 import net.dahliasolutions.models.mail.EmailDetails;
 import net.dahliasolutions.models.order.OrderRequest;
+import net.dahliasolutions.models.position.ChangeTemplateModel;
+import net.dahliasolutions.models.position.PermissionTemplate;
 import net.dahliasolutions.models.records.BigIntegerStringModel;
 import net.dahliasolutions.models.records.CampusDepartmentModel;
 import net.dahliasolutions.models.records.SingleStringModel;
@@ -19,6 +21,7 @@ import net.dahliasolutions.services.campus.CampusService;
 import net.dahliasolutions.services.department.DepartmentCampusService;
 import net.dahliasolutions.services.department.DepartmentRegionalService;
 import net.dahliasolutions.services.mail.EmailService;
+import net.dahliasolutions.services.position.PermissionTemplateService;
 import net.dahliasolutions.services.user.UserRolesService;
 import net.dahliasolutions.services.user.UserService;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -38,6 +41,7 @@ public class UserAPIController {
     private final CampusService campusService;
     private final DepartmentRegionalService departmentRegionalService;
     private final DepartmentCampusService departmentCampusService;
+    private final PermissionTemplateService permissionTemplateService;
     private final AuthService authService;
     private final EmailService emailService;
 
@@ -77,6 +81,24 @@ public class UserAPIController {
         return "false";
     }
 
+    @PostMapping("/settemplate")
+    public String setUserRole(@ModelAttribute ChangeTemplateModel templateModel) {
+        Optional<User> user = userService.findById(templateModel.userId());
+        Optional<PermissionTemplate> template = permissionTemplateService.findById(templateModel.templateId());
+
+        if (user.isPresent() && template.isPresent()) {
+            user.get().setUserRoles(new ArrayList<>());
+
+            for (UserRoles role : template.get().getUserRoles()) {
+                user.get().getUserRoles().add(role);
+            }
+            userService.save(user.get());
+
+            return "true";
+        }
+        return "false";
+    }
+
     @PostMapping("/sendPasswordChange")
     public BigIntegerStringModel sendPasswordChangeRequest(@ModelAttribute BigIntegerStringModel userModel, HttpSession session) {
         User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -105,10 +127,7 @@ public class UserAPIController {
 
     @PostMapping("/filteredusers")
     public List<User> filteredUserList(@ModelAttribute CampusDepartmentModel filterModel) {
-        // init return
         List<User> userListReturn;
-//        Integer idString = Integer.parseInt(filterModel.userId());
-//        BigInteger id = BigInteger.valueOf(idString);
         Optional<Campus> campus = campusService.findByName(filterModel.campus());
         Optional<User> user = userService.findById(filterModel.userId());
         Optional<DepartmentRegional> regionalDep = departmentRegionalService.findByName(filterModel.department());
@@ -116,15 +135,9 @@ public class UserAPIController {
         Optional<User> director = Optional.empty();
         if (user.isPresent()) { director = userService.findById(regionalDep.get().getDirectorId()); }
 
-
         if (campus.isEmpty()) {
             if (regionalDep.isPresent()) {
                 userListReturn = userService.findAllByDepartment(regionalDep.get());
-                if (director.isPresent()) {
-                    if (!userListReturn.contains(director.get())) {
-                        userListReturn.add(director.get());
-                    }
-                }
             } else {
                 userListReturn = userService.findAll();
             }
@@ -133,17 +146,30 @@ public class UserAPIController {
             Optional<DepartmentCampus> campusDep = departmentCampusService.findByNameAndCampus(filterModel.department(), campus.get());
             if (campusDep.isPresent()) {
                 userListReturn = userService.findAllByDepartmentCampus(campusDep.get());
-                if (director.isPresent()) {
-                    if (!userListReturn.contains(director.get())) {
-                        userListReturn.add(director.get());
-                    }
-                }
             } else {
                 userListReturn = userService.findAll();
             }
         }
 
-        if (user.isPresent()) { userListReturn.add(user.get()); }
+        // make sure regional director is available
+        Optional<DepartmentRegional> dep = departmentRegionalService.findByName(filterModel.department());
+        if (dep.isPresent()) {
+            Optional<User> regDir = userService.findById(dep.get().getDirectorId());
+            if (regDir.isPresent()) {
+                if (!userListReturn.contains(regDir.get())) {
+                    userListReturn.add(regDir.get());
+                }
+            }
+        }
+
+        // make sure current user director is present
+        if (director.isPresent()) {
+            if (!userListReturn.contains(director.get())) {
+                userListReturn.add(director.get());
+            }
+        }
+
+        // if (user.isPresent()) { userListReturn.add(user.get()); }
 
         Collections.sort(userListReturn, new Comparator<User>() {
             @Override

@@ -88,7 +88,6 @@
         /*<![CDATA[*/
         let searchTerm = /*[[${searchTerm}]]*/ " ";
         let hideInfo = /*[[${hideInfo}]]*/ " ";
-        const treeData = /*[[${folderTree}]]*/ "";
         /*]]>*/
         document.getElementById("searchInput").value = searchTerm;
 
@@ -124,6 +123,7 @@
                         console.log(info[key])
                     }
                 }
+                tab.scrollIntoView();
             } else {
                 tab.classList.add("hide");
                 for (let key in info) {
@@ -133,12 +133,17 @@
                         console.log(info[key])
                     }
                 }
+                info[0].scrollIntoView();
             }
         }
 
-        if (hideInfo) {
-            toggleResourceInfo();
+        function setInfoShow() {
+            if (window.innerWidth < 768) {
+                toggleResourceInfo();
+            }
         }
+
+        setInfoShow();
 
     </script>
 

@@ -247,12 +247,14 @@ public class UserController {
             }
         }
 
+        List<PermissionTemplate> templateList = getPermissionTemplates(currentUser);
 
         model.addAttribute("user", user.get());
         model.addAttribute("userCampus", user.get().getCampus().getName());
         model.addAttribute("userDepartment", user.get().getDepartment().getName());
         model.addAttribute("userPosition", user.get().getPosition().getName());
         model.addAttribute("userPosition", user.get().getPosition().getName());
+        model.addAttribute("templateList", templateList);
 
         model.addAttribute("authResourceRead", authResourceRead);
         model.addAttribute("authResourceWrite", authResourceWrite);
@@ -787,6 +789,24 @@ public class UserController {
         });
 
         return userListReturn;
+    }
+
+    private List<PermissionTemplate> getPermissionTemplates(User currentUser) {
+        List<PermissionTemplate> templateList = permissionTemplateService.findAll();
+        List<PermissionTemplate> returnList = new ArrayList<>();
+        for (PermissionTemplate perm : templateList) {
+            if (perm.getPosition().getLevel() > currentUser.getPosition().getLevel()) {
+                returnList.add(perm);
+            }
+        }
+
+        Collections.sort(returnList, new Comparator<PermissionTemplate>() {
+            @Override
+            public int compare(PermissionTemplate perm1, PermissionTemplate perm2) {
+                return perm1.getName().compareToIgnoreCase(perm2.getName());
+            }
+        });
+        return returnList;
     }
 
 }

@@ -27,8 +27,22 @@ public class PermissionTemplateService implements PermissionTemplateServiceInter
     }
 
     @Override
+    public List<PermissionTemplate> findAllByPosition(Position position) {
+        return permissinoTemplateRepository.findAllByPosition(position);
+    }
+
+    @Override
     public Optional<PermissionTemplate> findFirstByPosition(Position position) {
+        Optional<PermissionTemplate> posTemp = permissinoTemplateRepository.findFirstByPositionAndDefaultTemplate(position, true);
+        if (posTemp.isPresent()) {
+            return posTemp;
+        }
         return permissinoTemplateRepository.findFirstByPosition(position);
+    }
+
+    @Override
+    public Optional<PermissionTemplate> findDefaultByPosition(Position position) {
+        return permissinoTemplateRepository.findFirstByPositionAndDefaultTemplate(position, true);
     }
 
     @Override

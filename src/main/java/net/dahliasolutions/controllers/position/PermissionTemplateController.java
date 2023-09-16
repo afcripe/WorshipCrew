@@ -75,6 +75,7 @@ public class PermissionTemplateController {
 
     @PostMapping("/create")
     public String createPosition(@ModelAttribute PermissionTemplateModel templateModel, Model model, HttpSession session) {
+        redirectService.setHistory(session, "/permissiontemplate/new");
         Optional<PermissionTemplate> existingTemplate = permissionTemplateService.findByName(templateModel.name());
         if(existingTemplate.isPresent()) {
             session.setAttribute("msgError", "Template Name Already Exists!");
@@ -82,9 +83,16 @@ public class PermissionTemplateController {
             return "position/templateNew";
         }
 
+        Position position = positionService.findById(templateModel.positionId()).get();
+        boolean templateDefault = templateModel.defaultTemplate() != null;
+
+        boolean positionHasDefault = findDefaultTemplate(position);
+        if (!positionHasDefault) templateDefault = true;
+
         PermissionTemplate newTemplate = new PermissionTemplate();
             newTemplate.setName(templateModel.name());
-            newTemplate.setPosition(positionService.findById(templateModel.positionId()).get());
+            newTemplate.setPosition(position);
+            newTemplate.setDefaultTemplate(templateDefault);
 
         List<String> items = Arrays.asList(templateModel.roles().split("\s"));
         List<UserRoles> rolesList = new ArrayList<>();
@@ -138,12 +146,12 @@ public class PermissionTemplateController {
         model.addAttribute("template", template.get());
         model.addAttribute("positionList", positionList);
         model.addAttribute("roleList", roleList);
-        redirectService.setHistory(session, "/permissiontemplate/edit/"+id);
         return "position/templateEdit";
     }
 
     @PostMapping("/update")
     public String updatePosition(@ModelAttribute PermissionTemplateModel templateModel, Model model, HttpSession session) {
+        redirectService.setHistory(session, "/permissiontemplate/edit/"+templateModel.id());
         Optional<PermissionTemplate> template = permissionTemplateService.findById(templateModel.id());
         Optional<PermissionTemplate> existingTemplate = permissionTemplateService.findByName(templateModel.name());
         if(template.isEmpty()) {
@@ -158,9 +166,17 @@ public class PermissionTemplateController {
                 return redirectService.pathName(session, "position");
             }
         }
+        Position position = positionService.findById(templateModel.positionId()).get();
+
+        boolean dft = templateModel.defaultTemplate() != null;
+        //if new default make all other not default
+        if (dft){
+            setNoDefaultTemplate(position);
+        }
 
         template.get().setName(templateModel.name());
-        template.get().setPosition(positionService.findById(templateModel.positionId()).get());
+        template.get().setPosition(position);
+        template.get().setDefaultTemplate(dft);
 
         List<String> items = Arrays.asList(templateModel.roles().split("\s"));
         List<UserRoles> rolesList = new ArrayList<>();
@@ -189,5 +205,18 @@ public class PermissionTemplateController {
     public String deletePosition(@PathVariable BigInteger id, HttpSession session) {
         permissionTemplateService.deletePermissionTemplateById(id);
         return "redirect:/position";
+    }
+
+    private boolean findDefaultTemplate(Position position) {
+        Optional<PermissionTemplate> dft = permissionTemplateService.findDefaultByPosition(position);
+        return dft.isPresent();
+    }
+
+    private void setNoDefaultTemplate(Position position) {
+        List<PermissionTemplate> templateList = permissionTemplateService.findAllByPosition(position);
+        for (PermissionTemplate perm : templateList) {
+            perm.setDefaultTemplate(false);
+            permissionTemplateService.save(perm);
+        }
     }
 }
