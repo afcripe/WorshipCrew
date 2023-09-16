@@ -36,6 +36,7 @@
               <script th:inline="javascript">
                 function searchForm() {
                   event.preventDefault();
+                  debugger
                   window.location.href="/resource/search/"+document.getElementById("searchInput").value;
                 }
                 function searchKeyUp(event) {

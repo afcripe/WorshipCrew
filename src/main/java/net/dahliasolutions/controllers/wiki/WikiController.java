@@ -400,6 +400,16 @@ public class WikiController {
         return "wiki/folderManager";
     }
 
+    @GetMapping("/recent")
+    public String getRecentArticles(Model model, HttpSession session) {
+        redirectService.setHistory(session, "/resource/recent");
+        List<WikiPost> wikiPostList = wikiPostService.findRecent();
+
+        model.addAttribute("wikiPostList", wikiPostList);
+        model.addAttribute("searchTerm", "");
+        return "wiki/searchResults";
+    }
+
     @GetMapping("/search/{searchTerm}")
     public String searchArticle(@PathVariable String searchTerm, Model model, HttpSession session) {
         redirectService.setHistory(session, "/resource/search/title/"+searchTerm);
@@ -418,10 +428,8 @@ public class WikiController {
         }
 
         model.addAttribute("wikiPostList", wikiPostList);
-        model.addAttribute("tagList", tagList);
-        model.addAttribute("folderTree", wikiFolderService.getFolderTree());
         model.addAttribute("searchTerm", searcher);
-        return "wiki/index";
+        return "wiki/searchResults";
     }
 
     @GetMapping("/folders")

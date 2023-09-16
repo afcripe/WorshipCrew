@@ -7,78 +7,80 @@
 
     <div th:replace="~{wiki/moduleHeader :: header}">Header</div>
 
-    <div class="m-2">
+    <div class="mx-2">
 
-        <div class="row mt-2">
+        <div class="title-header">
+            <div class="h3 title-header-left" style="flex-grow: 1" th:text="${pageTitle}">Topics</div>
+            <div class="h4 text-link title-header-right" th:onclick="navToRecent()">Recent Articles</div>
 
-                <div class="wiki-article">
+        </div>
 
-                    <div class="wiki-body col-12 col-md-9 px-5">
-                        <div class="my-3 h3" th:text="${pageTitle}">Topics</div>
-                        <div th:each="topic : ${wikiPostList}">
-                            <div class="mt-5 h5">
-                                <span class="text-link" th:text="${#strings.capitalize(topic.folder)}" th:onclick="navToFolderTopic([[${topic.folder}]])"></span>
-<!--                                (<span th:text="${topic.postCount}"></span>)-->
-                            </div>
-                            <div class="article-topic-list">
-                                <div th:each="post : ${topic.wikiPost}" th:object="${post}">
-                                <div class="article-topic-entry selectableItem m-2" th:onclick="navToPost([[${post.id}]])">
-                                    <div class="article-topic-details">
-                                        <div class="article-topic-title"><span th:text="${post.title}"></span></div>
-                                        <div class="article-topic-summary"><span th:text="${post.summary}"></span></div>
-                                    </div>
-                                    <div class="article-topic-info">
-                                        <div class="article-topic-author">Author: <span th:text="*{author.fullName}"></span></div>
-                                        <div class="article-topic-date">Updated: <span th:text="*{#temporals.format(lastUpdated, 'MMM-dd-yyyy HH:mm')}"></span></div>
-                                    </div>
+        <div class="wiki-article">
+
+            <div class="wiki-body col-12 col-md-9">
+                <div th:each="topic : ${wikiPostList}">
+                    <div class="mt-5 h5">
+                        <span class="text-link" th:text="${#strings.capitalize(topic.folder)}" th:onclick="navToFolderTopic([[${topic.folder}]])"></span>
+                        <!--                                (<span th:text="${topic.postCount}"></span>)-->
+                    </div>
+                    <div class="article-topic-list">
+                        <div th:each="post : ${topic.wikiPost}" th:object="${post}">
+                            <div class="article-topic-entry selectableItem m-2" th:onclick="navToPost([[${post.id}]])">
+                                <div class="article-topic-details">
+                                    <div class="article-topic-title"><span th:text="${post.title}"></span></div>
+                                    <div class="article-topic-summary"><span th:text="${post.summary}"></span></div>
                                 </div>
+                                <div class="article-topic-info">
+                                    <div class="article-topic-author">Author: <span th:text="*{author.fullName}"></span></div>
+                                    <div class="article-topic-date">Updated: <span th:text="*{#temporals.format(lastUpdated, 'MMM-dd-yyyy HH:mm')}"></span></div>
                                 </div>
-
-                                <th:block th:if="${not #lists.isEmpty(topic.subFolders)}">
-                                    <div class="px-3 pt-2 h6">Folders</div>
-                                    <div th:each="folder : ${topic.subFolders}" th:object="${folder}">
-                                        <div class="px-3 article-topic-entry" th:onclick="navToFolder([[${folder.folder}]])">
-                                            <span class="text-link" th:text="${folder.folder}"></span>
-                                        </div>
-                                    </div>
-                                </th:block>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="wiki-info col-12 col-md-3">
-                        <div class="wiki-info-headroom d-sm-none d-md-block"></div>
-                        <div class="card m-1">
-                            <div class="card-title h6 selectableItem p-2" onclick="toggleResourceInfo()">Tags</div>
-                            <hr>
-                            <div>
-                                <div class="tag_primary m-1 selectableItem" style="display: inline-block;" th:onclick="navToTag([[*{tag.id}]])"
-                                     th:each="tag : *{tagList}" th:text="${tag.name + '(' + tag.references + ')'}"></div>
                             </div>
                         </div>
 
-                        <div class="card m-1">
-                            <div class="card-title h6 selectableItem p-2" onclick="toggleResourceInfo()">Unpublished Articles</div>
-                            <div class="card-title h6 selectableItem p-2" onclick="navUserArticles()">My Articles</div>
-                            <hr>
-                            <div class="selectableItem p-1" th:onclick="navToPost([[*{unpublished.id}]])"
-                                 th:each="unpublished : *{unpublishedList}" th:text="${unpublished.title}"></div>
-                        </div>
-                    </div>
+                        <th:block th:if="${not #lists.isEmpty(topic.subFolders)}">
+                            <div class="px-3 pt-2 h6">Folders</div>
+                            <div th:each="folder : ${topic.subFolders}" th:object="${folder}">
+                                <div class="px-3 article-topic-entry" th:onclick="navToFolder([[${folder.folder}]])">
+                                    <span class="text-link" th:text="${folder.folder}"></span>
+                                </div>
+                            </div>
+                        </th:block>
 
-                    <div class="wiki-info-tab hide">
-                        <div class="wiki-info-tab-title selectableItem" onclick="toggleResourceInfo()">
-                            Articles
-                        </div>
-                        <div class="wiki-info-tab-title selectableItem" onclick="toggleResourceInfo()">
-                            Tags
-                        </div>
                     </div>
+                </div>
+            </div>
 
+            <div class="wiki-info col-12 col-md-3">
+                <div class="wiki-info-headroom d-sm-none d-md-block"></div>
+                <div class="card m-1">
+                    <div class="card-title h6 selectableItem p-2" onclick="toggleResourceInfo()">Tags</div>
+                    <hr>
+                    <div>
+                        <div class="tag_primary m-1 selectableItem" style="display: inline-block;" th:onclick="navToTag([[*{tag.id}]])"
+                             th:each="tag : *{tagList}" th:text="${tag.name + '(' + tag.references + ')'}"></div>
+                    </div>
                 </div>
 
+                <div class="card m-1">
+                    <div class="card-title h6 selectableItem p-2" onclick="toggleResourceInfo()">Articles</div>
+                    <div class="card-title h6 selectableItem px-2" onclick="navUserArticles()">View All Articles</div>
+                    <hr>
+                    <div class="card-title h6 px-2" onclick="navUserArticles()">Unpublished</div>
+                    <div class="selectableItem p-1" th:onclick="navToPost([[*{unpublished.id}]])"
+                         th:each="unpublished : *{unpublishedList}" th:text="${unpublished.title}"></div>
+                </div>
             </div>
+
+            <div class="wiki-info-tab-home hide">
+                <div class="wiki-info-tab-title selectableItem" onclick="toggleResourceInfo()">
+                    Articles
+                </div>
+                <div class="wiki-info-tab-title selectableItem" onclick="toggleResourceInfo()">
+                    Tags
+                </div>
+            </div>
+
+        </div>
 
     </div>
 
@@ -102,13 +104,16 @@
         function navToPost(id) {
             window.location.href="/resource/article/"+id;
         }
+        function navToRecent() {
+            window.location.href="/resource/recent";
+        }
 
         function navUserArticles() {
             window.location.href="/resource/user";
         }
 
         function toggleResourceInfo() {
-            let tab = document.querySelector(".wiki-info-tab");
+            let tab = document.querySelector(".wiki-info-tab-home");
             let info = document.querySelectorAll(".wiki-info");
             if (tab.classList.contains("hide")) {
                 tab.classList.remove("hide");

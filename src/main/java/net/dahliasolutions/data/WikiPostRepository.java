@@ -37,8 +37,8 @@ public interface WikiPostRepository extends JpaRepository<WikiPost, BigInteger> 
     List<WikiPost> findByAuthorAndUnpublished(@Param("id") BigInteger id);
 
 
-    @Query(value="SELECT * FROM WIKI_POST WHERE PUBLISHED = TRUE ORDER BY LAST_UPDATED DESC LIMIT 10", nativeQuery = true)
-    List<WikiPost> findFirst10OrderByLastUpdatedDesc();
+    @Query(value="SELECT * FROM WIKI_POST WHERE PUBLISHED = TRUE ORDER BY LAST_UPDATED DESC LIMIT 15", nativeQuery = true)
+    List<WikiPost> findFirst15OrderByLastUpdatedDesc();
 
     @Query(value="SELECT * FROM WIKI_POST GROUP BY FOLDER AND PUBLISHED = TRUE", nativeQuery = true)
     List<WikiPost> findAllGroupByFolder();

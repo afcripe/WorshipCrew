@@ -64,7 +64,7 @@ public class WikiPostService implements WikiPostServiceInterface {
 
     @Override
     public List<WikiPost> findRecent()  {
-        return wikiPostRepository.findFirst10OrderByLastUpdatedDesc();
+        return wikiPostRepository.findFirst15OrderByLastUpdatedDesc();
     }
 
     @Override

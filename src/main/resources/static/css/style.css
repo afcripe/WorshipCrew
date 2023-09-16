@@ -146,6 +146,21 @@
 
 /* Resources Styling */
 
+.title-header {
+    display: flex;
+    flex-direction: row;
+    margin: 1rem;
+}
+
+.title-header-left {
+    flex-grow: 1;
+}
+
+.title-header-right {
+    text-align: right;
+}
+
+
 .wiki-article {
     display: flex;
     flex-direction: row;
@@ -159,7 +174,19 @@
 }
 
 .wiki-info-headroom {
-    height: 6rem;
+    height: 5rem;
+}
+
+.wiki-info-tab-home {
+    position: absolute;
+    top: 300px;
+    right: -60px;
+    height: 1.5em;
+    margin: auto;
+}
+
+.wiki-info-tab-home {
+    transform: rotate(-90deg);
 }
 
 .wiki-info-tab {
