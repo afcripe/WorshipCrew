@@ -14,7 +14,7 @@
         <div class="row pt-5 py-2">
             <div class="col">
                 <h4>
-                    <a th:href="'/support/department/'+*{department.department.name}" style="text-decoration: none">
+                    <a th:href="'/support/department/'+*{#strings.replace(department.department.name,' ','_')}" style="text-decoration: none">
                         <span th:text="*{department.department.name}" style="text-decoration: none"></span>
                         (<span th:text="*{#lists.size(department.ticketList)}" style="text-decoration: none"></span>)
                     </a>

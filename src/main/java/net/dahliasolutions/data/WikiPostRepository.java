@@ -30,6 +30,9 @@ public interface WikiPostRepository extends JpaRepository<WikiPost, BigInteger> 
     @Query(value="SELECT * FROM WIKI_POST WHERE AUTHOR_ID = :id", nativeQuery = true)
     List<WikiPost> findByAuthor(@Param("id") BigInteger id);
 
+    @Query(value="SELECT * FROM WIKI_POST WHERE AUTHOR_ID = :id AND PUBLISHED = TRUE", nativeQuery = true)
+    List<WikiPost> findByAuthorAndPublished(@Param("id") BigInteger id);
+
     @Query(value="SELECT * FROM WIKI_POST WHERE AUTHOR_ID = :id AND PUBLISHED = FALSE", nativeQuery = true)
     List<WikiPost> findByAuthorAndUnpublished(@Param("id") BigInteger id);
 

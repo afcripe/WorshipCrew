@@ -50,6 +50,66 @@ public class WikiController {
     }
 
     @GetMapping("")
+    public String getFolderHome(Model model, HttpSession session) {
+        AdminSettings adminSettings = adminSettingsService.getAdminSettings();
+        if (!adminSettings.getWikiHome().equals("")) {
+            return "redirect:/resource/home";
+        }
+
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        // find parent folders
+        List<WikiFolder> folders = wikiFolderService.findAll();
+        List<String> parentFolders = new ArrayList<>();
+        for (WikiFolder folder : folders) {
+            String[] dirs = folder.getFolder().split("/");
+            String pFolder = "/"+dirs[1];
+            if (!parentFolders.contains(pFolder)) parentFolders.add(pFolder);
+        }
+
+        //get article list for each folder
+
+        List<GroupedWikiPostList> folderPosts = new ArrayList<>();
+        for (String p : parentFolders) {
+            List<WikiFolder> subs = wikiFolderService.findAllByFolderNameStartsWith(p);
+            List<WikiFolder> sub = new ArrayList<>();
+            for (WikiFolder f : subs) {
+                if (!f.getFolder().equals(p)) {
+                    sub.add(f);
+                }
+            }
+
+            List<WikiPost> posts = wikiPostService.findAllByFolder(p);
+            GroupedWikiPostList gp =
+                    new GroupedWikiPostList(
+                            p.replace("/", ""),
+                            posts,
+                            posts.size(),
+                            sub);
+            folderPosts.add(gp);
+        }
+
+
+        List<WikiTag> tags = wikiTagService.findAll();
+        List<WikiTagReference> tagList = new ArrayList<>();
+        for ( WikiTag tag : tags ) {
+            WikiTagReference tagCounter = new WikiTagReference();
+                tagCounter.setId(tag.getId());
+                tagCounter.setName(tag.getName());
+                tagCounter.setReferences(wikiTagService.countReferences(tag.getId()));
+            tagList.add(tagCounter);
+        }
+
+
+        model.addAttribute("pageTitle", "Topics");
+        model.addAttribute("wikiPostList", folderPosts);
+        model.addAttribute("tagList", tagList);
+        model.addAttribute("unpublishedList", wikiPostService.findByAuthorAndUnpublished(user.getId()));
+        model.addAttribute("folderTree", wikiFolderService.getFolderTree());
+        model.addAttribute("hideInfo", true);
+        return "wiki/index";
+    }
+
+    @GetMapping("/home")
     public String getRecent(Model model, HttpSession session) {
         AdminSettings adminSettings = adminSettingsService.getAdminSettings();
 
@@ -82,9 +142,9 @@ public class WikiController {
         List<WikiTagReference> tagList = new ArrayList<>();
         for ( WikiTag tag : tags ) {
             WikiTagReference tagCounter = new WikiTagReference();
-                tagCounter.setId(tag.getId());
-                tagCounter.setName(tag.getName());
-                tagCounter.setReferences(wikiTagService.countReferences(tag.getId()));
+            tagCounter.setId(tag.getId());
+            tagCounter.setName(tag.getName());
+            tagCounter.setReferences(wikiTagService.countReferences(tag.getId()));
             tagList.add(tagCounter);
         }
 
@@ -93,7 +153,16 @@ public class WikiController {
         model.addAttribute("tagList", tagList);
         model.addAttribute("unpublishedList", wikiPostService.findByAuthorAndUnpublished(user.getId()));
         model.addAttribute("folderTree", wikiFolderService.getFolderTree());
+        model.addAttribute("hideInfo", true);
         return "wiki/index";
+    }
+
+    @GetMapping("/user")
+    public String getUserArticles(Model model, HttpSession session) {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        model.addAttribute("wikiPostList", wikiPostService.findByAuthorAndPublished(currentUser.getId()));
+        model.addAttribute("unpublishedList", wikiPostService.findByAuthorAndUnpublished(currentUser.getId()));
+        return "wiki/userPosts";
     }
 
     @GetMapping("/tag/{id}")
@@ -138,7 +207,7 @@ public class WikiController {
 
         List<GroupedWikiPostList> postList = new ArrayList<>();
         for ( WikiFolder folder : folders ) {
-            postList.add(new GroupedWikiPostList(folder.getFolder(), new ArrayList<>()));
+            postList.add(new GroupedWikiPostList(folder.getFolder(), new ArrayList<>(), 0, new ArrayList<>()));
         }
         for ( WikiPost post : wikiPostList ) {
             for ( GroupedWikiPostList dir : postList ) {
@@ -185,10 +254,43 @@ public class WikiController {
 
         Optional<WikiFolder> dir = wikiFolderService.findByFolder(folderFile);
         if (dir.isPresent()){
+
+            List<GroupedWikiPostList> folderPosts = new ArrayList<>();
+
+            List<WikiFolder> subs = wikiFolderService.findAllByFolderNameStartsWith(dir.get().getFolder());
+            List<WikiFolder> sub = new ArrayList<>();
+            for (WikiFolder f : subs) {
+                if (!f.getFolder().equals(dir.get().getFolder())) {
+                    sub.add(f);
+                }
+            }
+
             List<WikiPost> wikiPostList = wikiPostService.findAllByFolder(dir.get().getFolder());
-            model.addAttribute("wikiPostList", wikiPostList);
-            model.addAttribute("folder", dir.get());
-            return "wiki/folderPosts";
+            GroupedWikiPostList gp =
+                    new GroupedWikiPostList(
+                            "",
+                            wikiPostList,
+                            wikiPostList.size(),
+                            sub);
+            folderPosts.add(gp);
+
+            List<WikiTag> tags = wikiTagService.findAll();
+            List<WikiTagReference> tagList = new ArrayList<>();
+            for ( WikiTag tag : tags ) {
+                WikiTagReference tagCounter = new WikiTagReference();
+                tagCounter.setId(tag.getId());
+                tagCounter.setName(tag.getName());
+                tagCounter.setReferences(wikiTagService.countReferences(tag.getId()));
+                tagList.add(tagCounter);
+            }
+
+            model.addAttribute("pageTitle", dir.get().getFolder());
+            model.addAttribute("wikiPostList", folderPosts);
+            model.addAttribute("tagList", tagList);
+            model.addAttribute("unpublishedList", wikiPostService.findByAuthorAndUnpublished(currentUser.getId()));
+            model.addAttribute("folderTree", wikiFolderService.getFolderTree());
+            model.addAttribute("hideInfo", true);
+            return "wiki/index";
         }
 
         List<WikiPost> wikiList = wikiPostService.findByTitle(postName);

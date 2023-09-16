@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<div class="container-fluid m-0 p-0" layout:fragment="content">
+
+    <div th:replace="~{wiki/moduleHeader :: header}">Header</div>
+
+    <div class="m-2">
+
+        <div class="row mt-2">
+
+            <div class="wiki-article">
+
+                <div class="wiki-body col-12 col-md-9 px-5">
+                        <div class="my-3 h3" >Unpublished</div>
+                        <div class="article-topic-list">
+                            <div th:each="upost : ${unpublishedList}" th:object="${upost}">
+                            <div class="article-topic-entry selectableItem m-2" th:onclick="navToPost([[${upost.id}]])">
+                                <div class="article-topic-details">
+                                    <div class="article-topic-title"><span th:text="${upost.title}"></span></div>
+                                    <div class="article-topic-summary"><span th:text="${upost.summary}"></span></div>
+                                </div>
+                                <div class="article-topic-info">
+                                    <div class="article-topic-author">Updated: <span th:text="*{#temporals.format(lastUpdated, 'MMM-dd-yyyy HH:mm')}"></span></div>
+                                    <div class="article-topic-date"></div>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+
+                        <div class="my-3 h3" >Published</div>
+                        <div class="article-topic-list">
+                            <div th:each="post : ${wikiPostList}" th:object="${post}">
+                            <div class="article-topic-entry selectableItem m-2" th:onclick="navToPost([[${post.id}]])">
+                                <div class="article-topic-details">
+                                    <div class="article-topic-title"><span th:text="${post.title}"></span></div>
+                                    <div class="article-topic-summary"><span th:text="${post.summary}"></span></div>
+                                </div>
+                                <div class="article-topic-info">
+                                    <div class="article-topic-author">Updated: <span th:text="*{#temporals.format(lastUpdated, 'MMM-dd-yyyy HH:mm')}"></span></div>
+                                    <div class="article-topic-date"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        let searchTerm = /*[[${searchTerm}]]*/ " ";
+        /*]]>*/
+        document.getElementById("searchInput").value = searchTerm;
+
+        function navToPost(id) {
+            window.location.href="/resource/article/"+id;
+        }
+
+
+    </script>
+
+</div>
+
+</html>

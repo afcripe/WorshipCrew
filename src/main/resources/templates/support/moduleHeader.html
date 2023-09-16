@@ -29,10 +29,12 @@
 
         <div class="collapse navbar-collapse flex-grow-1" id="navbarBreadcrumb">
           <ul class="navbar-nav mr-auto p-1">
-            <li class="nav-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'SUPPORT_SUPERVISOR')}">
+            <li class="nav-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'SUPPORT_SUPERVISOR')
+                                   or #lists.contains(userRoles,'SUPPORT_READ')}">
               <a class="nav-link" href="/support/department">Department</a>
             </li>
-            <li class="nav-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'SUPPORT_SUPERVISOR')}">
+            <li class="nav-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'SUPPORT_SUPERVISOR')
+                                   or #lists.contains(userRoles,'SUPPORT_READ')}">
               <a class="nav-link" href="/support/campus">Campus</a>
             </li>
           </ul>

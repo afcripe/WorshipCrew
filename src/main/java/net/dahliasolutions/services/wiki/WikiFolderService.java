@@ -38,6 +38,11 @@ public class WikiFolderService implements WikiFolderServiceInterface {
     }
 
     @Override
+    public List<WikiFolder> findAllByFolderNameStartsWith(String name) {
+        return wikiFolderRepository.findAllByFolderNameStartsWith(name);
+    }
+
+    @Override
     public void deleteByFolder(WikiFolder wikiFolder) {
         if (wikiFolder.getFolder().equals("\"/general\"")) {
             return;

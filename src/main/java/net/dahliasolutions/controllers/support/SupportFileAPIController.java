@@ -120,7 +120,6 @@ public class SupportFileAPIController {
             // get the image save location and verify directories
             String fileName = StringUtils.cleanPath(imageFile.getOriginalFilename());
             String uploadDir = appServer.getResourceDir() + "/support/images";
-            String fileURL = appServer.getResourceURL() + "/support/images/" + fileName;
             Path uploadPath = Paths.get(uploadDir);
             if (!Files.exists(uploadPath)) {
                 try {
@@ -130,10 +129,20 @@ public class SupportFileAPIController {
                 }
             }
 
+            // check for existing file
+            Path filePath = uploadPath.resolve(fileName);
+            if (Files.exists(filePath)) {
+                String[] tokens = fileName.split("\\.(?=[^\\.]+$)");
+                String milli = String.valueOf(System.currentTimeMillis());
+                String suffix = milli.substring(milli.length()-4);
+                fileName = tokens[tokens.length-2]+"-"+suffix+"."+tokens[tokens.length-1];
+            }
+            String fileURL = appServer.getResourceURL()+"/support/images/"+fileName;
+            filePath = uploadPath.resolve(fileName);
+
             // try to save file
             try {
                 InputStream inputStream = imageFile.getInputStream();
-                Path filePath = uploadPath.resolve(fileName);
                 Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
                 System.out.println("error saving file");
@@ -150,10 +159,13 @@ public class SupportFileAPIController {
     public SingleBigIntegerModel removeStoredImage(@ModelAttribute SingleBigIntegerModel image){
         Optional<TicketImage> ticketImage = ticketImageService.findById(image.id());
         if (ticketImage.isPresent()) {
+            String trimmedPath = appServer.getResourceDir().replace("/content", "");
+            Path imagePath = Paths.get(trimmedPath+ticketImage.get().getFileLocation());
             try {
-                Files.deleteIfExists(Paths.get(ticketImage.get().getFileLocation()));
-            } catch (IOException e) {
-                System.out.println("File not Delted");
+                Files.deleteIfExists(imagePath);
+                System.out.println("Deleting File");
+            } catch (IOException ioException) {
+                System.out.println("File Not Found");
             }
             ticketImageService.deleteById(ticketImage.get().getId());
         }

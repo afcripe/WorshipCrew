@@ -9,36 +9,46 @@
 
     <div class="m-2">
 
-        <div class="card" style="max-width: 500px">
-            <div class="card-title">
-                <h5 onclick="toggleFolders()">Find Articles by Folders
-                    <i id="cartFolderNavDown" class="bi bi-caret-down-fill" style="display: none"></i>
-                    <i id="cartFolderNavRight" class="bi bi-caret-right-fill"></i>
-                </h5>
-            </div>
-            <div id="divFolderNav" class="folder-nav folder-nav-collapse">
-                <div id="folderChooser" class="px-5" style="border: 1px solid darkgray; border-radius: 5px; text-align: left;">
-                </div>
-            </div>
-        </div>
-
         <div class="row mt-2">
 
                 <div class="wiki-article">
 
-                    <div class="wiki-body col-12 col-md-9">
-                        <div class="mt-3 h5">Recent Articles</div>
-                        <div th:each="post : ${wikiPostList}">
-                            <div class="card selectableItem m-2" th:onclick="navToPost([[*{post.id}]])">
-                                <div class="px-2" th:object="${post}">
-                                    <span th:text="*{title}"></span>
-                                    <p th:text="*{summary}" style="font-size: small; height: 1.5em; overflow: hidden;"></p>
+                    <div class="wiki-body col-12 col-md-9 px-5">
+                        <div class="my-3 h3" th:text="${pageTitle}">Topics</div>
+                        <div th:each="topic : ${wikiPostList}">
+                            <div class="mt-5 h5">
+                                <span class="text-link" th:text="${#strings.capitalize(topic.folder)}" th:onclick="navToFolderTopic([[${topic.folder}]])"></span>
+<!--                                (<span th:text="${topic.postCount}"></span>)-->
+                            </div>
+                            <div class="article-topic-list">
+                                <div th:each="post : ${topic.wikiPost}" th:object="${post}">
+                                <div class="article-topic-entry selectableItem m-2" th:onclick="navToPost([[${post.id}]])">
+                                    <div class="article-topic-details">
+                                        <div class="article-topic-title"><span th:text="${post.title}"></span></div>
+                                        <div class="article-topic-summary"><span th:text="${post.summary}"></span></div>
+                                    </div>
+                                    <div class="article-topic-info">
+                                        <div class="article-topic-author">Author: <span th:text="*{author.fullName}"></span></div>
+                                        <div class="article-topic-date">Updated: <span th:text="*{#temporals.format(lastUpdated, 'MMM-dd-yyyy HH:mm')}"></span></div>
+                                    </div>
                                 </div>
+                                </div>
+
+                                <th:block th:if="${not #lists.isEmpty(topic.subFolders)}">
+                                    <div class="px-3 pt-2 h6">Folders</div>
+                                    <div th:each="folder : ${topic.subFolders}" th:object="${folder}">
+                                        <div class="px-3 article-topic-entry" th:onclick="navToFolder([[${folder.folder}]])">
+                                            <span class="text-link" th:text="${folder.folder}"></span>
+                                        </div>
+                                    </div>
+                                </th:block>
+
                             </div>
                         </div>
                     </div>
 
                     <div class="wiki-info col-12 col-md-3">
+                        <div class="wiki-info-headroom d-sm-none d-md-block"></div>
                         <div class="card m-1">
                             <div class="card-title h6 selectableItem p-2" onclick="toggleResourceInfo()">Tags</div>
                             <hr>
@@ -50,6 +60,7 @@
 
                         <div class="card m-1">
                             <div class="card-title h6 selectableItem p-2" onclick="toggleResourceInfo()">Unpublished Articles</div>
+                            <div class="card-title h6 selectableItem p-2" onclick="navUserArticles()">My Articles</div>
                             <hr>
                             <div class="selectableItem p-1" th:onclick="navToPost([[*{unpublished.id}]])"
                                  th:each="unpublished : *{unpublishedList}" th:text="${unpublished.title}"></div>
@@ -58,7 +69,7 @@
 
                     <div class="wiki-info-tab hide">
                         <div class="wiki-info-tab-title selectableItem" onclick="toggleResourceInfo()">
-                            Unpublished
+                            Articles
                         </div>
                         <div class="wiki-info-tab-title selectableItem" onclick="toggleResourceInfo()">
                             Tags
@@ -74,12 +85,16 @@
     <script th:inline="javascript">
         /*<![CDATA[*/
         let searchTerm = /*[[${searchTerm}]]*/ " ";
+        let hideInfo = /*[[${hideInfo}]]*/ " ";
         const treeData = /*[[${folderTree}]]*/ "";
         /*]]>*/
         document.getElementById("searchInput").value = searchTerm;
 
         function navToTag(id) {
             window.location.href="/resource/tag/"+id;
+        }
+        function navToFolderTopic(name) {
+            window.location.href="/resource/articles/"+name;
         }
         function navToFolder(name) {
             window.location.href="/resource/articles"+name;
@@ -88,77 +103,8 @@
             window.location.href="/resource/article/"+id;
         }
 
-        let folders = document.getElementById("divFolderNav");
-        let caretDown = document.getElementById("cartFolderNavDown");
-        let caretRight = document.getElementById("cartFolderNavRight");
-
-        folders.classList.remove("folder-nav-collapse");
-        caretDown.style.display = "none";
-        caretRight.style.display = "inline-block";
-
-        function toggleFolders() {
-            if (folders.classList.contains("folder-nav-collapse")){
-                folders.classList.remove("folder-nav-collapse");
-                caretDown.style.display = "none";
-                caretRight.style.display = "inline-block";
-            } else {
-                folders.classList.add("folder-nav-collapse");
-                caretDown.style.display = "inline-block";
-                caretRight.style.display = "none";
-            }
-        }
-
-        function loadFolders() {
-            const chooser = document.getElementById("folderChooser");
-            let parentUL = document.createElement("ul");
-            parentUL.id = "folderTree";
-            for (let i in treeData.folders) {
-                createList(parentUL, treeData.folders[i]);
-            }
-            chooser.appendChild(parentUL);
-
-            let toggler = document.getElementsByClassName("caret");
-            for (let i = 0; i < toggler.length; i++) {
-                toggler[i].addEventListener("click", function() {
-                    this.parentElement.querySelector(".nested").classList.toggle("active");
-                    this.classList.toggle("caret-down");
-                });
-            }
-        }
-
-        function createList(parent, data) {
-            let li = document.createElement("li"),
-                ul;
-
-            let item = document.createElement("span");
-            item.textContent = data.name;
-            item.dataset.path = data.path;
-            item.classList.add("selectableItem");
-            item.addEventListener("click", function (event){
-                selectTreeFolder(event.target, data.path);
-                event.stopPropagation();
-            })
-            li.appendChild(item);
-
-            parent.appendChild(li);
-            console.log(data.folders.length);
-            if (data.folders.length > 0) {
-                let c = document.createElement("span");
-                c.classList.add("caret")
-                li.insertBefore(c, li.firstChild);
-
-                ul = document.createElement("ul");
-                ul.classList.add("nested")
-                li.appendChild(ul);
-
-                for( let f in data.folders ) {
-                    createList(ul, data.folders[f]);
-                }
-            }
-        }
-
-        function selectTreeFolder(element, str) {
-            navToFolder(str);
+        function navUserArticles() {
+            window.location.href="/resource/user";
         }
 
         function toggleResourceInfo() {
@@ -185,7 +131,9 @@
             }
         }
 
-        loadFolders();
+        if (hideInfo) {
+            toggleResourceInfo();
+        }
 
     </script>
 

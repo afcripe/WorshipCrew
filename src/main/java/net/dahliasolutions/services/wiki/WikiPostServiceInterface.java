@@ -23,6 +23,7 @@ public interface WikiPostServiceInterface {
     List<WikiPost> findAllByTagId(BigInteger id);
     List<WikiPost> findByAuthor(BigInteger authorId);
     List<WikiPost> findByAuthorAndUnpublished(BigInteger authorId);
+    List<WikiPost> findByAuthorAndPublished(BigInteger authorId);
     WikiPost save(WikiPost wikiPost);
     void mergeTags(WikiTag sourceTag, WikiTag destinationTag);
     void removeTag(WikiTag wikiTag);

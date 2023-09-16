@@ -278,15 +278,30 @@ public class SupportController {
             }
         }
 
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
         LocalDateTime startDate = getStartDate(session.getAttribute("dateFilter").toString(), currentCycle);
         LocalDateTime endDate = getEndDate(session.getAttribute("dateFilter").toString(), currentCycle);
 
-        List<Campus> campusList = campusService.findAll();
+        List<Campus> campusList = campusList(currentUser);
+        if (campusList.size() == 1) {
+            return "redirect:/support/campus/"+campusList.get(0).getName();
+        }
+
+        BigInteger departmentID = BigInteger.valueOf(0);
+        List<DepartmentRegional> departmentList = departmentList(currentUser);
+        if (departmentList.size() == 1) {
+            departmentID = departmentList.get(0).getId();
+        }
 
         List<TicketCampus> campusItemList = new ArrayList<>();
         for (Campus campus : campusList) {
             TicketCampus campusItem = new TicketCampus(campus, new ArrayList<>());
-            campusItem.setTicketList(ticketService.findAllByCampusAndCycle(campus.getId(), startDate, endDate));
+            if (departmentID.equals(0)) {
+                campusItem.setTicketList(ticketService.findAllByCampusAndCycle(campus.getId(), startDate, endDate));
+            } else {
+                campusItem.setTicketList(ticketService.findAllByDepartmentAndCampusAndCycle(departmentID, campus.getId(), startDate, endDate));
+            }
             campusItemList.add(campusItem);
         }
 
@@ -321,6 +336,8 @@ public class SupportController {
                     session.setAttribute("cycle", 0);
             }
         }
+
+        name = name.replace("_"," ");
 
         LocalDateTime startDate = getStartDate(session.getAttribute("dateFilter").toString(), currentCycle);
         LocalDateTime endDate = getEndDate(session.getAttribute("dateFilter").toString(), currentCycle);
@@ -377,15 +394,30 @@ public class SupportController {
             }
         }
 
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
         LocalDateTime startDate = getStartDate(session.getAttribute("dateFilter").toString(), currentCycle);
         LocalDateTime endDate = getEndDate(session.getAttribute("dateFilter").toString(), currentCycle);
 
-        List<DepartmentRegional> departmentList = departmentRegionalService.findAll();
+        List<DepartmentRegional> departmentList = departmentList(currentUser);
+        if (departmentList.size() == 1) {
+            return "redirect:/support/department/"+departmentList.get(0).getName();
+        }
+
+        BigInteger campusId = BigInteger.valueOf(0);
+        List<Campus> campusList = campusList(currentUser);
+        if (campusList.size() == 1) {
+            campusId = campusList.get(0).getId();
+        }
 
         List<TicketDepartment> departmentItemList = new ArrayList<>();
         for (DepartmentRegional department : departmentList) {
             TicketDepartment departmentItem = new TicketDepartment(department, new ArrayList<>());
-            departmentItem.setTicketList(ticketService.findAllByDepartmentAndCycle(department.getId(), startDate, endDate));
+            if (campusId.equals(0)) {
+                departmentItem.setTicketList(ticketService.findAllByDepartmentAndCycle(department.getId(), startDate, endDate));
+            } else {
+                departmentItem.setTicketList(ticketService.findAllByDepartmentAndCampusAndCycle(department.getId(), campusId, startDate, endDate));
+            }
             departmentItemList.add(departmentItem);
         }
 
@@ -420,6 +452,8 @@ public class SupportController {
                     session.setAttribute("cycle", 0);
             }
         }
+
+        name = name.replace("_"," ");
 
         LocalDateTime startDate = getStartDate(session.getAttribute("dateFilter").toString(), currentCycle);
         LocalDateTime endDate = getEndDate(session.getAttribute("dateFilter").toString(), currentCycle);

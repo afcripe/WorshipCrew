@@ -13,7 +13,7 @@
         <div class="row pt-5 py-2">
             <div class="col">
                 <h4>
-                    <a th:href="'/support/campus/'+*{campus.campus.name}" style="text-decoration: none">
+                    <a th:href="'/support/campus/'+*{#strings.replace(campus.campus.name,' ','_')}" style="text-decoration: none">
                         <span th:text="*{campus.campus.name}" style="text-decoration: none"></span>
                         (<span th:text="*{#lists.size(campus.ticketList)}" style="text-decoration: none"></span>)
                     </a>

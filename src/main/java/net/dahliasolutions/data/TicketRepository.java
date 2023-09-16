@@ -39,6 +39,8 @@ public interface TicketRepository extends JpaRepository<Ticket, BigInteger> {
     List<Ticket> findAllByAgentAndCycle(@Param("agentId") BigInteger agentId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
     @Query(value = "SELECT * FROM TICKET WHERE DEPARTMENT_ID = :departmentId AND TICKET_DATE BETWEEN :start AND :end ORDER BY TICKET_DATE DESC", nativeQuery = true)
     List<Ticket> findAllByDepartmentAndCycle(@Param("departmentId") BigInteger departmentId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+    @Query(value = "SELECT * FROM TICKET WHERE DEPARTMENT_ID = :departmentId AND CAMPUS_ID = :campusId AND TICKET_DATE BETWEEN :start AND :end ORDER BY TICKET_DATE DESC", nativeQuery = true)
+    List<Ticket> findAllByDepartmentAndCampusAndCycle(@Param("departmentId") BigInteger departmentId, @Param("campusId") BigInteger campusId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
     @Query(value = "SELECT COUNT(ID) AS COUNT FROM TICKET", nativeQuery = true)
     int countAllById();
     @Query(value = "SELECT * FROM TICKET WHERE AGENT_ID = :agentId ORDER BY TICKET_DATE DESC", nativeQuery = true)

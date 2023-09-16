@@ -83,6 +83,11 @@ public class WikiPostService implements WikiPostServiceInterface {
     }
 
     @Override
+    public List<WikiPost> findByAuthorAndPublished(BigInteger authorId) {
+        return wikiPostRepository.findByAuthorAndPublished(authorId);
+    }
+
+    @Override
     public WikiPost save(WikiPost wikiPost) {
         return wikiPostRepository.save(wikiPost);
     }

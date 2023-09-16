@@ -18,4 +18,7 @@ public interface WikiFolderRepository extends JpaRepository<WikiFolder, String> 
     @Query(value="SELECT * FROM WIKI_FOLDER WHERE LOWER(FOLDER) LIKE CONCAT('%',LOWER(:name),'%')", nativeQuery = true)
     List<WikiFolder> findByFolderName(@Param("name") String name);
 
+    @Query(value="SELECT * FROM WIKI_FOLDER WHERE LOWER(FOLDER) LIKE CONCAT(LOWER(:name),'%')", nativeQuery = true)
+    List<WikiFolder> findAllByFolderNameStartsWith(@Param("name") String name);
+
 }

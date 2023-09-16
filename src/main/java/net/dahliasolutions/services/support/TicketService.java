@@ -210,6 +210,11 @@ public class TicketService implements TicketServiceInterface {
         return ticketRepository.findAllByDepartmentAndCycle(departmentId, startDate, endDate);
     }
 
+    @Override
+    public List<Ticket> findAllByDepartmentAndCampusAndCycle(BigInteger departmentId, BigInteger campusId, LocalDateTime startDate, LocalDateTime endDate) {
+        return ticketRepository.findAllByDepartmentAndCampusAndCycle(departmentId, campusId, startDate, endDate);
+    }
+
     private List<User> getSupervisors() {
         Collection<UserRoles> roles = getSupervisorCollection();
         List<User> userList = new ArrayList<>();

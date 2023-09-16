@@ -32,5 +32,6 @@ public interface TicketServiceInterface {
     List<Ticket> findAllByAgentAndCycle(BigInteger agentId, LocalDateTime startDate, LocalDateTime endDate);
     List<Ticket> findAllByMentionOpenAndCycle(BigInteger agentId, LocalDateTime startDate, LocalDateTime endDate);
     List<Ticket> findAllByDepartmentAndCycle(BigInteger departmentId, LocalDateTime startDate, LocalDateTime endDate);
+    List<Ticket> findAllByDepartmentAndCampusAndCycle(BigInteger departmentId, BigInteger campusId, LocalDateTime startDate, LocalDateTime endDate);
 
 }

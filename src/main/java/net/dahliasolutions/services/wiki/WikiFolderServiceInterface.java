@@ -12,6 +12,7 @@ public interface WikiFolderServiceInterface {
     Optional<WikiFolder> findByFolder(String folder);
     List<WikiFolder> findAll();
     List<WikiFolder> findByFolderName(String name);
+    List<WikiFolder> findAllByFolderNameStartsWith(String name);
     void deleteByFolder(WikiFolder wikiFolder);
     WikiFolderTree getFolderTree();
 

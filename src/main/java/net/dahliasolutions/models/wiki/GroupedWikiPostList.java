@@ -16,4 +16,6 @@ public class GroupedWikiPostList {
 
     private String folder;
     private List<WikiPost> wikiPost;
+    private int postCount;
+    private List<WikiFolder> subFolders;
 }
