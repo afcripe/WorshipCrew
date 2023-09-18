@@ -1015,3 +1015,9 @@ ul, #folderTree {
     border: 1px solid red;
     background-color: lightcoral;
 }
+
+.simple-border-item {
+    padding: 3px;
+    border: 1px solid var(--dwc-border-color);
+    border-radius: 5px;
+}

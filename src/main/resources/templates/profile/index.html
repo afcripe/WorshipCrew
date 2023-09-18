@@ -195,17 +195,27 @@
             </form>
             <strong>Active Endpoints</strong>
             <div th:each="ep : *{endpoints}">
-              <p><span th:text="${ep.name}"></span> | <span th:text="${ep.token}"></span></p>
+              <div th:id="'ep-'+${ep.id}" class="simple-border-item">
+                <div>
+                  <span th:text="${ep.name}"></span> |
+                  <span th:text="${ep.id}"></span>
+                  <button type="button" class="btn btn-sm btn-outline-primary"
+                          th:onclick="sendTestMessageToToken([[${ep.token}]])">Send Test</button>
+                  <button type="button" class="btn btn-sm btn-outline-danger"
+                          th:onclick="removeToken([[${ep.id}]])">X</button>
+                </div>
+                <p style="overflow-x: scroll; white-space: nowrap;" th:text="${ep.token}"></p>
+              </div>
             </div>
           </div>
 
           <script>
 
             async function sendTestMessage() {
-              let target = document.getElementById("pushTarget").value;
+              let targetInput = document.getElementById("pushTarget");
 
               let formData = new FormData();
-                  formData.set("recipientToken", target);
+                  formData.set("recipientToken", targetInput.value);
                   formData.set("title", "Test Message");
                   formData.set("body", "Test message sent through Spring Boot.");
 
@@ -215,6 +225,38 @@
               }).then(response => {
                 return response.json();
               }).then(data => {
+                console.log(data.name)
+              });
+            }
+
+            async function sendTestMessageToToken(token) {
+              let formData = new FormData();
+              formData.set("recipientToken", token);
+              formData.set("title", "Test Message");
+              formData.set("body", "Test message sent through Spring Boot.");
+
+              const response = await fetch('/api/v1/messaging/sendtestfiremessage', {
+                method: 'POST',
+                body: formData
+              }).then(response => {
+                return response.json();
+              }).then(data => {
+                console.log(data.name)
+              });
+            }
+
+            async function removeToken(id) {
+              let formData = new FormData();
+                  formData.set("id", id);
+
+              const response = await fetch('/api/v1/messaging/removetoken', {
+                method: 'POST',
+                body: formData
+              }).then(response => {
+                return response.json();
+              }).then(data => {
+                let eleId = "ep-"+id;
+                document.getElementById(eleId).remove();
                 console.log(data.name)
               });
             }

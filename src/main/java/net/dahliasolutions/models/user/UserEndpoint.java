@@ -1,5 +1,6 @@
 package net.dahliasolutions.models.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,5 +20,6 @@ public class UserEndpoint {
     private String token;
 
     @ManyToOne
+    @JsonIgnore
     private User user;
 }

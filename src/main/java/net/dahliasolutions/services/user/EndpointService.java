@@ -6,6 +6,7 @@ import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserEndpoint;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +22,11 @@ public class EndpointService implements EndpointServiceInterface{
     }
 
     @Override
+    public Optional<UserEndpoint> findById(BigInteger id) {
+        return endpointRepository.findById(id);
+    }
+
+    @Override
     public List<UserEndpoint> findAllByUser(User user) {
         return endpointRepository.findAllByUser(user);
     }
@@ -31,7 +37,10 @@ public class EndpointService implements EndpointServiceInterface{
     }
 
     @Override
-    public void deletByToken(String token) {
+    public void deleteByToken(String token) {
         endpointRepository.deleteByToken(token);
+    }
+    public void deleteById(BigInteger id) {
+        endpointRepository.deleteById(id);
     }
 }

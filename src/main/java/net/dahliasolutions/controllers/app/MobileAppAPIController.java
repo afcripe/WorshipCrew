@@ -254,7 +254,8 @@ public class MobileAppAPIController {
         Optional<UserNotificationSubscribe> subscription =
                 userSubscribeService.findByEndPointAndUser(NotificationEndPoint.Push, user);
         if (subscription.isEmpty()) {
-            UserNotificationSubscribe subscribe = new UserNotificationSubscribe(null, NotificationEndPoint.Push, user);
+            UserNotificationSubscribe subscribe = userSubscribeService.save(
+                    new UserNotificationSubscribe(null, NotificationEndPoint.Push, user));
             user.getSubscriptions().add(subscribe);
             userService.save(user);
         }

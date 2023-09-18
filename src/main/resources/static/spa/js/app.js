@@ -442,9 +442,9 @@ const browserInfo = () => {
     if (navigator.userAgent.indexOf("iPad") !== -1) thisOs = "iPad";
 
     if (navigator.userAgent.indexOf("Chrome") !== -1) thisBsr = "Chrome";
+    if (navigator.userAgent.indexOf("Safari") !== -1) thisBsr = "Safari";
     if (navigator.userAgent.indexOf("Edg") !== -1) thisBsr = "Edge";
     if (navigator.userAgent.indexOf("Firefox") !== -1) thisBsr = "Firefox";
-    if (navigator.userAgent.indexOf("Safari") !== -1) thisBsr = "Safari";
     if (navigator.userAgent.indexOf("OPR") !== -1) thisBsr = "Opera";
 
     return thisOs+" - "+thisBsr;

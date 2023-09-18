@@ -159,7 +159,6 @@ public class SecurityConfig {
                     auth.requestMatchers("/api/v1/admin").permitAll();
                     auth.requestMatchers("/api/v1/auth/**").permitAll();
                     auth.requestMatchers("/api/v1/app/**").permitAll();
-                    auth.requestMatchers("/api/v1/messaging/**").permitAll();
 
                     auth.requestMatchers("/api/v1/**").authenticated();
 
