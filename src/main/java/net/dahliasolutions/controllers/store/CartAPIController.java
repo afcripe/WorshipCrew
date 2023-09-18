@@ -201,14 +201,14 @@ public class CartAPIController {
                         null,
                         "A New Request",
                         orderRequest.getId().toString(),
-                        null,
+                        BigInteger.valueOf(0),
                         false,
                         false,
                         null,
                         EventModule.Request,
                         NotificationType.New,
-                        orderRequest.getSupervisor()
-
+                        orderRequest.getSupervisor(),
+                        BigInteger.valueOf(0)
                 ));
 
 //        EmailDetails emailDetailsSupervisor =

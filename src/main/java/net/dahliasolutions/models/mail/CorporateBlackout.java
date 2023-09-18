@@ -22,14 +22,14 @@ public class CorporateBlackout {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private BigInteger id;
-    private int year;
-    private int month;
-    private int dayStart;
-    private int dayEnd;
+    private int blackoutYear;
+    private int blackoutMonth;
+    private int blackoutStart;
+    private int blackoutDayEnd;
     private LocalTime timeStart;
     private LocalTime timeEnd;
     private boolean repeats;
     private String repeatCycle;
-    private boolean active;
+    private boolean activated;
     private BigInteger userId;
 }

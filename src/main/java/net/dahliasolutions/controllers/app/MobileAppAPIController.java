@@ -11,12 +11,14 @@ import net.dahliasolutions.models.support.*;
 import net.dahliasolutions.models.user.EndpointModel;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserEndpoint;
+import net.dahliasolutions.models.user.UserNotificationSubscribe;
 import net.dahliasolutions.services.AuthService;
 import net.dahliasolutions.services.JwtService;
 import net.dahliasolutions.services.order.OrderItemService;
 import net.dahliasolutions.services.order.OrderService;
 import net.dahliasolutions.services.support.TicketService;
 import net.dahliasolutions.services.user.EndpointService;
+import net.dahliasolutions.services.user.UserNotificationSubscribeService;
 import net.dahliasolutions.services.user.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +40,7 @@ public class MobileAppAPIController {
     private final OrderService orderService;
     private final OrderItemService orderItemService;
     private final EndpointService endpointService;
+    private final UserNotificationSubscribeService userSubscribeService;
 
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> getAuthUser(@ModelAttribute LoginModel loginModel) {
@@ -70,12 +73,15 @@ public class MobileAppAPIController {
 
         Optional<UserEndpoint> existingEP = endpointService.findByToken(endpoint.token());
         if (existingEP.isPresent()) {
+            addUserSubscription(apiUser.getUser());
             return new ResponseEntity<>(new SingleStringModel("exists"), HttpStatus.OK);
         }
 
         UserEndpoint newEP = endpointService.save(new UserEndpoint(null, endpoint.name(), endpoint.token(), apiUser.getUser()));
         apiUser.getUser().getEndpoints().add(newEP);
         userService.save(apiUser.getUser());
+
+        addUserSubscription(apiUser.getUser());
 
         System.out.println(endpoint.token());
         return new ResponseEntity<>(new SingleStringModel("success"), HttpStatus.OK);
@@ -92,6 +98,7 @@ public class MobileAppAPIController {
         if (existingEP.isPresent()) {
             apiUser.getUser().getEndpoints().remove(existingEP.get());
             userService.save(apiUser.getUser());
+            removeUserSubscription(apiUser.getUser());
         }
         return new ResponseEntity<>(new SingleStringModel("success"), HttpStatus.OK);
     }
@@ -241,6 +248,31 @@ public class MobileAppAPIController {
             }
         }
         return new APIUser(false, new User());
+    }
+
+    private void addUserSubscription(User user) {
+        Optional<UserNotificationSubscribe> subscription =
+                userSubscribeService.findByEndPointAndUser(NotificationEndPoint.Push, user);
+        if (subscription.isEmpty()) {
+            UserNotificationSubscribe subscribe = new UserNotificationSubscribe(null, NotificationEndPoint.Push, user);
+            user.getSubscriptions().add(subscribe);
+            userService.save(user);
+        }
+    }
+
+    private void removeUserSubscription(User user) {
+        List<UserEndpoint> endpoints = user.getEndpoints();
+        Optional<UserNotificationSubscribe> subscription =
+                userSubscribeService.findByEndPointAndUser(NotificationEndPoint.Push, user);
+        if (endpoints.isEmpty() && subscription.isPresent()) {
+            user.getSubscriptions().remove(subscription.get());
+            userService.save(user);
+            try {
+                userSubscribeService.deleteBySubscription(subscription.get());
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        }
     }
 
 }

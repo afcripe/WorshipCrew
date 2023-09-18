@@ -9,5 +9,5 @@ import java.util.List;
 public interface CorporateBlackoutRepository extends JpaRepository<CorporateBlackout, BigInteger> {
 
     List<CorporateBlackout> findAllByUserId(BigInteger userId);
-    List<CorporateBlackout> findAllByActive(boolean active);
+    List<CorporateBlackout> findAllByActivated(boolean active);
 }

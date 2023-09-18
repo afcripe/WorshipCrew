@@ -14,6 +14,7 @@ import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
 import net.dahliasolutions.services.EventService;
 import net.dahliasolutions.services.mail.EmailService;
+import net.dahliasolutions.services.mail.NotificationMessageService;
 import net.dahliasolutions.services.support.*;
 import net.dahliasolutions.services.user.UserRolesService;
 import net.dahliasolutions.services.user.UserService;
@@ -45,6 +46,7 @@ public class SupportAPIController {
     private final TicketNoteService noteService;
     private final UserRolesService rolesService;
     private final EmailService emailService;
+    private final NotificationMessageService messageService;
     private final EventService eventService;
 
     @GetMapping("")
@@ -177,7 +179,7 @@ public class SupportAPIController {
         boolean isPrivate = noteModel.isPrivate();
 
         boolean isAgent = supportEditor(currentUser);
-        if (currentUser.equals(ticket.get().getUser())) {
+        if (currentUser.getId().equals(ticket.get().getUser().getId())) {
             // force agent and private false if ticket belongs to current user
             isAgent = false;
             isPrivate = false;
@@ -204,17 +206,33 @@ public class SupportAPIController {
         ticket.get().getNotes().add(note);
         ticketService.save(ticket.get());
 
-        if (isAgent && !isPrivate) {
-            // email note user on if public
-            EmailDetails emailDetailsUser =
-                    new EmailDetails(ticket.get().getUser().getContactEmail(),"Support Ticket "+ticket.get().getId()+" has been updated", "", null );
-            BrowserMessage returnMsg = emailService.sendUserUpdateTicket(emailDetailsUser, ticket.get(), note);
+        if (isAgent) {
+            if (!isPrivate) {
+                // email note user on if public
+                EmailDetails emailDetailsUser =
+                        new EmailDetails(ticket.get().getUser().getContactEmail(), "Support Ticket " + ticket.get().getId() + " has been updated", "", null);
+                emailService.sendUserUpdateTicket(emailDetailsUser, ticket.get(), note);
+            }
         } else {
             // only send if assigned to agent
             if (ticket.get().getAgent() != null) {
-                EmailDetails emailDetailsAgent =
-                        new EmailDetails(ticket.get().getAgent().getContactEmail(),"Support Ticket "+ticket.get().getId()+" has been updated", "", null );
-                BrowserMessage returnMsg2 = emailService.sendAgentUpdateTicket(emailDetailsAgent, ticket.get(), note);
+                NotificationMessage returnMsg2 = messageService.createMessage(
+                        new NotificationMessage(
+                                null,
+                                "Support Ticket "+ticket.get().getId()+" has been updated",
+                                ticket.get().getId(),
+                                BigInteger.valueOf(0),
+                                false,
+                                false,
+                                null,
+                                EventModule.Support,
+                                NotificationType.Updated,
+                                ticket.get().getAgent(),
+                                note.getId()
+                        ));
+//                EmailDetails emailDetailsAgent =
+//                        new EmailDetails(ticket.get().getAgent().getContactEmail(),"Support Ticket "+ticket.get().getId()+" has been updated", "", null );
+//                BrowserMessage returnMsg2 = emailService.sendAgentUpdateTicket(emailDetailsAgent, ticket.get(), note);
             }
         }
 

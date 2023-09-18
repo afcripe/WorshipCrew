@@ -82,6 +82,22 @@
 
           </div>
         </div>
+
+        <div class="card" style="max-width: 500px;">
+          <div class="card-title alert alert-primary">
+            <h5>
+              Notifications
+            </h5>
+          </div>
+
+          <div class="card-body">
+            <div th:each="subscription : *{subscriptions}">
+              <p><span th:text="${subscription.endPoint}"></span></p>
+            </div>
+          </div>
+
+        </div>
+
       </div>
 
       <div class="col-12 col-lg-6 pb-2" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')}">
@@ -175,7 +191,7 @@
           <div class="card-body">
             <form>
               <input id="pushTarget" type="text">
-              <button type="button" class="btn btn-sm btn-outline-primary">Send Test</button>
+              <button type="button" class="btn btn-sm btn-outline-primary" onclick="sendTestMessage()">Send Test</button>
             </form>
             <strong>Active Endpoints</strong>
             <div th:each="ep : *{endpoints}">
@@ -183,7 +199,30 @@
             </div>
           </div>
 
+          <script>
+
+            async function sendTestMessage() {
+              let target = document.getElementById("pushTarget").value;
+
+              let formData = new FormData();
+                  formData.set("recipientToken", target);
+                  formData.set("title", "Test Message");
+                  formData.set("body", "Test message sent through Spring Boot.");
+
+              const response = await fetch('/api/v1/messaging/sendtestfiremessage', {
+                method: 'POST',
+                body: formData
+              }).then(response => {
+                return response.json();
+              }).then(data => {
+                console.log(data.name)
+              });
+            }
+
+          </script>
+
         </div>
+
       </div>
 
     </div>

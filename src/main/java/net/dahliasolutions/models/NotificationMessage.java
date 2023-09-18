@@ -36,6 +36,8 @@ public class NotificationMessage {
     @ManyToOne
     private User user;
 
+    private BigInteger noteId;
+
     @Override
     public String toString() {
         return "Notification{" +

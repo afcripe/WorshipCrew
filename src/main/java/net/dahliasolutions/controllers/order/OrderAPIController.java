@@ -8,13 +8,12 @@ import net.dahliasolutions.models.order.OrderItem;
 import net.dahliasolutions.models.order.OrderNote;
 import net.dahliasolutions.models.order.OrderRequest;
 import net.dahliasolutions.models.order.OrderStatus;
-import net.dahliasolutions.models.position.Position;
 import net.dahliasolutions.models.records.*;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
 import net.dahliasolutions.services.EventService;
-import net.dahliasolutions.services.NotificationService;
 import net.dahliasolutions.services.mail.EmailService;
+import net.dahliasolutions.services.mail.NotificationMessageService;
 import net.dahliasolutions.services.order.OrderItemService;
 import net.dahliasolutions.services.order.OrderNoteService;
 import net.dahliasolutions.services.order.OrderService;
@@ -22,7 +21,6 @@ import net.dahliasolutions.services.user.UserRolesService;
 import net.dahliasolutions.services.user.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
@@ -39,6 +37,7 @@ public class OrderAPIController {
     private final UserService userService;
     private final UserRolesService rolesService;
     private final EmailService emailService;
+    private final NotificationMessageService messageService;
     private final EventService eventService;
 
     @GetMapping("")
@@ -84,9 +83,26 @@ public class OrderAPIController {
                         new EmailDetails(orderRequest.get().getSupervisor().getContactEmail(),"Request Cancelled", "", null );
                 BrowserMessage returnMsg = emailService.sendUserRequest(emailDetailsUser, orderRequest.get());
 
-                EmailDetails emailDetailsSupervisor =
-                        new EmailDetails(orderRequest.get().getSupervisor().getContactEmail(),"A Request Has Been Cancelled", "", null );
-                BrowserMessage returnMsg2 = emailService.sendUserRequest(emailDetailsSupervisor, orderRequest.get());
+                // Notify supervisor
+                NotificationMessage returnMsg2 = messageService.createMessage(
+                        new NotificationMessage(
+                                null,
+                                "A Request Has Been Cancelled",
+                                orderRequest.get().getId().toString(),
+                                BigInteger.valueOf(0),
+                                false,
+                                false,
+                                null,
+                                EventModule.Request,
+                                NotificationType.Updated,
+                                orderRequest.get().getSupervisor(),
+                                BigInteger.valueOf(0)
+
+                        ));
+
+//                EmailDetails emailDetailsSupervisor =
+//                        new EmailDetails(orderRequest.get().getSupervisor().getContactEmail(),"A Request Has Been Cancelled", "", null );
+//                BrowserMessage returnMsg2 = emailService.sendUserRequest(emailDetailsSupervisor, orderRequest.get());
 
                 // send any additional notifications
                 String userFullName = orderRequest.get().getUser().getFirstName()+" "+orderRequest.get().getUser().getLastName();
@@ -191,18 +207,26 @@ public class OrderAPIController {
                     new EmailDetails(requestItem.get().getOrderRequest().getUser().getContactEmail(),"The Status of a Request Item Changed", "", null );
             BrowserMessage returnMsg = emailService.sendItemUpdate(emailDetailsUser, requestItem.get(), orderNote);
 
-            EmailDetails emailDetailsSupervisor =
-                    new EmailDetails(requestItem.get().getOrderRequest().getSupervisor().getContactEmail(),"The Status of a Request Item Changed", "", null );
-            BrowserMessage returnMsg2 = emailService.sendItemUpdate(emailDetailsSupervisor, requestItem.get(), orderNote);
+            // Notify supervisor
+            NotificationMessage returnMsg2 = messageService.createMessage(
+                    new NotificationMessage(
+                            null,
+                            "The Status of a Request Item Changed",
+                            "",
+                            requestItem.get().getId(),
+                            false,
+                            false,
+                            null,
+                            EventModule.Request,
+                            NotificationType.ItemUpdated,
+                            requestItem.get().getOrderRequest().getSupervisor(),
+                            orderNote.getId()
 
+                    ));
 
-//            EmailDetails emailDetailsUser =
-//                    new EmailDetails(requestItem.get().getOrderRequest().getUser().getContactEmail(),"The Status of a Request Item Changed", "", null );
-//            BrowserMessage returnMsg = emailService.sendUserRequest(emailDetailsUser, requestItem.get().getOrderRequest());
-//
 //            EmailDetails emailDetailsSupervisor =
 //                    new EmailDetails(requestItem.get().getOrderRequest().getSupervisor().getContactEmail(),"The Status of a Request Item Changed", "", null );
-//            BrowserMessage returnMsg2 = emailService.sendUserRequest(emailDetailsSupervisor, requestItem.get().getOrderRequest());
+//            BrowserMessage returnMsg2 = emailService.sendItemUpdate(emailDetailsSupervisor, requestItem.get(), orderNote);
 
 
             // send any additional notifications
@@ -368,10 +392,28 @@ public class OrderAPIController {
                         requestItem.get().getId(),
                         requestItem.get().getItemStatus(),
                         user));
+
+                // Notify supervisor
+                NotificationMessage returnMsg2 = messageService.createMessage(
+                        new NotificationMessage(
+                                null,
+                                "You have a New Request item to Fulfill",
+                                "",
+                                requestItem.get().getId(),
+                                false,
+                                false,
+                                null,
+                                EventModule.Request,
+                                NotificationType.NewItem,
+                                newSuper.get(),
+                                BigInteger.valueOf(0)
+
+                        ));
+
                 // email new supervisor
-                EmailDetails emailDetailsSupervisor =
-                        new EmailDetails(newSuper.get().getContactEmail(),"You have a New Request item to Fulfill", "", null );
-                BrowserMessage returnMsg2 = emailService.sendSupervisorItemRequest(emailDetailsSupervisor, requestItem.get(), requestItem.get().getOrderRequest().getSupervisor().getId());
+//                EmailDetails emailDetailsSupervisor =
+//                        new EmailDetails(newSuper.get().getContactEmail(),"You have a New Request item to Fulfill", "", null );
+//                BrowserMessage returnMsg2 = emailService.sendSupervisorItemRequest(emailDetailsSupervisor, requestItem.get(), requestItem.get().getOrderRequest().getSupervisor().getId());
 
                 // send any additional notifications
                 String userFullName = user.getFirstName()+" "+user.getLastName();
@@ -402,10 +444,26 @@ public class OrderAPIController {
                     BigInteger.valueOf(0),
                     request.get().getOrderStatus(),
                     request.get().getUser()));
-            // email supervisor
-            EmailDetails emailDetailsSupervisor =
-                    new EmailDetails(request.get().getSupervisor().getContactEmail(),"A Request Reason has been Updated", "", null );
-            BrowserMessage returnMsg2 = emailService.sendUserRequest(emailDetailsSupervisor, request.get());
+
+            // Notify supervisor
+            NotificationMessage returnMsg2 = messageService.createMessage(
+                    new NotificationMessage(
+                            null,
+                            "A Request Reason has been Updated",
+                            request.get().getId().toString(),
+                            BigInteger.valueOf(0),
+                            false,
+                            false,
+                            null,
+                            EventModule.Request,
+                            NotificationType.Updated,
+                            request.get().getSupervisor(),
+                            BigInteger.valueOf(0)
+
+                    ));
+//            EmailDetails emailDetailsSupervisor =
+//                    new EmailDetails(request.get().getSupervisor().getContactEmail(),"A Request Reason has been Updated", "", null );
+//            BrowserMessage returnMsg2 = emailService.sendUserRequest(emailDetailsSupervisor, request.get());
 
             // send any additional notifications
             String userFullName = request.get().getUser()+" "+request.get().getUser();

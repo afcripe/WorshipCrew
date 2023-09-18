@@ -9,6 +9,7 @@ import net.dahliasolutions.models.department.DepartmentCampus;
 import net.dahliasolutions.models.department.DepartmentRegional;
 import net.dahliasolutions.models.position.Position;
 import net.dahliasolutions.models.user.User;
+import net.dahliasolutions.models.user.UserNotificationSubscribe;
 import net.dahliasolutions.models.user.UserRoles;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,27 +33,16 @@ public class UserService implements UserServiceInterface{
     private final CampusRepository campusRepository;
     private final DepartmentCampusRepository departmentCampusRepository;
     private final ProfileService profileService;
+    private final UserNotificationSubscribeRepository subscribeRepository;
 
     @Override
     public User createDefaultUser(User user) {
-        user.setActivated(true);
-        user.setDeleted(false);
-        user.setNotificationEndPoint(NotificationEndPoint.Email);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        User newUser = userRepository.save(user);
-        profileService.createDefaultProfile(user);
-        return newUser;
+        return setNewUser(user, true);
     }
 
     @Override
     public User createUser(User user) {
-        user.setActivated(false);
-        user.setDeleted(false);
-        user.setNotificationEndPoint(NotificationEndPoint.Email);
-        user.setPassword("-UserMustChangeThisByClickingOnTheEmailedLink-");
-        User newUser = userRepository.save(user);
-        profileService.createDefaultProfile(user);
-        return newUser;
+        return setNewUser(user, false);
     }
 
     @Override
@@ -256,5 +246,23 @@ public class UserService implements UserServiceInterface{
     public UserDetails loadUserByUsername(String username) {
         Optional<User> user = userRepository.findByUsernameIgnoreCase(username);
         return user.orElse(null);
+    }
+
+    private User setNewUser(User user, boolean activated) {
+        user.setActivated(activated);
+        user.setDeleted(false);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setSubscriptions(new ArrayList<>());
+        User newUser = userRepository.save(user);
+
+        // profile Table
+        profileService.createDefaultProfile(newUser);
+
+        UserNotificationSubscribe subscription = subscribeRepository.save(
+                new UserNotificationSubscribe(null, NotificationEndPoint.Email, newUser));
+        user.getSubscriptions().add(subscription);
+        userRepository.save(newUser);
+
+        return newUser;
     }
 }

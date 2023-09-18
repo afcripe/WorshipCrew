@@ -18,7 +18,10 @@
                 <div class="note-address">
                     <div></div>
                     <div></div>
-                    <div></div>
+                    <div>
+                        <i class="bi bi-pencil-square selectableItem btn-edit" style="float: right;"></i>
+                        <div></div>
+                    </div>
                 </div>
                 <div class="note-content">
                     <div></div>
@@ -732,18 +735,16 @@
             formData.set("detail", inputDetails.value);
             formData.set("images", uploadedImages);
             formData.set("ticketId", inputId.value);
-debugger
+
             const response = await fetch('/api/v1/support/note/new', {
                 method: 'POST',
                 body: formData
             }).then(response => {
-                debugger
                 return response.json();
             }).then(data => {
-                debugger
                 displayNewNoteBtn.removeAttribute("disabled");
                 clearForm()
-
+debugger
                 let newID = "note-"+data.id;
                 let clone = templateNote.content.cloneNode(true);
 
@@ -756,11 +757,17 @@ debugger
                     noteDivs[3].innerText = parseDate(data.noteDate);
 
                     if (inputIsAgent.value === "true") {
+                        let visible = noteDivs[4].childNodes;
+
+                        visible[1].addEventListener("click", function (event) {updateTicketNote(data.id)});
+
                         if (data.notePrivate) {
-                            noteDivs[4].innerText = "Private";
+                            visible[3].innerText = "Private";
                         } else {
-                            noteDivs[4].innerText = "Public";
+                            visible[3].innerText = "Public";
                         }
+                    } else {
+                        noteDivs[4].style.display = "none";
                     }
 
                     noteDivs[6].innerText = data.detail;
@@ -791,7 +798,11 @@ debugger
             while(imageNames.firstChild) {
                 imageNames.removeChild(imageNames.firstChild)
             }
-            inputPublic.checked = false;
+            try {
+                inputPublic.checked = false;
+            } catch (e) {
+                // no private checkbox
+            }
             inputDetails.value = "";
         }
 

@@ -38,12 +38,12 @@ public class User implements UserDetails {
     private boolean activated;
     private boolean deleted;
 
-    @Enumerated
-    private NotificationEndPoint notificationEndPoint;
-
     public String getFullName() {
          return firstName+" "+lastName;
     }
+
+    @OneToMany(fetch = FetchType.EAGER)
+    private List<UserNotificationSubscribe> subscriptions;
 
     @ManyToOne
     @JsonIgnore

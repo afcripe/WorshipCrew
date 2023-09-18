@@ -15,11 +15,13 @@ import net.dahliasolutions.models.support.*;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
 import net.dahliasolutions.services.EventService;
+import net.dahliasolutions.services.MessageService;
 import net.dahliasolutions.services.RedirectService;
 import net.dahliasolutions.services.campus.CampusService;
 import net.dahliasolutions.services.department.DepartmentCampusService;
 import net.dahliasolutions.services.department.DepartmentRegionalService;
 import net.dahliasolutions.services.mail.EmailService;
+import net.dahliasolutions.services.mail.NotificationMessageService;
 import net.dahliasolutions.services.support.*;
 import net.dahliasolutions.services.user.UserRolesService;
 import net.dahliasolutions.services.user.UserService;
@@ -52,6 +54,7 @@ public class SupportController {
     private final TicketImageService ticketImageService;
     private final RedirectService redirectService;
     private final EmailService emailService;
+    private final NotificationMessageService messageService;
     private final EventService eventService;
 
     @ModelAttribute
@@ -183,14 +186,44 @@ public class SupportController {
 
         // determine if agent or agent list
         if (ticket.getAgent() != null) {
-            EmailDetails emailDetailsAgent =
-                    new EmailDetails(ticket.getAgent().getContactEmail(),"A New Support Ticket Needs Acknowledgement", "", null );
-            BrowserMessage returnMsg2 = emailService.sendAgentTicket(emailDetailsAgent, ticket, ticket.getNotes().get(0), ticket.getAgent().getId());
+            // Notify Agent
+            NotificationMessage returnMsg2 = messageService.createMessage(
+                    new NotificationMessage(
+                            null,
+                            "A New Support Ticket Needs Acknowledgement",
+                            ticket.getId(),
+                            BigInteger.valueOf(0),
+                            false,
+                            false,
+                            null,
+                            EventModule.Support,
+                            NotificationType.New,
+                            ticket.getAgent(),
+                            ticket.getNotes().get(0).getId()
+                    ));
+//            EmailDetails emailDetailsAgent =
+//                    new EmailDetails(ticket.getAgent().getContactEmail(),"A New Support Ticket Needs Acknowledgement", "", null );
+//            BrowserMessage returnMsg2 = emailService.sendAgentTicket(emailDetailsAgent, ticket, ticket.getNotes().get(0), ticket.getAgent().getId());
         } else {
             for (User agent : ticket.getAgentList()) {
-                EmailDetails emailDetailsAgent =
-                        new EmailDetails(agent.getContactEmail(), "A New Support Ticket Needs Acceptance", "", null);
-                BrowserMessage returnMsg2 = emailService.sendAgentListTicket(emailDetailsAgent, ticket, ticket.getNotes().get(0), agent.getId());
+                // Notify Agent
+                NotificationMessage returnMsg2 = messageService.createMessage(
+                        new NotificationMessage(
+                                null,
+                                "A New Support Ticket Needs Acceptance",
+                                ticket.getId(),
+                                BigInteger.valueOf(0),
+                                false,
+                                false,
+                                null,
+                                EventModule.Support,
+                                NotificationType.New,
+                                agent,
+                                ticket.getNotes().get(0).getId()
+                        ));
+//                EmailDetails emailDetailsAgent =
+//                        new EmailDetails(agent.getContactEmail(), "A New Support Ticket Needs Acceptance", "", null);
+//                BrowserMessage returnMsg2 = emailService.sendAgentListTicket(emailDetailsAgent, ticket, ticket.getNotes().get(0), agent.getId());
             }
         }
 
