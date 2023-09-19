@@ -7,10 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.*;
 import net.dahliasolutions.models.mail.EmailDetails;
 import net.dahliasolutions.models.order.*;
-import net.dahliasolutions.models.records.AddSupervisorModel;
-import net.dahliasolutions.models.records.BigIntegerStringModel;
-import net.dahliasolutions.models.records.ChangeStatusModel;
-import net.dahliasolutions.models.records.SingleStringModel;
+import net.dahliasolutions.models.records.*;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
 import net.dahliasolutions.services.JwtService;
@@ -222,25 +219,50 @@ public class MobileAppAPIRequestController {
         }
         return new ResponseEntity<>(orderNoteService.findByOrderId(id), HttpStatus.OK);
     }
-    
+
     @PostMapping("/getacknowledge")
-    public ResponseEntity<SingleStringModel> getRequestAcknowledge(@ModelAttribute BigIntegerStringModel requestModel, HttpServletRequest request) {
+    public ResponseEntity<SingleStringModel> getRequestAcknowledge(@ModelAttribute SingleBigIntegerModel requestModel, HttpServletRequest request) {
         APIUser apiUser = getUserFromToken(request);
         if (!apiUser.isValid()) {
             return new ResponseEntity<>(new SingleStringModel("Access denied!"), HttpStatus.FORBIDDEN);
         }
-        
+
         Optional<OrderRequest> orderRequest = orderService.findById(requestModel.id());
         if (orderRequest.isEmpty()) {
             return new ResponseEntity<>(new SingleStringModel("Not Found"), HttpStatus.NOT_FOUND);
         }
-        
+
         if (orderRequest.get().getOrderStatus().equals(OrderStatus.Submitted)
                 && orderRequest.get().getSupervisor().getId().equals(apiUser.getUser().getId())) {
             return new ResponseEntity<>(new SingleStringModel("Acknowledge"), HttpStatus.OK);
         }
 
         return new ResponseEntity<>(new SingleStringModel("Not Supervisor"), HttpStatus.BAD_REQUEST);
+    }
+
+    @PostMapping("/setacknowledge")
+    public ResponseEntity<SingleStringModel> setRequestAcknowledge(@ModelAttribute SingleBigIntegerModel requestModel, HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new SingleStringModel("Access denied!"), HttpStatus.FORBIDDEN);
+        }
+
+        Optional<OrderRequest> orderRequest = orderService.findById(requestModel.id());
+        if (orderRequest.isEmpty()) {
+            return new ResponseEntity<>(new SingleStringModel("Not Found"), HttpStatus.NOT_FOUND);
+        }
+        orderRequest.get().setOrderStatus(OrderStatus.Received);
+        orderService.save(orderRequest.get());
+        OrderNote orderNote = orderNoteService.createOrderNote(new OrderNote(
+                null,
+                orderRequest.get().getId(),
+                null,
+                "Request marked received. ",
+                BigInteger.valueOf(0),
+                OrderStatus.Received,
+                apiUser.getUser()));
+
+        return new ResponseEntity<>(new SingleStringModel("success"), HttpStatus.OK);
     }
 
     @GetMapping("/itemorderstatus/{id}")

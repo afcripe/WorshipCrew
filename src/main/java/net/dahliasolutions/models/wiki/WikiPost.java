@@ -19,7 +19,7 @@ import java.util.List;
 public class WikiPost {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private BigInteger id;
     private String title;
     private String folder;
@@ -33,8 +33,7 @@ public class WikiPost {
     @ManyToOne
     private User author;
 
-    @Lob
-    @Column(name = "body", columnDefinition="BLOB")
+    @Column(name = "body", columnDefinition = "text")
     private String body;
 
     @ManyToMany

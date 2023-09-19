@@ -8,9 +8,9 @@ import RequestView from "./RequestView.js";
 import SearchView from "./SearchView.js";
 
 import { postLogin, renewToken } from "./Login.js";
-import { toggleDetail, showTicketAgents, updateAgent, updateNote, updateTicketStatus, postTicketNote, postTicketStatus, postTicketAddAgent, postTicketRemoveAgent, updateTicketSLA, postTicketSLA } from "./TicketView.js";
+import { toggleDetail, showTicketAgents, updateAgent, updateNote, updateTicketStatus, postTicketNote, postTicketStatus, postTicketAddAgent, postTicketRemoveAgent, updateTicketSLA, postTicketSLA, postTicketAccept } from "./TicketView.js";
 import { imageDialog } from "./ImageView.js";
-import { updateRequest, updateRequestItem, showRequestHistory, updateSupervisor, updateRequestAgent, updateRequestItemAgent, postRequestStatus, postRequestItemStatus, postRequestAddAgent, postRequestItemAddAgent, postRequestAddSupervisor, postRequestRemoveSupervisor } from "./RequestView.js";
+import { updateRequest, updateRequestItem, showRequestHistory, updateSupervisor, updateRequestAgent, updateRequestItemAgent, postRequestStatus, postRequestItemStatus, postRequestAddAgent, postRequestItemAddAgent, postRequestAddSupervisor, postRequestRemoveSupervisor, postRequestAcknowledged } from "./RequestView.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
 import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-messaging.js";
 
@@ -224,7 +224,11 @@ const hidePopForms = () => {
     let pops = document.querySelectorAll(".form__popup");
     if (pops.length > 0) {
         for (let p in pops) {
-            pops[p].remove();
+            try {
+                pops[p].remove();
+            } catch (e) {
+                console.log("Element is not a Popup")
+            }
         }
     }
 }
@@ -389,6 +393,22 @@ const postRemoveRequestAgent = async (requestId, userId) => {
     updateAppProgress(0);
     let response = await postRequestRemoveSupervisor(requestId, userId, token);
     updateAppProgress(101);
+}
+
+const postRequestAck = async () => {
+    updateAppProgress(0);
+    debugger
+    let rsp = await postRequestAcknowledged(token);
+    updateAppProgress(101);
+    navigateTo("/app/request/"+rsp);
+}
+
+const postTicketAcc = async () => {
+    updateAppProgress(0);
+    debugger
+    let rsp = await postTicketAccept(token);
+    updateAppProgress(101);
+    navigateTo("/app/ticket/"+rsp);
 }
 
 
@@ -688,6 +708,17 @@ document.addEventListener("DOMContentLoaded", () => {
             showRequestHistory(e.target.dataset.requestHistory, token);
         }
 
+        if ( e.target.matches("[data-form-request-acknowledge]")) {
+            e.preventDefault();
+            debugger
+            if (e.target.dataset.formRequestAcknowledge === "accept") {
+                postRequestAck();
+            } else {
+                let d = document.getElementById("formRequest");
+                d.remove();
+            }
+        }
+
         // Tickets
 
         if ( e.target.matches("[data-ticket-agent-remove]")) {
@@ -749,6 +780,17 @@ document.addEventListener("DOMContentLoaded", () => {
             } else {
                 console.log("Cancelled Update SLA");
                 document.querySelector(".form__popup").remove();
+            }
+        }
+
+        if ( e.target.matches("[data-form-ticket-accept]")) {
+            e.preventDefault();
+            debugger
+            if (e.target.dataset.formTicketAccept === "accept") {
+                postTicketAcc();
+            } else {
+                let d = document.getElementById("formRequest");
+                d.remove();
             }
         }
 

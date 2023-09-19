@@ -27,7 +27,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addResourceLocations("/static/")
                 .setCacheControl(CacheControl.noCache());
         registry.addResourceHandler("/content/**")
-                .addResourceLocations("file:///Users/afcripe/var/destinyworshipexchange/content/")
+                .addResourceLocations("file:///var/destinyworshipexchange/content/")
                 .setCacheControl(CacheControl.noCache());
     }
 // file:///Users/afcripe/var/destinyworshipexchange/content/

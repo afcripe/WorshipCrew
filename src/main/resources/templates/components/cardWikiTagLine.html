@@ -9,7 +9,7 @@
         <input th:id="'input-' + *{id}" type="text" th:value="*{name}" style="display: none;"
                th:onkeyup="updateTag('tag-[[*{id}]]', [[*{id}]])">
         <span th:id="'display-' + *{id}" th:text="*{name}" class="h6 align-content-center"></span>
-          (<span th:text="*{references}"></span>)
+          (<span th:text="*{referencedTag}"></span>)
       </div>
       <div class="col-6 align-content-end" style="vertical-align: center">
         <button id="btnEdit" class="btn btn-sm btn-wiki ml-2" type="button"

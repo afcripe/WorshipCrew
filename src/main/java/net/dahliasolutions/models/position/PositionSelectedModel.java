@@ -18,7 +18,6 @@ import java.math.BigInteger;
 public class PositionSelectedModel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private BigInteger id;
     private int level;
     private String name;

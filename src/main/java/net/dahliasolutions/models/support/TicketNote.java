@@ -17,14 +17,13 @@ import java.util.List;
 public class TicketNote {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private BigInteger id;
     private LocalDateTime noteDate;
     private boolean notePrivate;
     private boolean agentNote;
 
-    @Lob
-    @Column(name = "detail", columnDefinition="BLOB")
+    @Column(name = "detail", columnDefinition = "text")
     private String detail;
 
     @OneToMany(fetch = FetchType.EAGER)

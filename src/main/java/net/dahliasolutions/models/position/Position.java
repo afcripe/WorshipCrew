@@ -20,7 +20,7 @@ import java.math.BigInteger;
 public class Position {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private BigInteger id;
     private int level;
     private String name;

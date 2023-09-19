@@ -4,6 +4,9 @@ import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.*;
+import net.dahliasolutions.models.order.OrderNote;
+import net.dahliasolutions.models.order.OrderRequest;
+import net.dahliasolutions.models.order.OrderStatus;
 import net.dahliasolutions.models.records.*;
 import net.dahliasolutions.models.support.*;
 import net.dahliasolutions.models.user.User;
@@ -233,6 +236,49 @@ public class MobileAppAPITicketController {
         }
 
         return new ResponseEntity<>(ticket.get().getAgentList(), HttpStatus.OK);
+    }
+
+    @PostMapping("/getaccept")
+    public ResponseEntity<SingleStringModel> getTicketAccept(@ModelAttribute SingleStringModel requestModel, HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new SingleStringModel("Access denied!"), HttpStatus.FORBIDDEN);
+        }
+
+        Optional<Ticket> ticket = ticketService.findById(requestModel.name());
+        if (ticket.isEmpty()) {
+            return new ResponseEntity<>(new SingleStringModel("Not Found"), HttpStatus.NOT_FOUND);
+        }
+
+        if (ticket.get().getAgent() == null) {
+            return new ResponseEntity<>(new SingleStringModel("Acknowledge"), HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(new SingleStringModel("Not Supervisor"), HttpStatus.BAD_REQUEST);
+    }
+
+    @PostMapping("/setaccept")
+    public ResponseEntity<SingleStringModel> setTicketAccept(@ModelAttribute SingleStringModel requestModel, HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new SingleStringModel("Access denied!"), HttpStatus.FORBIDDEN);
+        }
+
+        Optional<Ticket> ticket = ticketService.findById(requestModel.name());
+        if (ticket.isEmpty()) {
+            return new ResponseEntity<>(new SingleStringModel("Not Found"), HttpStatus.NOT_FOUND);
+        }
+        ticket.get().setAgentList(
+                removeFromSupervisorList(apiUser.getUser(), ticket.get().getAgentList()));
+
+        ticket.get().setAgent(apiUser.getUser());
+        ticketService.save(ticket.get());
+        TicketNote ticketNote = noteService.createTicketNote(
+                new TicketNote(null, null, false,
+                        true, "Ticket was accepted by "+apiUser.getUser().getFullName()+".",
+                        new ArrayList<>(), apiUser.getUser(), ticket.get()));
+
+        return new ResponseEntity<>(new SingleStringModel("success"), HttpStatus.OK);
     }
 
     @GetMapping("/agentoptions")

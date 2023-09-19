@@ -18,6 +18,6 @@ public class WikiFolderReference {
     @Id
     @Column(name = "folder")
     private String folder;
-    private int references;
+    private int referencedFolder;
 
 }

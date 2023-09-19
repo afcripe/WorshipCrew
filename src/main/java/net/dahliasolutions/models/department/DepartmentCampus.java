@@ -17,7 +17,7 @@ import java.math.BigInteger;
 public class DepartmentCampus {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private BigInteger id;
     private String name;
     private BigInteger directorId;

@@ -20,7 +20,7 @@ import java.util.List;
 public class OrderRequest {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private BigInteger id;
     private LocalDateTime requestDate;
     private String requestNote;

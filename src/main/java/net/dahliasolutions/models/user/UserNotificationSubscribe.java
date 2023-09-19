@@ -18,7 +18,7 @@ import java.math.BigInteger;
 public class UserNotificationSubscribe {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private BigInteger id;
 
     @Enumerated

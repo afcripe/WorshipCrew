@@ -18,7 +18,7 @@ import java.util.List;
 public class StoreCategory {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private BigInteger id;
     private String name;
 

@@ -19,7 +19,7 @@ import java.math.BigInteger;
 public class TicketPriority {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private BigInteger id;
     private int displayOrder;
     private String priority;

@@ -45,12 +45,12 @@
                 document.getElementById('newTagName').value = "/";
                 document.getElementById('newTagName').focus();
             }
-            async function addNewTag(tag, target) {
+            async function addNewFolder(tag, target) {
                 let apiURL = '/api/v1/wiki/foldermanager/new';
                 let formData = new FormData();
                     formData.set("id", "0")
                     formData.set("name", document.getElementById('newTagName').value)
-                    formData.set("references", "0")
+                    formData.set("referencedFolder", "0")
 
                 const responseEditTag = await fetch(apiURL, {
                     method: 'POST',
@@ -62,26 +62,26 @@
                 });
             }
 
-            function newTagInput(event) {
+            function newFolderInput(event) {
                 event.preventDefault()
-                if (event.key == "Enter") { newTag() }
+                if (event.key == "Enter") { addNewFolder() }
             }
 
-            function escTagInput() {
+            function escFolderInput() {
                 document.getElementById("newFolder").close();
             }
 
         </script>
-        <form onsubmit="newTagInput(event)" method="dialog">
+        <form onsubmit="newFolderInput(event)" method="dialog">
             <div class="d-flex">
                 <label class="form-control-label h4 pr-2 w-75" style="float: left">New Tag</label>
-                <button class="btn btn-sm btn-outline-primary m-2 w-25" onclick="escTagInput()">Close</button>
+                <button class="btn btn-sm btn-outline-primary m-2 w-25" onclick="escFolderInput()">Close</button>
             </div>
             <div class="d-flex">
                 <input id="newTagName" class="form-control pr-2 w-75" type="text"
                        placeholder="New Tag" style="float: left;" onkeyup="newTagInput(event)">
                 <button type="button" class="btn btn-sm btn-wiki m-2 w-25" style="float: right"
-                        onclick="addNewTag()">Add</button>
+                        onclick="addNewFolder()">Add</button>
             </div>
         </form>
     </dialog>
@@ -108,7 +108,7 @@
             }
 
             function editFolderDialogOK() {
-                document.getElementById("chooseTag").close();
+                document.getElementById("updateFolder").close();
             }
 
             function editFolderInput(event) {
@@ -128,7 +128,7 @@
                 <button type="button" class="btn btn-sm btn-wiki m-2 w-25" style="float: right"
                         onclick="updateFolder()">Update</button>
                 <button type="button" class="btn btn-sm btn-wiki m-2 w-25" style="float: right"
-                        onclick="editFolderDialogOK()">OK</button>
+                        onclick="editFolderDialogOK()">Cancel</button>
             </div>
         </form>
     </dialog>

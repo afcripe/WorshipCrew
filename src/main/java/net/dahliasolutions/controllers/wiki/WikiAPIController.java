@@ -157,7 +157,7 @@ public class WikiAPIController {
         wikiPostService.removeTag(wikiTag.get());
         wikiTagService.deleteById(wikiTagModel.getId());
 
-        wikiTagModel.setReferences(0);
+        wikiTagModel.setReferencedTag(0);
         return wikiTagModel;
     }
 
@@ -176,7 +176,7 @@ public class WikiAPIController {
             WikiTagReference mergedTagCount = new WikiTagReference();
             mergedTagCount.setId(wikiTag.get().getId());
             mergedTagCount.setName(wikiTag.get().getName());
-            mergedTagCount.setReferences(mrgCount);
+            mergedTagCount.setReferencedTag(mrgCount);
             return mergedTagCount;
         }
 

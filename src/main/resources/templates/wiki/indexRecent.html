@@ -44,7 +44,7 @@
                             <hr>
                             <div>
                                 <div class="tag_primary m-1 selectableItem" style="display: inline-block;" th:onclick="navToTag([[*{tag.id}]])"
-                                     th:each="tag : *{tagList}" th:text="${tag.name + '(' + tag.references + ')'}"></div>
+                                     th:each="tag : *{tagList}" th:text="${tag.name + '(' + tag.referencedTag + ')'}"></div>
                             </div>
                         </div>
 

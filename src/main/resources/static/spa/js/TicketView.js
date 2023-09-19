@@ -24,6 +24,37 @@ export default class extends AbstractView {
     }
 
     async getNotification() {
+        let canAccept = await getRemoteTicketAccept(this.params.id, this.params.token);
+
+        if(canAccept) {
+            let r=`<div>`;
+            r+=`<form><div class="form-content form__popup-content">`;
+
+            r+=`<h4>Accept Ticket</h4>`;
+
+            r+=`<div class="request__item-detail">`;
+            r+=`This Ticket has not been assigned. Would you like to accept this ticket?`;
+            r+=`<input type="hidden" id="ticketAcceptId" value="`+this.params.id+`">`;
+            r+=`</div>`;
+
+            r+=`<div class="request__item-detail detail-padding-bottom">`;
+            r+=`<div class="request__item-field-center">`;
+            r+=`<button type="button" class="btn btn-sm btn-store" data-form-ticket-accept="accept">Acknowledge</button>`;
+            r+=`</div>`;
+            r+=`<div class="request__item-field-center">`;
+            r+=`<button type="button" class="btn btn-sm btn-outline-cancel" data-form-ticket-accept="reject">Close</button>`;
+            r+=`</div>`;
+            r+=`</div>`;
+
+            r+=`</div></form></div>`;
+
+            let dialogHTML =  document.createElement("div");
+            dialogHTML.id = "formRequest";
+            dialogHTML.classList.add("form__popup");
+            dialogHTML.innerHTML = r;
+            document.body.appendChild(dialogHTML);
+        }
+
         return null;
     }
 }
@@ -123,6 +154,25 @@ async function updateTicketSLA(ticketID, token) {
     setAppProgress(101);
 }
 
+async function getRemoteTicketAccept(id, token) {
+    let formData = new FormData();
+        formData.set("name", id);
+
+    const response = await fetch('/api/v1/app/ticket/getaccept', {
+        method: 'POST',
+        headers: {
+            authorization: "Bearer "+token
+        },
+        body: formData
+    });
+    const status = response.status;
+    if (status === 200) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 async function getRemoteTicket(id, token) {
     const response = await fetch('/api/v1/app/ticket/'+id, {
         headers: {
@@ -197,6 +247,20 @@ function toggleDetail() {
         detail.classList.add("ticket__hide-group");
     }
 
+}
+
+async function postTicketAccept(token) {
+    let formData = new FormData();
+        formData.set("name", document.getElementById("ticketAcceptId").value);
+    const response = await fetch('/api/v1/app/ticket/setaccept', {
+        method: 'POST',
+        headers: {
+            authorization: "Bearer "+token
+        },
+        body: formData
+    });
+    let rsp =  await response.json();
+    return document.getElementById("ticketAcceptId").value;
 }
 
 async function postTicketNote(token) {
@@ -329,7 +393,11 @@ function htmlTicket(tkt) {
     if (tkt.closeDate) {
         r += `<div class="ticket__detail">` + formatDate(tkt.ticketDate) + `</div>`;
     }
-    r+=`<div class="ticket__detail">Assigned To: `+tkt.agent.fullName+`</div>`;
+    if (tkt.agent) {
+        r += `<div class="ticket__detail">Assigned To: ` + tkt.agent.fullName + `</div>`;
+    } else {
+        r += `<div class="ticket__detail">Assigned To: NOT ASSIGNED</div>`;
+    }
     r+=`<div class="ticket__detail">Sbmitted By: `+tkt.user.fullName+`</div>`;
     r+=`<div class="ticket__detail">User Priority: `+tkt.priority+`</div>`;
     r+=`<div class="ticket__detail">Campus: `+tkt.campus.name+` - `+tkt.department.name+`</div>`;
@@ -567,5 +635,5 @@ function formatDate(dte) {
     return strDate + " " + partTime[0] + ":" + partTime[1];
 }
 
-export { toggleDetail, showTicketAgents, updateAgent, updateNote, updateTicketSLA, postTicketSLA,
+export { toggleDetail, showTicketAgents, updateAgent, updateNote, updateTicketSLA, postTicketSLA, postTicketAccept,
     updateTicketStatus, postTicketNote, postTicketStatus, postTicketAddAgent, postTicketRemoveAgent };

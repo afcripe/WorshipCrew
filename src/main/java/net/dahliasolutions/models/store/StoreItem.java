@@ -22,15 +22,14 @@ import java.util.List;
 public class StoreItem {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private BigInteger id;
     private String name;
     private boolean specialOrder;
     private boolean available;
     private int leadTime;
 
-    @Lob
-    @Column(name = "description", columnDefinition="BLOB")
+    @Column(name = "description", columnDefinition = "text")
     private String description;
 
     @Nullable

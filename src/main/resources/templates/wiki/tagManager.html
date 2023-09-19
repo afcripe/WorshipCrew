@@ -33,7 +33,7 @@
                 let formData = new FormData();
                     formData.set("id", "0")
                     formData.set("name", document.getElementById('newTagName').value)
-                    formData.set("references", "0")
+                    formData.set("referencedTag", "0")
 
                 const responseEditTag = await fetch(apiURL, {
                     method: 'POST',
@@ -46,7 +46,7 @@
             }
 
             function newTagDialogOK() {
-                document.getElementById("chooseTag").close();
+                document.getElementById("newTag").close();
             }
 
             function newTagInput(event) {
@@ -65,7 +65,7 @@
                 <button type="button" class="btn btn-sm btn-wiki m-2 w-25" style="float: right"
                         onclick="addNewTag()">Add</button>
                 <button type="button" class="btn btn-sm btn-wiki m-2 w-25" style="float: right"
-                        onclick="newTagDialogOK()">OK</button>
+                        onclick="newTagDialogOK()">Cancel</button>
             </div>
         </form>
     </dialog>
@@ -77,7 +77,7 @@
                 let formData = new FormData();
                     formData.set("id", document.getElementById('editTagId').value)
                     formData.set("name", document.getElementById('editTagName').value)
-                    formData.set("references", "0")
+                    formData.set("referencedTag", "0")
 
                 const responseEditTag = await fetch(apiURL, {
                     method: 'POST',
@@ -90,7 +90,7 @@
             }
 
             function editTagDialogOK() {
-                document.getElementById("chooseTag").close();
+                document.getElementById("updateTag").close();
             }
 
             function editTagInput(event) {
@@ -110,7 +110,7 @@
                 <button type="button" class="btn btn-sm btn-wiki m-2 w-25" style="float: right"
                         onclick="updateTag()">Update</button>
                 <button type="button" class="btn btn-sm btn-wiki m-2 w-25" style="float: right"
-                        onclick="editTagDialogOK()">OK</button>
+                        onclick="editTagDialogOK()">Cancel</button>
             </div>
         </form>
     </dialog>
@@ -125,7 +125,7 @@
             let formData = new FormData();
             formData.set("id", id)
             formData.set("name", tagSpanQry[0].innerText)
-            formData.set("references", tagSpanQry[1].innerText)
+            formData.set("referencedTag", tagSpanQry[1].innerText)
 
             const responseDeleteTag = await fetch(apiURL, {
                 method: 'POST',

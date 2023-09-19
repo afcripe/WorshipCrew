@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 public class OrderItem {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private BigInteger id;
     private BigInteger productId;
     private String productName;

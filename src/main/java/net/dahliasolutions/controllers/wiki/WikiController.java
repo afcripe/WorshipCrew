@@ -95,7 +95,7 @@ public class WikiController {
             WikiTagReference tagCounter = new WikiTagReference();
                 tagCounter.setId(tag.getId());
                 tagCounter.setName(tag.getName());
-                tagCounter.setReferences(wikiTagService.countReferences(tag.getId()));
+                tagCounter.setReferencedTag(wikiTagService.countReferences(tag.getId()));
             tagList.add(tagCounter);
         }
 
@@ -122,7 +122,7 @@ public class WikiController {
                 WikiTagReference tagCounter = new WikiTagReference();
                 tagCounter.setId(tag.getId());
                 tagCounter.setName(tag.getName());
-                tagCounter.setReferences(wikiTagService.countReferences(tag.getId()));
+                tagCounter.setReferencedTag(wikiTagService.countReferences(tag.getId()));
                 tagList.add(tagCounter);
             }
 
@@ -144,7 +144,7 @@ public class WikiController {
             WikiTagReference tagCounter = new WikiTagReference();
             tagCounter.setId(tag.getId());
             tagCounter.setName(tag.getName());
-            tagCounter.setReferences(wikiTagService.countReferences(tag.getId()));
+            tagCounter.setReferencedTag(wikiTagService.countReferences(tag.getId()));
             tagList.add(tagCounter);
         }
 
@@ -280,7 +280,7 @@ public class WikiController {
                 WikiTagReference tagCounter = new WikiTagReference();
                 tagCounter.setId(tag.getId());
                 tagCounter.setName(tag.getName());
-                tagCounter.setReferences(wikiTagService.countReferences(tag.getId()));
+                tagCounter.setReferencedTag(wikiTagService.countReferences(tag.getId()));
                 tagList.add(tagCounter);
             }
 
@@ -378,7 +378,7 @@ public class WikiController {
             WikiTagReference tagCounter = new WikiTagReference();
             tagCounter.setId(tag.getId());
             tagCounter.setName(tag.getName());
-            tagCounter.setReferences(wikiTagService.countReferences(tag.getId()));
+            tagCounter.setReferencedTag(wikiTagService.countReferences(tag.getId()));
             tagList.add(tagCounter);
         }
 
@@ -393,7 +393,7 @@ public class WikiController {
         for (WikiFolder folder : folderList) {
             WikiFolderReference ref = new WikiFolderReference();
             ref.setFolder(folder.getFolder());
-            ref.setReferences(wikiPostService.findCountReferencesByFolder(folder));
+            ref.setReferencedFolder(wikiPostService.findCountReferencesByFolder(folder));
             refList.add(ref);
         }
         model.addAttribute("folderList", refList);
@@ -423,7 +423,7 @@ public class WikiController {
             WikiTagReference tagCounter = new WikiTagReference();
             tagCounter.setId(tag.getId());
             tagCounter.setName(tag.getName());
-            tagCounter.setReferences(wikiTagService.countReferences(tag.getId()));
+            tagCounter.setReferencedTag(wikiTagService.countReferences(tag.getId()));
             tagList.add(tagCounter);
         }
 

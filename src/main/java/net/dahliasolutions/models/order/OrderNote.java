@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class OrderNote {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private BigInteger id;
     private BigInteger orderId;
     private LocalDateTime noteDate;

@@ -28,11 +28,37 @@ export default class extends AbstractView {
     }
 
     async getNotification() {
-        let canAcknowledge = await getRemoteAcknowledge(this.params.id, this.params.username, this.params.token);
-        console.log(canAcknowledge)
+        let canAcknowledge = await getRemoteAcknowledge(this.params.id, this.params.token);
 
-        // ToDo - Popup Acknowledge Request
+        if(canAcknowledge) {
+            // ToDo - Popup Acknowledge Request
+            let r = `<div>`;
+            r += `<form><div class="form-content form__popup-content">`;
 
+            r += `<h4>Acknowledge Request</h4>`;
+
+            r += `<div class="request__item-detail">`;
+            r += `This Request is still in 'Submitted' status. Would you like to acknowledge this request as 'Received'?`;
+            r += `<input type="hidden" id="requestAcknowledgedId" value="` + this.params.id + `">`;
+            r += `</div>`;
+
+            r += `<div class="request__item-detail detail-padding-bottom">`;
+            r += `<div class="request__item-field-center">`;
+            r += `<button type="button" class="btn btn-sm btn-store" data-form-request-acknowledge="accept">Acknowledge</button>`;
+            r += `</div>`;
+            r += `<div class="request__item-field-center">`;
+            r += `<button type="button" class="btn btn-sm btn-outline-cancel" data-form-request-acknowledge="reject">Close</button>`;
+            r += `</div>`;
+            r += `</div>`;
+
+            r += `</div></form></div>`;
+
+            let dialogHTML = document.createElement("div");
+            dialogHTML.id = "formRequest";
+            dialogHTML.classList.add("form__popup");
+            dialogHTML.innerHTML = r;
+            document.body.appendChild(dialogHTML);
+        }
         return null;
     }
 }
@@ -57,10 +83,9 @@ function setAppProgress(prg) {
     }
 }
 
-async function getRemoteAcknowledge(id, username, token) {
+async function getRemoteAcknowledge(id, token) {
     let formData = new FormData();
         formData.set("id", id);
-        formData.set("name", username);
 
     const response = await fetch('/api/v1/app/request/getacknowledge', {
         method: 'POST',
@@ -70,7 +95,6 @@ async function getRemoteAcknowledge(id, username, token) {
         body: formData
     });
     const status = response.status;
-    debugger
     if (status === 200) {
         return true;
     } else {
@@ -225,6 +249,20 @@ async function getOrderSupervisorOptions(token) {
     });
     return await response.json();
 
+}
+
+async function postRequestAcknowledged(token) {
+    let formData = new FormData();
+    formData.set("id", document.getElementById("requestAcknowledgedId").value);
+    const response = await fetch('/api/v1/app/request/setacknowledge', {
+        method: 'POST',
+        headers: {
+            authorization: "Bearer "+token
+        },
+        body: formData
+    });
+    let rsp =  await response.json();
+    return document.getElementById("requestAcknowledgedId").value;
 }
 
 async function postRequestStatus(token) {
@@ -627,5 +665,5 @@ function formatDate(dte) {
     return strDate + " " + partTime[0] + ":" + partTime[1];
 }
 
-export { updateRequest, updateRequestItem, showRequestHistory, updateSupervisor, updateRequestAgent, updateRequestItemAgent,
+export { updateRequest, updateRequestItem, showRequestHistory, updateSupervisor, updateRequestAgent, updateRequestItemAgent, postRequestAcknowledged,
     postRequestStatus, postRequestItemStatus, postRequestAddAgent, postRequestItemAddAgent, postRequestAddSupervisor, postRequestRemoveSupervisor};

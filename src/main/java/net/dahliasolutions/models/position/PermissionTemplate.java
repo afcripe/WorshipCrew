@@ -19,7 +19,7 @@ import java.util.List;
 public class PermissionTemplate {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private BigInteger id;
     private String name;
     private boolean defaultTemplate;
