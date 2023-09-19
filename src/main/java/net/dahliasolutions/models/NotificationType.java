@@ -5,5 +5,6 @@ public enum NotificationType {
     Updated,
     NewItem,
     ItemUpdated,
-    NewList
+    NewList,
+    Cancelled
 }

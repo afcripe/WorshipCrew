@@ -451,7 +451,7 @@ public class OrderController {
             dayString = "0"+dayString;
         }
         // create date and convert to LocalDateTime
-        String dateString = dateNow.getYear()+"-"+monthString+"-"+ dayString+" 00:00";
+        String dateString = dateNow.getYear()+"-"+monthString+"-"+ dayString+" 24:00";
         LocalDateTime returnDate = LocalDateTime.parse(dateString, formatter);
 
         // adjust date based on part

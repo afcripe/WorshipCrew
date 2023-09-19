@@ -49,6 +49,10 @@ export default class extends AbstractView {
         this.setAppProgress(80);
         return r;
     }
+
+    async getNotification() {
+        return null;
+    }
 }
 
 function setAppProgress(prg) {

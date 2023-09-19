@@ -19,6 +19,10 @@ export default class extends AbstractView {
         returnHTML = returnHTML.replaceAll("\n","");
         return returnHTML.replaceAll("\n","");
     }
+
+    async getNotification() {
+        return null;
+    }
 }
 
 function setAppProgress(prg) {

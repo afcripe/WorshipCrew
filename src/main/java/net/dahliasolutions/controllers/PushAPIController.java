@@ -44,9 +44,9 @@ public class PushAPIController {
     @PostMapping("/sendtestfiremessage")
     public SingleStringModel sendTestByToken(@ModelAttribute FirebaseMessageModel firebaseMessage) throws FirebaseMessagingException, JSONException {
         Map<String, String> data = Map.ofEntries(
-                Map.entry("link", "http://localhost:8081/app/"),
-                Map.entry("module", "ticket"),
-                Map.entry("moduleId", "ST-000001")
+                Map.entry("link", "http://localhost:8081/app"),
+                Map.entry("module", ""),
+                Map.entry("moduleId", "")
                 );
 
         FirebaseMessage msg = new FirebaseMessage();
@@ -54,6 +54,11 @@ public class PushAPIController {
                         msg.setTitle(firebaseMessage.title());
                         msg.setBody(firebaseMessage.body());
                         msg.setData(data);
+        try {
+            Thread.sleep(2000);
+        } catch (Exception e) {
+            //
+        }
 
         System.out.println(msg.getTitle());
         String sentMsg = firebaseMessagingService.sendNotificationByToken(msg);

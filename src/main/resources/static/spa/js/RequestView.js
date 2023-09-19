@@ -26,6 +26,15 @@ export default class extends AbstractView {
         returnHTML = returnHTML.replaceAll("\n","");
         return returnHTML.replaceAll("\n","");
     }
+
+    async getNotification() {
+        let canAcknowledge = await getRemoteAcknowledge(this.params.id, this.params.username, this.params.token);
+        console.log(canAcknowledge)
+
+        // ToDo - Popup Acknowledge Request
+
+        return null;
+    }
 }
 
 function setAppProgress(prg) {
@@ -45,6 +54,27 @@ function setAppProgress(prg) {
         }
     } catch (e) {
         document.getElementById("appProgress").style.display = "none";
+    }
+}
+
+async function getRemoteAcknowledge(id, username, token) {
+    let formData = new FormData();
+        formData.set("id", id);
+        formData.set("name", username);
+
+    const response = await fetch('/api/v1/app/request/getacknowledge', {
+        method: 'POST',
+        headers: {
+            authorization: "Bearer "+token
+        },
+        body: formData
+    });
+    const status = response.status;
+    debugger
+    if (status === 200) {
+        return true;
+    } else {
+        return false;
     }
 }
 

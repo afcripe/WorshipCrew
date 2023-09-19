@@ -137,6 +137,8 @@ const router = async () => {
     document.querySelector("#app").innerHTML = await view.getHtml();
 
     updateAppProgress(101);
+
+    await view.getNotification(token, username);
 };
 
 const getLoggedIn = async () => {
@@ -451,18 +453,23 @@ const browserInfo = () => {
 }
 
 const subscribe = async() => {
+    let regSW = await navigator.serviceWorker.register('/firebase-messaging-sw.js')
+
+    console.log("subscribe requested");
     // Add the public key generated from the console here.
     getToken(messaging, {vapidKey: "BPkHKoGBXYuuTEfyty0lBzi1RruJbGobRImxy9Jl008QPmgNxeo7Hj2BYaDb-AJD4hOraF6ZHirFl_VtxeMKiZk"})
         .then(async (currentToken) => {
+            console.log("Got token.")
             if (currentToken) {
                 // Send token to server
                 // navigator.serviceWorker.register("/firebase-messaging-sw.js");
                 let appInst = browserInfo();
                 let formData = new FormData();
-                formData.set("id", "0");
-                formData.set("name", appInst);
-                formData.set("token", currentToken);
+                    formData.set("id", "0");
+                    formData.set("name", appInst);
+                    formData.set("token", currentToken);
 
+                console.log("Sending token to server");
                 const response = await fetch('/api/v1/app/swtoken', {
                     method: 'POST',
                     headers: {
@@ -474,6 +481,7 @@ const subscribe = async() => {
                 console.log(rsp.name);
                 navigateTo("/app/settings");
             } else {
+                console.log("Needs browser permission");
                 // Show permission request UI
                 Notification.requestPermission()
                     .then((perm) => {
@@ -486,6 +494,7 @@ const subscribe = async() => {
             }
         })
         .catch((err) => {
+            console.log("Error getting token.")
             console.log(err);
         });
 };

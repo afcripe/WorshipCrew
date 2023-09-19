@@ -94,7 +94,7 @@ public class OrderAPIController {
                                 false,
                                 null,
                                 EventModule.Request,
-                                NotificationType.Updated,
+                                NotificationType.Cancelled,
                                 orderRequest.get().getSupervisor(),
                                 BigInteger.valueOf(0)
 
@@ -398,7 +398,7 @@ public class OrderAPIController {
                         new NotificationMessage(
                                 null,
                                 "You have a New Request item to Fulfill",
-                                "",
+                                requestItem.get().getOrderRequest().getId().toString(),
                                 requestItem.get().getId(),
                                 false,
                                 false,

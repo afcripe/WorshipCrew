@@ -30,4 +30,8 @@ export default class {
     async getHtml() {
         return "";
     }
+
+    async getNotification() {
+        return null;
+    }
 }

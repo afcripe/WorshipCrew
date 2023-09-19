@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +37,7 @@ public class NotificationMessageService implements NotificationMessageServiceInt
     private final OrderNoteService orderNoteService;
     private final TicketService ticketService;
     private final TicketNoteService ticketNoteService;
+    private final AppServer appServer;
 
     @Override
     public NotificationMessage createMessage(NotificationMessage message) {
@@ -87,25 +89,95 @@ public class NotificationMessageService implements NotificationMessageServiceInt
     private BrowserMessage sendPush(NotificationMessage message) {
         BrowserMessage notificationStatus = new BrowserMessage("msgScheduled", "Message Blackout Period. Send Delayed.");
 
+        Map<String, String> data = Map.ofEntries(
+                Map.entry("link", appServer.getBaseURL()+"/app"),
+                Map.entry("module", message.getModule().toString().toLowerCase()),
+                Map.entry("moduleId", message.getModuleId())
+        );
+
         // ToDo - Blackouts
 
         if (message.getModule().equals(EventModule.Request)) {
-            BigInteger orderId = new BigInteger(message.getModuleId());
-            OrderRequest newRequest = orderService.findById(orderId).get();
-
-            if (message.getType().equals(NotificationType.New)) {
-                for (UserEndpoint ep : message.getUser().getEndpoints()) {
-                    FirebaseMessage fireMessage = new FirebaseMessage();
-                    fireMessage.setRecipientToken(ep.getToken());
-                    fireMessage.setTitle("DWC Notification");
-                    fireMessage.setBody(message.getSubject());
-                    firebaseMessagingService.sendNotificationByToken(fireMessage);
+            switch (message.getType()) {
+                case New -> {
+                    for (UserEndpoint ep : message.getUser().getEndpoints()) {
+                        FirebaseMessage fireMessage = new FirebaseMessage();
+                                        fireMessage.setRecipientToken(ep.getToken());
+                                        fireMessage.setTitle("New Request");
+                                        fireMessage.setBody(message.getSubject());
+                                        fireMessage.setData(data);
+                        firebaseMessagingService.sendNotificationByToken(fireMessage);
+                    }
                 }
-
-            } else if (message.getType().equals(NotificationType.NewItem)) {
-
+                case NewItem -> {
+                    for (UserEndpoint ep : message.getUser().getEndpoints()) {
+                        FirebaseMessage fireMessage = new FirebaseMessage();
+                                        fireMessage.setRecipientToken(ep.getToken());
+                                        fireMessage.setTitle("New Request Item");
+                                        fireMessage.setBody(message.getSubject());
+                                        fireMessage.setData(data);
+                        firebaseMessagingService.sendNotificationByToken(fireMessage);
+                    }
+                }
+                case ItemUpdated -> {
+                    for (UserEndpoint ep : message.getUser().getEndpoints()) {
+                        FirebaseMessage fireMessage = new FirebaseMessage();
+                                        fireMessage.setRecipientToken(ep.getToken());
+                                        fireMessage.setTitle("Request Item Updated");
+                                        fireMessage.setBody(message.getSubject());
+                                        fireMessage.setData(data);
+                        firebaseMessagingService.sendNotificationByToken(fireMessage);
+                    }
+                }
+                case Updated -> {
+                    for (UserEndpoint ep : message.getUser().getEndpoints()) {
+                        FirebaseMessage fireMessage = new FirebaseMessage();
+                                        fireMessage.setRecipientToken(ep.getToken());
+                                        fireMessage.setTitle("Request Updated");
+                                        fireMessage.setBody(message.getSubject());
+                                        fireMessage.setData(data);
+                        firebaseMessagingService.sendNotificationByToken(fireMessage);
+                    }
+                }
+                case Cancelled -> {
+                    for (UserEndpoint ep : message.getUser().getEndpoints()) {
+                        FirebaseMessage fireMessage = new FirebaseMessage();
+                                        fireMessage.setRecipientToken(ep.getToken());
+                                        fireMessage.setTitle("Request Cancelled");
+                                        fireMessage.setBody(message.getSubject());
+                                        fireMessage.setData(data);
+                        firebaseMessagingService.sendNotificationByToken(fireMessage);
+                    }
+                }
             }
         }
+
+        if (message.getModule().equals(EventModule.Support)) {
+            switch (message.getType()) {
+                case New, NewList -> {
+                    for (UserEndpoint ep : message.getUser().getEndpoints()) {
+                        FirebaseMessage fireMessage = new FirebaseMessage();
+                        fireMessage.setRecipientToken(ep.getToken());
+                        fireMessage.setTitle("New Ticket");
+                        fireMessage.setBody(message.getSubject());
+                        fireMessage.setData(data);
+                        firebaseMessagingService.sendNotificationByToken(fireMessage);
+                    }
+                }
+                case Updated -> {
+                    for (UserEndpoint ep : message.getUser().getEndpoints()) {
+                        FirebaseMessage fireMessage = new FirebaseMessage();
+                        fireMessage.setRecipientToken(ep.getToken());
+                        fireMessage.setTitle("Ticket Updated");
+                        fireMessage.setBody(message.getSubject());
+                        fireMessage.setData(data);
+                        firebaseMessagingService.sendNotificationByToken(fireMessage);
+                    }
+                }
+            }
+
+        }
+
         return new BrowserMessage("msgSuccess", "Message Sent.");
     }
 

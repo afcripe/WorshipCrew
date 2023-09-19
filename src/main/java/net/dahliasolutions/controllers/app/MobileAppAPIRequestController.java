@@ -8,6 +8,7 @@ import net.dahliasolutions.models.*;
 import net.dahliasolutions.models.mail.EmailDetails;
 import net.dahliasolutions.models.order.*;
 import net.dahliasolutions.models.records.AddSupervisorModel;
+import net.dahliasolutions.models.records.BigIntegerStringModel;
 import net.dahliasolutions.models.records.ChangeStatusModel;
 import net.dahliasolutions.models.records.SingleStringModel;
 import net.dahliasolutions.models.user.User;
@@ -143,7 +144,7 @@ public class MobileAppAPIRequestController {
 
         Optional<OrderRequest> req = orderService.findById(id);
         if (req.isEmpty()) {
-            return new ResponseEntity<>(appRequest, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(appRequest, HttpStatus.NOT_FOUND);
         }
 
         appRequest.setAppRequestByRequest(req.get());
@@ -162,7 +163,7 @@ public class MobileAppAPIRequestController {
 
         Optional<OrderItem> item = orderItemService.findById(id);
         if (item.isEmpty()) {
-            return new ResponseEntity<>(new AppRequestItem(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new AppRequestItem(), HttpStatus.NOT_FOUND);
         }
 
         AppRequestItem appItem = new AppRequestItem();
@@ -184,7 +185,7 @@ public class MobileAppAPIRequestController {
 
         Optional<OrderRequest> req = orderService.findById(id);
         if (req.isEmpty()) {
-            return new ResponseEntity<>(items, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(items, HttpStatus.NOT_FOUND);
         }
 
         for (OrderItem item : req.get().getRequestItems()) {
@@ -207,7 +208,7 @@ public class MobileAppAPIRequestController {
 
         Optional<OrderRequest> req = orderService.findById(id);
         if (req.isEmpty()) {
-            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.NOT_FOUND);
         }
 
         return new ResponseEntity<>(req.get().getSupervisorList(), HttpStatus.OK);
@@ -221,6 +222,26 @@ public class MobileAppAPIRequestController {
         }
         return new ResponseEntity<>(orderNoteService.findByOrderId(id), HttpStatus.OK);
     }
+    
+    @PostMapping("/getacknowledge")
+    public ResponseEntity<SingleStringModel> getRequestAcknowledge(@ModelAttribute BigIntegerStringModel requestModel, HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new SingleStringModel("Access denied!"), HttpStatus.FORBIDDEN);
+        }
+        
+        Optional<OrderRequest> orderRequest = orderService.findById(requestModel.id());
+        if (orderRequest.isEmpty()) {
+            return new ResponseEntity<>(new SingleStringModel("Not Found"), HttpStatus.NOT_FOUND);
+        }
+        
+        if (orderRequest.get().getOrderStatus().equals(OrderStatus.Submitted)
+                && orderRequest.get().getSupervisor().getId().equals(apiUser.getUser().getId())) {
+            return new ResponseEntity<>(new SingleStringModel("Acknowledge"), HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(new SingleStringModel("Not Supervisor"), HttpStatus.BAD_REQUEST);
+    }
 
     @GetMapping("/itemorderstatus/{id}")
     public ResponseEntity<AppRequestItem> getRequestItemStatusById(@PathVariable BigInteger id, HttpServletRequest request) {
@@ -231,7 +252,7 @@ public class MobileAppAPIRequestController {
 
         Optional<OrderItem> item = orderItemService.findById(id);
         if (item.isEmpty()) {
-            return new ResponseEntity<>(new AppRequestItem(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new AppRequestItem(), HttpStatus.NOT_FOUND);
         }
 
         AppRequestItem appItem = new AppRequestItem();
@@ -283,7 +304,7 @@ public class MobileAppAPIRequestController {
         Optional<OrderRequest> orderRequest = orderService.findById(statusModel.requestId());
 
         if (orderRequest.isEmpty()) {
-            return new ResponseEntity<>(new SingleStringModel(""), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new SingleStringModel(""), HttpStatus.NOT_FOUND);
         }
 
         if (orderRequest.isPresent()) {
@@ -313,7 +334,7 @@ public class MobileAppAPIRequestController {
         Optional<OrderItem> requestItem = orderItemService.findById(statusModel.requestId());
 
         if (requestItem.isEmpty()) {
-            return new ResponseEntity<>(new SingleStringModel(""), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new SingleStringModel(""), HttpStatus.NOT_FOUND);
         }
 
         String noteDetail = statusModel.requestNote();
@@ -351,7 +372,7 @@ public class MobileAppAPIRequestController {
         Optional<User> newSuper = userService.findById(supervisorModel.userId());
 
         if (orderRequest.isEmpty()) {
-            return new ResponseEntity<>(new SingleStringModel(""), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new SingleStringModel(""), HttpStatus.NOT_FOUND);
         }
 
         String noteDetail = "";
@@ -407,7 +428,7 @@ public class MobileAppAPIRequestController {
         Optional<User> newSuper = userService.findById(supervisorModel.userId());
 
         if (orderRequest.isEmpty()) {
-            return new ResponseEntity<>(new SingleStringModel(""), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new SingleStringModel(""), HttpStatus.NOT_FOUND);
         }
 
         boolean required = false;
@@ -439,7 +460,7 @@ public class MobileAppAPIRequestController {
                 return new ResponseEntity<>(new SingleStringModel(newSuper.get().getFullName()), HttpStatus.OK);
             }
         }
-        return new ResponseEntity<>(new SingleStringModel(newSuper.get().getFullName()), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new SingleStringModel(newSuper.get().getFullName()), HttpStatus.NOT_FOUND);
     }
 
     @PostMapping("/changeitemsupervisor")
@@ -453,7 +474,7 @@ public class MobileAppAPIRequestController {
         Optional<User> newSuper = userService.findById(supervisorModel.userId());
 
         if (requestItem.isEmpty()) {
-            return new ResponseEntity<>(new SingleStringModel(""), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new SingleStringModel(""), HttpStatus.NOT_FOUND);
         }
 
         String noteDetail = "";
@@ -485,7 +506,7 @@ public class MobileAppAPIRequestController {
                 return new ResponseEntity<>(new SingleStringModel(newSuper.get().getFullName()), HttpStatus.OK);
             }
         }
-        return new ResponseEntity<>(new SingleStringModel(newSuper.get().getFullName()), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new SingleStringModel(newSuper.get().getFullName()), HttpStatus.NOT_FOUND);
     }
 
     private APIUser getUserFromToken(HttpServletRequest request) {
