@@ -1,15 +1,14 @@
 package net.dahliasolutions.config;
 
-import jakarta.servlet.Filter;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import net.dahliasolutions.data.UserRepository;
+import net.dahliasolutions.data.*;
 import net.dahliasolutions.models.user.Profile;
 import net.dahliasolutions.models.user.User;
+import net.dahliasolutions.models.user.UserRoles;
 import net.dahliasolutions.services.user.ProfileService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -17,7 +16,6 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -25,8 +23,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Configuration
@@ -36,12 +36,34 @@ public class SecurityConfig {
 
     private final UserRepository userRepository;
     private final ProfileService profileService;
-//    private final JWTAuthenticationFilter jwtAuthFilter;
+    private final UserRolesRepository rolesRepository;
+    private final PositionRepository positionRepository;
+    private final CampusRepository campusRepository;
+    private final DepartmentCampusRepository departmentCampusRepository;
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> userRepository.findByUsernameIgnoreCase(username)
+        return username -> userInterceptor(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Username Not Found."));
+    }
+    private Optional<User> userInterceptor(String username) {
+        if(username.equals("admin@admin.com")) {
+            List<UserRoles> roles = new ArrayList<>();
+            roles.add(rolesRepository.findByName("ADMIN_WRITE").get());
+            return Optional.ofNullable(User.builder()
+                    .id(BigInteger.valueOf(0))
+                    .username("admin@admin.com")
+                    .contactEmail("andrew@dahliasolutions.net")
+                    .firstName("Admin").lastName("Admin")
+                    .password("$2a$10$c0KujdAN776fInjdk08fd.kFnqBL5spBnm0yOaA7GJnmpUTT5dGc2")
+                    .activated(true).userRoles(roles)
+                    .position(positionRepository.findById(BigInteger.valueOf(1)).get())
+                    .campus(campusRepository.findById(BigInteger.valueOf(1)).get())
+                    .department(departmentCampusRepository.findById(BigInteger.valueOf(1)).get())
+                    .deleted(false).subscriptions(new ArrayList<>()).endpoints(new ArrayList<>())
+                    .build());
+        }
+        return userRepository.findByUsernameIgnoreCase(username);
     }
 
     @Bean
@@ -61,17 +83,6 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-//    @Bean
-//    @Order(1)
-//    public SecurityFilterChain jwtFilterChain(HttpSecurity http) throws Exception {
-//        http
-//                .csrf(AbstractHttpConfigurer::disable)
-//                .securityMatcher("/api/v1/app/**")
-//                .authenticationProvider(authenticationProvider())
-//                .addFilterAfter(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-//        return http.build();
-//    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

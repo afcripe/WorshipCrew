@@ -794,8 +794,17 @@ public class UserController {
     private List<PermissionTemplate> getPermissionTemplates(User currentUser) {
         List<PermissionTemplate> templateList = permissionTemplateService.findAll();
         List<PermissionTemplate> returnList = new ArrayList<>();
+        boolean supervisor = false;
+
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+        for (UserRoles role : roles){
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_SUPERVISOR")) {
+                supervisor = true;
+            }
+        }
+
         for (PermissionTemplate perm : templateList) {
-            if (perm.getPosition().getLevel() > currentUser.getPosition().getLevel()) {
+            if (perm.getPosition().getLevel() > currentUser.getPosition().getLevel() || supervisor) {
                 returnList.add(perm);
             }
         }

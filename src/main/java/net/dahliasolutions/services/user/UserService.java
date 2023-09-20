@@ -265,4 +265,5 @@ public class UserService implements UserServiceInterface{
 
         return newUser;
     }
+
 }
