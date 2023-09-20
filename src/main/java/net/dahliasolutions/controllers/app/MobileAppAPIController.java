@@ -70,6 +70,10 @@ public class MobileAppAPIController {
                     || role.getName().equals("SUPPORT_AGENT") || role.getName().equals("SUPPORT_READ")) {
                 mods.setTicketMod(true);
             }
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("RESOURCE_SUPERVISOR")
+                    || role.getName().equals("RESOURCE_WRITE") || role.getName().equals("RESOURCE_READ")) {
+                mods.setResourceMod(true);
+            }
         }
 
         return new ResponseEntity<>(mods, HttpStatus.OK);

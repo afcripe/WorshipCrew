@@ -2,8 +2,11 @@ package net.dahliasolutions.controllers.app;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.*;
+import net.dahliasolutions.models.campus.Campus;
+import net.dahliasolutions.models.department.DepartmentRegional;
 import net.dahliasolutions.models.order.OrderNote;
 import net.dahliasolutions.models.order.OrderRequest;
 import net.dahliasolutions.models.order.OrderStatus;
@@ -12,15 +15,16 @@ import net.dahliasolutions.models.support.*;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
 import net.dahliasolutions.services.JwtService;
-import net.dahliasolutions.services.support.TicketImageService;
-import net.dahliasolutions.services.support.TicketNoteService;
-import net.dahliasolutions.services.support.TicketSLAService;
-import net.dahliasolutions.services.support.TicketService;
+import net.dahliasolutions.services.campus.CampusService;
+import net.dahliasolutions.services.department.DepartmentCampusService;
+import net.dahliasolutions.services.department.DepartmentRegionalService;
+import net.dahliasolutions.services.support.*;
 import net.dahliasolutions.services.user.UserRolesService;
 import net.dahliasolutions.services.user.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -47,6 +51,10 @@ public class MobileAppAPITicketController {
     private final TicketImageService ticketImageService;
     private final TicketNoteService noteService;
     private final TicketSLAService slaService;
+    private final TicketPriorityService ticketPriorityService;
+    private final CampusService campusService;
+    private final DepartmentRegionalService departmentRegionalService;
+    private final DepartmentCampusService departmentCampusService;
     private final AppServer appServer;
 
     @GetMapping("/listbyuser")
@@ -541,6 +549,49 @@ public class MobileAppAPITicketController {
         return new ResponseEntity<>(new SingleStringModel(""), HttpStatus.BAD_REQUEST);
     }
 
+
+    @GetMapping("/getprioritylist")
+    public ResponseEntity<List<TicketPriority>> getTicketPriorityList(HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
+        }
+
+        return new ResponseEntity<>(ticketPriorityService.findAll(), HttpStatus.OK);
+    }
+
+    @GetMapping("/getcampuslist")
+    public ResponseEntity<List<Campus>> getTicketCampusList(HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
+        }
+
+        return new ResponseEntity<>(campusList(apiUser.getUser()), HttpStatus.OK);
+    }
+
+    @GetMapping("/getdepartmentlist")
+    public ResponseEntity<List<DepartmentRegional>> getTicketDepartmentList(HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
+        }
+
+        return new ResponseEntity<>(departmentList(apiUser.getUser()), HttpStatus.OK);
+    }
+
+    @PostMapping("newticket")
+    public ResponseEntity<SingleStringModel> setNewTicket(TicketNewModel ticketNewModel, HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new SingleStringModel(""), HttpStatus.FORBIDDEN);
+        }
+
+        Ticket ticket = ticketService.createTicket(ticketNewModel, apiUser.getUser(), null);
+
+        return new ResponseEntity<>(new SingleStringModel(ticket.getId()), HttpStatus.OK);
+    }
+
     private APIUser getUserFromToken(HttpServletRequest request) {
         final String authHeader = request.getHeader("Authorization");
         final String token;
@@ -608,6 +659,34 @@ public class MobileAppAPITicketController {
         }
         list.add(user);
         return list;
+    }
+
+    private List<Campus> campusList(User currentUser) {
+        List<Campus> campusList = new ArrayList<>();
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+        for (UserRoles role : roles) {
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("SUPPORT_SUPERVISOR")
+                    || role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")) {
+                campusList = campusService.findAll();
+                return campusList;
+            }
+        }
+        campusList.add(currentUser.getCampus());
+        return campusList;
+    }
+
+    private List<DepartmentRegional> departmentList(User currentUser) {
+        List<DepartmentRegional> departmentList = new ArrayList<>();
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+        for (UserRoles role : roles) {
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("SUPPORT_SUPERVISOR")
+                    || role.getName().equals("CAMPUS_WRITE") || role.getName().equals("CAMPUS_READ")) {
+                departmentList = departmentRegionalService.findAll();
+                return departmentList;
+            }
+        }
+        departmentList.add(currentUser.getDepartment().getRegionalDepartment());
+        return departmentList;
     }
 
 }

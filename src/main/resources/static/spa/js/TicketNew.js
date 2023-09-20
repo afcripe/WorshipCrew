@@ -8,8 +8,11 @@ export default class DashboardClass extends AbstractView {
 
     async getHtml() {
         this.setAppProgress(20);
+        let priorities = await getRemoteTicketPriority(this.params.token);
+        let campuses = await getRemoteTicketCampus(this.params.token);
+        let departments = await getRemoteTicketDepartment(this.params.token);
 
-        let returnHTML = htmlForm();
+        let returnHTML = htmlForm(priorities, campuses, departments);
 
         this.setAppProgress(80);
         returnHTML = returnHTML.replaceAll("\n","");
@@ -41,29 +44,71 @@ function setAppProgress(prg) {
     }
 }
 
-async function getRemoteRequestTicketsByUser(token) {
-    const response = await fetch('/api/v1/app/dashboarduseritems', {
+async function getRemoteTicketPriority(token) {
+    const response = await fetch('/api/v1/app/ticket/getprioritylist', {
         headers: {
             authorization: "Bearer "+token
         }
     });
-    const tickets = await response.json();
+    const priorities = await response.json();
     const status = response.status;
-    return tickets;
+    return priorities;
 }
 
-async function getRemoteDashboard(token) {
-    const response = await fetch('/api/v1/app/dashboard', {
+async function getRemoteTicketCampus(token) {
+    const response = await fetch('/api/v1/app/ticket/getcampuslist', {
         headers: {
             authorization: "Bearer "+token
         }
     });
-    const tickets = await response.json();
+    const campuses = await response.json();
     const status = response.status;
-    return tickets;
+    return campuses;
 }
 
-function htmlForm() {
+async function getRemoteTicketDepartment(token) {
+    const response = await fetch('/api/v1/app/ticket/getdepartmentlist', {
+        headers: {
+            authorization: "Bearer "+token
+        }
+    });
+    const departments = await response.json();
+    const status = response.status;
+    return departments;
+}
+
+async function postNewTicket(token) {
+    setAppProgress(20);
+    const formSummary = document.getElementById("ticketSummary");
+    const formDetail = document.getElementById("ticketDetail");
+    const formPriority = document.getElementById("ticketPriority");
+    const formCampus = document.getElementById("ticketCampus");
+    const formDepartment = document.getElementById("ticketDepartment");
+
+    let formData = new FormData();
+        formData.set("summary", formSummary.value);
+        formData.set("details", formDetail.value);
+        formData.set("priority", formPriority.value);
+        formData.set("campus", formCampus.value);
+        formData.set("department", formDepartment.value);
+        formData.set("image", "");
+
+    setAppProgress(40);
+
+    const response = await fetch('/api/v1/app/ticket/newticket', {
+        method: 'POST',
+        headers: {
+            authorization: "Bearer "+token
+        },
+        body: formData
+    });
+    let rsp = await response.json();
+
+    setAppProgress(80);
+    return rsp.name;
+}
+
+function htmlForm(priorities, campuses, departments) {
     let r=`<form><div class="form-content">`;
 
     r+=`<div class="ticket__group">`;
@@ -84,34 +129,39 @@ function htmlForm() {
     r+=`<div class="form-group-col">`;
     r+=`<label>Priority</label>`;
     r+=`<select id="ticketPriority" class="form-control">`;
-    r+=`<option value="0">Select Priority</option>`;
-    r+=`</select>`;
-    r+=`</div>`;
-
-    r+=`<div class="form-group-col">`;
-    r+=`<label>SLA</label>`;
-    r+=`<select id="ticketSLA" class="form-control">`;
-    r+=`<option value="0">Select SLA</option>`;
+    r+=`<option value="0" selected>Select Priority</option>`;
+    for (let p in priorities) {
+        let pri = priorities[p]
+        r+=`<option value="`+pri.priority+`">`+pri.priority+`</option>`;
+    }
     r+=`</select>`;
     r+=`</div>`;
 
     r+=`<div class="form-group-col">`;
     r+=`<label>Campus</label>`;
     r+=`<select id="ticketCampus" class="form-control">`;
-    r+=`<option value="0">Select Campus</option>`;
+    r+=`<option value="0" selected>Select Campus</option>`;
+    for (let c in campuses) {
+        let cam = campuses[c]
+        r+=`<option value="`+cam.id+`">`+cam.name+`</option>`;
+    }
     r+=`</select>`;
     r+=`</div>`;
 
     r+=`<div class="form-group-col detail-padding-bottom">`;
     r+=`<label>Department</label>`;
     r+=`<select id="ticketDepartment" class="form-control">`;
-    r+=`<option value="0">Select Department</option>`;
+    r+=`<option value="0" selected>Select Department</option>`;
+    for (let d in departments) {
+        let dep = departments[d]
+        r+=`<option value="`+dep.id+`">`+dep.name+`</option>`;
+    }
     r+=`</select>`;
     r+=`</div>`;
 
     r+=`<div class="form-group-row detail-padding-bottom">`;
     r+=`<div class="request__item-field-center">`;
-    r+=`<button type="button" class="btn btn btn-support" data-form-ticket-new="update">Submite</button>`;
+    r+=`<button type="button" class="btn btn btn-support" data-form-ticket-new="submit">Submite</button>`;
     r+=`</div>`;
     r+=`<div class="request__item-field-center">`;
     r+=`<button type="button" class="btn btn btn-outline-cancel" data-nav-link="tickets">Cancel</button>`;
@@ -129,3 +179,5 @@ function formatDate(dte) {
     let partTime = strTime.split(":");
     return strDate + " " + partTime[0] + ":" + partTime[1];
 }
+
+export { postNewTicket };

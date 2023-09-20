@@ -12,10 +12,12 @@ public class AppUserPermissionModel {
     private boolean userMod;
     private boolean requestMod;
     private boolean ticketMod;
+    private boolean resourceMod;
 
     public AppUserPermissionModel() {
         this.userMod = false;
         this.requestMod = false;
         this.ticketMod = false;
+        this.resourceMod = false;
     }
 }

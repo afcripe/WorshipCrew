@@ -6,10 +6,12 @@ import TicketView from "./TicketView.js";
 import TicketNew from "./TicketNew.js";
 import Requests from "./Requests.js";
 import RequestView from "./RequestView.js";
+import Resources from "./Resources.js";
 import SearchView from "./SearchView.js";
 
 import { postLogin, renewToken } from "./Login.js";
 import { toggleDetail, showTicketAgents, updateAgent, updateNote, updateTicketStatus, postTicketNote, postTicketStatus, postTicketAddAgent, postTicketRemoveAgent, updateTicketSLA, postTicketSLA, postTicketAccept } from "./TicketView.js";
+import { postNewTicket } from "./TicketNew.js";
 import { imageDialog } from "./ImageView.js";
 import { updateRequest, updateRequestItem, showRequestHistory, updateSupervisor, updateRequestAgent, updateRequestItemAgent, postRequestStatus, postRequestItemStatus, postRequestAddAgent, postRequestItemAddAgent, postRequestAddSupervisor, postRequestRemoveSupervisor, postRequestAcknowledged } from "./RequestView.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
@@ -89,6 +91,7 @@ const router = async () => {
         { path: "/app/ticketNew", view: TicketNew },
         { path: "/app/requests", view: Requests },
         { path: "/app/request/:id", view: RequestView },
+        { path: "/app/resources", view: Resources },
         { path: "/app/settings", view: Settings }
     ];
 
@@ -415,6 +418,14 @@ const postTicketAcc = async () => {
     navigateTo("/app/ticket/"+rsp);
 }
 
+const postTicketNew = async () => {
+    updateAppProgress(0);
+    debugger
+    let rsp = await postNewTicket(token);
+    updateAppProgress(101);
+    navigateTo("/app/ticket/"+rsp);
+}
+
 
 // App Modules and Theming //
 
@@ -423,6 +434,7 @@ const setModules = async () => {
     const modRequest = document.getElementById("modRequest");
     const modTicket = document.getElementById("modTicket");
     const modTicketNew = document.getElementById("modTicketNew");
+    const modResource = document.getElementById("modResource");
 
     const response = await fetch('/api/v1/app/getmodules', {
         method: 'GET',
@@ -442,7 +454,6 @@ const setModules = async () => {
                 modUser.classList.add("module__hide");
             } catch (e) {}
         }
-
         if (data.requestMod) {
             try {
                 modRequest.classList.remove("module__hide");
@@ -463,12 +474,23 @@ const setModules = async () => {
                 modTicketNew.classList.add("module__hide");
             } catch (e) {}
         }
+
+        if (data.resourceMod) {
+            try {
+                modResource.classList.remove("module__hide");
+            } catch (e) {}
+        } else {
+            try {
+                modResource.classList.add("module__hide");
+            } catch (e) {}
+        }
     } else {
         try {
             modUser.classList.add("module__hide");
             modRequest.classList.add("module__hide");
             modTicket.classList.add("module__hide");
             modTicketNew.classList.add("module__hide");
+            modResource.classList.add("module__hide");
         } catch (e) {}
     }
 
@@ -871,6 +893,14 @@ document.addEventListener("DOMContentLoaded", () => {
             } else {
                 let d = document.getElementById("formRequest");
                 d.remove();
+            }
+        }
+
+        if ( e.target.matches("[data-form-ticket-new]")) {
+            e.preventDefault();
+            debugger
+            if (e.target.dataset.formTicketNew === "submit") {
+                postTicketNew();
             }
         }
 
