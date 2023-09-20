@@ -25,27 +25,37 @@
 <!--        <div style="flex-grow: 1; text-align: center">-->
 <!--            <img src="/img/favicon.png" alt="Exchange Logo" width="32" data-nav-link="" />-->
 <!--        </div>-->
-        <div style="flex-grow: 1; text-align: center">
+        <div class="nav__button"  data-nav-link="">
             <i class="bi bi-house nav__icon color-icon" data-nav-link=""></i>
         </div>
-        <div style="flex-grow: 1; text-align: center">
+        <div id="modRequest" class="nav__button module__hide" data-nav-link="requests">
           <i class="bi bi-cart4 nav__icon color-store" data-nav-link="requests"></i>
         </div>
-        <div style="flex-grow: 1; text-align: center">
+        <div id="modTicket" class="nav__button module__hide" data-nav-link="tickets">
             <i class="bi bi-life-preserver nav__icon color-support" data-nav-link="tickets"></i>
         </div>
-        <div style="flex-grow: 1; text-align: center">
+        <div class="nav__button" data-nav-link="settings">
             <i class="bi bi-gear nav__icon color-icon" data-nav-link="settings"></i>
         </div>
-        <div style="flex-grow: 1; text-align: center">
-            <i class="bi bi-search nav__icon color-icon" data-search="search"></i>
-        </div>
+          <div class="nav__button" data-search="search">
+              <i class="bi bi-search nav__icon color-icon" data-search="search"></i>
+          </div>
+          <div class="nav__button-menu" data-nav-menu="menu">
+              <i class="bi bi-three-dots-vertical nav__menu color-icon" data-nav-menu="menu"></i>
+          </div>
       </div>
     </nav>
 
     <div id="app"></div>
 
     <progress id="appProgress" max="100" style="display: none"></progress>
+
+    <div id="appMenu" class="app__menu menu__hide">
+        <ul>
+            <li id="modTicketNew" class="module__hide color-icon" data-nav-link="ticketNew">New Ticket</li>
+            <li id="modUser" class="module__hide color-icon">Users</li>
+        </ul>
+    </div>
 
     <script type="module" src="/spa/js/app.js"></script>
 

@@ -235,7 +235,6 @@ function toggleDetail() {
     let btnExpand = document.getElementById("btnDetailExpand");
     let btnCollapse = document.getElementById("btnDetailCollapse");
     if ( detail.classList.contains("ticket__collapse-group") ) {
-        detail.classList.remove("ticket__hide-group");
         detail.classList.remove("ticket__collapse-group");
         btnExpand.style.display = "none";
         btnCollapse.style.display = "block";
@@ -244,7 +243,6 @@ function toggleDetail() {
         detail.classList.add("ticket__collapse-group");
         btnExpand.style.display = "block";
         btnCollapse.style.display = "none";
-        detail.classList.add("ticket__hide-group");
     }
 
 }
@@ -388,7 +386,7 @@ function htmlTicket(tkt) {
         r+=`<div class="ticket__detail">SLA: </div>`;
     }
 
-    r+=`<div id="groupDetailExpand" class="ticket__expand-group ticket__collapse-group ticket__hide-group">`;
+    r+=`<div id="groupDetailExpand" class="ticket__expand-group ticket__collapse-group">`;
     r+=`<div class="ticket__detail">Date Sbmitted: `+formatDate(tkt.ticketDate)+`</div>`;
     if (tkt.closeDate) {
         r += `<div class="ticket__detail">` + formatDate(tkt.ticketDate) + `</div>`;

@@ -3,6 +3,7 @@ import Login from "./Login.js";
 import Settings from "./Settings.js";
 import Tickets from "./Tickets.js";
 import TicketView from "./TicketView.js";
+import TicketNew from "./TicketNew.js";
 import Requests from "./Requests.js";
 import RequestView from "./RequestView.js";
 import SearchView from "./SearchView.js";
@@ -85,6 +86,7 @@ const router = async () => {
         { path: "/app/search/:id", view: SearchView },
         { path: "/app/tickets", view: Tickets },
         { path: "/app/ticket/:id", view: TicketView },
+        { path: "/app/ticketNew", view: TicketNew },
         { path: "/app/requests", view: Requests },
         { path: "/app/request/:id", view: RequestView },
         { path: "/app/settings", view: Settings }
@@ -178,6 +180,7 @@ const getLoggedIn = async () => {
         token = "";
         isLoggedIn = false;
     }
+    const mods = await setModules();
     router();
 }
 
@@ -195,6 +198,7 @@ const doLogin = async (u, p) => {
     token = auth.token;
     isLoggedIn = auth.loggedIn;
     updateAppProgress(101);
+    const mods = await setModules();
     router();
 }
 
@@ -412,7 +416,65 @@ const postTicketAcc = async () => {
 }
 
 
-// App Theming //
+// App Modules and Theming //
+
+const setModules = async () => {
+    const modUser = document.getElementById("modUser");
+    const modRequest = document.getElementById("modRequest");
+    const modTicket = document.getElementById("modTicket");
+    const modTicketNew = document.getElementById("modTicketNew");
+
+    const response = await fetch('/api/v1/app/getmodules', {
+        method: 'GET',
+        headers: {
+            authorization: "Bearer " + token
+        }
+    });
+    let data = await response.json();
+    const status = response.status;
+    if (status === 200) {
+        if (data.userMod) {
+            try {
+                modUser.classList.remove("module__hide");
+            } catch (e) {}
+        } else {
+            try {
+                modUser.classList.add("module__hide");
+            } catch (e) {}
+        }
+
+        if (data.requestMod) {
+            try {
+                modRequest.classList.remove("module__hide");
+            } catch (e) {}
+        } else {
+            try {
+                modRequest.classList.add("module__hide");
+            } catch (e) {}
+        }
+        if (data.ticketMod) {
+            try {
+                modTicket.classList.remove("module__hide");
+                modTicketNew.classList.remove("module__hide");
+            } catch (e) {}
+        } else {
+            try {
+                modTicket.classList.add("module__hide");
+                modTicketNew.classList.add("module__hide");
+            } catch (e) {}
+        }
+    } else {
+        try {
+            modUser.classList.add("module__hide");
+            modRequest.classList.add("module__hide");
+            modTicket.classList.add("module__hide");
+            modTicketNew.classList.add("module__hide");
+        } catch (e) {}
+    }
+
+    return true;
+}
+
 const toggleTheme = () => {
     if (appTheme === "dark") {
         appTheme = "light";
@@ -442,6 +504,13 @@ const setAppTheme = () => {
         } catch (e) {
             console.log("dark mode is not enabled")
         }
+    }
+}
+
+const hideAppMenu = () => {
+    const menu = document.querySelector(".app__menu");
+    if (!menu.classList.contains("menu__hide")) {
+        menu.classList.add("menu__hide");
     }
 }
 
@@ -580,6 +649,9 @@ window.addEventListener("popstate", router);
 document.addEventListener("DOMContentLoaded", () => {
 
     document.body.addEventListener("click", e => {
+        let appMenu = false;
+        let viewMenu = false;
+
         if ( e.target.matches("[data-search]")) {
             toggleSearch();
         }
@@ -591,6 +663,14 @@ document.addEventListener("DOMContentLoaded", () => {
             const tgt = document.querySelector('[data-link-search]');
             let url = e.target.dataset.linkSearch;
             navigateTo(url);
+        }
+        if ( e.target.matches("[data-nav-menu]")) {
+            e.preventDefault();
+            const menu = document.querySelector(".app__menu");
+            if (menu.classList.contains("menu__hide")) {
+                menu.classList.remove("menu__hide");
+                appMenu = true;
+            }
         }
         if ( e.target.matches("[data-link-ticket]")) {
             let url = "/app/ticket/"+e.target.dataset.linkTicket;
@@ -816,6 +896,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 doLogin(username, password);
             }
         }
+
+        // if not navigating and menu not clicked, make sure they are dismissed
+        if (!appMenu) {
+            hideAppMenu();
+        }
+
     });
 
     document.body.addEventListener("change", e => {
@@ -838,6 +924,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     setAppTheme();
+
+    setModules();
 
     getLoggedIn();
 });

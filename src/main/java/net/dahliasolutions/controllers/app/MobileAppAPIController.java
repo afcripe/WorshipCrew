@@ -8,10 +8,7 @@ import net.dahliasolutions.models.*;
 import net.dahliasolutions.models.order.*;
 import net.dahliasolutions.models.records.SingleStringModel;
 import net.dahliasolutions.models.support.*;
-import net.dahliasolutions.models.user.EndpointModel;
-import net.dahliasolutions.models.user.User;
-import net.dahliasolutions.models.user.UserEndpoint;
-import net.dahliasolutions.models.user.UserNotificationSubscribe;
+import net.dahliasolutions.models.user.*;
 import net.dahliasolutions.services.AuthService;
 import net.dahliasolutions.services.JwtService;
 import net.dahliasolutions.services.order.OrderItemService;
@@ -49,6 +46,33 @@ public class MobileAppAPIController {
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    }
+
+    @GetMapping("/getmodules")
+    public ResponseEntity<AppUserPermissionModel> getUseModules(HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        AppUserPermissionModel mods = new AppUserPermissionModel();
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(mods, HttpStatus.FORBIDDEN);
+        }
+
+        Collection<UserRoles> roles = apiUser.getUser().getUserRoles();
+        for (UserRoles role : roles){
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_SUPERVISOR")
+                    || role.getName().equals("USER_WRITE") || role.getName().equals("USER_READ")) {
+                mods.setUserMod(true);
+            }
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("REQUEST_SUPERVISOR")
+                    || role.getName().equals("REQUEST_WRITE")) {
+                mods.setRequestMod(true);
+            }
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("SUPPORT_SUPERVISOR")
+                    || role.getName().equals("SUPPORT_AGENT") || role.getName().equals("SUPPORT_READ")) {
+                mods.setTicketMod(true);
+            }
+        }
+
+        return new ResponseEntity<>(mods, HttpStatus.OK);
     }
 
     @GetMapping("/renewtoken")

@@ -158,8 +158,23 @@ dialog {
     flex-direction: row;
 }
 
+.nav__button {
+    flex-grow: 1;
+    text-align: center;
+}
+
 .nav__icon {
-    padding-left: 15px;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.nav__button-menu {
+    text-align: center;
+}
+
+.nav__menu {
+    padding-left: 5px;
+    padding-right: 5px;
     font-size: 1.5rem;
     font-weight: bold;
 }
@@ -176,10 +191,66 @@ dialog {
     text-decoration: none;
 }
 
+.app__menu {
+    position: fixed;
+    bottom: 3.5rem;
+    right: 2px;
+    border: black .1em solid;
+    background-color: var(--dwc-nav);
+    border-radius: 5px;
+    padding: 0;
+    margin: 0;
+    z-index: 110;
+    opacity: 1;
+    visibility: visible;
+    -webkit-transition: opacity 400ms, visibility 600ms;
+    transition: opacity 400ms, visibility 600ms;
+}
+
+.menu__hide {
+    opacity: 0;
+    visibility: hidden;
+}
+
+#appMenu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    vertical-align: middle;
+}
+
+#appMenu li {
+    padding:  0.3rem 0.8rem 0.3rem 0.8rem;
+    line-height: 2rem;
+}
+
+#appMenu li:not(:last-child) {
+    border-bottom: black .1em solid;
+}
+
+.module__hide {
+    display: none;
+}
+
+
 /* Form Fields */
 /* ----------- */
 .form-content {
     width: 100%;
+}
+
+.form-group-row {
+    width: calc(100% - 28px);
+    display: flex;
+    flex-direction: row;
+    padding: 0.25rem;
+}
+
+.form-group-col {
+    width: calc(100% - 28px);
+    display: flex;
+    flex-direction: column;
+    padding: 0.25rem;
 }
 
 .form-control {
@@ -671,19 +742,17 @@ dialog {
 }
 
 .ticket__expand-group {
-    opacity: 1;
     height: auto;
-    transition-property: height, opacity;
-    transition-duration: 0.8s;
-}
-
-.ticket__hide-group {
-    display: none;
+    opacity: 1;
+    visibility: visible;
+    -webkit-transition: height 800ms, opacity 800ms, visibility 1s;
+    transition: height 800ms, opacity 400ms, visibility 1s;
 }
 
 .ticket__collapse-group {
-    opacity: 0;
     height: 0;
+    opacity: 0;
+    visibility: hidden;
 }
 
 .ticket__detail-expand {
