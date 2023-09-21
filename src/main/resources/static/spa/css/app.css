@@ -114,11 +114,16 @@ dialog {
     width: calc(100vw - 8px);
     height: 0.4rem;
     border: black .1em solid;
-    background-color: var(--dwc-nav);
     border-radius: 5px;
     padding: 0;
     margin: 0;
     z-index: 120;
+}
+progress::-webkit-progress-bar {
+    background-color: var(--dwc-nav);
+}
+progress::-webkit-progress-value {
+    background-color: var(--dwc-color);
 }
 
 .nav__search {
@@ -653,9 +658,10 @@ dialog {
 /* Module Lists */
 
 .list__item {
+    position: relative;
     width: calc(100% - 28px);
     padding: 0.375rem 0.75rem;
-    margin: 0.25rem 0 0.25rem 0;
+    margin: 0.25rem 0 1.25rem 0;
     border: 2px solid var(--dwc-border-color);
     border-radius: 0.25rem;
 }
@@ -677,10 +683,34 @@ dialog {
     font-size: 1rem;
     flex-grow: 1;
     text-align: center;
+    height: 1.2rem;
+    overflow-x: hidden;
+}
+
+.item-title {
+    font-size: 1rem;
+    flex-grow: 1;
+    height: 1.2rem;
+    overflow-x: hidden;
 }
 
 .item-detail {
     font-size: 1rem;
+    height: 1.2rem;
+    overflow-x: hidden;
+}
+
+.item-type {
+    position: absolute;
+    top: -12px;
+    right: 8px;
+    padding: 0.1rem;
+    height: 1rem;
+    font-size: small;
+    color: var(--dwc-border-color);
+    border: 2px solid var(--dwc-border-color);
+    border-radius: 5px;
+    background-color: var(--dwc-body-bg);
 }
 
 .item__hr {
@@ -1025,4 +1055,41 @@ dialog {
     margin: 0;
     font-size: small;
     overflow: hidden;
+}
+
+.resource__group {
+    display: flex;
+    flex-direction: row;
+    padding-top: 0.75rem;
+}
+
+.resource__bottom-spacer {
+    padding-bottom: 0.75rem;
+}
+
+.resource__title {
+    font-weight: bold;
+    font-size: 1.25rem;
+}
+
+.resource__subtitle {
+    font-size: small;
+}
+
+/* Users */
+
+
+.user-group {
+    flex-direction: column;
+    flex-grow: 1;
+    padding: 0;
+    margin: 0.5rem 0 0.5rem 0;
+    border: .05rem solid var(--dwc-border-color);
+    border-radius: 5px;
+}
+
+.user-name {
+    padding: 1rem;
+    margin: 0;
+    line-height: 1rem;
 }

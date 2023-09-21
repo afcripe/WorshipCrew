@@ -51,3 +51,9 @@ dark,
 .dark .btn-outline-support {
     color: var(--dwc-btn-color);
 }
+
+.dark .item-type {
+    color: var(--dwc-border-color-dark);
+    border: 2px solid var(--dwc-border-color-dark);
+    background-color: var(--dwc-body-bg-dark);
+}

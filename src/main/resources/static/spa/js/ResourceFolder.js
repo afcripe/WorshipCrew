@@ -8,9 +8,8 @@ export default class extends AbstractView {
 
     async getHtml() {
         this.setAppProgress(20);
-        let folderList = await getRemoteResourceHomeFolders(this.params.token);
-
-        let returnHTML = htmlHomePage(folderList);
+        let folder = await getRemoteResourceFolder(this.params.id, this.params.token);
+        let returnHTML = htmlHomePage(folder);
 
         this.setAppProgress(80);
         returnHTML = returnHTML.replaceAll("\n","");
@@ -42,47 +41,39 @@ function setAppProgress(prg) {
     }
 }
 
-async function getRemoteResourceHomeFolders(token) {
-    const response = await fetch('/api/v1/app/resources/homefolders', {
+async function getRemoteResourceFolder(id, token) {
+    let formData = new FormData();
+        formData.set("name", id);
+    const response = await fetch('/api/v1/app/resources/folder', {
+        method: 'POST',
         headers: {
             authorization: "Bearer "+token
-        }
+        },
+        body: formData
     });
-    const folderList = await response.json();
+    const folder = await response.json();
     const status = response.status;
-    return folderList;
+    return folder;
 }
 
-function htmlHomePage(folderList) {
-    let r =`<div class="resource__group resource__bottom-spacer">`;
-    r+=`<div class="resource__title">Topics</div>`;
+function htmlHomePage(folder) {
+    let r =`<div class="resource__group">`;
+    r+=`<h4>`+formatFolder(folder.folder)+`</h4>`;
     r+=`</div>`;
 
-    for (let f in folderList) {
-        let folder = folderList[f];
-        r+=`<div class="ticket__detail-group">`;
-            r+=`<h4 data-resource-link-folder="/`+folder.folder+`">`+capitalizeFirstLetter(folder.folder)+`</h4>`;
+    for (let p in folder.wikiPost) {
+        let post = folder.wikiPost[p];
+        r += `<div class="article-topic-details" data-resource-link-post="`+post.id+`">`;
+        r += `<div class="article-topic-title" data-resource-link-post="`+post.id+`">` + post.title + `</div>`;
+        r += `<div class="article-topic-summary" data-resource-link-post="`+post.id+`">` + post.summary + `</div>`;
+        r += `</div>`
+    }
 
-        for (let p in folder.wikiPost) {
-            let post = folder.wikiPost[p];
-            r += `<div class="article-topic-details" data-resource-link-post="`+post.id+`">`;
-            //r += `<div>`;
-                r += `<div class="article-topic-title" data-resource-link-post="`+post.id+`">` + post.title + `</div>`;
-                r += `<div class="article-topic-summary" data-resource-link-post="`+post.id+`">` + post.summary + `</div>`;
-            r += `</div>`
-            //r += `</div>`;
-        }
-
-        for (let t in folder.subFolders) {
-            let topic = folder.subFolders[t];
-            r += `<div class="article-topic-details">`;
-            //r += `<div>`;
-            r += `<div class="article-topic-folder" data-resource-link-folder="`+topic.folder+`">` + topic.folder + `</div>`;
-            r += `</div>`
-            //r += `</div>`;
-        }
-
-        r+=`</div>`;
+    for (let t in folder.subFolders) {
+        let topic = folder.subFolders[t];
+        r += `<div class="article-topic-details">`;
+        r += `<div class="article-topic-folder" data-resource-link-folder="`+topic.folder+`">` + topic.folder + `</div>`;
+        r += `</div>`
     }
 
     return r;
@@ -94,6 +85,21 @@ function formatDate(dte) {
     let partsDate = strDate.split("-");
     let partTime = strTime.split(":");
     return strDate + " " + partTime[0] + ":" + partTime[1];
+}
+
+function formatFolder(string) {
+    let strArray = string.split("/");
+    let strReturn = "";
+    for (let i in strArray) {
+        if (i>1) {
+            strReturn+=" / ";
+        }
+        if ( strArray[i].length > 0 ) {
+            strReturn+=capitalizeFirstLetter(strArray[i]);
+        }
+    }
+
+    return strReturn;
 }
 
 function capitalizeFirstLetter(string) {

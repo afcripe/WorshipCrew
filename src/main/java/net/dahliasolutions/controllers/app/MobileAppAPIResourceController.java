@@ -4,41 +4,19 @@ import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.APIUser;
-import net.dahliasolutions.models.AppItem;
-import net.dahliasolutions.models.AppServer;
-import net.dahliasolutions.models.campus.Campus;
-import net.dahliasolutions.models.department.DepartmentRegional;
 import net.dahliasolutions.models.records.*;
-import net.dahliasolutions.models.support.*;
 import net.dahliasolutions.models.user.User;
-import net.dahliasolutions.models.user.UserRoles;
 import net.dahliasolutions.models.wiki.*;
-import net.dahliasolutions.services.AdminSettingsService;
 import net.dahliasolutions.services.JwtService;
-import net.dahliasolutions.services.RedirectService;
-import net.dahliasolutions.services.campus.CampusService;
-import net.dahliasolutions.services.department.DepartmentCampusService;
-import net.dahliasolutions.services.department.DepartmentRegionalService;
-import net.dahliasolutions.services.support.*;
-import net.dahliasolutions.services.user.UserRolesService;
 import net.dahliasolutions.services.user.UserService;
 import net.dahliasolutions.services.wiki.WikiFolderService;
 import net.dahliasolutions.services.wiki.WikiPostService;
 import net.dahliasolutions.services.wiki.WikiTagService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigInteger;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @RestController
@@ -51,7 +29,6 @@ public class MobileAppAPIResourceController {
     private final WikiPostService wikiPostService;
     private final WikiFolderService wikiFolderService;
     private final WikiTagService wikiTagService;
-    private final AppServer appServer;
 
     @GetMapping("/")
     public ResponseEntity<String> getResourceHome(HttpServletRequest request) {
@@ -84,7 +61,9 @@ public class MobileAppAPIResourceController {
         APIUser apiUser = getUserFromToken(request);
         if (!apiUser.isValid()) {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
-        }// find parent folders
+        }
+
+        // find parent folders
         List<WikiFolder> folders = wikiFolderService.findAll();
         List<String> parentFolders = new ArrayList<>();
         for (WikiFolder folder : folders) {
@@ -115,6 +94,51 @@ public class MobileAppAPIResourceController {
         }
 
         return new ResponseEntity<>(folderPosts, HttpStatus.OK);
+
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<WikiPost> getResourceArticle(@PathVariable BigInteger id, HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new WikiPost(), HttpStatus.FORBIDDEN);
+        }
+
+        Optional<WikiPost> wikiPost = wikiPostService.findById(id);
+        if (wikiPost.isEmpty()) {
+            return new ResponseEntity<>(new WikiPost(), HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(wikiPost.get(), HttpStatus.OK);
+
+    }
+
+    @PostMapping("/folder")
+    public ResponseEntity<GroupedWikiPostList> getResourceFolder(@ModelAttribute SingleStringModel stringModel, HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new GroupedWikiPostList(), HttpStatus.FORBIDDEN);
+        }
+
+        String folder = "/"+stringModel.name();
+
+        List<WikiFolder> subs = wikiFolderService.findAllByFolderNameStartsWith(folder);
+        List<WikiFolder> sub = new ArrayList<>();
+        for (WikiFolder f : subs) {
+            if (!f.getFolder().equals(folder)) {
+                sub.add(f);
+            }
+        }
+
+        List<WikiPost> posts = wikiPostService.findAllByFolder(folder);
+        GroupedWikiPostList gp =
+                new GroupedWikiPostList(
+                        folder,
+                        posts,
+                        posts.size(),
+                        sub);
+
+        return new ResponseEntity<>(gp, HttpStatus.OK);
 
     }
 

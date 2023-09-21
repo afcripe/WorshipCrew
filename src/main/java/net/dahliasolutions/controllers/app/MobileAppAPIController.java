@@ -9,6 +9,7 @@ import net.dahliasolutions.models.order.*;
 import net.dahliasolutions.models.records.SingleStringModel;
 import net.dahliasolutions.models.support.*;
 import net.dahliasolutions.models.user.*;
+import net.dahliasolutions.models.wiki.WikiPost;
 import net.dahliasolutions.services.AuthService;
 import net.dahliasolutions.services.JwtService;
 import net.dahliasolutions.services.order.OrderItemService;
@@ -17,6 +18,7 @@ import net.dahliasolutions.services.support.TicketService;
 import net.dahliasolutions.services.user.EndpointService;
 import net.dahliasolutions.services.user.UserNotificationSubscribeService;
 import net.dahliasolutions.services.user.UserService;
+import net.dahliasolutions.services.wiki.WikiPostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +37,7 @@ public class MobileAppAPIController {
     private final UserService userService;
     private final TicketService ticketService;
     private final OrderService orderService;
+    private final WikiPostService wikiPostService;
     private final OrderItemService orderItemService;
     private final EndpointService endpointService;
     private final UserNotificationSubscribeService userSubscribeService;
@@ -237,6 +240,12 @@ public class MobileAppAPIController {
         List<Ticket> tickets = ticketService.searchAllById(searchTerm);
         for (Ticket ticket : tickets) {
             r.add(new UniversalAppSearchModel("ticket", ticket.getId(), ticket.getUser().getFullName(), ticket.getTicketDetail()));
+        }
+
+        // search for tickets
+        List<WikiPost> wikiPosts = wikiPostService.searchByTitle(searchTerm);
+        for (WikiPost post : wikiPosts) {
+            r.add(new UniversalAppSearchModel("resource", post.getId().toString(), post.getTitle(), post.getSummary()));
         }
 
 

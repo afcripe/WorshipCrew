@@ -7,6 +7,9 @@ import TicketNew from "./TicketNew.js";
 import Requests from "./Requests.js";
 import RequestView from "./RequestView.js";
 import Resources from "./Resources.js";
+import ResourceView from "./ResourceView.js";
+import ResourceFolder from "./ResourceFolder.js";
+import Users from "./Users.js";
 import SearchView from "./SearchView.js";
 
 import { postLogin, renewToken } from "./Login.js";
@@ -92,6 +95,9 @@ const router = async () => {
         { path: "/app/requests", view: Requests },
         { path: "/app/request/:id", view: RequestView },
         { path: "/app/resources", view: Resources },
+        { path: "/app/resource/:id", view: ResourceView },
+        { path: "/app/resourceFolder/:id", view: ResourceFolder },
+        { path: "/app/users", view: Users },
         { path: "/app/settings", view: Settings }
     ];
 
@@ -404,7 +410,6 @@ const postRemoveRequestAgent = async (requestId, userId) => {
 
 const postRequestAck = async () => {
     updateAppProgress(0);
-    debugger
     let rsp = await postRequestAcknowledged(token);
     updateAppProgress(101);
     navigateTo("/app/request/"+rsp);
@@ -412,7 +417,6 @@ const postRequestAck = async () => {
 
 const postTicketAcc = async () => {
     updateAppProgress(0);
-    debugger
     let rsp = await postTicketAccept(token);
     updateAppProgress(101);
     navigateTo("/app/ticket/"+rsp);
@@ -420,7 +424,6 @@ const postTicketAcc = async () => {
 
 const postTicketNew = async () => {
     updateAppProgress(0);
-    debugger
     let rsp = await postNewTicket(token);
     updateAppProgress(101);
     navigateTo("/app/ticket/"+rsp);
@@ -812,7 +815,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if ( e.target.matches("[data-form-request-acknowledge]")) {
             e.preventDefault();
-            debugger
             if (e.target.dataset.formRequestAcknowledge === "accept") {
                 postRequestAck();
             } else {
@@ -887,7 +889,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if ( e.target.matches("[data-form-ticket-accept]")) {
             e.preventDefault();
-            debugger
             if (e.target.dataset.formTicketAccept === "accept") {
                 postTicketAcc();
             } else {
@@ -898,10 +899,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if ( e.target.matches("[data-form-ticket-new]")) {
             e.preventDefault();
-            debugger
             if (e.target.dataset.formTicketNew === "submit") {
                 postTicketNew();
             }
+        }
+
+        // resources
+
+        if ( e.target.matches("[data-resource-link-post]")) {
+            e.preventDefault();
+            console.log(e.target.dataset.resourceLinkPost);
+            navigateTo("/app/resource/"+e.target.dataset.resourceLinkPost);
+        }
+        if ( e.target.matches("[data-resource-link-folder]")) {
+            e.preventDefault();
+            navigateTo("/app/resourceFolder"+e.target.dataset.resourceLinkFolder);
         }
 
         // settings

@@ -3,18 +3,15 @@ import AbstractView from "./AbstractView.js";
 export default class extends AbstractView {
     constructor(params) {
         super(params);
-        this.setTitle("Search");
+        this.setTitle("Resources");
     }
 
     async getHtml() {
         this.setAppProgress(20);
-        let searchResults = await getRemoteSearch(this.params.id, this.params.token);
-        let returnHTML = `<h1>Search Results</h1>`;
-        this.setAppProgress(60);
-        for (let i in searchResults) {
-            let searchResult = searchResults[i];
-            returnHTML += htmlResultLine(searchResult);
-        }
+        let post = await getRemoteResourcePost(this.params.id, this.params.token);
+
+        let returnHTML = htmlHomePage(post);
+
         this.setAppProgress(80);
         returnHTML = returnHTML.replaceAll("\n","");
         return returnHTML.replaceAll("\n","");
@@ -45,31 +42,30 @@ function setAppProgress(prg) {
     }
 }
 
-async function getRemoteSearch(searchTerm, token) {
-    const response = await fetch('/api/v1/app/search/'+searchTerm, {
+async function getRemoteResourcePost(id, token) {
+    const response = await fetch('/api/v1/app/resources/'+id, {
         headers: {
             authorization: "Bearer "+token
         }
     });
-    return await response.json();
+    const post = await response.json();
+    const status = response.status;
+    return post;
 }
 
-function htmlResultLine(rst) {
-    let lnk = "\/app\/"+rst.searchType+"\/"+rst.searchId;
-    let r = "";
-    r+=`<div class="list__item" data-link-search="`+lnk+`">`;
-    r+=`<div class="item-type">`+rst.searchType+`</div>`;
-    r+=`<div class="list__Item-line" data-link-search="`+lnk+`">`;
-    if (rst.searchType === "request" || rst.searchType === "ticket") {
-        r += `<div class="item-id" data-link-search="` + lnk + `">` + rst.searchId + `</div>`;
-        r+=`<div class="item-user" data-link-search="`+lnk+`">`+rst.searchName+`</div>`;
-    } else {
-        r+=`<div class="item-title" data-link-search="`+lnk+`">`+rst.searchName+`</div>`;
-    }
+function htmlHomePage(post) {
+    let r =`<div class="resource__group">`;
+    r+=`<div class="resource__title">`+post.title+`</div>`;
+    r+=`</div>`;
+    r+=`<div class="resource__group">`;
+    r+=`<div class="resource__subtitle">Author: `+post.author.fullName+`</div>`;
+    r+=`</div>`;
+    r+=`<div class="resource__group">`;
+    r+=`<div class="resource__subtitle">Last Updated: `+formatDate(post.lastUpdated)+`</div>`;
+    r+=`</div>`;
+    r+=`<hr>`;
 
-    r+=`</div><div class="list__Item-line" data-link-search="`+lnk+`">`;
-    r+=`<div class="item-detail" data-link-search="`+lnk+`">`+rst.searchDetail+`</div>`;
-    r+=`</div></div>`;
+    r+=post.body;
 
     return r;
 }

@@ -8,9 +8,8 @@ export default class extends AbstractView {
 
     async getHtml() {
         this.setAppProgress(20);
-        let folderList = await getRemoteResourceHomeFolders(this.params.token);
-
-        let returnHTML = htmlHomePage(folderList);
+        let userList = await getRemoteUserList(this.params.token)
+        let returnHTML = htmlUsers(userList);
 
         this.setAppProgress(80);
         returnHTML = returnHTML.replaceAll("\n","");
@@ -42,46 +41,23 @@ function setAppProgress(prg) {
     }
 }
 
-async function getRemoteResourceHomeFolders(token) {
-    const response = await fetch('/api/v1/app/resources/homefolders', {
+async function getRemoteUserList(token) {
+    const response = await fetch('/api/v1/app/users/', {
         headers: {
             authorization: "Bearer "+token
         }
     });
-    const folderList = await response.json();
+    const userList = await response.json();
     const status = response.status;
-    return folderList;
+    return userList;
 }
 
-function htmlHomePage(folderList) {
-    let r =`<div class="resource__group resource__bottom-spacer">`;
-    r+=`<div class="resource__title">Topics</div>`;
-    r+=`</div>`;
-
-    for (let f in folderList) {
-        let folder = folderList[f];
-        r+=`<div class="ticket__detail-group">`;
-            r+=`<h4 data-resource-link-folder="/`+folder.folder+`">`+capitalizeFirstLetter(folder.folder)+`</h4>`;
-
-        for (let p in folder.wikiPost) {
-            let post = folder.wikiPost[p];
-            r += `<div class="article-topic-details" data-resource-link-post="`+post.id+`">`;
-            //r += `<div>`;
-                r += `<div class="article-topic-title" data-resource-link-post="`+post.id+`">` + post.title + `</div>`;
-                r += `<div class="article-topic-summary" data-resource-link-post="`+post.id+`">` + post.summary + `</div>`;
-            r += `</div>`
-            //r += `</div>`;
-        }
-
-        for (let t in folder.subFolders) {
-            let topic = folder.subFolders[t];
-            r += `<div class="article-topic-details">`;
-            //r += `<div>`;
-            r += `<div class="article-topic-folder" data-resource-link-folder="`+topic.folder+`">` + topic.folder + `</div>`;
-            r += `</div>`
-            //r += `</div>`;
-        }
-
+function htmlUsers(userList) {
+    let r =`<h1>Users</h1>`;
+    for (let u in userList) {
+        let user = userList[u];
+        r+=`<div class="user-group">`;
+        r+=`<div class="user-name">`+user.fullName+`</div>`;
         r+=`</div>`;
     }
 
