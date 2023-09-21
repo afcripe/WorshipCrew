@@ -161,23 +161,25 @@
       let area = "";
       let country = "";
 
+      if (str.length<=4) {
+        return str;
+      }
       loc = str.substring(str.length,str.length-4);
+
+      if (str.length<=7) {
+        return str.substring(str.length - 4, 0) + "-" + loc;
+      }
       exchange = str.substring(str.length-4,str.length-7);
 
-      if (str.length>7) {
-        area = "(" + str.substring(str.length-7,str.length-10) + ") ";
+      if (str.length<=10) {
+        return "(" + str.substring(str.length-7,0) + ") " + exchange + "-" + loc;
       }
+      area = "(" + str.substring(str.length-7,str.length-10) + ") ";
 
       if (str.length>10) {
         country = "+" + str.substring(str.length-10,0) + " ";
       }
       return country + area + exchange + "-" + loc;
-
-      let match = str.match(/^(\d{3})(\d{3})(\d{4})$/);
-      if (match) {
-        return '(' + match[1] + ') ' + match[2] + '-' + match[3];
-      }
-      return str;
     }
 
     function updatePhoneFormat() {
