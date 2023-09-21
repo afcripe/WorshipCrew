@@ -31,6 +31,7 @@
 
             <p>Username: <span class="card-text" th:text="*{username}"/></p>
             <p>E-mail: <span class="card-text" th:text="*{contactEmail}"/></p>
+            <p>Phone: <span class="card-text" id="contactPhone" th:text="*{contactPhone}"/></p>
             <p>Campus: <span class="card-text" th:if="*{campus}" th:text="*{campus.name}"/></p>
             <p>Department: <span class="card-text" th:if="*{department}" th:text="*{department.name}"/></p>
             <p>Position: <span class="card-text" th:if="*{position}" th:text="*{position.name}"/></p>
@@ -153,6 +154,38 @@
         } catch (e) { console.log("no authRefresh available") }
       });
     }
+
+    function formatPhoneNumber(str) {
+      let loc = "";
+      let exchange = "";
+      let area = "";
+      let country = "";
+
+      loc = str.substring(str.length,str.length-4);
+      exchange = str.substring(str.length-4,str.length-7);
+
+      if (str.length>7) {
+        area = "(" + str.substring(str.length-7,str.length-10) + ") ";
+      }
+
+      if (str.length>10) {
+        country = "+" + str.substring(str.length-10,0) + " ";
+      }
+      return country + area + exchange + "-" + loc;
+
+      let match = str.match(/^(\d{3})(\d{3})(\d{4})$/);
+      if (match) {
+        return '(' + match[1] + ') ' + match[2] + '-' + match[3];
+      }
+      return str;
+    }
+
+    function updatePhoneFormat() {
+      let cnt = document.getElementById("contactPhone");
+      cnt.innerText = formatPhoneNumber(cnt.innerText);
+    }
+
+    updatePhoneFormat();
 
   </script>
 

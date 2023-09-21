@@ -35,6 +35,7 @@ public class User implements UserDetails {
     private String lastName;
     transient String fullname;
     private String contactEmail;
+    private String contactPhone;
     private boolean activated;
     private boolean deleted;
 

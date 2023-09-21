@@ -315,11 +315,15 @@ public class UserController {
             updatePermissions = true;
         }
 
+        // strip phone number
+        String phone = userModel.contactPhone().replaceAll("[^0-9]","");
+
         user.get().setUsername(userModel.username());
 
         user.get().setFirstName(userModel.firstName());
         user.get().setLastName(userModel.lastName());
         user.get().setContactEmail(userModel.contactEmail());
+        user.get().setContactPhone(phone);
         user.get().setPosition(positionService.findByName(userModel.position()).orElse(null));
         user.get().setCampus(campusService.findByName(userModel.campus()).orElse(null));
         user.get().setDepartment(departmentCampusService.findByNameAndCampus(userModel.department(), user.get().getCampus()).orElse(null));
@@ -381,12 +385,17 @@ public class UserController {
             session.setAttribute("msgError", "Username already exists!");
             return "user/userNew";
         }
+
+        // strip phone number
+        String phone = userModel.contactPhone().replaceAll("[^0-9]","");
+
         User newUser;
         User user = new User();
             user.setUsername(userModel.username());
             user.setFirstName(userModel.firstName());
             user.setLastName(userModel.lastName());
             user.setContactEmail(userModel.username());
+            user.setContactPhone(phone);
             user.setPosition(positionService.findByName(userModel.position()).orElse(null));
             user.setCampus(campusService.findByName(userModel.campus()).orElse(null));
             user.setDepartment(departmentCampusService.findByNameAndCampus(userModel.department(), user.getCampus()).orElse(null));
