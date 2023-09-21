@@ -161,6 +161,10 @@
       let area = "";
       let country = "";
 
+      if (!str) {
+        return "";
+      }
+
       if (str.length<=4) {
         return str;
       }

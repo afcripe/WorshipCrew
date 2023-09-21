@@ -10,6 +10,7 @@ import Resources from "./Resources.js";
 import ResourceView from "./ResourceView.js";
 import ResourceFolder from "./ResourceFolder.js";
 import Users from "./Users.js";
+import UserView from "./UserView.js";
 import SearchView from "./SearchView.js";
 
 import { postLogin, renewToken } from "./Login.js";
@@ -98,6 +99,7 @@ const router = async () => {
         { path: "/app/resource/:id", view: ResourceView },
         { path: "/app/resourceFolder/:id", view: ResourceFolder },
         { path: "/app/users", view: Users },
+        { path: "/app/user/:id", view: UserView },
         { path: "/app/settings", view: Settings }
     ];
 
@@ -908,12 +910,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if ( e.target.matches("[data-resource-link-post]")) {
             e.preventDefault();
-            console.log(e.target.dataset.resourceLinkPost);
             navigateTo("/app/resource/"+e.target.dataset.resourceLinkPost);
         }
         if ( e.target.matches("[data-resource-link-folder]")) {
             e.preventDefault();
             navigateTo("/app/resourceFolder"+e.target.dataset.resourceLinkFolder);
+        }
+
+        // users
+
+        if ( e.target.matches("[data-user-link]")) {
+            e.preventDefault();
+            navigateTo("/app/user/"+e.target.dataset.userLink);
         }
 
         // settings

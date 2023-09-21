@@ -15,9 +15,15 @@ dark,
     color: var(--dwc-body-color-dark);
     border-color: var(--dwc-border-color-dark);
 }
+
+.dark a {
+    color: var(--dwc-body-color-dark);
+}
+
 .dark .image-viewer__dialog {
     background-color: var(--dwc-body-bg-dark);
 }
+
 .dark .history-viewer__dialog {
     color: var(--dwc-body-color-dark);
 }

@@ -56,9 +56,15 @@ body {
     min-width: 340px;
     font-size: 1.15rem;
 }
+
 dialog {
     background-color: var(--dwc-body-bg);
 }
+
+a {
+    color: var(--dwc-body-color);
+}
+
 
 #app {
     position: fixed;
@@ -1078,7 +1084,6 @@ progress::-webkit-progress-value {
 
 /* Users */
 
-
 .user-group {
     flex-direction: column;
     flex-grow: 1;
@@ -1092,4 +1097,33 @@ progress::-webkit-progress-value {
     padding: 1rem;
     margin: 0;
     line-height: 1rem;
+}
+
+.user__group {
+    display: flex;
+    flex-direction: row;
+    padding-top: 0.75rem;
+}
+
+.user__detail-group {
+    position: relative;
+    width: calc(100% - 28px);
+    padding: 0.375rem 0.75rem;
+    margin: 0.25rem 0 0.25rem 0;
+    border: 2px solid var(--dwc-border-color);
+    border-radius: 0.25rem;
+    z-index: 1;
+}
+
+.user__detail {
+    width: 100%;
+    padding-bottom: 0.5rem;
+    padding-top: 0.5rem;
+}
+
+.user__permission {
+    width: 100%;
+    font-size: 0.8rem;
+    padding-bottom: 0.5rem;
+    padding-top: 0.5rem;
 }

@@ -47,6 +47,36 @@ public class MobileAppAPIUserController {
 
         return new ResponseEntity<>(userList, HttpStatus.OK);
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable BigInteger id, HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new User(), HttpStatus.FORBIDDEN);
+        }
+
+        Optional<User> user = userService.findById(id);
+        if (user.isEmpty()) {
+            return new ResponseEntity<>(new User(), HttpStatus.BAD_REQUEST);
+        }
+
+
+        return new ResponseEntity<>(user.get(), HttpStatus.OK);
+    }
+    @GetMapping("/directorof/{id}")
+    public ResponseEntity<User> getUserDirectorByUserId(@PathVariable BigInteger id, HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new User(), HttpStatus.FORBIDDEN);
+        }
+
+        Optional<User> user = userService.findById(id);
+        if (user.isEmpty()) {
+            return new ResponseEntity<>(new User(), HttpStatus.BAD_REQUEST);
+        }
+
+
+        return new ResponseEntity<>(user.get().getDirector(), HttpStatus.OK);
+    }
 
     private APIUser getUserFromToken(HttpServletRequest request) {
         final String authHeader = request.getHeader("Authorization");

@@ -8,8 +8,9 @@ export default class extends AbstractView {
 
     async getHtml() {
         this.setAppProgress(20);
-        let userList = await getRemoteUserList(this.params.token)
-        let returnHTML = htmlUsers(userList);
+        let user = await getRemoteUser(this.params.id, this.params.token);
+        let director = await getRemoteUserDirector(this.params.id, this.params.token);
+        let returnHTML = htmlUser(user, director);
 
         this.setAppProgress(80);
         returnHTML = returnHTML.replaceAll("\n","");
@@ -41,25 +42,49 @@ function setAppProgress(prg) {
     }
 }
 
-async function getRemoteUserList(token) {
-    const response = await fetch('/api/v1/app/users/', {
+async function getRemoteUser(id, token) {
+    const response = await fetch('/api/v1/app/users/'+id, {
         headers: {
             authorization: "Bearer "+token
         }
     });
-    const userList = await response.json();
+    const user = await response.json();
     const status = response.status;
-    return userList;
+    return user;
 }
 
-function htmlUsers(userList) {
-    let r =`<h1>Users</h1>`;
-    for (let u in userList) {
-        let user = userList[u];
-        r+=`<div class="user-group" data-user-link="`+user.id+`">`;
-        r+=`<div class="user-name" data-user-link="`+user.id+`">`+user.fullName+`</div>`;
-        r+=`</div>`;
+async function getRemoteUserDirector(id, token) {
+    const response = await fetch('/api/v1/app/users/directorof/'+id, {
+        headers: {
+            authorization: "Bearer "+token
+        }
+    });
+    const director = await response.json();
+    const status = response.status;
+    return director;
+}
+
+function htmlUser(user, director) {
+    let r = `<div class="user__group">`;
+    r+=`<div class="ticket__left ticket__title">`+user.fullName+`</div>`;
+    r+=`</div>`;
+
+    r+=`<div class="user__detail-group">`;
+    r+=`<div class="user__detail">Username: <a href="tel:`+user.username+`">`+user.username+`</a></div>`;
+    r+=`<div class="user__detail">Phone: <a href="tel:`+user.contactPhone+`">`+formatPhoneNumber(user.contactPhone)+`</a></div>`;
+    r+=`<div class="user__detail">Campus: `+user.campus.name+`</div>`;
+    r+=`<div class="user__detail">Department: `+user.department.name+`</div>`;
+    r+=`<div class="user__detail">Position: `+user.position.name+`</div>`;
+    r+=`<div class="user__detail">Supervisor: `+director.fullName+`</div>`;
+    r+=`</div>`;
+
+    r+=`<div class="user__detail-group">`;
+    r+=`<h4>Permissions</h4>`;
+    for (let i in user.userRoles) {
+        let role = user.userRoles[i];
+        r+=`<div class="user__permission">`+role.name+`</div>`;
     }
+    r+=`</div>`;
 
     return r;
 }
@@ -77,6 +102,10 @@ function formatPhoneNumber(str) {
     let exchange = "";
     let area = "";
     let country = "";
+
+    if (!str) {
+        return "";
+    }
 
     if (str.length<=4) {
         return str;
