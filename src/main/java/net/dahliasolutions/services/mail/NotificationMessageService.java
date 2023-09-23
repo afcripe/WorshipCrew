@@ -9,6 +9,7 @@ import net.dahliasolutions.models.order.OrderNote;
 import net.dahliasolutions.models.order.OrderRequest;
 import net.dahliasolutions.models.support.Ticket;
 import net.dahliasolutions.models.support.TicketNote;
+import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserEndpoint;
 import net.dahliasolutions.models.user.UserNotificationSubscribe;
 import net.dahliasolutions.services.FirebaseMessagingService;
@@ -29,7 +30,6 @@ import java.util.Map;
 public class NotificationMessageService implements NotificationMessageServiceInterface{
 
     private final NotificationMessageRepository messageRepository;
-//    private final PushService pushService;
     private final FirebaseMessagingService firebaseMessagingService;
     private final EmailService emailService;
     private final OrderService orderService;
@@ -37,11 +37,20 @@ public class NotificationMessageService implements NotificationMessageServiceInt
     private final OrderNoteService orderNoteService;
     private final TicketService ticketService;
     private final TicketNoteService ticketNoteService;
+    private final AppEventService appEventService;
     private final AppServer appServer;
 
     @Override
     public NotificationMessage createMessage(NotificationMessage message) {
         return messageRepository.save(message);
+    }
+
+    @Override
+    public NotificationMessage createEventMessage(NotificationMessage message, User user) {
+        NotificationMessage newMessage = message;
+                            newMessage.setId(null);
+                            newMessage.setUser(user);
+        return messageRepository.save(newMessage);
     }
 
     @Override
@@ -194,27 +203,35 @@ public class NotificationMessageService implements NotificationMessageServiceInt
                 requestItem = orderItemService.findById(message.getItemId()).get();
             }
 
-            switch (message.getType()) {
-                case New -> {
-                    EmailDetails emailDetailsSupervisor =
-                            new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
-                    emailService.sendSupervisorRequest(emailDetailsSupervisor, newRequest, message.getUser().getId());
-                }
-                case NewItem -> {
-                    EmailDetails emailDetailsSupervisor =
-                            new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null );
-                    emailService.sendSupervisorItemRequest(emailDetailsSupervisor, requestItem, requestItem.getOrderRequest().getSupervisor().getId());
-                }
-                case ItemUpdated -> {
-                    OrderNote note = orderNoteService.findById(message.getNoteId()).get();
-                    EmailDetails emailDetailsSupervisor =
-                            new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null );
-                    emailService.sendItemUpdate(emailDetailsSupervisor, requestItem, note);
-                }
-                case Updated -> {
-                    EmailDetails emailDetailsSupervisor =
-                            new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null );
-                    emailService.sendUserRequest(emailDetailsSupervisor, newRequest);
+            if (message.getEventId() != null) {
+                AppEvent appEvent = appEventService.findAppEventById(message.getEventId()).get();
+                //send event email
+                EmailDetails emailEventDetails =
+                        new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
+                emailService.sendSystemNotification(emailEventDetails, appEvent);
+            } else {
+                switch (message.getType()) {
+                    case New -> {
+                        EmailDetails emailDetailsSupervisor =
+                                new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
+                        emailService.sendSupervisorRequest(emailDetailsSupervisor, newRequest, message.getUser().getId());
+                    }
+                    case NewItem -> {
+                        EmailDetails emailDetailsSupervisor =
+                                new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
+                        emailService.sendSupervisorItemRequest(emailDetailsSupervisor, requestItem, requestItem.getOrderRequest().getSupervisor().getId());
+                    }
+                    case ItemUpdated -> {
+                        OrderNote note = orderNoteService.findById(message.getNoteId()).get();
+                        EmailDetails emailDetailsSupervisor =
+                                new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
+                        emailService.sendItemUpdate(emailDetailsSupervisor, requestItem, note);
+                    }
+                    case Updated -> {
+                        EmailDetails emailDetailsSupervisor =
+                                new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
+                        emailService.sendUserRequest(emailDetailsSupervisor, newRequest);
+                    }
                 }
             }
         }

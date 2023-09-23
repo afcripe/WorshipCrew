@@ -2,14 +2,13 @@ package net.dahliasolutions.models;
 
 public enum EventType {
     New,
-    Changed,
+    Updated,
+    NewItem,
+    ItemUpdated,
+    NewList,
     Cancelled,
     Closed,
     Deleted,
-    Accessed,
-    ItemUpdated,
     DeadlineApproaching,
-    DeadlinePassed,
-    Periodic,
-    Any
+    DeadlinePassed
 }

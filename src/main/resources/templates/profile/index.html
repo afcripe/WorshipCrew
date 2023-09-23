@@ -92,7 +92,12 @@
 
           <div class="card-body">
             <div th:each="subscription : *{subscriptions}">
-              <p><span th:text="${subscription.endPoint}"></span></p>
+                <span th:text="${subscription.endPoint.name}"></span>
+                <th:block th:if="${subscription.endPoint.name == 'Email'}">
+                  <span>&nbsp;&nbsp;</span>
+                  <input id="chkEndpointEmail" type="checkbox" th:checked="*{enableEmailSubscription}"
+                          th:disabled="*{#lists.size(subscriptions) > 2}">
+                </th:block>
             </div>
           </div>
 

@@ -43,7 +43,7 @@ public class NotificationAPIController {
     @PostMapping("/newnotification")
     public BigIntegerStringModel updateOrderNotification(@ModelAttribute BigIntegerStringModel notifyModel) {
         Notification notify = new Notification(
-                null, notifyModel.name(), "",
+                null, notifyModel.name(), "", "",
                 EventModule.Request, EventType.New, new ArrayList<>());
         notify = notificationService.save(notify);
         return new BigIntegerStringModel(notify.getId(), notify.getName());

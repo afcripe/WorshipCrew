@@ -202,11 +202,12 @@ public class CartAPIController {
                         "A New Request",
                         orderRequest.getId().toString(),
                         BigInteger.valueOf(0),
+                        null,
                         false,
                         false,
                         null,
                         EventModule.Request,
-                        NotificationType.New,
+                        EventType.New,
                         orderRequest.getSupervisor(),
                         BigInteger.valueOf(0)
                 ));
@@ -216,13 +217,13 @@ public class CartAPIController {
 //        BrowserMessage returnMsg2 = emailService.sendSupervisorRequest(emailDetailsSupervisor, orderRequest, orderRequest.getSupervisor().getId());
 
         // send any additional notifications
-        String userFullName = user.get().getFirstName()+" "+user.get().getLastName();
-        String eventName = "A New Request by "+userFullName;
-        String superFullName = orderRequest.getSupervisor().getFirstName()+" "+orderRequest.getSupervisor().getLastName();
-        String eventDesc = "A New Request has been placed by "+userFullName+
-                ", and sent to "+superFullName+" for fulfillment";
-        Event e = new Event(null, eventName, eventDesc, orderRequest.getId(), "", EventModule.Request, EventType.New);
-        eventService.dispatchEvent(e);
+//        String userFullName = user.get().getFirstName()+" "+user.get().getLastName();
+//        String eventName = "A New Request by "+userFullName;
+//        String superFullName = orderRequest.getSupervisor().getFirstName()+" "+orderRequest.getSupervisor().getLastName();
+//        String eventDesc = "A New Request has been placed by "+userFullName+
+//                ", and sent to "+superFullName+" for fulfillment";
+//        AppEvent e = new AppEvent(null, eventName, eventDesc, orderRequest.getId().toString(), "", EventModule.Request, EventType.New);
+//        eventService.dispatchEvent(e);
 
         cartService.emptyCart(cartModel.id());
         return new SingleBigIntegerModel(orderRequest.getId());

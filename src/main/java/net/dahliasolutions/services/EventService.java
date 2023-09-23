@@ -2,12 +2,9 @@ package net.dahliasolutions.services;
 
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.*;
-import net.dahliasolutions.models.mail.EmailDetails;
-import net.dahliasolutions.models.order.OrderRequest;
 import net.dahliasolutions.models.user.User;
-import net.dahliasolutions.services.mail.EmailService;
-import net.dahliasolutions.services.order.OrderService;
-import net.dahliasolutions.services.user.UserService;
+import net.dahliasolutions.services.mail.AppEventService;
+import net.dahliasolutions.services.mail.NotificationMessageService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -21,75 +18,59 @@ import java.util.Optional;
 public class EventService {
 
     private final NotificationService notificationService;
-    private final MessageService messageService;
-    private final UserService userService;
-    private final OrderService orderService;
-    private final EmailService emailService;
+    private final AppEventService appEventService;
+    private final NotificationMessageService notificationMessageService;
 
-    public Event dispatchEvent(Event dispatch) {
+    public AppEvent createEvent(AppEvent dispatch) {
         List<Notification> notifyList = notificationService.findAllByModuleAndType(dispatch.getModule(), dispatch.getType());
-        Event newEvent = dispatch;
-        Message message;
 
-        // if no notifications found, return
-        if (notifyList.isEmpty()) {
-            return newEvent;
-        }
-
-        // create new message from notification with event id
-        if (dispatch.getId() == null) {
-            newEvent.setId(BigInteger.valueOf(Instant.now().toEpochMilli()));
-            message = messageService.createMessage(newEvent.getId(), notifyList.get(0));
-            message.setUsers(new ArrayList<>());
+        // find existing event or generate new id
+        if (dispatch.getId() != null) {
+            dispatch.setId(BigInteger.valueOf(Instant.now().toEpochMilli()));
+            dispatch.setUsers(new ArrayList<>());
         } else {
-            message = messageService.findById(newEvent.getId()).get();
-        }
-        messageService.save(message);
-        for (Notification notify : notifyList) {
-            switch (dispatch.getModule()) {
-                case Request:
-                    requestEvent(dispatch, notify, message);
-                    break;
-                default:
-                    for (User u : notify.getUsers()) {
-                        if (!message.getUsers().contains(u)) {
-                            EmailDetails emailDetails =
-                                    new EmailDetails(u.getContactEmail(), dispatch.getName(), "", null);
-                            BrowserMessage returnMsg = emailService.sendSystemNotification(emailDetails, dispatch);
-                            message.getUsers().add(u);
-                        }
-                    }
-                    messageService.save(message);
+            Optional<AppEvent> existingEvent = appEventService.findAppEventById(dispatch.getId());
+            if (existingEvent.isEmpty()) {
+                dispatch.setId(BigInteger.valueOf(Instant.now().toEpochMilli()));
+                dispatch.setUsers(new ArrayList<>());
+            } else {
+                dispatch = existingEvent.get();
             }
-
         }
-        return newEvent;
-    }
 
-    private void requestEvent(Event dispatch, Notification notify, Message message) {
-        switch (dispatch.getType()) {
-            case New:OrderRequest request = orderService.findById(dispatch.getItemId()).get();
-                for (User u : notify.getUsers()) {
-                    if (!message.getUsers().contains(u)) {
-                        EmailDetails emailDetails =
-                                new EmailDetails(u.getContactEmail(), dispatch.getName(), "", null);
-                        BrowserMessage returnMsg = emailService.sendUserRequest(emailDetails, request);
-                        message.getUsers().add(u);
-                    }
+        NotificationMessage message = new NotificationMessage(
+                null,
+                dispatch.getName(),
+                dispatch.getItemId(),
+                BigInteger.valueOf(0),
+                dispatch.getId(),
+                false,
+                false,
+                null,
+                dispatch.getModule(),
+                dispatch.getType(),
+                null,
+                BigInteger.valueOf(0)
+        );
+
+        // ToDo - corporate blackout dates
+
+        for (Notification notify : notifyList) {
+
+            // ToDo - create new notificationMessage for each event and user
+            // if not blackout, send notificationMessage
+            // if blackout, mark sent and save for later viewing
+            // maybe make missed event message that is scheduled
+
+            for (User u : notify.getUsers()) {
+                if (!dispatch.getUsers().contains(u)) {
+                    NotificationMessage userMessage = notificationMessageService.createEventMessage(message, u);
+                    dispatch.getUsers().add(u);
                 }
-                messageService.save(message);
-                break;
-            default:
-                for (User u : notify.getUsers()) {
-                    if (!message.getUsers().contains(u)) {
-                        EmailDetails emailDetails =
-                                new EmailDetails(u.getContactEmail(), dispatch.getName(), "", null);
-                        BrowserMessage returnMsg = emailService.sendSystemNotification(emailDetails, dispatch);
-                        message.getUsers().add(u);
-                    }
-                }
-                messageService.save(message);
+            }
         }
+        appEventService.save(dispatch);
+        return dispatch;
     }
 
 }

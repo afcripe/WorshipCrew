@@ -39,6 +39,9 @@ public class User implements UserDetails {
     private boolean activated;
     private boolean deleted;
 
+    @Column(columnDefinition = "boolean default true")
+    private boolean enableEmailSubscription;
+
     public String getFullName() {
          return firstName+" "+lastName;
     }

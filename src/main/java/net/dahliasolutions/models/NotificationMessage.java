@@ -23,6 +23,7 @@ public class NotificationMessage {
     private String subject;
     private String moduleId;
     private BigInteger itemId;
+    private BigInteger eventId;
     private boolean sendNow;
     private boolean sent;
     private LocalDateTime dateSent;
@@ -31,7 +32,7 @@ public class NotificationMessage {
     private EventModule module;
 
     @Enumerated
-    private NotificationType type;
+    private EventType type;
 
     @ManyToOne
     private User user;

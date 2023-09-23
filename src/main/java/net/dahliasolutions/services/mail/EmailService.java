@@ -429,7 +429,7 @@ public class EmailService implements EmailServiceInterface{
     }
 
     @Override
-    public BrowserMessage sendSystemNotification(EmailDetails emailDetails, Event event) {
+    public BrowserMessage sendSystemNotification(EmailDetails emailDetails, AppEvent event) {
         // set template variables
         Context context = new Context();
         context.setVariable("baseURL", appServer.getBaseURL());

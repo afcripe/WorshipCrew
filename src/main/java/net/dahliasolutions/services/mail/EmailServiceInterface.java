@@ -1,8 +1,7 @@
 package net.dahliasolutions.services.mail;
 
+import net.dahliasolutions.models.AppEvent;
 import net.dahliasolutions.models.BrowserMessage;
-import net.dahliasolutions.models.Event;
-import net.dahliasolutions.models.Notification;
 import net.dahliasolutions.models.mail.EmailDetails;
 import net.dahliasolutions.models.order.OrderItem;
 import net.dahliasolutions.models.order.OrderNote;
@@ -28,6 +27,6 @@ public interface EmailServiceInterface {
     BrowserMessage sendAgentListTicket(EmailDetails emailDetails, Ticket ticket, TicketNote ticketNote, BigInteger id);
     BrowserMessage sendUserUpdateTicket(EmailDetails emailDetails, Ticket ticket, TicketNote ticketNote);
     BrowserMessage sendAgentUpdateTicket(EmailDetails emailDetails, Ticket ticket, TicketNote ticketNote);
-    BrowserMessage sendSystemNotification(EmailDetails emailDetails, Event event);
+    BrowserMessage sendSystemNotification(EmailDetails emailDetails, AppEvent event);
     void sendStatement(User user);
 }

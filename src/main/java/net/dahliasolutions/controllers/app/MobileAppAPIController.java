@@ -131,6 +131,7 @@ public class MobileAppAPIController {
             userService.save(apiUser.getUser());
             removeUserSubscription(apiUser.getUser());
         }
+
         return new ResponseEntity<>(new SingleStringModel("success"), HttpStatus.OK);
     }
 
@@ -304,6 +305,9 @@ public class MobileAppAPIController {
                 userSubscribeService.findByEndPointAndUser(NotificationEndPoint.Push, user);
         if (endpoints.isEmpty() && subscription.isPresent()) {
             user.getSubscriptions().remove(subscription.get());
+            if (user.getSubscriptions().size()<2) {
+                user.setEnableEmailSubscription(true);
+            }
             userService.save(user);
             try {
                 userSubscribeService.deleteBySubscription(subscription.get());

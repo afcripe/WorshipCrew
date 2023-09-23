@@ -21,6 +21,7 @@ public class Notification {
     private BigInteger id;
     private String name;
     private String Description;
+    private String itemId;
 
     @Enumerated
     private EventModule module;
