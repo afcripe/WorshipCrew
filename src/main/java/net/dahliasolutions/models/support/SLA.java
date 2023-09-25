@@ -1,9 +1,6 @@
 package net.dahliasolutions.models.support;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigInteger;
@@ -18,6 +15,7 @@ public class SLA {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "sla_gen", sequenceName = "sla_seq", allocationSize = 1)
     private BigInteger id;
     private String name;
     private String description;

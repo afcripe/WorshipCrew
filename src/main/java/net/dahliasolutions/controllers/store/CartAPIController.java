@@ -22,6 +22,7 @@ import net.dahliasolutions.services.user.UserService;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -217,6 +218,16 @@ public class CartAPIController {
 //        BrowserMessage returnMsg2 = emailService.sendSupervisorRequest(emailDetailsSupervisor, orderRequest, orderRequest.getSupervisor().getId());
 
         // send any additional notifications
+        AppEvent notifyEvent = eventService.createEvent(new AppEvent(
+                null,
+                "New Request",
+                "A new request has been placed by "+user.get().getFullName(),
+                orderRequest.getId().toString(),
+                EventModule.Request,
+                EventType.New,
+                new ArrayList<>()
+        ));
+
 //        String userFullName = user.get().getFirstName()+" "+user.get().getLastName();
 //        String eventName = "A New Request by "+userFullName;
 //        String superFullName = orderRequest.getSupervisor().getFirstName()+" "+orderRequest.getSupervisor().getLastName();

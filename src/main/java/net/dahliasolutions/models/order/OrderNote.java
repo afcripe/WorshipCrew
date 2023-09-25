@@ -18,6 +18,7 @@ public class OrderNote {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "order_note_gen", sequenceName = "order_note_seq", allocationSize = 1)
     private BigInteger id;
     private BigInteger orderId;
     private LocalDateTime noteDate;

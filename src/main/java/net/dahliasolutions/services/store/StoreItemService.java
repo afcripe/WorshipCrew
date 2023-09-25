@@ -8,9 +8,13 @@ import net.dahliasolutions.models.department.DepartmentRegional;
 import net.dahliasolutions.models.order.OrderRequest;
 import net.dahliasolutions.models.order.OrderStatus;
 import net.dahliasolutions.models.position.Position;
+import net.dahliasolutions.models.store.StoreCategory;
 import net.dahliasolutions.models.store.StoreItem;
 import net.dahliasolutions.models.store.StoreItemOption;
 import net.dahliasolutions.models.store.StoreSubCategory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -48,16 +52,19 @@ public class StoreItemService implements StoreItemServiceInterface {
         return storeItems;
     }
 
-
     @Override
     public List<StoreItem> findAll() {
-        List<StoreItem> storeItems = storeItemRepository.findAll();
-        return storeItems;
+        return storeItemRepository.findAll();
     }
 
     @Override
-    public List<StoreItem> findAllByAvailable() {
-        return storeItemRepository.findAllByAvailable();
+    public Page<StoreItem> findAll(Pageable pageable) {
+        return storeItemRepository.findAll(pageable);
+    }
+
+    @Override
+    public List<StoreItem> findAllByAvailableNotPaginated() {
+        return storeItemRepository.findAllByAvailableNotPaginated();
     }
 
     @Override
@@ -77,8 +84,8 @@ public class StoreItemService implements StoreItemServiceInterface {
     }
 
     @Override
-    public List<StoreItem> findAllByAvailableAndDepartment(BigInteger departmentId) {
-        return storeItemRepository.findAllByAvailableAndDepartment(departmentId);
+    public List<StoreItem> findAllByAvailableAndDepartmentNotPageable(BigInteger departmentId) {
+        return storeItemRepository.findAllByAvailableAndDepartmentNotPageable(departmentId);
     }
 
     @Override
@@ -130,5 +137,65 @@ public class StoreItemService implements StoreItemServiceInterface {
     @Override
     public Integer countBySubCategory(BigInteger id) {
         return storeItemRepository.countBySubCategoryId(id);
+    }
+
+    @Override
+    public Page<StoreItem> findAllByAvailable(boolean available, Pageable pageable) {
+        return storeItemRepository.findAllByAvailable(available, pageable);
+    }
+
+    @Override
+    public Page<StoreItem> findAllByAvailableAndDepartment(boolean available, DepartmentRegional department, Pageable pageable) {
+        return storeItemRepository.findAllByAvailableAndDepartment(available, department, pageable);
+    }
+
+    @Override
+    public Page<StoreItem> findAllByAvailableAndPositionList(boolean available, Position position, Pageable pageable) {
+        return storeItemRepository.findAllByAvailableAndPositionList(available, position, pageable);
+    }
+
+    @Override
+    public Page<StoreItem> findAllByAvailableAndDepartmentAndPositionList(boolean available, DepartmentRegional department, Position position, Pageable pageable) {
+        return storeItemRepository.findAllByAvailableAndDepartmentAndPositionList(available, department, position, pageable);
+    }
+
+    @Override
+    public Page<StoreItem> findAllByAvailableAndCategory(boolean available, StoreCategory category, Pageable pageable) {
+        return storeItemRepository.findAllByAvailableAndCategory(available, category, pageable);
+    }
+
+    @Override
+    public Page<StoreItem> findAllByAvailableAndSubCategory(boolean available, StoreSubCategory subCategory, Pageable pageable) {
+        return storeItemRepository.findAllByAvailableAndSubCategory(available,subCategory,pageable);
+    }
+
+    @Override
+    public Page<StoreItem> findAllByAvailableAndCategoryAndPositionList(boolean available, StoreCategory category, Position position, Pageable pageable) {
+        return storeItemRepository.findAllByAvailableAndCategoryAndPositionList(available, category, position, pageable);
+    }
+
+    @Override
+    public Page<StoreItem> findAllByAvailableAndCategoryAndDepartment(boolean available, StoreCategory category, DepartmentRegional department, Pageable pageable) {
+        return storeItemRepository.findAllByAvailableAndCategoryAndDepartment(available, category, department, pageable);
+    }
+
+    @Override
+    public Page<StoreItem> findAllByAvailableAndCategoryAndDepartmentAndPositionList(boolean available, StoreCategory category, DepartmentRegional department, Position position, Pageable pageable) {
+        return storeItemRepository.findAllByAvailableAndCategoryAndDepartmentAndPositionList(available, category, department, position, pageable);
+    }
+
+    @Override
+    public Page<StoreItem> findAllByAvailableAndSubCategoryAndPositionList(boolean available, StoreSubCategory subCategory, Position position, Pageable pageable) {
+        return storeItemRepository.findAllByAvailableAndSubCategoryAndPositionList(available, subCategory, position, pageable);
+    }
+
+    @Override
+    public Page<StoreItem> findAllByAvailableAndSubCategoryAndDepartment(boolean available, StoreSubCategory category, DepartmentRegional department, Pageable pageable) {
+        return storeItemRepository.findAllByAvailableAndSubCategoryAndDepartment(available, category, department, pageable);
+    }
+
+    @Override
+    public Page<StoreItem> findAllByAvailableAndSubCategoryAndDepartmentAndPositionList(boolean available, StoreSubCategory subCategory, DepartmentRegional department, Position position, Pageable pageable) {
+        return storeItemRepository.findAllByAvailableAndSubCategoryAndDepartmentAndPositionList(available, subCategory, department, position, pageable);
     }
 }

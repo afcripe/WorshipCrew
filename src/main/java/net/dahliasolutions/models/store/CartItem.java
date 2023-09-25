@@ -21,6 +21,7 @@ public class CartItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "cart_item_gen", sequenceName = "cart_item_seq", allocationSize = 1)
     private BigInteger id;
     private BigInteger productId;
     private String productName;

@@ -18,6 +18,7 @@ public class TicketNote {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "ticket_note_gen", sequenceName = "ticket_note_seq", allocationSize = 1)
     private BigInteger id;
     private LocalDateTime noteDate;
     private boolean notePrivate;

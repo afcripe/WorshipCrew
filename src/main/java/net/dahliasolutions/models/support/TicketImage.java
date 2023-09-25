@@ -1,9 +1,6 @@
 package net.dahliasolutions.models.support;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,7 +16,8 @@ import java.math.BigInteger;
 public class TicketImage {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "ticket_image_gen", sequenceName = "ticket_image_seq", allocationSize = 1)
     private BigInteger id;
     private String name;
     private String description;

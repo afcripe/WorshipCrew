@@ -25,7 +25,7 @@ public class EventService {
         List<Notification> notifyList = notificationService.findAllByModuleAndType(dispatch.getModule(), dispatch.getType());
 
         // find existing event or generate new id
-        if (dispatch.getId() != null) {
+        if (dispatch.getId() == null) {
             dispatch.setId(BigInteger.valueOf(Instant.now().toEpochMilli()));
             dispatch.setUsers(new ArrayList<>());
         } else {

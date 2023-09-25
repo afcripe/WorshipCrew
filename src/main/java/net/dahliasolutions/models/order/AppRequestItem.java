@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 public class AppRequestItem {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private BigInteger id;
     private BigInteger requestId;
     private BigInteger productId;

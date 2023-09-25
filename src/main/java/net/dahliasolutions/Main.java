@@ -6,7 +6,6 @@ import net.dahliasolutions.models.department.DepartmentRegional;
 import net.dahliasolutions.models.position.Position;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.wiki.WikiTag;
-import net.dahliasolutions.services.NotificationService;
 import net.dahliasolutions.services.campus.CampusService;
 import net.dahliasolutions.services.department.DepartmentRegionalService;
 import net.dahliasolutions.services.position.PositionService;
@@ -53,7 +52,7 @@ public class Main {
 //    @Bean
 //    CommandLineRunner run(UserRolesService roleService, PositionService positionService, WikiTagService wikiTagService,
 //                          UserService userService, CampusService campusService, DepartmentRegionalService departmentRegionalService,
-//                          WikiFolderService wikiFolderService, NotificationService notificationService) {
+//                          WikiFolderService wikiFolderService) {
 //        return args -> {
 //
 //            wikiTagService.createWikiTag(new WikiTag(null, "production"));

@@ -18,6 +18,7 @@ public class Notification {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "notification_gen", sequenceName = "notification_seq", allocationSize = 1)
     private BigInteger id;
     private String name;
     private String Description;

@@ -20,6 +20,7 @@ public class WikiPost {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "wiki_post_gen", sequenceName = "wiki_post_seq", allocationSize = 1)
     private BigInteger id;
     private String title;
     private String folder;

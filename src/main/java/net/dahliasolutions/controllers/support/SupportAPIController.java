@@ -222,11 +222,12 @@ public class SupportAPIController {
                                 "Support Ticket "+ticket.get().getId()+" has been updated",
                                 ticket.get().getId(),
                                 BigInteger.valueOf(0),
+                                null,
                                 false,
                                 false,
                                 null,
                                 EventModule.Support,
-                                NotificationType.Updated,
+                                EventType.Updated,
                                 ticket.get().getAgent(),
                                 note.getId()
                         ));
@@ -237,11 +238,15 @@ public class SupportAPIController {
         }
 
         // send any additional notifications
-        String userFullName = currentUser.getFirstName()+" "+currentUser.getLastName();
-        String eventName = "Ticket "+ticket.get().getId()+" was updated by "+userFullName;
-        String eventDesc = "A note was added to Ticket "+ticket.get().getId()+" by "+userFullName+".";
-        Event e = new Event(null, eventName, eventDesc, BigInteger.valueOf(0), ticket.get().getId(), EventModule.Support, EventType.Changed);
-        eventService.dispatchEvent(e);
+        AppEvent notifyEvent = eventService.createEvent(new AppEvent(
+                null,
+                "Ticket "+ticket.get().getId()+" was updated by "+currentUser.getFullName(),
+                "A note was added to Ticket "+ticket.get().getId()+" by "+currentUser.getFullName(),
+                ticket.get().getId(),
+                EventModule.Support,
+                EventType.Updated,
+                new ArrayList<>()
+        ));
 
         return note;
     }
@@ -348,15 +353,19 @@ public class SupportAPIController {
             BrowserMessage returnMsg = emailService.sendUserUpdateTicket(emailDetailsUser, ticket.get(), ticketNote);
 
             // send any additional notifications
-            String userFullName = currentUser.getFirstName()+" "+currentUser.getLastName();
-            String eventName = "Ticket "+ticket.get().getId()+" status was updated by "+userFullName;
-            String eventDesc = "The status of Ticket "+ticket.get().getId()+" was changed to "+statusModel.status()+" by "+userFullName+".";
-            Event e = new Event(null, eventName, eventDesc, BigInteger.valueOf(0), ticket.get().getId(), EventModule.Support, EventType.Changed);
-            eventService.dispatchEvent(e);
+            AppEvent notifyEvent = eventService.createEvent(new AppEvent(
+                    null,
+                    "Ticket "+ticket.get().getId()+" status was updated by "+currentUser.getFullName(),
+                    "The status of Ticket "+ticket.get().getId()+" was changed to "+statusModel.status()+" by "+currentUser.getFullName(),
+                    ticket.get().getId(),
+                    EventModule.Support,
+                    EventType.Updated,
+                    new ArrayList<>()
+            ));
             //closed
             if (setStatus.equals(TicketStatus.Closed)) {
-                e.setType(EventType.Closed);
-                eventService.dispatchEvent(e);
+                notifyEvent.setType(EventType.Closed);
+                eventService.createEvent(notifyEvent);
             }
         }
 
@@ -396,12 +405,15 @@ public class SupportAPIController {
                 }
             }
             // send any additional notifications
-            String userFullName = currentUser.getFirstName()+" "+currentUser.getLastName();
-            String agentFullName = newSuper.get().getFirstName()+" "+newSuper.get().getLastName();
-            String eventName = agentFullName+" was added to Ticket "+ticket.get().getId();
-            String eventDesc = agentFullName+" was added as and agent to Ticket "+ticket.get().getId()+" by "+userFullName;
-            Event e = new Event(null, eventName, eventDesc, BigInteger.valueOf(0), ticket.get().getId(), EventModule.Support, EventType.Changed);
-            eventService.dispatchEvent(e);
+            AppEvent notifyEvent = eventService.createEvent(new AppEvent(
+                    null,
+                    newSuper.get().getFullName()+" was added to Ticket "+ticket.get().getId(),
+                    newSuper.get().getFullName()+" was added as an agent to Ticket "+ticket.get().getId()+" by "+currentUser.getFullName(),
+                    ticket.get().getId(),
+                    EventModule.Support,
+                    EventType.Updated,
+                    new ArrayList<>()
+            ));
         }
         return supervisorModel;
     }
@@ -428,12 +440,15 @@ public class SupportAPIController {
                 true, noteDetail, new ArrayList<>(), currentUser, ticket.get()));
             }
             // send any additional notifications
-            String userFullName = currentUser.getFirstName()+" "+currentUser.getLastName();
-            String agentFullName = newSuper.get().getFirstName()+" "+newSuper.get().getLastName();
-            String eventName = agentFullName+" was removed from Ticket "+ticket.get().getId();
-            String eventDesc = "Agent "+agentFullName+" was removed from Ticket "+ticket.get().getId()+" by "+userFullName;
-            Event e = new Event(null, eventName, eventDesc, BigInteger.valueOf(0), ticket.get().getId(), EventModule.Support, EventType.Changed);
-            eventService.dispatchEvent(e);
+            AppEvent notifyEvent = eventService.createEvent(new AppEvent(
+                    null,
+                    newSuper.get().getFullName()+" was removed from Ticket "+ticket.get().getId(),
+                    newSuper.get().getFullName()+" was removed from Ticket "+ticket.get().getId()+" by "+currentUser.getFullName(),
+                    ticket.get().getId(),
+                    EventModule.Support,
+                    EventType.Updated,
+                    new ArrayList<>()
+            ));
         }
         return supervisorModel;
     }
@@ -465,12 +480,15 @@ public class SupportAPIController {
                                 true, noteDetail, new ArrayList<>(), currentUser, ticket.get()));
 
                 // send any additional notifications
-                String userFullName = currentUser.getFirstName()+" "+currentUser.getLastName();
-                String eventName = "SLA on Ticket "+ticket.get().getId()+" was changed to "+sla.get().getName();
-                String eventDesc = "SLA on Ticket "+ticket.get().getId()+" was changed to "+sla.get().getName()+" by "+userFullName+
-                        ". The new date for completion is, "+newDueDate;
-                Event e = new Event(null, eventName, eventDesc, BigInteger.valueOf(0), ticket.get().getId(), EventModule.Support, EventType.Changed);
-                eventService.dispatchEvent(e);
+                AppEvent notifyEvent = eventService.createEvent(new AppEvent(
+                        null,
+                        "SLA on Ticket "+ticket.get().getId()+" was changed to "+sla.get().getName(),
+                        "SLA on Ticket "+ticket.get().getId()+" was changed to "+sla.get().getName()+" by "+currentUser.getFullName(),
+                        ticket.get().getId(),
+                        EventModule.Support,
+                        EventType.Updated,
+                        new ArrayList<>()
+                ));
 
                 return sla.get();
             }

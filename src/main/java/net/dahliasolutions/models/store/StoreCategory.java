@@ -19,6 +19,7 @@ public class StoreCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "store_category_gen", sequenceName = "store_category_seq", allocationSize = 1)
     private BigInteger id;
     private String name;
 

@@ -3,6 +3,9 @@ package net.dahliasolutions.controllers.store;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.AdminSettings;
+import net.dahliasolutions.models.AppEvent;
+import net.dahliasolutions.models.EventModule;
+import net.dahliasolutions.models.EventType;
 import net.dahliasolutions.models.store.RequestNotifyTarget;
 import net.dahliasolutions.models.records.SingleBigIntegerModel;
 import net.dahliasolutions.models.records.SingleStringModel;
@@ -11,6 +14,7 @@ import net.dahliasolutions.models.user.Profile;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
 import net.dahliasolutions.services.AdminSettingsService;
+import net.dahliasolutions.services.EventService;
 import net.dahliasolutions.services.store.*;
 import net.dahliasolutions.services.user.ProfileService;
 import net.dahliasolutions.services.user.UserService;
@@ -37,6 +41,7 @@ public class StoreAPIController {
     private final AdminSettingsService adminSettingsService;
     private final UserService userService;
     private final StoreSettingService storeSettingService;
+    private final EventService eventService;
 
     @GetMapping("")
     public List<StoreItem> goStoreHome() {
@@ -47,7 +52,19 @@ public class StoreAPIController {
     public SingleBigIntegerModel postNewStoreItem(@ModelAttribute SingleStringModel item) {
         StoreItem storeItem = new StoreItem();
         storeItem.setName(item.name());
-        return new SingleBigIntegerModel(storeItemService.createStoreItem(storeItem).getId());
+        storeItem = storeItemService.createStoreItem(storeItem);
+
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        AppEvent notifyEvent = eventService.createEvent(new AppEvent(
+                null,
+                currentUser.getFullName()+" Created a new store item.",
+                item.name()+" was added to the store by "+currentUser.getFullName(),
+                storeItem.getId().toString(),
+                EventModule.Store,
+                EventType.New,
+                new ArrayList<>()
+        ));
+        return new SingleBigIntegerModel(storeItem.getId());
     }
 
     @GetMapping ("/display/{style}")

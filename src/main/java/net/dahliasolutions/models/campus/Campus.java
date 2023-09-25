@@ -17,6 +17,7 @@ public class Campus {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "campus_generator", sequenceName = "campus_gseq", allocationSize = 1)
     private BigInteger id;
     private String name;
     private String city;

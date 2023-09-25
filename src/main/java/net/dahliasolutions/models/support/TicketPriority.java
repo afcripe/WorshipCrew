@@ -1,9 +1,6 @@
 package net.dahliasolutions.models.support;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +17,7 @@ public class TicketPriority {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "ticket_priority_gen", sequenceName = "ticket_priority_seq", allocationSize = 1)
     private BigInteger id;
     private int displayOrder;
     private String priority;

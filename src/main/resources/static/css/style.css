@@ -775,6 +775,16 @@
 }
 
 /* Filter Nav Styles */
+
+.filter-page {
+    background: transparent;
+    font-size: medium;
+    display: flex;
+    vertical-align: middle;
+    padding-top: 5px;
+    position: relative;
+}
+
 .filter-nav {
     background-color: var(--dwc-side-nav-bg);
     border: 1px solid var(--dwc-border-color);

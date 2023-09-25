@@ -345,13 +345,15 @@ public class UserController {
         session.setAttribute("msgSuccess", "User successfully updated.");
 
         // send any additional notifications
-        String userFullName = currentUser.getFirstName()+" "+currentUser.getLastName();
-        String theUser = user.get().getFirstName()+" "+user.get().getLastName();
-        String eventName = "User "+theUser+" has been updated";
-        String eventDesc = "User "+theUser+" was updated by "+userFullName;
-        // update
-        Event e = new Event(null, eventName, eventDesc, user.get().getId(), "", EventModule.User, EventType.Changed);
-        eventService.dispatchEvent(e);
+        AppEvent notifyEvent = eventService.createEvent(new AppEvent(
+                null,
+                "User "+user.get().getFullName()+" has been updated",
+                "User "+user.get().getFullName()+" was updated by "+currentUser.getFullName(),
+                user.get().getId().toString(),
+                EventModule.User,
+                EventType.Updated,
+                new ArrayList<>()
+        ));
 
         return "redirect:/user/"+userModel.id().toString();
     }
@@ -422,13 +424,15 @@ public class UserController {
         session.setAttribute("msgSuccess", "User successfully added.");
 
         // send any additional notifications
-        String userFullName = currentUser.getFirstName()+" "+currentUser.getLastName();
-        String theUser = user.getFirstName()+" "+user.getLastName();
-        String eventName = "New User "+theUser+" has been added";
-        String eventDesc = "User "+theUser+" was added by "+userFullName;
-        // new
-        Event e = new Event(null, eventName, eventDesc, user.getId(), "", EventModule.User, EventType.New);
-        eventService.dispatchEvent(e);
+        AppEvent notifyEvent = eventService.createEvent(new AppEvent(
+                null,
+                "New User "+user.getFullName()+" has been added",
+                "User "+user.getFullName()+" was added by "+currentUser.getFullName(),
+                user.getId().toString(),
+                EventModule.User,
+                EventType.New,
+                new ArrayList<>()
+        ));
 
         return "redirect:/user/"+user.getId().toString();
     }
@@ -536,13 +540,15 @@ public class UserController {
         session.setAttribute("msgSuccess", "Password Change Successful.");
 
         // send any additional notifications
-        String userFullName = currentUser.getFirstName()+" "+currentUser.getLastName();
-        String theUser = user.get().getFirstName()+" "+user.get().getLastName();
-        String eventName = "User "+theUser+" password was changed";
-        String eventDesc = "User "+theUser+" password was changed by "+userFullName;
-        // changed
-        Event e = new Event(null, eventName, eventDesc, user.get().getId(), "", EventModule.User, EventType.Changed);
-        eventService.dispatchEvent(e);
+        AppEvent notifyEvent = eventService.createEvent(new AppEvent(
+                null,
+                "User "+user.get().getFullName()+" password was changed",
+                "User "+user.get().getFullName()+" password was changed by "+currentUser.getFullName(),
+                user.get().getId().toString(),
+                EventModule.User,
+                EventType.Updated,
+                new ArrayList<>()
+        ));
 
         return "redirect:/user/"+changePasswordModel.id();
     }
@@ -560,16 +566,18 @@ public class UserController {
         }
 
         // send any additional notifications
-        String userFullName = currentUser.getFirstName()+" "+currentUser.getLastName();
-        String theUser = user.get().getFirstName()+" "+user.get().getLastName();
-        String eventName = "User "+theUser+" was deleted";
-        String eventDesc = "User "+theUser+" was deleted by "+userFullName;
-        // changed
-        Event e = new Event(null, eventName, eventDesc, user.get().getId(), "", EventModule.User, EventType.Changed);
-        eventService.dispatchEvent(e);
+        AppEvent notifyEvent = eventService.createEvent(new AppEvent(
+                null,
+                "User "+user.get().getFullName()+" was deleted",
+                "User "+user.get().getFullName()+" was deleted by "+currentUser.getFullName(),
+                user.get().getId().toString(),
+                EventModule.User,
+                EventType.Updated,
+                new ArrayList<>()
+        ));
         // deleted
-        e.setType(EventType.Deleted);
-        eventService.dispatchEvent(e);
+        notifyEvent.setType(EventType.Deleted);
+        eventService.createEvent(notifyEvent);
 
         return redirectService.pathName(session, "user");
     }
@@ -593,13 +601,15 @@ public class UserController {
         }
 
         // send any additional notifications
-        String userFullName = currentUser.getFirstName()+" "+currentUser.getLastName();
-        String theUser = user.get().getFirstName()+" "+user.get().getLastName();
-        String eventName = "User "+theUser+" was restored";
-        String eventDesc = "User "+theUser+" was restored by "+userFullName;
-        // changed
-        Event e = new Event(null, eventName, eventDesc, user.get().getId(), "", EventModule.User, EventType.Changed);
-        eventService.dispatchEvent(e);
+        AppEvent notifyEvent = eventService.createEvent(new AppEvent(
+                null,
+                "User "+user.get().getFullName()+" was restored",
+                "User "+user.get().getFullName()+" was restored by "+currentUser.getFullName(),
+                user.get().getId().toString(),
+                EventModule.User,
+                EventType.Updated,
+                new ArrayList<>()
+        ));
 
         return redirectService.pathName(session, "user");
     }

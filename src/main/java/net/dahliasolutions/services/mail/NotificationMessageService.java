@@ -7,6 +7,7 @@ import net.dahliasolutions.models.mail.EmailDetails;
 import net.dahliasolutions.models.order.OrderItem;
 import net.dahliasolutions.models.order.OrderNote;
 import net.dahliasolutions.models.order.OrderRequest;
+import net.dahliasolutions.models.store.StoreItem;
 import net.dahliasolutions.models.support.Ticket;
 import net.dahliasolutions.models.support.TicketNote;
 import net.dahliasolutions.models.user.User;
@@ -16,8 +17,10 @@ import net.dahliasolutions.services.FirebaseMessagingService;
 import net.dahliasolutions.services.order.OrderItemService;
 import net.dahliasolutions.services.order.OrderNoteService;
 import net.dahliasolutions.services.order.OrderService;
+import net.dahliasolutions.services.store.StoreItemService;
 import net.dahliasolutions.services.support.TicketNoteService;
 import net.dahliasolutions.services.support.TicketService;
+import net.dahliasolutions.services.user.UserService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -37,6 +40,8 @@ public class NotificationMessageService implements NotificationMessageServiceInt
     private final OrderNoteService orderNoteService;
     private final TicketService ticketService;
     private final TicketNoteService ticketNoteService;
+    private final StoreItemService storeItemService;
+    private final UserService userService;
     private final AppEventService appEventService;
     private final AppServer appServer;
 
@@ -111,73 +116,58 @@ public class NotificationMessageService implements NotificationMessageServiceInt
                 case New -> {
                     for (UserEndpoint ep : message.getUser().getEndpoints()) {
                         FirebaseMessage fireMessage = new FirebaseMessage();
-                                        fireMessage.setRecipientToken(ep.getToken());
-                                        fireMessage.setTitle("New Request");
-                                        fireMessage.setBody(message.getSubject());
-                                        fireMessage.setData(data);
+                        fireMessage.setRecipientToken(ep.getToken());
+                        fireMessage.setTitle("New Request");
+                        fireMessage.setBody(message.getSubject());
+                        fireMessage.setData(data);
                         firebaseMessagingService.sendNotificationByToken(fireMessage);
                     }
                 }
                 case NewItem -> {
                     for (UserEndpoint ep : message.getUser().getEndpoints()) {
                         FirebaseMessage fireMessage = new FirebaseMessage();
-                                        fireMessage.setRecipientToken(ep.getToken());
-                                        fireMessage.setTitle("New Request Item");
-                                        fireMessage.setBody(message.getSubject());
-                                        fireMessage.setData(data);
+                        fireMessage.setRecipientToken(ep.getToken());
+                        fireMessage.setTitle("New Request Item");
+                        fireMessage.setBody(message.getSubject());
+                        fireMessage.setData(data);
                         firebaseMessagingService.sendNotificationByToken(fireMessage);
                     }
                 }
                 case ItemUpdated -> {
                     for (UserEndpoint ep : message.getUser().getEndpoints()) {
                         FirebaseMessage fireMessage = new FirebaseMessage();
-                                        fireMessage.setRecipientToken(ep.getToken());
-                                        fireMessage.setTitle("Request Item Updated");
-                                        fireMessage.setBody(message.getSubject());
-                                        fireMessage.setData(data);
+                        fireMessage.setRecipientToken(ep.getToken());
+                        fireMessage.setTitle("Request Item Updated");
+                        fireMessage.setBody(message.getSubject());
+                        fireMessage.setData(data);
                         firebaseMessagingService.sendNotificationByToken(fireMessage);
                     }
                 }
                 case Updated -> {
                     for (UserEndpoint ep : message.getUser().getEndpoints()) {
                         FirebaseMessage fireMessage = new FirebaseMessage();
-                                        fireMessage.setRecipientToken(ep.getToken());
-                                        fireMessage.setTitle("Request Updated");
-                                        fireMessage.setBody(message.getSubject());
-                                        fireMessage.setData(data);
+                        fireMessage.setRecipientToken(ep.getToken());
+                        fireMessage.setTitle("Request Updated");
+                        fireMessage.setBody(message.getSubject());
+                        fireMessage.setData(data);
                         firebaseMessagingService.sendNotificationByToken(fireMessage);
                     }
                 }
                 case Cancelled -> {
                     for (UserEndpoint ep : message.getUser().getEndpoints()) {
                         FirebaseMessage fireMessage = new FirebaseMessage();
-                                        fireMessage.setRecipientToken(ep.getToken());
-                                        fireMessage.setTitle("Request Cancelled");
-                                        fireMessage.setBody(message.getSubject());
-                                        fireMessage.setData(data);
-                        firebaseMessagingService.sendNotificationByToken(fireMessage);
-                    }
-                }
-            }
-        }
-
-        if (message.getModule().equals(EventModule.Support)) {
-            switch (message.getType()) {
-                case New, NewList -> {
-                    for (UserEndpoint ep : message.getUser().getEndpoints()) {
-                        FirebaseMessage fireMessage = new FirebaseMessage();
                         fireMessage.setRecipientToken(ep.getToken());
-                        fireMessage.setTitle("New Ticket");
+                        fireMessage.setTitle("Request Cancelled");
                         fireMessage.setBody(message.getSubject());
                         fireMessage.setData(data);
                         firebaseMessagingService.sendNotificationByToken(fireMessage);
                     }
                 }
-                case Updated -> {
+                default -> {
                     for (UserEndpoint ep : message.getUser().getEndpoints()) {
                         FirebaseMessage fireMessage = new FirebaseMessage();
                         fireMessage.setRecipientToken(ep.getToken());
-                        fireMessage.setTitle("Ticket Updated");
+                        fireMessage.setTitle("Request Module Notification");
                         fireMessage.setBody(message.getSubject());
                         fireMessage.setData(data);
                         firebaseMessagingService.sendNotificationByToken(fireMessage);
@@ -185,6 +175,115 @@ public class NotificationMessageService implements NotificationMessageServiceInt
                 }
             }
 
+            if (message.getModule().equals(EventModule.Support)) {
+                switch (message.getType()) {
+                    case New, NewList -> {
+                        for (UserEndpoint ep : message.getUser().getEndpoints()) {
+                            FirebaseMessage fireMessage = new FirebaseMessage();
+                            fireMessage.setRecipientToken(ep.getToken());
+                            fireMessage.setTitle("New Ticket");
+                            fireMessage.setBody(message.getSubject());
+                            fireMessage.setData(data);
+                            firebaseMessagingService.sendNotificationByToken(fireMessage);
+                        }
+                    }
+                    case Updated -> {
+                        for (UserEndpoint ep : message.getUser().getEndpoints()) {
+                            FirebaseMessage fireMessage = new FirebaseMessage();
+                            fireMessage.setRecipientToken(ep.getToken());
+                            fireMessage.setTitle("Ticket Updated");
+                            fireMessage.setBody(message.getSubject());
+                            fireMessage.setData(data);
+                            firebaseMessagingService.sendNotificationByToken(fireMessage);
+                        }
+                    }
+                    default -> {
+                        for (UserEndpoint ep : message.getUser().getEndpoints()) {
+                            FirebaseMessage fireMessage = new FirebaseMessage();
+                            fireMessage.setRecipientToken(ep.getToken());
+                            fireMessage.setTitle("Support Module Notification");
+                            fireMessage.setBody(message.getSubject());
+                            fireMessage.setData(data);
+                            firebaseMessagingService.sendNotificationByToken(fireMessage);
+                        }
+                    }
+                }
+
+            }
+
+
+            if (message.getModule().equals(EventModule.Store)) {
+                switch (message.getType()) {
+                    case New -> {
+                        for (UserEndpoint ep : message.getUser().getEndpoints()) {
+                            FirebaseMessage fireMessage = new FirebaseMessage();
+                            fireMessage.setRecipientToken(ep.getToken());
+                            fireMessage.setTitle("New Store Item");
+                            fireMessage.setBody(message.getSubject());
+                            fireMessage.setData(data);
+                            firebaseMessagingService.sendNotificationByToken(fireMessage);
+                        }
+                    }
+                    case Updated -> {
+                        for (UserEndpoint ep : message.getUser().getEndpoints()) {
+                            FirebaseMessage fireMessage = new FirebaseMessage();
+                            fireMessage.setRecipientToken(ep.getToken());
+                            fireMessage.setTitle("Store Item Updated");
+                            fireMessage.setBody(message.getSubject());
+                            fireMessage.setData(data);
+                            firebaseMessagingService.sendNotificationByToken(fireMessage);
+                        }
+                    }
+                    default -> {
+                        for (UserEndpoint ep : message.getUser().getEndpoints()) {
+                            FirebaseMessage fireMessage = new FirebaseMessage();
+                            fireMessage.setRecipientToken(ep.getToken());
+                            fireMessage.setTitle("Store Module Notification");
+                            fireMessage.setBody(message.getSubject());
+                            fireMessage.setData(data);
+                            firebaseMessagingService.sendNotificationByToken(fireMessage);
+                        }
+                    }
+                }
+
+            }
+
+
+            if (message.getModule().equals(EventModule.User)) {
+                switch (message.getType()) {
+                    case New -> {
+                        for (UserEndpoint ep : message.getUser().getEndpoints()) {
+                            FirebaseMessage fireMessage = new FirebaseMessage();
+                            fireMessage.setRecipientToken(ep.getToken());
+                            fireMessage.setTitle("New User");
+                            fireMessage.setBody(message.getSubject());
+                            fireMessage.setData(data);
+                            firebaseMessagingService.sendNotificationByToken(fireMessage);
+                        }
+                    }
+                    case Updated -> {
+                        for (UserEndpoint ep : message.getUser().getEndpoints()) {
+                            FirebaseMessage fireMessage = new FirebaseMessage();
+                            fireMessage.setRecipientToken(ep.getToken());
+                            fireMessage.setTitle("User Updated");
+                            fireMessage.setBody(message.getSubject());
+                            fireMessage.setData(data);
+                            firebaseMessagingService.sendNotificationByToken(fireMessage);
+                        }
+                    }
+                    default -> {
+                        for (UserEndpoint ep : message.getUser().getEndpoints()) {
+                            FirebaseMessage fireMessage = new FirebaseMessage();
+                            fireMessage.setRecipientToken(ep.getToken());
+                            fireMessage.setTitle("User Module Notification");
+                            fireMessage.setBody(message.getSubject());
+                            fireMessage.setData(data);
+                            firebaseMessagingService.sendNotificationByToken(fireMessage);
+                        }
+                    }
+                }
+
+            }
         }
 
         return new BrowserMessage("msgSuccess", "Message Sent.");
@@ -261,6 +360,33 @@ public class NotificationMessageService implements NotificationMessageServiceInt
                 }
             }
 
+        }
+
+        if (message.getModule().equals(EventModule.Store)) {
+//            BigInteger itemId = new BigInteger(message.getModuleId());
+//            StoreItem storeItem = storeItemService.findById(itemId).get();
+
+            if (message.getEventId() != null) {
+                AppEvent appEvent = appEventService.findAppEventById(message.getEventId()).get();
+                //send event email
+                EmailDetails emailEventDetails =
+                        new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
+                emailService.sendSystemNotification(emailEventDetails, appEvent);
+            }
+        }
+
+
+        if (message.getModule().equals(EventModule.User)) {
+//            BigInteger userId = new BigInteger(message.getModuleId());
+//            User user = userService.findById(userId).get();
+
+            if (message.getEventId() != null) {
+                AppEvent appEvent = appEventService.findAppEventById(message.getEventId()).get();
+                //send event email
+                EmailDetails emailEventDetails =
+                        new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
+                emailService.sendSystemNotification(emailEventDetails, appEvent);
+            }
         }
 
         return new BrowserMessage("msgSuccess", "Message Sent.");

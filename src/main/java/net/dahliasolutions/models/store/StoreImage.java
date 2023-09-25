@@ -1,9 +1,6 @@
 package net.dahliasolutions.models.store;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +17,7 @@ public class StoreImage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "store_image_gen", sequenceName = "store_image_seq", allocationSize = 1)
     private BigInteger id;
     private String name;
     private String description;

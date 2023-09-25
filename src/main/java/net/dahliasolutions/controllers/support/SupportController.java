@@ -193,11 +193,12 @@ public class SupportController {
                             "A New Support Ticket Needs Acknowledgement",
                             ticket.getId(),
                             BigInteger.valueOf(0),
+                            null,
                             false,
                             false,
                             null,
                             EventModule.Support,
-                            NotificationType.New,
+                            EventType.New,
                             ticket.getAgent(),
                             ticket.getNotes().get(0).getId()
                     ));
@@ -213,11 +214,12 @@ public class SupportController {
                                 "A New Support Ticket Needs Acceptance",
                                 ticket.getId(),
                                 BigInteger.valueOf(0),
+                                null,
                                 false,
                                 false,
                                 null,
                                 EventModule.Support,
-                                NotificationType.New,
+                                EventType.New,
                                 agent,
                                 ticket.getNotes().get(0).getId()
                         ));
@@ -228,16 +230,19 @@ public class SupportController {
         }
 
         // send any additional notifications
-        String userFullName = currentUser.getFirstName()+" "+currentUser.getLastName();
-        String eventName = "A New Ticket Submitted by "+userFullName;
         String superFullName = "[not yet assigned]";
         if (ticket.getAgent() != null) {
             superFullName = ticket.getAgent().getFirstName()+" "+ticket.getAgent().getLastName();
         }
-        String eventDesc = "A New Ticket has been submitted by "+userFullName+
-                ", and sent to "+superFullName+".";
-        Event e = new Event(null, eventName, eventDesc, BigInteger.valueOf(0), ticket.getId(), EventModule.Support, EventType.New);
-        eventService.dispatchEvent(e);
+        AppEvent notifyEvent = eventService.createEvent(new AppEvent(
+                null,
+                "A New Ticket was Submitted by "+currentUser.getFullName(),
+                "A New Ticket has been submitted by "+currentUser.getFullName()+ ", and sent to "+superFullName+".",
+                ticket.getId(),
+                EventModule.Support,
+                EventType.New,
+                new ArrayList<>()
+        ));
 
         return "redirect:/support/ticket/" + ticket.getId();
     }

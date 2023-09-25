@@ -21,6 +21,7 @@ public class OrderRequest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "order_request_gen", sequenceName = "order_request_seq", allocationSize = 1)
     private BigInteger id;
     private LocalDateTime requestDate;
     private String requestNote;

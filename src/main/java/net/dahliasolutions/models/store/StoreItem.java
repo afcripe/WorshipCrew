@@ -3,10 +3,7 @@ package net.dahliasolutions.models.store;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import net.dahliasolutions.models.department.DepartmentRegional;
 import net.dahliasolutions.models.position.Position;
 
@@ -14,7 +11,8 @@ import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,6 +21,7 @@ public class StoreItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "store_item_gen", sequenceName = "store_item_seq", allocationSize = 1)
     private BigInteger id;
     private String name;
     private boolean specialOrder;

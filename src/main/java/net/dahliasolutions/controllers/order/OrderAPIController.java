@@ -90,11 +90,12 @@ public class OrderAPIController {
                                 "A Request Has Been Cancelled",
                                 orderRequest.get().getId().toString(),
                                 BigInteger.valueOf(0),
+                                null,
                                 false,
                                 false,
                                 null,
                                 EventModule.Request,
-                                NotificationType.Cancelled,
+                                EventType.Cancelled,
                                 orderRequest.get().getSupervisor(),
                                 BigInteger.valueOf(0)
 
@@ -105,12 +106,15 @@ public class OrderAPIController {
 //                BrowserMessage returnMsg2 = emailService.sendUserRequest(emailDetailsSupervisor, orderRequest.get());
 
                 // send any additional notifications
-                String userFullName = orderRequest.get().getUser().getFirstName()+" "+orderRequest.get().getUser().getLastName();
-                String eventName = "A Request Has Been Cancelled.";
-                String eventDesc = "Request "+orderRequest.get().getId().toString()+" has been cancelled by "+userFullName;
-                    // cancel
-                Event e = new Event(null, eventName, eventDesc, orderRequest.get().getId(), "", EventModule.Request, EventType.Cancelled);
-                eventService.dispatchEvent(e);
+                AppEvent notifyEvent = eventService.createEvent(new AppEvent(
+                        null,
+                        "A Request Has Been Cancelled.",
+                        "Request "+orderRequest.get().getId().toString()+" has been cancelled by "+orderRequest.get().getUser().getFullName(),
+                        orderRequest.get().getId().toString(),
+                        EventModule.Request,
+                        EventType.Cancelled,
+                        new ArrayList<>()
+                ));
             }
         }
 
@@ -163,16 +167,20 @@ public class OrderAPIController {
         BrowserMessage returnMsg = emailService.sendUserRequest(emailDetailsUser, orderRequest.get());
 
         // send any additional notifications
-        String userFullName = user.getFirstName()+" "+user.getLastName();
-        String eventName = "Request "+orderRequest.get().getId()+" Status has been updated to "+setStatus;
-        String eventDesc = "The Status for Request "+orderRequest.get().getId()+
-                " has been updated to ["+setStatus+"] by "+userFullName;
-        Event e = new Event(null, eventName, eventDesc, orderRequest.get().getId(), "", EventModule.Request, EventType.Changed);
-        eventService.dispatchEvent(e);
+        AppEvent notifyEvent = eventService.createEvent(new AppEvent(
+                null,
+                "Request "+orderRequest.get().getId()+" Status has been updated to "+setStatus,
+                "The Status for Request "+orderRequest.get().getId()+
+                        " has been updated to ["+setStatus+"] by "+user.getFullName(),
+                orderRequest.get().getId().toString(),
+                EventModule.Request,
+                EventType.Updated,
+                new ArrayList<>()
+        ));
         //closed
         if (setStatus.equals(OrderStatus.Complete)) {
-            e.setType(EventType.Closed);
-            eventService.dispatchEvent(e);
+            notifyEvent.setType(EventType.Closed);
+            eventService.createEvent(notifyEvent);
         }
 
         return statusModel;
@@ -214,11 +222,12 @@ public class OrderAPIController {
                             "The Status of a Request Item Changed",
                             "",
                             requestItem.get().getId(),
+                            null,
                             false,
                             false,
                             null,
                             EventModule.Request,
-                            NotificationType.ItemUpdated,
+                            EventType.ItemUpdated,
                             requestItem.get().getOrderRequest().getSupervisor(),
                             orderNote.getId()
 
@@ -230,16 +239,20 @@ public class OrderAPIController {
 
 
             // send any additional notifications
-            String userFullName = user.getFirstName()+" "+user.getLastName();
-            String eventName = "A Requested Item Status was changed to "+setStatus;
-            String eventDesc = "An Item Status for Request ID "+requestItem.get().getOrderRequest().getId()+
-                    " has been updated to ["+setStatus+"] by "+userFullName;
-            Event e = new Event(null, eventName, eventName, requestItem.get().getOrderRequest().getId(), "", EventModule.Request, EventType.ItemUpdated);
-            eventService.dispatchEvent(e);
+            AppEvent notifyEvent = eventService.createEvent(new AppEvent(
+                    null,
+                    "A Requested Item Status was changed to "+setStatus,
+                    "An Item Status for Request ID "+requestItem.get().getOrderRequest().getId()+
+                            " has been updated to ["+setStatus+"] by "+user.getFullName(),
+                    requestItem.get().getOrderRequest().getId().toString(),
+                    EventModule.Request,
+                    EventType.ItemUpdated,
+                    new ArrayList<>()
+            ));
             // complete
             if (setStatus.equals(OrderStatus.Complete)) {
-                e.setType(EventType.Closed);
-                eventService.dispatchEvent(e);
+                notifyEvent.setType(EventType.Closed);
+                eventService.createEvent(notifyEvent);
             }
         }
 
@@ -276,12 +289,16 @@ public class OrderAPIController {
                             user));
 
                     // send any additional notifications
-                    String userFullName = user.getFirstName()+" "+user.getLastName();
-                    String eventName = "Request "+orderRequest.get().getId()+" Supervisor was changed to "+newSuper.get().getFirstName()+" "+newSuper.get().getLastName();
-                    String eventDesc = "Request ID "+orderRequest.get().getId()+" was assigned to "+
-                            newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+" by "+userFullName;
-                    Event e = new Event(null, eventName, eventDesc, orderRequest.get().getId(), "", EventModule.Request, EventType.Changed);
-                    eventService.dispatchEvent(e);
+                    AppEvent notifyEvent = eventService.createEvent(new AppEvent(
+                            null,
+                            "Request "+orderRequest.get().getId()+" Supervisor was changed to "+newSuper.get().getFirstName()+" "+newSuper.get().getLastName(),
+                            "Request ID "+orderRequest.get().getId()+" was assigned to "+
+                                    newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+" by "+user.getFullName(),
+                            orderRequest.get().getId().toString(),
+                            EventModule.Request,
+                            EventType.Updated,
+                            new ArrayList<>()
+                    ));
                 } else {
                     noteDetail = newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+" was add to the request.";
 
@@ -299,12 +316,16 @@ public class OrderAPIController {
                             user));
 
                     // send any additional notifications
-                    String userFullName = user.getFirstName()+" "+user.getLastName();
-                    String eventName = newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+" was added to a Request "+orderRequest.get().getId();
-                    String eventDesc = newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+
-                            " has been added to Request "+orderRequest.get().getId()+" by "+userFullName;
-                    Event e = new Event(null, eventName, eventDesc, orderRequest.get().getId(), "", EventModule.Request, EventType.Changed);
-                    eventService.dispatchEvent(e);
+                    AppEvent notifyEvent = eventService.createEvent(new AppEvent(
+                            null,
+                            newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+" was added to Request "+orderRequest.get().getId(),
+                            newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+
+                                    " has been added to Request "+orderRequest.get().getId()+" by "+user.getFullName(),
+                            orderRequest.get().getId().toString(),
+                            EventModule.Request,
+                            EventType.Updated,
+                            new ArrayList<>()
+                    ));
                 }
             }
         }
@@ -346,12 +367,16 @@ public class OrderAPIController {
                         user));
 
                 // send any additional notifications
-                String userFullName = user.getFirstName()+" "+user.getLastName();
-                String eventName = newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+" was removed from Request "+orderRequest.get().getId();
-                String eventDesc = newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+
-                        " was removed from Request "+orderRequest.get().getId()+" by "+userFullName;
-                Event e = new Event(null, eventName, eventDesc, orderRequest.get().getId(), "", EventModule.Request, EventType.Changed);
-                eventService.dispatchEvent(e);
+                AppEvent notifyEvent = eventService.createEvent(new AppEvent(
+                        null,
+                        newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+" was removed from Request "+orderRequest.get().getId(),
+                        newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+
+                                " was removed from Request "+orderRequest.get().getId()+" by "+user.getFullName(),
+                        orderRequest.get().getId().toString(),
+                        EventModule.Request,
+                        EventType.Updated,
+                        new ArrayList<>()
+                ));
             } else {
                 session.setAttribute("msgError", "Cannot remove someone who is assigned to request.");
                 return new AddSupervisorModel(BigInteger.valueOf(0), BigInteger.valueOf(0), false);
@@ -400,11 +425,12 @@ public class OrderAPIController {
                                 "You have a New Request item to Fulfill",
                                 requestItem.get().getOrderRequest().getId().toString(),
                                 requestItem.get().getId(),
+                                null,
                                 false,
                                 false,
                                 null,
                                 EventModule.Request,
-                                NotificationType.NewItem,
+                                EventType.NewItem,
                                 newSuper.get(),
                                 BigInteger.valueOf(0)
 
@@ -416,13 +442,17 @@ public class OrderAPIController {
 //                BrowserMessage returnMsg2 = emailService.sendSupervisorItemRequest(emailDetailsSupervisor, requestItem.get(), requestItem.get().getOrderRequest().getSupervisor().getId());
 
                 // send any additional notifications
-                String userFullName = user.getFirstName()+" "+user.getLastName();
-                String eventName = newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+" has been made a Supervisor on an item for request "+requestItem.get().getOrderRequest().getId();
-                String eventDesc = "An item in Request "+requestItem.get().getOrderRequest().getId()+" was assigned to "+
-                        newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+
-                        " by "+userFullName;
-                Event e = new Event(null, eventName, eventDesc, requestItem.get().getOrderRequest().getId(), "", EventModule.Request, EventType.Changed);
-                eventService.dispatchEvent(e);
+                AppEvent notifyEvent = eventService.createEvent(new AppEvent(
+                        null,
+                        newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+" has been made a Supervisor on an item for request "+requestItem.get().getOrderRequest().getId(),
+                        "An item in Request "+requestItem.get().getOrderRequest().getId()+" was assigned to "+
+                                newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+
+                                " by "+user.getFullName(),
+                        requestItem.get().getOrderRequest().getId().toString(),
+                        EventModule.Request,
+                        EventType.Updated,
+                        new ArrayList<>()
+                ));
             }
         }
         return supervisorModel;
@@ -452,11 +482,12 @@ public class OrderAPIController {
                             "A Request Reason has been Updated",
                             request.get().getId().toString(),
                             BigInteger.valueOf(0),
+                            null,
                             false,
                             false,
                             null,
                             EventModule.Request,
-                            NotificationType.Updated,
+                            EventType.Updated,
                             request.get().getSupervisor(),
                             BigInteger.valueOf(0)
 
@@ -466,12 +497,16 @@ public class OrderAPIController {
 //            BrowserMessage returnMsg2 = emailService.sendUserRequest(emailDetailsSupervisor, request.get());
 
             // send any additional notifications
-            String userFullName = request.get().getUser()+" "+request.get().getUser();
-            String eventName = "A Request Reason was updated by "+userFullName;
-            String eventDesc = "A Request Reason for Request with ID, "+request.get().getId()+
-                    ", was update to ("+requestModel.name()+") by "+userFullName;
-            Event e = new Event(null, eventName, eventDesc, request.get().getId(), "", EventModule.Request, EventType.Changed);
-            eventService.dispatchEvent(e);
+            AppEvent notifyEvent = eventService.createEvent(new AppEvent(
+                    null,
+                    "A Request Reason was updated by "+request.get().getUser().getFullName(),
+                    "A Request Reason for Request with ID, "+request.get().getId()+
+                            ", was update to ("+requestModel.name()+") by "+request.get().getUser().getFullName(),
+                    request.get().getId().toString(),
+                    EventModule.Request,
+                    EventType.Updated,
+                    new ArrayList<>()
+            ));
 
             return 1;
         }

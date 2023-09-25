@@ -1,9 +1,6 @@
 package net.dahliasolutions.models.mail;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,8 +15,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 public class MailerLinks {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "mailer_links_generator", sequenceName = "mailer_links_seq", allocationSize = 1)
     private BigInteger id;
     private BigInteger userId;
     private BigInteger serviceId;

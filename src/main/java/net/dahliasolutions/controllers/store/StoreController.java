@@ -17,6 +17,9 @@ import net.dahliasolutions.services.position.PositionService;
 import net.dahliasolutions.services.store.*;
 import net.dahliasolutions.services.user.UserService;
 import net.dahliasolutions.services.wiki.WikiPostService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -60,11 +63,11 @@ public class StoreController {
         model.addAttribute("showCategories", true);
     }
 
-    @GetMapping("")
-    public String goStoreHome(Model model, HttpSession session) {
-        redirectService.setHistory(session, "/store");
+    @GetMapping()
+    public String goStoreHome(@RequestParam Optional<Integer> page, @RequestParam Optional<Integer> elements, Model model, HttpSession session) {
         AdminSettings adminSettings = adminSettingsService.getAdminSettings();
         if (!adminSettings.getStoreHome().equals("")) {
+            redirectService.setHistory(session, "/store");
             model.addAttribute("wikiPost", getStoreHomeFromPath(adminSettings.getStoreHome()));
             return "store/storeHome";
         }
@@ -72,44 +75,100 @@ public class StoreController {
         User user = (User) auth.getPrincipal();
         DepartmentRegional department = departmentService.findByName(user.getDepartment().getName()).get();
 
-        List<StoreItem> itemList;
+        // create pageable request
+        if (page.isEmpty()) {
+            page = Optional.of(0);
+        }
+        if (elements.isEmpty()){
+            elements = Optional.of(2);
+        }
+        Pageable pageRequest = PageRequest.of(page.get(), elements.get());
+
+        Page<StoreItem> itemList;
         if (allowByAdmin()) {
-            itemList = storeItemService.findAll();
+            itemList = storeItemService.findAll(pageRequest);
         } else {
             if (adminSettings.isRestrictStorePosition() && adminSettings.isRestrictStoreDepartment()) {
-                itemList = storeItemService.findAllByAvailableAndPositionListContainsAndDepartment(user.getPosition(), department.getId());
+                //itemList = storeItemService.findAllByAvailableAndPositionListContainsAndDepartment(user.getPosition(), department.getId());
+                itemList = storeItemService.findAllByAvailableAndDepartmentAndPositionList(true, department, user.getPosition(), pageRequest);
             } else if (adminSettings.isRestrictStorePosition()) {
-                itemList = storeItemService.findAllByAvailableAndPositionListContains(user.getPosition());
+                //itemList = storeItemService.findAllByAvailableAndPositionListContains(user.getPosition());
+                itemList = storeItemService.findAllByAvailableAndPositionList(true, user.getPosition(), pageRequest);
             } else if (adminSettings.isRestrictStoreDepartment()) {
-                itemList = storeItemService.findAllByAvailableAndDepartment(department.getId());
+                itemList = storeItemService.findAllByAvailableAndDepartment(true, department, pageRequest);
             } else {
-                itemList = storeItemService.findAllByAvailable();
+                itemList = storeItemService.findAllByAvailable(true, pageRequest);
             }
         }
 
         model.addAttribute("storeItems", itemList);
+        redirectService.setHistory(session, "/store");
         return "store/index";
     }
 
     @GetMapping("/{category}/{subCategory}")
-    public String goStoreCategory(@PathVariable String category, @PathVariable String subCategory, Model model, HttpSession session) {
-        redirectService.setHistory(session, "/store/"+category+"/"+subCategory);
-        String selectCategory = "";
-        String selectSubCategory = "";
+    public String goStoreCategory(@RequestParam Optional<Integer> page, @RequestParam Optional<Integer> elements, @PathVariable String category, @PathVariable Optional<String> subCategory, Model model, HttpSession session) {
+        AdminSettings adminSettings = adminSettingsService.getAdminSettings();
 
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        DepartmentRegional department = departmentService.findByName(user.getDepartment().getName()).get();
+
+        String subName = "";
+        if (subCategory.isPresent()) {
+            subName = subCategory.get();
+        }
         Optional<StoreCategory> storeCategory = categoryService.findByName(category);
-        Optional<StoreSubCategory> storeSubCategory = subCategoryService.findByNameAndCategoryId(subCategory, storeCategory.get().getId());
+        Optional<StoreSubCategory> storeSubCategory = subCategoryService.findByNameAndCategoryId(subName, storeCategory.get().getId());
 
-        List<StoreItem> itemList = new ArrayList<>();
-        if (storeSubCategory.isPresent()) {
-            itemList = storeItemService.findBySubCategory(storeSubCategory.get());
-            selectSubCategory = storeSubCategory.get().getName();
-            selectCategory = storeCategory.get().getName();
+        // create pageable request
+        if (page.isEmpty()) {
+            page = Optional.of(0);
+        }
+        if (elements.isEmpty()){
+            elements = Optional.of(2);
+        }
+        Pageable pageRequest = PageRequest.of(page.get(), elements.get());
+
+        Page<StoreItem> itemList;
+        if (allowByAdmin()) {
+            if (storeSubCategory.isPresent()) {
+                itemList = storeItemService.findAllByAvailableAndSubCategory(true, storeSubCategory.get(), pageRequest);
+            } else {
+                itemList = storeItemService.findAllByAvailableAndCategory(true, storeCategory.get(), pageRequest);
+            }
+        } else {
+            if (adminSettings.isRestrictStorePosition() && adminSettings.isRestrictStoreDepartment()) {
+                if (storeSubCategory.isPresent()) {
+                    itemList = storeItemService.findAllByAvailableAndSubCategoryAndDepartmentAndPositionList(true, storeSubCategory.get(), department, user.getPosition(), pageRequest);
+                } else {
+                    itemList = storeItemService.findAllByAvailableAndCategoryAndDepartmentAndPositionList(true, storeCategory.get(), department, user.getPosition(), pageRequest);
+                }
+            } else if (adminSettings.isRestrictStorePosition()) {
+                if (storeSubCategory.isPresent()) {
+                    itemList = storeItemService.findAllByAvailableAndSubCategoryAndPositionList(true, storeSubCategory.get(), user.getPosition(), pageRequest);
+                } else {
+                    itemList = storeItemService.findAllByAvailableAndCategoryAndPositionList(true, storeCategory.get(), user.getPosition(), pageRequest);
+                }
+            } else if (adminSettings.isRestrictStoreDepartment()) {
+                if (storeSubCategory.isPresent()) {
+                    itemList = storeItemService.findAllByAvailableAndSubCategoryAndDepartment(true, storeSubCategory.get(), department, pageRequest);
+                } else {
+                    itemList = storeItemService.findAllByAvailableAndCategoryAndDepartment(true, storeCategory.get(), department, pageRequest);
+                }
+            } else {
+                if (storeSubCategory.isPresent()) {
+                    itemList = storeItemService.findAllByAvailableAndSubCategory(true, storeSubCategory.get(), pageRequest);
+                } else {
+                    itemList = storeItemService.findAllByAvailableAndCategory(true, storeCategory.get(), pageRequest);
+                }
+            }
         }
 
+
         model.addAttribute("storeItems", itemList);
-        model.addAttribute("selectedCategory", selectCategory);
-        model.addAttribute("selectedSubCategory", selectSubCategory);
+        model.addAttribute("selectedCategory", category);
+        model.addAttribute("selectedSubCategory", subName);
+        redirectService.setHistory(session, "/store/"+category+"/"+subName);
         return "store/index";
     }
 
@@ -196,11 +255,15 @@ public class StoreController {
 
         // send any additional notifications
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String userFullName = user.getFirstName()+" "+user.getLastName();
-        String eventName = userFullName+"Created a new store item.";
-        String eventDesc = newItem.getName()+" was added to the store by "+userFullName;
-        Event e = new Event(null, eventName, eventDesc, newItem.getId(), "", EventModule.Store, EventType.New);
-        eventService.dispatchEvent(e);
+        AppEvent notifyEvent = eventService.createEvent(new AppEvent(
+                null,
+                user.getFullName()+" Created a new store item.",
+                newItem.getName()+" was added to the store by "+user.getFullName(),
+                newItem.getId().toString(),
+                EventModule.Store,
+                EventType.New,
+                new ArrayList<>()
+        ));
 
         return "redirect:/store/item/"+newItem.getId().toString();
     }
@@ -331,11 +394,15 @@ public class StoreController {
 
         // send any additional notifications
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String userFullName = user.getFirstName()+" "+user.getLastName();
-        String eventName = userFullName+"Updated a store item.";
-        String eventDesc = storeItem.get().getName()+" was updated by "+userFullName;
-        Event e = new Event(null, eventName, eventDesc, storeItem.get().getId(), "", EventModule.Store, EventType.Changed);
-        eventService.dispatchEvent(e);
+        AppEvent notifyEvent = eventService.createEvent(new AppEvent(
+                null,
+                user.getFullName()+"Updated a store item.",
+                storeItem.get().getName()+" was updated by "+user.getFullName(),
+                storeItem.get().getId().toString(),
+                EventModule.Store,
+                EventType.Updated,
+                new ArrayList<>()
+        ));
 
         return "redirect:/store/item/"+storeItemModel.id().toString();
     }
@@ -406,12 +473,46 @@ public class StoreController {
 
     @GetMapping("/search/{searchTerm}")
     public String searchArticle(@PathVariable String searchTerm, Model model, HttpSession session) {
-        redirectService.setHistory(session, "/store/search/title/"+searchTerm);
         String searcher = URLDecoder.decode(searchTerm, StandardCharsets.UTF_8);
+
+        AdminSettings adminSettings = adminSettingsService.getAdminSettings();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) auth.getPrincipal();
+        DepartmentRegional department = departmentService.findByName(user.getDepartment().getName()).get();
+
+        List<StoreItem> searchList = storeItemService.searchAll(searcher);
         List<StoreItem> itemList = storeItemService.searchAll(searcher);
+        if (allowByAdmin()) {
+            itemList = searchList;
+        } else {
+            if (adminSettings.isRestrictStorePosition() && adminSettings.isRestrictStoreDepartment()) {
+                for (StoreItem item : searchList) {
+                    if (item.getPositionList().contains(user.getPosition()) && item.getDepartment().equals(department)) {
+                        itemList.add(item);
+                    }
+                }
+            } else if (adminSettings.isRestrictStorePosition()) {
+                for (StoreItem item : searchList) {
+                    if (item.getPositionList().contains(user.getPosition())) {
+                        itemList.add(item);
+                    }
+                }
+            } else if (adminSettings.isRestrictStoreDepartment()) {
+                for (StoreItem item : searchList) {
+                    if (item.getDepartment().equals(department)) {
+                        itemList.add(item);
+                    }
+                }
+            } else {
+                for (StoreItem item : searchList) {
+                    itemList = searchList;
+                }
+            }
+        }
 
         model.addAttribute("storeItems", itemList);
         model.addAttribute("searchTerm", searcher);
+        redirectService.setHistory(session, "/store/search/title/"+searchTerm);
         return "store/index";
     }
 
@@ -444,7 +545,7 @@ public class StoreController {
         Collection<UserRoles> roles = currentUser.getUserRoles();
 
         for (UserRoles role : roles){
-            if (role.getName().equals("ADMIN_WRITE")) {
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("STORE_SUPERVISOR")) {
                 return true;
             }
         }

@@ -19,6 +19,7 @@ public class StoreItemOption {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "store_item_option_gen", sequenceName = "store_item_option_gen", allocationSize = 1)
     private BigInteger id;
     private String name;
 

@@ -18,13 +18,16 @@
     </div>
     <div class="row">
 
-      <div class="row">
+      <div class="row pb-1">
         <div class="col-6 mt-2">
           <div class="form-group" style="display: flex;" th:unless="*{#lists.isEmpty(itemOptions)}">
             <label class="form-control-label">Option:&nbsp;&nbsp;</label>
             <select th:id="*{id}+'-details'" class="form-control">
               <option th:each="opt : *{itemOptions}" th:value="${opt.name}" th:text="${opt.name}"></option>
             </select>
+          </div>
+          <div class="form-group" style="display: flex;" th:if="*{#lists.isEmpty(itemOptions)}" th:onclick="navToItem([[*{id}]])">
+              <div style="flex-grow: 1">No Options Available</div>
           </div>
         </div>
 

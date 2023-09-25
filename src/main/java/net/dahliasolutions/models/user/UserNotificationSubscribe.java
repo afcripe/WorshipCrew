@@ -19,6 +19,7 @@ public class UserNotificationSubscribe {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "user_notification_subscribe_gen", sequenceName = "user_notification_subscribe_seq", allocationSize = 1)
     private BigInteger id;
 
     @Enumerated

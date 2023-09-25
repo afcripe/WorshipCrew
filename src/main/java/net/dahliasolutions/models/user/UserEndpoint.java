@@ -15,6 +15,7 @@ public class UserEndpoint {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "user_endpoint_gen", sequenceName = "user_endpoint_seq", allocationSize = 1)
     private BigInteger id;
     private String name;
     private String token;

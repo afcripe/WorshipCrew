@@ -18,7 +18,6 @@ import java.util.List;
 public class AppRequest {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private BigInteger id;
     private LocalDateTime requestDate;
     private String requestNote;

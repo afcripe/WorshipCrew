@@ -2,8 +2,8 @@ package net.dahliasolutions.controllers.mail;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import net.dahliasolutions.models.AppEvent;
 import net.dahliasolutions.models.BrowserMessage;
-import net.dahliasolutions.models.Event;
 import net.dahliasolutions.models.EventModule;
 import net.dahliasolutions.models.EventType;
 import net.dahliasolutions.models.mail.EmailDetails;
@@ -32,7 +32,6 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -206,10 +205,15 @@ public class EmailController {
             ticketService.save(ticket.get());
 
             // send any additional notifications
-            String eventName = "Ticket "+ticket.get().getId()+" was acknowledged by "+agent.get().getFullName();
-            String eventDesc = "Ticket "+ticket.get().getId()+" was acknowledged by "+agent.get().getFullName()+" via email link.";
-            Event e = new Event(null, eventName, eventDesc, BigInteger.valueOf(0), ticket.get().getId(), EventModule.Support, EventType.Changed);
-            eventService.dispatchEvent(e);
+            AppEvent notifyEvent = eventService.createEvent(new AppEvent(
+                    null,
+                    "Ticket "+ticket.get().getId()+" was acknowledged by "+agent.get().getFullName(),
+                    "Ticket "+ticket.get().getId()+" was acknowledged by "+agent.get().getFullName()+" via email link.",
+                    ticket.get().getId(),
+                    EventModule.Support,
+                    EventType.New,
+                    new ArrayList<>()
+            ));
         }
 
         mailerLinks.setForceExpire(true);
@@ -239,11 +243,15 @@ public class EmailController {
                 ticketService.save(ticket.get());
 
                 // send any additional notifications
-                String eventName = "Ticket "+ticket.get().getId()+" was accepted by "+agent.get().getFullName();
-                String eventDesc = "Ticket "+ticket.get().getId()+" was accepted by "+agent.get().getFullName()+
-                        " via email link, and has been assigned as primary agent.";
-                Event e = new Event(null, eventName, eventDesc, BigInteger.valueOf(0), ticket.get().getId(), EventModule.Support, EventType.Changed);
-                eventService.dispatchEvent(e);
+                AppEvent notifyEvent = eventService.createEvent(new AppEvent(
+                        null,
+                        "Ticket "+ticket.get().getId()+" was accepted by "+agent.get().getFullName(),
+                        "Ticket "+ticket.get().getId()+" was accepted by "+agent.get().getFullName(),
+                        ticket.get().getId(),
+                        EventModule.Support,
+                        EventType.New,
+                        new ArrayList<>()
+                ));
             }
 
             // force expire mailerLink

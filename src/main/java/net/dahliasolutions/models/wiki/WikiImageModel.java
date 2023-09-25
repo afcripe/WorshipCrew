@@ -17,7 +17,6 @@ import java.math.BigInteger;
 public class WikiImageModel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private BigInteger id;
     private String name;
     private String description;

@@ -20,6 +20,7 @@ public class PermissionTemplate {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "position_template_gen", sequenceName = "position_template_seq", allocationSize = 1)
     private BigInteger id;
     private String name;
     private boolean defaultTemplate;

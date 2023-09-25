@@ -26,6 +26,14 @@
                         </li>
                         </th:block>
                     </ul>
+
+                    <ul class="dropdown-menu category-dropdown-menu" th:aria-labelledby="*{cat.name}+'dropdown'"
+                        th:if="${#lists.isEmpty(cat.subCategoryList)}">
+                            <li>
+                                <a class="dropdown-item" th:href="'/store/'+${cat.name}+'/'+${cat.name}" th:text="${cat.name}"></a>
+                            </li>
+                    </ul>
+
                 </li>
             </ul>
         </div>
@@ -33,19 +41,33 @@
 
         <div class="flex-fill p-1 pb-4 w-100 mx-2">
 
+            <div class="row mt-2" th:if="${storeItems.totalPages > 1}">
+                <div class="filter-page d-flex">
+                    <ul class="filter-nav-links">
+                        <li th:onclick="navStorePageLeft([[${storeItems.number}]])"><i class="bi bi-caret-left-fill"></i></li>
+                        <th:block th:each="i: ${#numbers.sequence(0, storeItems.totalPages - 1)}">
+                        <li th:classappend="${storeItems.number} == ${i} ? 'current' : ''"
+                            th:onclick="navStorePage([[${i}]])" th:text="${i}"></li>
+                        </th:block>
+                        <li th:onclick="navStorePageRight([[${storeItems.number}]], [[${storeItems.totalPages}]])"><i class="bi bi-caret-right-fill"></i></li>
+                    </ul>
+                </div>
+            </div>
+
+
             <div class="row mt-2">
 
-                <p th:if="${#lists.isEmpty(storeItems)}">No, it's not prime day.</p>
+                <p th:if="${#lists.isEmpty(storeItems.content)}">No, it's not prime day.</p>
 
                 <div th:if="${session.storeLayout == 'list'}">
-                    <div th:each="item : ${storeItems}">
+                    <div th:each="item : ${storeItems.content}" class="pb-1">
                         <div th:replace="~{components/cardStoreItemLine :: cardFragment(${item})}">List</div>
                     </div>
                 </div>
 
                 <div th:if="${session.storeLayout == 'grid'}">
                     <div class="store_grid_wrapper">
-                        <div th:each="item : ${storeItems}">
+                        <div th:each="item : ${storeItems.content}">
                             <div th:replace="~{components/cardStoreItemLG :: cardFragment(${item})}">Card</div>
                         </div>
                     </div>
@@ -96,6 +118,31 @@
 
         function navToItem(id) {
             window.location.href="/store/item/"+id;
+        }
+
+        function navStorePage(i) {
+            let currentURL = new URL(location.toString());
+            if (currentURL.searchParams.has("page")) {
+                console.log(currentURL.searchParams.get("page"))
+                if (currentURL.searchParams.get("page") === i) {
+                    console.log(currentURL.searchParams.get("page"))
+                    return;
+                }
+            }
+            currentURL.searchParams.set("page", i);
+            window.location.href=currentURL;
+        }
+
+        function navStorePageLeft(i) {
+            if (i>0) {
+                navStorePage(i-1)
+            }
+        }
+
+        function navStorePageRight(i, end) {
+            if (i<end-1) {
+                navStorePage(i+1)
+            }
         }
     </script>
 

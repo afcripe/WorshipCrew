@@ -22,7 +22,7 @@ public class NotificationEvent {
     private EventModule module;
 
     @Enumerated
-    private NotificationType type;
+    private EventType type;
 
     private User user;
 }

@@ -311,7 +311,7 @@
       editSubCategoryDisplay.style.display = "block";
       editSubIdDisplay.value = 0;
       editSubNameDisplay.value = "";
-    }
+    }message_users
 
     function editSub(id, name) {
       debugger
@@ -320,6 +320,10 @@
     }
 
     async function updateSub() {
+      if (editSubNameDisplay.value === ""){
+        editSubNameDisplay.focus();
+        return;
+      }
       let formData = new FormData();
           formData.set("id", editSubIdDisplay.value)
           formData.set("name", editSubNameDisplay.value)

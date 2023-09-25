@@ -1,15 +1,12 @@
 package net.dahliasolutions.models.position;
 
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import java.math.BigInteger;
 
 @Data
@@ -21,6 +18,7 @@ public class Position {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "position_gen", sequenceName = "position_seq", allocationSize = 1)
     private BigInteger id;
     private int level;
     private String name;

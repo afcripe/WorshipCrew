@@ -1,9 +1,6 @@
 package net.dahliasolutions.models.wiki;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +17,7 @@ public class WikiTagReference {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "wiki_tag_reference_gen", sequenceName = "wiki_tag_reference_seq", allocationSize = 1)
     private BigInteger id;
     private String name;
     private int referencedTag;

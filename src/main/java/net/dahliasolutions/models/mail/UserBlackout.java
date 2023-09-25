@@ -1,9 +1,6 @@
 package net.dahliasolutions.models.mail;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +18,7 @@ public class UserBlackout {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "user_blackout_generator", sequenceName = "user_blackout_seq", allocationSize = 1)
     private BigInteger id;
     private int blackoutYear;
     private int blackoutMonth;
