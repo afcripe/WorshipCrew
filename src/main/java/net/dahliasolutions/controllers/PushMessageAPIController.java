@@ -36,7 +36,7 @@ public class PushMessageAPIController {
     @PostMapping("/sendtestfiremessage")
     public SingleStringModel sendTestByToken(@ModelAttribute FirebaseMessageModel firebaseMessage) throws FirebaseMessagingException {
         Map<String, String> data = Map.ofEntries(
-                    Map.entry("link", "http://localhost:8081/app"),
+                    Map.entry("link", "https://www.destinyworshipcrew.com/app"),
                     Map.entry("module", ""),
                     Map.entry("moduleId", "")
             );

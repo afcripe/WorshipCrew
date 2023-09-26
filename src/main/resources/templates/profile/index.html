@@ -238,7 +238,7 @@
               let formData = new FormData();
               formData.set("recipientToken", token);
               formData.set("title", "Test Message");
-              formData.set("body", "Test message sent through Spring Boot.");
+              formData.set("body", "Test message from Webapp sent through Spring Boot.");
 
               const response = await fetch('/api/v1/messaging/sendtestfiremessage', {
                 method: 'POST',

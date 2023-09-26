@@ -116,8 +116,8 @@ public class UserAPIController {
             return new BigIntegerStringModel(BigInteger.valueOf(0), "");
         }
 
-        EmailDetails emailDetails = new EmailDetails(user.get().getContactEmail(),"",
-                "Password Change Request", null);
+        EmailDetails emailDetails = new EmailDetails(user.get().getContactEmail(),"Password Change Request",
+                "", null);
         BrowserMessage msg = emailService.sendPasswordResetMail(emailDetails, user.get().getId());
 
         session.setAttribute(msg.getMsgType(), msg.getMessage());

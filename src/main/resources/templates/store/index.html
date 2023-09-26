@@ -43,14 +43,16 @@
 
             <div class="row mt-2" th:if="${storeItems.totalPages > 1}">
                 <div class="filter-page d-flex">
+                    <div class="filter-page-spacer"></div>
                     <ul class="filter-nav-links">
-                        <li th:onclick="navStorePageLeft([[${storeItems.number}]])"><i class="bi bi-caret-left-fill"></i></li>
+                        <li class="filter-nav-padding" th:onclick="navStorePageLeft([[${storeItems.number}]])"><i class="bi bi-caret-left-fill"></i></li>
                         <th:block th:each="i: ${#numbers.sequence(0, storeItems.totalPages - 1)}">
-                        <li th:classappend="${storeItems.number} == ${i} ? 'current' : ''"
+                        <li class="filter-nav-padding" th:classappend="${storeItems.number} == ${i} ? 'current' : ''"
                             th:onclick="navStorePage([[${i}]])" th:text="${i}"></li>
                         </th:block>
-                        <li th:onclick="navStorePageRight([[${storeItems.number}]], [[${storeItems.totalPages}]])"><i class="bi bi-caret-right-fill"></i></li>
+                        <li class="filter-nav-padding" th:onclick="navStorePageRight([[${storeItems.number}]], [[${storeItems.totalPages}]])"><i class="bi bi-caret-right-fill"></i></li>
                     </ul>
+                    <div class="filter-page-spacer"></div>
                 </div>
             </div>
 
@@ -73,6 +75,22 @@
                     </div>
                 </div>
 
+            </div>
+
+
+            <div class="row mt-2" th:if="${storeItems.totalPages > 1}">
+                <div class="filter-page d-flex">
+                    <div class="filter-page-spacer"></div>
+                    <ul class="filter-nav-links">
+                        <li class="filter-nav-padding" th:onclick="navStorePageLeft([[${storeItems.number}]])"><i class="bi bi-caret-left-fill"></i></li>
+                        <th:block th:each="i: ${#numbers.sequence(0, storeItems.totalPages - 1)}">
+                            <li class="filter-nav-padding" th:classappend="${storeItems.number} == ${i} ? 'current' : ''"
+                                th:onclick="navStorePage([[${i}]])" th:text="${i}"></li>
+                        </th:block>
+                        <li class="filter-nav-padding" th:onclick="navStorePageRight([[${storeItems.number}]], [[${storeItems.totalPages}]])"><i class="bi bi-caret-right-fill"></i></li>
+                    </ul>
+                    <div class="filter-page-spacer"></div>
+                </div>
             </div>
 
         </div>

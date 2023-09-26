@@ -6,11 +6,8 @@ import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.FirebaseMessage;
-import ognl.Token;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +20,7 @@ public class FirebaseMessagingService {
                 .builder()
                 .setTitle(firebaseMessage.getTitle())
                 .setBody(firebaseMessage.getBody())
-                .setImage("https://www.destinyworshipexchange.com/img/favicon.png")
+                .setImage("https://www.destinyworshipcrew.com/img/favicon.png")
                 .build();
 
         Message message = Message

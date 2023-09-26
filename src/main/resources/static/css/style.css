@@ -781,8 +781,12 @@
     font-size: medium;
     display: flex;
     vertical-align: middle;
+    text-align: center;
     padding-top: 5px;
     position: relative;
+}
+.filter-page-spacer {
+    flex-grow: 1;
 }
 
 .filter-nav {
@@ -829,6 +833,10 @@
 }
 .notification-edit {
     text-decoration: none;
+}
+.filter-nav-padding {
+    margin-left: 5px;
+    margin-right: 5px;
 }
 
 /* Folder Tree */

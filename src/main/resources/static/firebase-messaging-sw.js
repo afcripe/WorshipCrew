@@ -18,8 +18,7 @@ self.addEventListener('notificationclick', function(event) {
 self.addEventListener('push', function(e) {
 
     const payload = JSON.parse(e.data.text());
-    console.log(payload);
-    let payloadURL = payload.data.link+"/"+payload.data.module+"/"+payload.data.moduleId;
+    let payloadURL = payload.data.link;
     if (payload.data.module !== "") {
         payloadURL += "/"+payload.data.module;
     }if (payload.data.moduleId !== "") {

@@ -22,7 +22,7 @@ public class AppServer {
     public String getResourceURL() { return resourceURL; }
 
     public void setBaseURL() {
-        this.baseURL = "http://localhost:8081";
+        this.baseURL = "https://www.destinyworshipcrew.com";
     }
 
     public void setBaseURL(String baseURL) {

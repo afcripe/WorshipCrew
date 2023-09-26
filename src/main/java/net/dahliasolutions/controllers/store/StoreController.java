@@ -80,7 +80,7 @@ public class StoreController {
             page = Optional.of(0);
         }
         if (elements.isEmpty()){
-            elements = Optional.of(2);
+            elements = Optional.of(15);
         }
         Pageable pageRequest = PageRequest.of(page.get(), elements.get());
 
@@ -125,7 +125,7 @@ public class StoreController {
             page = Optional.of(0);
         }
         if (elements.isEmpty()){
-            elements = Optional.of(2);
+            elements = Optional.of(15);
         }
         Pageable pageRequest = PageRequest.of(page.get(), elements.get());
 

@@ -7,3 +7,13 @@ spring.datasource.password=password
 spring.jpa.hibernate.ddl-auto=none
 
 spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+
+
+
+
+spring.mail.host=mail.noip.com
+spring.mail.port=587
+spring.mail.username=support@destinyworshipexchange.com
+spring.mail.password=1qa2ws3ed4rf
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
