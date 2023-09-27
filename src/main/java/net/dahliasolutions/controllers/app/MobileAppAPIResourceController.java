@@ -79,7 +79,11 @@ public class MobileAppAPIResourceController {
             List<WikiFolder> sub = new ArrayList<>();
             for (WikiFolder f : subs) {
                 if (!f.getFolder().equals(p)) {
-                    sub.add(f);
+                    String fSubString = f.getFolder().substring(p.length());
+                    String[] subDirs = fSubString.split("/");
+                    if(subDirs.length <= 2) {
+                        sub.add(f);
+                    }
                 }
             }
 
@@ -169,7 +173,11 @@ public class MobileAppAPIResourceController {
         List<WikiFolder> sub = new ArrayList<>();
         for (WikiFolder f : subs) {
             if (!f.getFolder().equals(folder)) {
-                sub.add(f);
+                String fSubString = f.getFolder().substring(folder.length());
+                String[] subDirs = fSubString.split("/");
+                if(subDirs.length <= 2) {
+                    sub.add(f);
+                }
             }
         }
 
