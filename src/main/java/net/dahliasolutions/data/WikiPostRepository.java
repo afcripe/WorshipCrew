@@ -14,9 +14,11 @@ public interface WikiPostRepository extends JpaRepository<WikiPost, BigInteger> 
     List<WikiPost> findAllByPublished(Boolean published);
     List<WikiPost> findAllByFolder(String name);
     List<WikiPost> findAllByFolderAndPublished(String name, Boolean published);
+    List<WikiPost> findAllByFolderAndPublishedOrderByPinToTopDesc(String name, Boolean published);
+    Integer countAllByPublished(Boolean published);
 
     @Query(value="SELECT * FROM WIKI_POST WHERE UPPER(TITLE) LIKE UPPER(:s) AND PUBLISHED = TRUE", nativeQuery = true)
-    List<WikiPost> findByTitle(@Param("s") String title);
+    List<WikiPost> findAllByTitle(@Param("s") String title);
 
     @Query(value="SELECT * FROM WIKI_POST WHERE UPPER(TITLE) LIKE UPPER(:s)", nativeQuery = true)
     List<WikiPost> findByTitleIncludeUnpublished(@Param("s") String title);

@@ -18,4 +18,5 @@ public class GroupedWikiPostList {
     private List<WikiPost> wikiPost;
     private int postCount;
     private List<WikiFolder> subFolders;
+    private int pinnedPosts;
 }

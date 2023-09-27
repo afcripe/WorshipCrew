@@ -55,6 +55,12 @@ public class DepartmentController {
                 redirectService.setHistory(session, "/department");
                 return "department/listDepartments";
             }
+            if (role.getName().equals("USER_SUPERVISOR")) {
+                model.addAttribute("departmentList", departmentRegionalService.findAll());
+
+                redirectService.setHistory(session, "/department");
+                return "department/listDepartments";
+            }
             // if director permissions redirect to regional department
             if (role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")) {
                 return "redirect:/department/department/" + user.getDepartment().getRegionalDepartment().getId();

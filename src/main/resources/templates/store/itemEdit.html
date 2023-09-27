@@ -55,6 +55,8 @@
                 document.getElementById('uploadProgress').style.display='none';
                 document.getElementById('btnUploadSubmit').removeAttribute("disabled");
                 document.getElementById('btnUploadCancel').removeAttribute("disabled");
+                // clear file
+                document.getElementById('imageFile').files = null;
                 // close dialog
                 document.getElementById("uploadDialog").close();
               }

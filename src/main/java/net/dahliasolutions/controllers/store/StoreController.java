@@ -84,23 +84,33 @@ public class StoreController {
         }
         Pageable pageRequest = PageRequest.of(page.get(), elements.get());
 
-        Page<StoreItem> itemList;
-        if (allowByAdmin()) {
-            itemList = storeItemService.findAll(pageRequest);
-        } else {
-            if (adminSettings.isRestrictStorePosition() && adminSettings.isRestrictStoreDepartment()) {
-                //itemList = storeItemService.findAllByAvailableAndPositionListContainsAndDepartment(user.getPosition(), department.getId());
-                itemList = storeItemService.findAllByAvailableAndDepartmentAndPositionList(true, department, user.getPosition(), pageRequest);
-            } else if (adminSettings.isRestrictStorePosition()) {
-                //itemList = storeItemService.findAllByAvailableAndPositionListContains(user.getPosition());
-                itemList = storeItemService.findAllByAvailableAndPositionList(true, user.getPosition(), pageRequest);
-            } else if (adminSettings.isRestrictStoreDepartment()) {
-                itemList = storeItemService.findAllByAvailableAndDepartment(true, department, pageRequest);
+        Page<StoreItem> itemList = null;
+        // create loop to make sure page is not out of bounds
+        for (int loop = 1; loop < 2; loop++) {
+            if (allowByAdmin()) {
+                itemList = storeItemService.findAll(pageRequest);
             } else {
-                itemList = storeItemService.findAllByAvailable(true, pageRequest);
+                if (adminSettings.isRestrictStorePosition() && adminSettings.isRestrictStoreDepartment()) {
+                    //itemList = storeItemService.findAllByAvailableAndPositionListContainsAndDepartment(user.getPosition(), department.getId());
+                    itemList = storeItemService.findAllByAvailableAndDepartmentAndPositionList(true, department, user.getPosition(), pageRequest);
+                } else if (adminSettings.isRestrictStorePosition()) {
+                    //itemList = storeItemService.findAllByAvailableAndPositionListContains(user.getPosition());
+                    itemList = storeItemService.findAllByAvailableAndPositionList(true, user.getPosition(), pageRequest);
+                } else if (adminSettings.isRestrictStoreDepartment()) {
+                    itemList = storeItemService.findAllByAvailableAndDepartment(true, department, pageRequest);
+                } else {
+                    itemList = storeItemService.findAllByAvailable(true, pageRequest);
+                }
             }
+            
+            if (itemList.getNumber() >= itemList.getTotalPages()) {
+                pageRequest = PageRequest.of(0, elements.get());
+            } else {
+                break;
+            }
+            
         }
-
+ 
         model.addAttribute("storeItems", itemList);
         redirectService.setHistory(session, "/store");
         return "store/index";
@@ -129,39 +139,49 @@ public class StoreController {
         }
         Pageable pageRequest = PageRequest.of(page.get(), elements.get());
 
-        Page<StoreItem> itemList;
-        if (allowByAdmin()) {
-            if (storeSubCategory.isPresent()) {
-                itemList = storeItemService.findAllByAvailableAndSubCategory(true, storeSubCategory.get(), pageRequest);
-            } else {
-                itemList = storeItemService.findAllByAvailableAndCategory(true, storeCategory.get(), pageRequest);
-            }
-        } else {
-            if (adminSettings.isRestrictStorePosition() && adminSettings.isRestrictStoreDepartment()) {
-                if (storeSubCategory.isPresent()) {
-                    itemList = storeItemService.findAllByAvailableAndSubCategoryAndDepartmentAndPositionList(true, storeSubCategory.get(), department, user.getPosition(), pageRequest);
-                } else {
-                    itemList = storeItemService.findAllByAvailableAndCategoryAndDepartmentAndPositionList(true, storeCategory.get(), department, user.getPosition(), pageRequest);
-                }
-            } else if (adminSettings.isRestrictStorePosition()) {
-                if (storeSubCategory.isPresent()) {
-                    itemList = storeItemService.findAllByAvailableAndSubCategoryAndPositionList(true, storeSubCategory.get(), user.getPosition(), pageRequest);
-                } else {
-                    itemList = storeItemService.findAllByAvailableAndCategoryAndPositionList(true, storeCategory.get(), user.getPosition(), pageRequest);
-                }
-            } else if (adminSettings.isRestrictStoreDepartment()) {
-                if (storeSubCategory.isPresent()) {
-                    itemList = storeItemService.findAllByAvailableAndSubCategoryAndDepartment(true, storeSubCategory.get(), department, pageRequest);
-                } else {
-                    itemList = storeItemService.findAllByAvailableAndCategoryAndDepartment(true, storeCategory.get(), department, pageRequest);
-                }
-            } else {
+        Page<StoreItem> itemList = null;
+        // create loop to make sure page is not out of bounds
+        for (int loop = 1; loop < 2; loop++) {
+            if (allowByAdmin()) {
                 if (storeSubCategory.isPresent()) {
                     itemList = storeItemService.findAllByAvailableAndSubCategory(true, storeSubCategory.get(), pageRequest);
                 } else {
                     itemList = storeItemService.findAllByAvailableAndCategory(true, storeCategory.get(), pageRequest);
                 }
+            } else {
+                if (adminSettings.isRestrictStorePosition() && adminSettings.isRestrictStoreDepartment()) {
+                    if (storeSubCategory.isPresent()) {
+                        itemList = storeItemService.findAllByAvailableAndSubCategoryAndDepartmentAndPositionList(true, storeSubCategory.get(), department, user.getPosition(), pageRequest);
+                    } else {
+                        itemList = storeItemService.findAllByAvailableAndCategoryAndDepartmentAndPositionList(true, storeCategory.get(), department, user.getPosition(), pageRequest);
+                    }
+                } else if (adminSettings.isRestrictStorePosition()) {
+                    if (storeSubCategory.isPresent()) {
+                        itemList = storeItemService.findAllByAvailableAndSubCategoryAndPositionList(true, storeSubCategory.get(), user.getPosition(), pageRequest);
+                    } else {
+                        itemList = storeItemService.findAllByAvailableAndCategoryAndPositionList(true, storeCategory.get(), user.getPosition(), pageRequest);
+                    }
+                } else if (adminSettings.isRestrictStoreDepartment()) {
+                    if (storeSubCategory.isPresent()) {
+                        itemList = storeItemService.findAllByAvailableAndSubCategoryAndDepartment(true, storeSubCategory.get(), department, pageRequest);
+                    } else {
+                        itemList = storeItemService.findAllByAvailableAndCategoryAndDepartment(true, storeCategory.get(), department, pageRequest);
+                    }
+                } else {
+                    if (storeSubCategory.isPresent()) {
+                        itemList = storeItemService.findAllByAvailableAndSubCategory(true, storeSubCategory.get(), pageRequest);
+                    } else {
+                        itemList = storeItemService.findAllByAvailableAndCategory(true, storeCategory.get(), pageRequest);
+                    }
+                }
             }
+
+            if (itemList.getNumber() >= itemList.getTotalPages()) {
+                pageRequest = PageRequest.of(0, elements.get());
+            } else {
+                break;
+            }
+
         }
 
 
@@ -426,6 +446,14 @@ public class StoreController {
         for (User u : users) {
             notificationUsers.add(new BigIntegerStringModel(u.getId(), u.getFirstName()+' '+u.getLastName()));
         }
+
+        // item counts
+        Integer availableItemCount = storeItemService.countAllByAvailable(true);
+        Integer unavailableItemCount = storeItemService.countAllByAvailable(false);
+
+        model.addAttribute("availableItemCount", availableItemCount);
+        model.addAttribute("unavailableItemCount", unavailableItemCount);
+        model.addAttribute("totalItemCount", availableItemCount+unavailableItemCount);
 
         model.addAttribute("categoryList", categoryList);
         model.addAttribute("storeHome", adminSettingsService.getAdminSettings().getStoreHome());

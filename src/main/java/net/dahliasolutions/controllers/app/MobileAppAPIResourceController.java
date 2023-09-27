@@ -84,12 +84,19 @@ public class MobileAppAPIResourceController {
             }
 
             List<WikiPost> posts = wikiPostService.findAllByFolder(p);
+            int pinned = 0;
+            for (WikiPost post : posts) {
+                if (post.isPinToTop()) {
+                    pinned++;
+                }
+            }
             GroupedWikiPostList gp =
                     new GroupedWikiPostList(
                             p.replace("/", ""),
                             posts,
                             posts.size(),
-                            sub);
+                            sub,
+                            pinned);
             folderPosts.add(gp);
         }
 
@@ -113,6 +120,42 @@ public class MobileAppAPIResourceController {
 
     }
 
+    @PostMapping("/article")
+    public ResponseEntity<WikiPost> getResourceArticleByName(@ModelAttribute SingleStringModel stringModel, HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new WikiPost(), HttpStatus.FORBIDDEN);
+        }
+
+        // split folder and name
+        String[] folderList = stringModel.name().split("/");
+        String postURLName = folderList[folderList.length-1];
+        String postName = postURLName.replace("-", " ");
+        String folders = "";
+        WikiPost post = new WikiPost();
+                post.setPublished(false);
+
+        // build folder
+        for ( int i=0; i<folderList.length-1; i++ ) {
+            folders = folders + "/" + folderList[i];
+        }
+
+        // find posts with name
+        List<WikiPost> wikiPostList = wikiPostService.findByTitle(postName);
+        if (wikiPostList.isEmpty()) {
+            return new ResponseEntity<>(new WikiPost(), HttpStatus.BAD_REQUEST);
+        }
+        // return only post in correct folder
+        for (WikiPost p : wikiPostList) {
+            if (p.getFolder().equals(folders)) {
+                post = p;
+            }
+        }
+
+        return new ResponseEntity<>(post, HttpStatus.OK);
+
+    }
+
     @PostMapping("/folder")
     public ResponseEntity<GroupedWikiPostList> getResourceFolder(@ModelAttribute SingleStringModel stringModel, HttpServletRequest request) {
         APIUser apiUser = getUserFromToken(request);
@@ -131,12 +174,19 @@ public class MobileAppAPIResourceController {
         }
 
         List<WikiPost> posts = wikiPostService.findAllByFolder(folder);
+        int pinned = 0;
+        for (WikiPost post : posts) {
+            if (post.isPinToTop()) {
+                pinned++;
+            }
+        }
         GroupedWikiPostList gp =
                 new GroupedWikiPostList(
                         folder,
                         posts,
                         posts.size(),
-                        sub);
+                        sub,
+                        pinned);
 
         return new ResponseEntity<>(gp, HttpStatus.OK);
 

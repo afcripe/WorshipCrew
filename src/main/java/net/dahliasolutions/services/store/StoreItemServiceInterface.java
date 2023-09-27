@@ -29,6 +29,7 @@ public interface StoreItemServiceInterface {
     void deleteById(BigInteger id);
     Integer countByCategory(BigInteger id);
     Integer countBySubCategory(BigInteger id);
+    Integer countAllByAvailable(Boolean available);
 
     Page<StoreItem> findAllByAvailable(boolean available, Pageable pageable);
     Page<StoreItem> findAllByAvailableAndDepartment(boolean available, DepartmentRegional department, Pageable pageable);

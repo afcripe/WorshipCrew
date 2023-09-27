@@ -11,5 +11,6 @@ public record WikiPostModel (
         BigInteger authorId,
         String anonymous,
         String published,
-        String hideInfo) {
+        String hideInfo,
+        String pinToTop) {
 }

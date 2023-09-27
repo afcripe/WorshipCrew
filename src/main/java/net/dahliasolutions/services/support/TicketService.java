@@ -63,6 +63,10 @@ public class TicketService implements TicketServiceInterface {
                 agent = null;
                 agentList = getSupervisors();
                 break;
+            case SupportAgents:
+                agent = null;
+                agentList = getAgents();
+                break;
             case RegionalDepartmentDirector:
                 BigInteger dirId = user.getDepartment().getRegionalDepartment().getDirectorId();
                 agent = userService.findById(dirId).get();
@@ -231,9 +235,31 @@ public class TicketService implements TicketServiceInterface {
         return userList;
     }
 
+    private List<User> getAgents() {
+        Collection<UserRoles> roles = getAgentCollection();
+        List<User> userList = new ArrayList<>();
+        List<User> allUsers = userService.findAll();
+
+        for (User user : allUsers) {
+            for (UserRoles role : user.getUserRoles()) {
+                if (roles.contains(role)) {
+                    userList.add(user);
+                    break;
+                }
+            }
+        }
+        return userList;
+    }
+
     private Collection<UserRoles> getSupervisorCollection() {
         Collection<UserRoles> roles = new ArrayList<>();
         roles.add(rolesService.findByName("SUPPORT_SUPERVISOR").get());
+        return roles;
+    }
+
+    private Collection<UserRoles> getAgentCollection() {
+        Collection<UserRoles> roles = new ArrayList<>();
+        roles.add(rolesService.findByName("SUPPORT_AGENT").get());
         return roles;
     }
 

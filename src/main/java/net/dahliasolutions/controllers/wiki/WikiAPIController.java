@@ -36,6 +36,7 @@ public class WikiAPIController {
         boolean doc = Boolean.valueOf(wikiPostModel.anonymous());
         boolean pub = Boolean.valueOf(wikiPostModel.published());
         boolean info = Boolean.valueOf(wikiPostModel.hideInfo());
+        boolean pin = Boolean.valueOf(wikiPostModel.pinToTop());
 
         // remove line breaks from summary
         String summary = wikiPostModel.summary().replace("\r\n", " ");
@@ -54,6 +55,7 @@ public class WikiAPIController {
                 newPost.setAnonymous(doc);
                 newPost.setPublished(pub);
                 newPost.setHideInfo(info);
+                newPost.setPinToTop(pin);
                 newPost.setTagList(new ArrayList<>());
             return wikiPostService.createWikiPost(newPost).getId();
         }
@@ -66,6 +68,7 @@ public class WikiAPIController {
         wikiPost.get().setAnonymous(doc);
         wikiPost.get().setPublished(pub);
         wikiPost.get().setHideInfo(info);
+        wikiPost.get().setPinToTop(pin);
 
         return wikiPostService.save(wikiPost.get()).getId();
     }

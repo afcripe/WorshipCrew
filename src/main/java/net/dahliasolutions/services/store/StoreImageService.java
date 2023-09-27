@@ -1,5 +1,6 @@
 package net.dahliasolutions.services.store;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.data.StoreImageRepository;
 import net.dahliasolutions.models.store.StoreImage;

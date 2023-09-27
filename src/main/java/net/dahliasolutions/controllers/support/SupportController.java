@@ -134,6 +134,22 @@ public class SupportController {
         List<TicketNotifyTarget> targetList = Arrays.asList(TicketNotifyTarget.values());
         List<User> userList = userService.findAllByRoles("ADMIN_WRITE,SUPPORT_AGENT,SUPPORT_SUPERVISOR");
 
+        List<Ticket> tickets = ticketService.findAll();
+        Integer completeTickets = 0;
+        Integer openTickets = 0;
+        for (Ticket ticket : tickets) {
+            if (ticket.getTicketStatus().equals(TicketStatus.Closed)) {
+                completeTickets++;
+            }
+            if (!ticket.getTicketStatus().equals(TicketStatus.Closed)) {
+                openTickets++;
+            }
+        }
+
+        model.addAttribute("totalTickets", tickets.size());
+        model.addAttribute("openTickets", openTickets);
+        model.addAttribute("completeTickets", completeTickets);
+
         model.addAttribute("priorityList", ticketPriorityService.findAll());
         model.addAttribute("targetList", targetList);
         model.addAttribute("userList", userList);

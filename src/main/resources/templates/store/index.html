@@ -12,7 +12,7 @@
         <div id="mainContent" class="wrapper d-flex">
 
         <div id="storeCategoryNav" class="navbar navbar-light bg-light flex-fill px-2 pt-1 d-none d-md-block category-nav">
-            <h5 id="storeCategoryNavTitle" class="store-category-nav-title" onclick="clearCategory()">Categories</h5>
+            <h5 id="storeCategoryNavTitle" class="category-nav-title" onclick="clearCategory()">Categories</h5>
             <ul class="navbar-nav pb-3" th:each="cat : ${categoryList}">
                 <li class="nav-item dropdown" th:id="*{cat.name}">
                     <a class="nav-link dropdown-toggle" href="#" th:onclick="selectCategory([[*{cat.name}]])"
@@ -41,17 +41,26 @@
 
         <div class="flex-fill p-1 pb-4 w-100 mx-2">
 
-            <div class="row mt-2" th:if="${storeItems.totalPages > 1}">
+            <div class="row mt-2">
                 <div class="filter-page d-flex">
                     <div class="filter-page-spacer"></div>
                     <ul class="filter-nav-links">
                         <li class="filter-nav-padding" th:onclick="navStorePageLeft([[${storeItems.number}]])"><i class="bi bi-caret-left-fill"></i></li>
-                        <th:block th:each="i: ${#numbers.sequence(0, storeItems.totalPages - 1)}">
+                        <th:block th:each="i: ${#numbers.sequence(0, storeItems.totalPages-1)}">
                         <li class="filter-nav-padding" th:classappend="${storeItems.number} == ${i} ? 'current' : ''"
-                            th:onclick="navStorePage([[${i}]])" th:text="${i}"></li>
+                            th:onclick="navStorePage([[${i}]])" th:text="${i+1}"></li>
                         </th:block>
                         <li class="filter-nav-padding" th:onclick="navStorePageRight([[${storeItems.number}]], [[${storeItems.totalPages}]])"><i class="bi bi-caret-right-fill"></i></li>
                     </ul>
+                    <select id="pageItemCount" class="filter-page-item-count" onchange="navStoreCount()">
+                        <option value="5" th:selected="${storeItems.size} == '5'">5</option>
+                        <option value="10" th:selected="${storeItems.size} == '10'">10</option>
+                        <option value="15" th:selected="${storeItems.size} == '15'">15</option>
+                        <option value="20" th:selected="${storeItems.size} == '20'">20</option>
+                        <option value="30" th:selected="${storeItems.size} == '30'">30</option>
+                        <option value="40" th:selected="${storeItems.size} == '40'">40</option>
+                        <option value="50" th:selected="${storeItems.size} == '50'">50</option>
+                    </select>
                     <div class="filter-page-spacer"></div>
                 </div>
             </div>
@@ -83,9 +92,9 @@
                     <div class="filter-page-spacer"></div>
                     <ul class="filter-nav-links">
                         <li class="filter-nav-padding" th:onclick="navStorePageLeft([[${storeItems.number}]])"><i class="bi bi-caret-left-fill"></i></li>
-                        <th:block th:each="i: ${#numbers.sequence(0, storeItems.totalPages - 1)}">
+                        <th:block th:each="i: ${#numbers.sequence(0, storeItems.totalPages-1)}">
                             <li class="filter-nav-padding" th:classappend="${storeItems.number} == ${i} ? 'current' : ''"
-                                th:onclick="navStorePage([[${i}]])" th:text="${i}"></li>
+                                th:onclick="navStorePage([[${i}]])" th:text="${i+1}"></li>
                         </th:block>
                         <li class="filter-nav-padding" th:onclick="navStorePageRight([[${storeItems.number}]], [[${storeItems.totalPages}]])"><i class="bi bi-caret-right-fill"></i></li>
                     </ul>
@@ -138,7 +147,22 @@
             window.location.href="/store/item/"+id;
         }
 
+        function navStoreCount() {
+            let count = document.getElementById("pageItemCount").value;
+            let currentURL = new URL(location.toString());
+            if (currentURL.searchParams.has("elements")) {
+                console.log(currentURL.searchParams.get("elements"))
+                if (currentURL.searchParams.get("elements") === count) {
+                    console.log(currentURL.searchParams.get("elements"))
+                    return;
+                }
+            }
+            currentURL.searchParams.set("elements", count);
+            window.location.href=currentURL;
+        }
+
         function navStorePage(i) {
+            debugger
             let currentURL = new URL(location.toString());
             if (currentURL.searchParams.has("page")) {
                 console.log(currentURL.searchParams.get("page"))
@@ -152,12 +176,13 @@
         }
 
         function navStorePageLeft(i) {
-            if (i>0) {
+            if (i>1) {
                 navStorePage(i-1)
             }
         }
 
         function navStorePageRight(i, end) {
+            debugger
             if (i<end-1) {
                 navStorePage(i+1)
             }

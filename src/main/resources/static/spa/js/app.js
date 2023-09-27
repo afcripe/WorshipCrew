@@ -8,6 +8,7 @@ import Requests from "./Requests.js";
 import RequestView from "./RequestView.js";
 import Resources from "./Resources.js";
 import ResourceView from "./ResourceView.js";
+import ResourceArticle from "./ResourceArticle.js";
 import ResourceFolder from "./ResourceFolder.js";
 import Users from "./Users.js";
 import UserView from "./UserView.js";
@@ -97,6 +98,7 @@ const router = async () => {
         { path: "/app/request/:id", view: RequestView },
         { path: "/app/resources", view: Resources },
         { path: "/app/resource/:id", view: ResourceView },
+        { path: "/app/article/:id", view: ResourceArticle },
         { path: "/app/resourceFolder/:id", view: ResourceFolder },
         { path: "/app/users", view: Users },
         { path: "/app/user/:id", view: UserView },
@@ -944,6 +946,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 let username = document.getElementById("formLogin-username").value;
                 let password = document.getElementById("formLogin-password").value;
                 doLogin(username, password);
+            }
+        }
+
+        if ( e.target.href !== "") {
+            let refArray = "";
+            try {
+                refArray = e.target.href.split("/resource/articles/")
+            } catch (e) {}
+            if (refArray.length > 0) {
+                e.preventDefault();
+                navigateTo("/app/article/"+refArray[refArray.length-1]);
             }
         }
 

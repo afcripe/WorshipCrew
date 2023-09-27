@@ -74,17 +74,29 @@ public class WikiController {
             List<WikiFolder> sub = new ArrayList<>();
             for (WikiFolder f : subs) {
                 if (!f.getFolder().equals(p)) {
-                    sub.add(f);
+                    String fSubString = f.getFolder().substring(p.length());
+                    String[] subDirs = fSubString.split("/");
+                    if(subDirs.length <= 2) {
+                        sub.add(f);
+                    }
                 }
             }
 
             List<WikiPost> posts = wikiPostService.findAllByFolder(p);
+            int pinned = 0;
+            for (WikiPost post : posts) {
+                if (post.isPinToTop()) {
+                    pinned++;
+                }
+            }
+
             GroupedWikiPostList gp =
                     new GroupedWikiPostList(
                             p.replace("/", ""),
                             posts,
                             posts.size(),
-                            sub);
+                            sub,
+                            pinned);
             folderPosts.add(gp);
         }
 
@@ -183,15 +195,15 @@ public class WikiController {
     }
 
     @GetMapping("/folder/{name}")
-    public String getByTags(@PathVariable String name, Model model, HttpSession session) {
+    public String getByFolder(@PathVariable String name, Model model, HttpSession session) {
         redirectService.setHistory(session, "/resource");
-        Optional<WikiFolder> wikiFolder = wikiFolderService.findByFolder(name);
+        Optional<WikiFolder> wikiFolder = wikiFolderService.findByFolder("/"+name);
         if (wikiFolder.isEmpty()) {
             session.setAttribute("msgError", "Folder not Found.");
             return redirectService.pathName(session, "/resource");
         }
 
-        List<WikiPost> wikiPostList = wikiPostService.findAllByFolder(name);
+        List<WikiPost> wikiPostList = wikiPostService.findAllByFolder("/"+name);
 
 
         model.addAttribute("wikiPostList", wikiPostList);
@@ -207,7 +219,7 @@ public class WikiController {
 
         List<GroupedWikiPostList> postList = new ArrayList<>();
         for ( WikiFolder folder : folders ) {
-            postList.add(new GroupedWikiPostList(folder.getFolder(), new ArrayList<>(), 0, new ArrayList<>()));
+            postList.add(new GroupedWikiPostList(folder.getFolder(), new ArrayList<>(), 0, new ArrayList<>(), 0));
         }
         for ( WikiPost post : wikiPostList ) {
             for ( GroupedWikiPostList dir : postList ) {
@@ -261,17 +273,29 @@ public class WikiController {
             List<WikiFolder> sub = new ArrayList<>();
             for (WikiFolder f : subs) {
                 if (!f.getFolder().equals(dir.get().getFolder())) {
-                    sub.add(f);
+                    String fSubString = f.getFolder().substring(dir.get().getFolder().length());
+                    String[] subDirs = fSubString.split("/");
+                    if(subDirs.length <= 2) {
+                        sub.add(f);
+                    }
                 }
             }
 
             List<WikiPost> wikiPostList = wikiPostService.findAllByFolder(dir.get().getFolder());
+            int pinned = 0;
+            for (WikiPost p : wikiPostList) {
+                if (p.isPinToTop()) {
+                    pinned++;
+                }
+            }
+
             GroupedWikiPostList gp =
                     new GroupedWikiPostList(
                             "",
                             wikiPostList,
                             wikiPostList.size(),
-                            sub);
+                            sub,
+                            pinned);
             folderPosts.add(gp);
 
             List<WikiTag> tags = wikiTagService.findAll();
@@ -336,6 +360,7 @@ public class WikiController {
             wikiPost.setAnonymous(false);
             wikiPost.setPublished(false);
             wikiPost.setHideInfo(false);
+            wikiPost.setPinToTop(false);
             wikiPost.setTagList(new ArrayList<>());
 
         model.addAttribute("wikiPost", wikiPost);
@@ -363,6 +388,8 @@ public class WikiController {
 
     @GetMapping("/settings")
     public String getWikiSettings(Model model) {
+        model.addAttribute("publishedCount", wikiPostService.countAllByPublished(true));
+        model.addAttribute("unpublishedCount", wikiPostService.countAllByPublished(false));
         model.addAttribute("wikiHome", adminSettingsService.getAdminSettings().getWikiHome());
         model.addAttribute("portalHome", adminSettingsService.getAdminSettings().getPortalHome());
         model.addAttribute("docsHome", adminSettingsService.getAdminSettings().getDocumentationHome());

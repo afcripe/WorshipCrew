@@ -46,7 +46,7 @@
           <tr th:each="department : ${departmentList}">
             <td><span th:text="${department.name}"/></td>
             <td><span th:text="${department.directorName}"/></td>
-            <td><button class="btn btn-sm btn-outline-success" th:if="${departmentEdit} or ${user.department.name} eq ${department.name}"
+            <td><button class="btn btn-sm btn-outline-success" th:if="${departmentEdit} and ${user.department.name} eq ${department.name}"
                         th:onclick="navToCampusDepartment([[*{id}]], [[${department.id}]]);">Edit</button></td>
           </tr>
           </tbody>

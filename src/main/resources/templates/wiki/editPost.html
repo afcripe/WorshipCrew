@@ -39,6 +39,9 @@
                             &nbsp;&nbsp;
                             <label  for="hideInfo">Hide Info by Default</label>
                             <input id="hideInfo" name="hideInfo" type="checkbox" th:checked="*{hideInfo}"/>
+                            &nbsp;&nbsp;
+                            <label  for="pinToTop">Pin to Top</label>
+                            <input id="pinToTop" name="pinToTop" type="checkbox" th:checked="*{pinToTop}"/>
                         </div>
 
                     </div>
@@ -98,6 +101,10 @@
                 document.getElementById('uploadProgress').style.display='none';
                 document.getElementById('btnUploadSubmit').removeAttribute("disabled");
                 document.getElementById('btnUploadCancel').removeAttribute("disabled");
+                // clear form
+                document.getElementById('fileName').value = "";
+                document.getElementById('fileDescription').value = "";
+                document.getElementById('imageFile').files = null;
                 // close dialog
                 document.getElementById("uploadDialog").close();
             }
@@ -522,11 +529,16 @@
             let myTextContent = tinyMCE.activeEditor.getContent({ format: "text" });
             let mySummary = inputSummary.value;
             if (inputSummary.value === "") {
-                mySummary = myTextContent.substring(0,255);
+                try {
+                    mySummary = myTextContent.substring(0, 254);
+                } catch (e) {
+                    mySummary = "";
+                }
             }
             let myAnonymous = document.getElementById('anonymous');
             let myPublished = document.getElementById('published');
             let myHideInfo = document.getElementById('hideInfo');
+            let myPinToTop = document.getElementById('pinToTop');
 
             let formData = new FormData();
                 formData.set("id", document.getElementById('postId').value);
@@ -538,7 +550,8 @@
                 formData.set("anonymous", myAnonymous.checked);
                 formData.set("published", myPublished.checked);
                 formData.set("hideInfo", myHideInfo.checked);
-            debugger
+                formData.set("pinToTop", myPinToTop.checked);
+
             let newFolder = document.getElementById('folder').value;
             console.log(newFolder);
 

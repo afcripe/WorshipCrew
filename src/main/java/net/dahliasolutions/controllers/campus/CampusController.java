@@ -84,11 +84,9 @@ public class CampusController {
             return redirectService.pathName(session, "campus");
         }
         // verify permission
-        if (!user.getCampus().getId().equals(id)) {
-            if (!campusesView()) {
-                session.setAttribute("msgError", "Access Denied");
-                return redirectService.pathName(session, "campus");
-            }
+        if (!campusView()) {
+            session.setAttribute("msgError", "Access Denied");
+            return redirectService.pathName(session, "campus");
         }
 
         List<DepartmentCampus> departmentList = departmentCampusService.findAllByCampus(campus.get());
@@ -220,14 +218,28 @@ public class CampusController {
         return redirectService.pathName(session, "campus");
     }
 
+    private boolean campusView() {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+        for (UserRoles role : roles){
+            if (role.getName().equals("ADMIN_WRITE")
+                    || role.getName().equals("DIRECTOR_WRITE")
+                    || role.getName().equals("DIRECTOR_READ")
+                    || role.getName().equals("CAMPUS_READ")
+                    || role.getName().equals("CAMPUS_WRITE")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private boolean campusesView() {
         User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Collection<UserRoles> roles = currentUser.getUserRoles();
         for (UserRoles role : roles){
             if (role.getName().equals("ADMIN_WRITE")
-                || role.getName().equals("DIRECTOR_WRITE")
-                || role.getName().equals("DIRECTOR_READ")
-                || role.getName().equals("USER_SUPERVISOR")) {
+                    || role.getName().equals("DIRECTOR_WRITE")
+                    || role.getName().equals("DIRECTOR_READ")) {
                 return true;
             }
         }
@@ -238,7 +250,7 @@ public class CampusController {
         User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Collection<UserRoles> roles = currentUser.getUserRoles();
         for (UserRoles role : roles){
-            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_SUPERVISOR")) {
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("CAMPUS_WRITE")) {
                 return true;
             }
         }
@@ -249,12 +261,12 @@ public class CampusController {
         User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Collection<UserRoles> roles = currentUser.getUserRoles();
         for (UserRoles role : roles){
-            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_SUPERVISOR")) {
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("DIRECTOR_WRITE")) {
                 return true;
             }
-            if (role.getName().equals("CAMPUS_WRITE") && currentUser.getCampus().getId().equals(campus.getId())) {
-                return true;
-            }
+//            if (role.getName().equals("CAMPUS_WRITE") && currentUser.getCampus().getId().equals(campus.getId())) {
+//                return true;
+//            }
         }
         return false;
     }

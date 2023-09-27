@@ -9,8 +9,16 @@
 
   <div class="container my-3">
 
-    <div class="col-xs-1 col-md-2">
-      <h2 class="color-wiki">Settings</h2>
+    <div class="row">
+      <div class="col-12 col-md-4">
+        <h2 class="color-wiki">Settings</h2>
+      </div>
+      <div class="col-12 col-md-4">
+        Published: <span th:text="${publishedCount}"></span>
+      </div>
+      <div class="col-12 col-md-4">
+        Unpublished: <span th:text="${unpublishedCount}"></span>
+      </div>
     </div>
 
     <div class="row">

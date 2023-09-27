@@ -34,7 +34,8 @@ public interface StoreItemRepository extends JpaRepository<StoreItem, BigInteger
     Page<StoreItem> findAllByAvailableAndSubCategoryAndPositionList(boolean available, StoreSubCategory subCategory, Position position, Pageable pageable);
     Page<StoreItem> findAllByAvailableAndSubCategoryAndDepartment(boolean available, StoreSubCategory category, DepartmentRegional department, Pageable pageable);
     Page<StoreItem> findAllByAvailableAndSubCategoryAndDepartmentAndPositionList(boolean available, StoreSubCategory subCategory, DepartmentRegional department, Position position, Pageable pageable);
-
+    List<StoreItem> findBySubCategory(StoreSubCategory subCategory);
+    Integer countAllByAvailable(Boolean available);
 
     @Query(value="SELECT * FROM STORE_ITEM WHERE AVAILABLE = TRUE", nativeQuery = true)
     List<StoreItem> findAllByAvailableNotPaginated();
@@ -48,16 +49,14 @@ public interface StoreItemRepository extends JpaRepository<StoreItem, BigInteger
     List<StoreItem> findAllByAvailableAndDepartmentNotPageable(@Param("departmentId") BigInteger departmentId);
     @Query(value="SELECT * FROM STORE_ITEM WHERE UPPER(NAME) LIKE CONCAT('%',UPPER(:s),'%') OR UPPER(DESCRIPTION) LIKE CONCAT('%',UPPER(:s),'%')", nativeQuery = true)
     List<StoreItem> searchAll(@Param("s") String searchTerm);
-
-    List<StoreItem> findBySubCategory(StoreSubCategory subCategory);
-
     @Query(value="SELECT COUNT(ID) FROM STORE_ITEM WHERE CATEGORY_ID=:i", nativeQuery = true)
     Integer countByCategoryId(@Param("i") BigInteger id);
-
     @Query(value="SELECT COUNT(ID) FROM STORE_ITEM WHERE SUB_CATEGORY_ID=:i", nativeQuery = true)
     Integer countBySubCategoryId(@Param("i") BigInteger id);
     @Query(value = "SELECT * FROM STORE_ITEM_POSITION_LIST WHERE POSITION_LIST_ID = :positionId", nativeQuery = true)
     List<Tuple> findAllByPosition(@Param("positionId") BigInteger positionId);
 
+    @Query(value="SELECT COUNT(ID) FROM STORE_ITEM WHERE AVAILABLE=:available", nativeQuery = true)
+    Integer countByAvailable(@Param("available") Boolean available);
 
 }

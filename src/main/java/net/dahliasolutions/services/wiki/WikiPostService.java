@@ -29,7 +29,7 @@ public class WikiPostService implements WikiPostServiceInterface {
 
     @Override
     public List<WikiPost> findByTitle(String title) {
-        return wikiPostRepository.findByTitle(title);
+        return wikiPostRepository.findAllByTitle(title);
     }
 
     @Override
@@ -59,7 +59,7 @@ public class WikiPostService implements WikiPostServiceInterface {
 
     @Override
     public List<WikiPost> findAllByFolder(String name) {
-        return wikiPostRepository.findAllByFolderAndPublished(name, true);
+        return wikiPostRepository.findAllByFolderAndPublishedOrderByPinToTopDesc(name, true);
     }
 
     @Override
@@ -90,6 +90,11 @@ public class WikiPostService implements WikiPostServiceInterface {
     @Override
     public WikiPost save(WikiPost wikiPost) {
         return wikiPostRepository.save(wikiPost);
+    }
+
+    @Override
+    public Integer countAllByPublished(Boolean published) {
+        return wikiPostRepository.countAllByPublished(published);
     }
 
     @Override

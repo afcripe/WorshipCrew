@@ -140,6 +140,11 @@ public class StoreItemService implements StoreItemServiceInterface {
     }
 
     @Override
+    public Integer countAllByAvailable(Boolean available) {
+        return storeItemRepository.countAllByAvailable(available);
+    }
+
+    @Override
     public Page<StoreItem> findAllByAvailable(boolean available, Pageable pageable) {
         return storeItemRepository.findAllByAvailable(available, pageable);
     }

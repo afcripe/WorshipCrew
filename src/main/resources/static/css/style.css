@@ -99,6 +99,7 @@
 
 }
 .category-nav-title {
+    cursor: pointer;
     color: var(--dwc-page-nav);
 }
 .category-dropdown-menu {
@@ -837,6 +838,12 @@
 .filter-nav-padding {
     margin-left: 5px;
     margin-right: 5px;
+}
+
+.filter-page-item-count {
+    height: 2.2rem;
+    border-radius: 5px;
+    margin-left: 16px;
 }
 
 /* Folder Tree */

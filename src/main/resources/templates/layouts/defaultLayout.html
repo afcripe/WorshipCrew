@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Destiny Worship Exchange</title>
+        <title>Destiny Worship Crew</title>
 
         <meta name="description" content="Dahlia Solutions, LLC">
         <meta name="author" content="Dahlia Solutions, LLC">
@@ -92,10 +92,10 @@
                         <a class="list-group-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'USER_SUPERVISOR')
                                                     or #lists.contains(userRoles,'USER_READ') or #lists.contains(userRoles,'USER_WRITE')}"
                            href="/user">Users</a>
-                        <a class="list-group-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'USER_SUPERVISOR')
+                        <a class="list-group-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')
                                                     or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')}"
                            href="/campus">Campus</a>
-                        <a class="list-group-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'USER_SUPERVISOR')
+                        <a class="list-group-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')
                                                 or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')}"
                            href="/department">Departments</a>
                         <a class="list-group-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'USER_SUPERVISOR')}"
@@ -133,11 +133,11 @@
                             or #lists.contains(userRoles,'USER_READ') or #lists.contains(userRoles,'USER_WRITE')}" href="/user">
                             <i class="bi bi-people"></i>
                         </a>
-                        <a class="list-group-item p-1" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'USER_SUPERVISOR')
+                        <a class="list-group-item p-1" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')
                             or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')}" href="/campus">
                             <i class="bi bi-houses"></i>
                         </a>
-                        <a class="list-group-item p-1" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'USER_SUPERVISOR')
+                        <a class="list-group-item p-1" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')
                             or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')}" href="/department">
                             <i class="bi bi-collection"></i>
                         </a>

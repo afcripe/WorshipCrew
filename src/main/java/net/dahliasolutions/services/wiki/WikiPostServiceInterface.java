@@ -25,6 +25,7 @@ public interface WikiPostServiceInterface {
     List<WikiPost> findByAuthorAndUnpublished(BigInteger authorId);
     List<WikiPost> findByAuthorAndPublished(BigInteger authorId);
     WikiPost save(WikiPost wikiPost);
+    Integer countAllByPublished(Boolean published);
     void mergeTags(WikiTag sourceTag, WikiTag destinationTag);
     void removeTag(WikiTag wikiTag);
     void removeFolder(WikiFolder wikiFolder);

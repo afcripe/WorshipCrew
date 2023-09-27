@@ -79,6 +79,22 @@ public class OrderController {
             notificationUsers.add(new BigIntegerStringModel(u.getId(), u.getFirstName()+' '+u.getLastName()));
         }
 
+        List<OrderRequest> requests = orderService.findAll();
+        Integer completeRequests = 0;
+        Integer openRequests = 0;
+        for (OrderRequest request : requests) {
+            if (request.getOrderStatus().equals(OrderStatus.Complete)) {
+                completeRequests++;
+            }
+            if (!request.getOrderStatus().equals(OrderStatus.Complete) || !request.getOrderStatus().equals(OrderStatus.Cancelled)) {
+                openRequests++;
+            }
+        }
+
+        model.addAttribute("totalRequests", requests.size());
+        model.addAttribute("openRequests", openRequests);
+        model.addAttribute("completeRequests", completeRequests);
+
         model.addAttribute("notificationList", notificationList);
         model.addAttribute("typeList", Arrays.asList(EventType.values()));
         model.addAttribute("notificationUsers", notificationUsers);

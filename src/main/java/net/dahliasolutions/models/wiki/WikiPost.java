@@ -31,6 +31,9 @@ public class WikiPost {
     private boolean published;
     private boolean hideInfo;
 
+    @Column(columnDefinition = "boolean default false")
+    private boolean pinToTop;
+
     @ManyToOne
     private User author;
 

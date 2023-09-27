@@ -20,8 +20,17 @@
 
     <div class="row">
 
-      <div class="col-xs-1 col-md-2">
+      <div class="col-12 col-md-3">
         <h2 class="color-store">Settings</h2>
+      </div>
+      <div class="col-12 col-md-3">
+        Available: <span th:text="${availableItemCount}"></span>
+      </div>
+      <div class="col-12 col-md-3">
+        Unavailable: <span th:text="${unavailableItemCount}"></span>
+      </div>
+      <div class="col-12 col-md-3">
+        Total: <span th:text="${totalItemCount}"></span>
       </div>
 
     </div>

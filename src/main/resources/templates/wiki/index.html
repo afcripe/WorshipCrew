@@ -10,7 +10,7 @@
     <div class="mx-2">
 
         <div class="title-header">
-            <div class="h3 title-header-left" style="flex-grow: 1" th:text="${pageTitle}">Topics</div>
+            <div id="resourcePageTitle" class="h3 title-header-left" style="flex-grow: 1" th:text="${pageTitle}">Topics</div>
             <div class="h4 text-link title-header-right" th:onclick="navToRecent()">Recent Articles</div>
 
         </div>
@@ -24,7 +24,7 @@
                         <!--                                (<span th:text="${topic.postCount}"></span>)-->
                     </div>
                     <div class="article-topic-list">
-                        <div th:each="post : ${topic.wikiPost}" th:object="${post}">
+                        <div th:each="post, pStat : ${topic.wikiPost}" th:object="${post}">
                             <div class="article-topic-entry selectableItem m-2" th:onclick="navToPost([[${post.id}]])">
                                 <div class="article-topic-details">
                                     <div class="article-topic-title"><span th:text="${post.title}"></span></div>
@@ -35,6 +35,7 @@
                                     <div class="article-topic-date">Updated: <span th:text="*{#temporals.format(lastUpdated, 'MMM-dd-yyyy HH:mm')}"></span></div>
                                 </div>
                             </div>
+                            <hr th:if="${pStat.count eq topic.pinnedPosts}">
                         </div>
 
                         <th:block th:if="${not #lists.isEmpty(topic.subFolders)}">
@@ -88,6 +89,7 @@
         /*<![CDATA[*/
         let searchTerm = /*[[${searchTerm}]]*/ " ";
         let hideInfo = /*[[${hideInfo}]]*/ " ";
+        let jsPageTitle = /*[[${pageTitle}]]*/ " ";
         /*]]>*/
         document.getElementById("searchInput").value = searchTerm;
 
@@ -143,7 +145,43 @@
             }
         }
 
+        function setPageTitleLinks() {
+            console.log(jsPageTitle);
+            debugger
+            let titleArray = jsPageTitle.split("/");
+            let titleEl = document.getElementById("resourcePageTitle");
+
+            // set vars for loop
+            titleEl.innerHTML = "";
+            let crumb = "/resource/articles"
+
+            if (titleArray.length === 1) {
+                titleEl.innerHTML += titleArray[0];
+            } if (titleArray.length === 2) {
+                // build title
+                for (let t = 1; t < titleArray.length; t++) {
+                    if (titleArray[t] !== "") {
+                        titleEl.innerHTML += "/ "+titleArray[t];
+                    }
+                }
+            } else if (titleArray.length > 2) {
+                // build breadcrumb
+                for (let a = 1; a < titleArray.length; a++) {
+                    if (a < titleArray.length-1) {
+                        if (titleArray[a] !== "") {
+                            crumb += "/" + titleArray[a];
+                            titleEl.innerHTML += `\/&nbsp;<a href="` + crumb + `">` + titleArray[a] + `</a>&nbsp;`;
+                        }
+                    } else {
+                        titleEl.innerHTML += "/ "+titleArray[a];
+                    }
+                }
+
+            }
+        }
+
         setInfoShow();
+        setPageTitleLinks();
 
     </script>
 
