@@ -11,6 +11,7 @@ import net.dahliasolutions.services.campus.CampusService;
 import net.dahliasolutions.services.department.DepartmentCampusService;
 import net.dahliasolutions.services.department.DepartmentRegionalService;
 import net.dahliasolutions.services.RedirectService;
+import net.dahliasolutions.services.user.UserRolesService;
 import net.dahliasolutions.services.user.UserService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -32,6 +33,7 @@ public class DepartmentController {
     private final DepartmentCampusService departmentCampusService;
     private final UserService userService;
     private final CampusService campusService;
+    private final UserRolesService rolesService;
     private final RedirectService redirectService;
 
     @ModelAttribute
@@ -47,24 +49,25 @@ public class DepartmentController {
         Collection<UserRoles> roles = user.getUserRoles();
         // init the list
 
-        for (UserRoles role : roles){
-            // if admin, continue to listing
-            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_SUPERVISOR")) {
+        if(roles.contains(rolesService.findByName("ADMIN_WRITE").get())) {
+            // if admin list all
+            model.addAttribute("departmentList", departmentRegionalService.findAll());
+            redirectService.setHistory(session, "/department");
+            return "department/listDepartments";
+        }
+        if(roles.contains(rolesService.findByName("USER_SUPERVISOR").get())) {
+            // if user_supervisor and also director, list all
+            if(roles.contains(rolesService.findByName("DIRECTOR_WRITE").get()) ||
+                    roles.contains(rolesService.findByName("DIRECTOR_READ").get())) {
                 model.addAttribute("departmentList", departmentRegionalService.findAll());
-
                 redirectService.setHistory(session, "/department");
                 return "department/listDepartments";
             }
-            if (role.getName().equals("USER_SUPERVISOR")) {
-                model.addAttribute("departmentList", departmentRegionalService.findAll());
-
-                redirectService.setHistory(session, "/department");
-                return "department/listDepartments";
-            }
+        }
+        if(roles.contains(rolesService.findByName("DIRECTOR_WRITE").get()) ||
+                roles.contains(rolesService.findByName("DIRECTOR_READ").get())) {
             // if director permissions redirect to regional department
-            if (role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")) {
-                return "redirect:/department/department/" + user.getDepartment().getRegionalDepartment().getId();
-            }
+            return "redirect:/department/department/" + user.getDepartment().getRegionalDepartment().getId();
         }
         session.setAttribute("msgError", "Problem loading Department");
         return redirectService.pathName(session, "/");
