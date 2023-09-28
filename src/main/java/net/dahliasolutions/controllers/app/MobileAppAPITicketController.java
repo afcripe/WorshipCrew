@@ -131,6 +131,32 @@ public class MobileAppAPITicketController {
         return new ResponseEntity<>(appItemList, HttpStatus.OK);
     }
 
+    @GetMapping("/allopen")
+    public ResponseEntity<List<AppItem>> getTicketsAllOpen(HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
+        }
+
+        List<AppItem> appItemList = new ArrayList<>();
+        List<Ticket> openAgentTicketList = ticketService.findAllOpen();
+
+        for (Ticket tkt : openAgentTicketList) {
+            if (!tkt.getTicketStatus().equals(TicketStatus.Closed)) {
+                appItemList.add(new AppItem(
+                        tkt.getId(),
+                        tkt.getTicketStatus().toString(),
+                        tkt.getTicketDetail(),
+                        tkt.getTicketDate(),
+                        0,
+                        tkt.getUser().getFullName(),
+                        "tickets"));
+            }
+        }
+
+        return new ResponseEntity<>(appItemList, HttpStatus.OK);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<AppTicket> getTicketById(@PathVariable String id, HttpServletRequest request) {
         APIUser apiUser = getUserFromToken(request);

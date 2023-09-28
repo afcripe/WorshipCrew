@@ -2,10 +2,12 @@ import Dashboard from "./Dashboard.js";
 import Login from "./Login.js";
 import Settings from "./Settings.js";
 import Tickets from "./Tickets.js";
+import TicketAll from "./TicketAll.js";
 import TicketView from "./TicketView.js";
 import TicketNew from "./TicketNew.js";
 import Requests from "./Requests.js";
 import RequestView from "./RequestView.js";
+import RequestAll from "./RequestAll.js";
 import Resources from "./Resources.js";
 import ResourceView from "./ResourceView.js";
 import ResourceArticle from "./ResourceArticle.js";
@@ -92,9 +94,11 @@ const router = async () => {
         { path: "/app/login", view: Login },
         { path: "/app/search/:id", view: SearchView },
         { path: "/app/tickets", view: Tickets },
+        { path: "/app/ticketAll", view: TicketAll },
         { path: "/app/ticket/:id", view: TicketView },
         { path: "/app/ticketNew", view: TicketNew },
         { path: "/app/requests", view: Requests },
+        { path: "/app/requestAll", view: RequestAll },
         { path: "/app/request/:id", view: RequestView },
         { path: "/app/resources", view: Resources },
         { path: "/app/resource/:id", view: ResourceView },
@@ -662,6 +666,13 @@ const requestNotificationPermission = () => {
         });
 }
 
+const sendToClipboard = async (str) => {
+    navigator.clipboard.writeText(str)
+        .then((prom) => {
+            alert(str+" copied to clipboard.");
+        });
+}
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
@@ -840,7 +851,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if ( e.target.matches("[data-nav-all-requests]") ) {
             e.preventDefault();
-            console.log("view all requests");
+            navigateTo("/app/requestAll");
+        }
+
+        if ( e.target.matches("[data-nav-my-requests]") ) {
+            e.preventDefault();
+            navigateTo("/app/requests");
         }
 
         // Tickets
@@ -926,7 +942,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if ( e.target.matches("[data-nav-all-tickets]") ) {
             e.preventDefault();
-            console.log("view all tickets");
+            navigateTo("/app/ticketAll");
+        }
+
+        if ( e.target.matches("[data-nav-my-tickets]") ) {
+            e.preventDefault();
+            navigateTo("/app/tickets");
         }
 
         // resources
@@ -938,6 +959,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if ( e.target.matches("[data-resource-link-folder]")) {
             e.preventDefault();
             navigateTo("/app/resourceFolder"+e.target.dataset.resourceLinkFolder);
+        }
+        if ( e.target.matches("[data-nav-copy]")) {
+            e.preventDefault();
+            sendToClipboard(e.target.dataset.navCopy);
         }
 
         // users

@@ -3,16 +3,27 @@ import AbstractView from "./AbstractView.js";
 export default class extends AbstractView {
     constructor(params) {
         super(params);
-        this.setTitle("Resources");
+        this.setTitle("Tickets");
     }
 
     async getHtml() {
         this.setAppProgress(20);
-        let post = await getRemoteResourcePost(this.params.id, this.params.token);
+        let tickets = await getRemoteTicketsAll(this.params.token);
+        let returnHTML = `<div class="list__group">
+                        <div class="list__group-item-grow title__module">Tickets</div>
+                        <div class="list__group-item-right">
+                        <span data-nav-my-tickets>View Mine</span></div></div>`;
 
-        let returnHTML = htmlHomePage(post, this.params.id);
+        this.setAppProgress(60);
+        if (tickets.length > 0) {
+            returnHTML += '<h3>Open Tickets</h3>';
+            for (let n in tickets) {
+                let mt = tickets[n];
+                returnHTML += htmlTicketLine(mt);
+            }
+        }
 
-        this.setAppProgress(80);
+        this.setAppProgress(90);
         returnHTML = returnHTML.replaceAll("\n","");
         return returnHTML.replaceAll("\n","");
     }
@@ -42,38 +53,27 @@ function setAppProgress(prg) {
     }
 }
 
-async function getRemoteResourcePost(id, token) {
-    const response = await fetch('/api/v1/app/resources/'+id, {
+async function getRemoteTicketsAll(token) {
+    const response = await fetch('/api/v1/app/ticket/allopen', {
         headers: {
             authorization: "Bearer "+token
         }
     });
-    const post = await response.json();
+    const tickets = await response.json();
     const status = response.status;
-    return post;
+    return tickets;
 }
 
-function htmlHomePage(post, id) {
-    let r =`<div class="resource__group">`;
-    r+=`<div class="resource__title">`+post.title+`</div>`;
-    r+=`</div>`;
-    r+=`<div class="resource__group">`;
-    if (post.author.fullName !== null) {
-        r += `<div class="resource__subtitle">Author: ` + post.author.fullName + `</div>`;
-    } else {
-        r += `<div class="resource__subtitle">Author: ` + post.author.firstName + ` ` + post.author.lastName + `</div>`;
-    }
-    r+=`</div>`;
-    r+=`<div class="resource__group">`;
-    let thisLink = location.protocol+"//"+location.host+"/resource/article/"+id;
-    r += `<div class="resource__subtitle">URL: <span style="text-decoration: underline;" data-nav-copy="`+thisLink+`">Article: ` + id + `</span></div>`;
-    r+=`</div>`;
-    r+=`<div class="resource__group">`;
-    r+=`<div class="resource__subtitle">Last Updated: `+formatDate(post.lastUpdated)+`</div>`;
-    r+=`</div>`;
-    r+=`<hr>`;
-
-    r+=post.body;
+function htmlTicketLine(tkt) {
+    let r = "";
+    r+=`<div class="list__item" data-link-ticket="`+tkt.id+`">`;
+    r+=`<div class="list__Item-line" data-link-ticket="`+tkt.id+`">`;
+    r+=`<div class="item-id" data-link-ticket="`+tkt.id+`">`+tkt.id+`</div>`;
+    r+=`<div class="item-user" data-link-ticket="`+tkt.id+`">`+tkt.user+`</div>`;
+    r+=`<div class="item-date" data-link-ticket="`+tkt.id+`">`+formatDate(tkt.date)+`</div>`;
+    r+=`</div><div class="list__Item-line" data-link-ticket="`+tkt.id+`">`;
+    r+=`<div class="item-detail" data-link-ticket="`+tkt.id+`">`+tkt.detail+`</div>`;
+    r+=`</div></div>`;
 
     return r;
 }

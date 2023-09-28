@@ -131,6 +131,30 @@ public class MobileAppAPIRequestController {
         return new ResponseEntity<>(appItemList, HttpStatus.OK);
     }
 
+    @GetMapping("/allopen")
+    public ResponseEntity<List<AppItem>> getRequestsAllOpen(HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
+        }
+
+        List<AppItem> appItemList = new ArrayList<>();
+        for (OrderRequest item : orderService.findAll()) {
+            if (!item.getOrderStatus().equals(OrderStatus.Complete) || !item.getOrderStatus().equals(OrderStatus.Cancelled)) {
+                appItemList.add(new AppItem(
+                        item.getId().toString(),
+                        item.getOrderStatus().toString(),
+                        item.getRequestNote(),
+                        item.getRequestDate(),
+                        item.getItemCount(),
+                        item.getUser().getFullName(),
+                        "requests"));
+            }
+        }
+
+        return new ResponseEntity<>(appItemList, HttpStatus.OK);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<AppRequest> getRequestById(@PathVariable BigInteger id, HttpServletRequest request) {
         APIUser apiUser = getUserFromToken(request);
