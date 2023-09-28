@@ -1,5 +1,6 @@
 package net.dahliasolutions.services.user;
 
+import io.netty.util.internal.StringUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.data.*;
@@ -249,6 +250,11 @@ public class UserService implements UserServiceInterface{
     }
 
     private User setNewUser(User user, boolean activated) {
+        // make sure there is a password for the new user
+        if (StringUtil.isNullOrEmpty(user.getPassword())) {
+            user.setPassword("ThisPasswordMustBeChangeByUser!!");
+        }
+
         user.setActivated(activated);
         user.setDeleted(false);
         user.setPassword(passwordEncoder.encode(user.getPassword()));

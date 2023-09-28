@@ -70,6 +70,30 @@ public class OrderController {
         return "order/orderList";
     }
 
+    @GetMapping("/openrequestmanager")
+    public String getAllOpenOrders(Model model, HttpSession session) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        boolean perm = requestManagerPermission(user);
+
+        if (!perm) {
+            session.setAttribute("msgError", "Access Denied.");
+            return redirectService.pathName(session, "/request");
+        }
+
+        List<OrderRequest> orders = orderService.findAll();
+        List<OrderRequest> orderList = new ArrayList<>();
+        for (OrderRequest order : orders) {
+            if (!order.getOrderStatus().equals(OrderStatus.Complete) || !order.getOrderStatus().equals(OrderStatus.Cancelled)) {
+                orderList.add(order);
+            }
+        }
+
+        model.addAttribute("user", user);
+        model.addAttribute("orderList", orderList);
+        redirectService.setHistory(session, "/request/openrequestmanager");
+        return "order/openOrderManager";
+    }
+
     @GetMapping("/settings")
     public String getStoreSettings(Model model) {
         List<Notification> notificationList = notificationService.findAllByModule(EventModule.Request);
@@ -380,6 +404,17 @@ public class OrderController {
             default:
                 return "redirect:/request";
         }
+    }
+
+    /*  Determine Edit Permissions */
+    private boolean requestManagerPermission(User user){
+        Collection<UserRoles> roles = user.getUserRoles();
+        for (UserRoles role : roles){
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("REQUEST_SUPERVISOR")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /*  Determine Edit Permissions */

@@ -3,15 +3,9 @@ package net.dahliasolutions.controllers;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.AdminSettings;
-import net.dahliasolutions.models.BrowserMessage;
-import net.dahliasolutions.models.LoginModel;
-import net.dahliasolutions.models.mail.EmailDetails;
-import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.wiki.WikiPost;
 import net.dahliasolutions.services.AdminSettingsService;
 import net.dahliasolutions.services.RedirectService;
-import net.dahliasolutions.services.mail.EmailService;
-import net.dahliasolutions.services.user.UserService;
 import net.dahliasolutions.services.wiki.WikiPostService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,7 +13,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
@@ -27,7 +20,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/documentation")
 @RequiredArgsConstructor
-public class documentationController {
+public class DocumentationController {
 
     private final RedirectService redirectService;
     private final AdminSettingsService adminSettingsService;

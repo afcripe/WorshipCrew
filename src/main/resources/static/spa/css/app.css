@@ -663,6 +663,30 @@ progress::-webkit-progress-value {
 
 /* Module Lists */
 
+.title__module {
+    font-size: 2rem;
+    font-weight: bolder;
+}
+
+.title__modul-item {
+    font-size: 1.5rem;
+    font-weight: bolder;
+}
+
+.list__group {
+    display: flex;
+    flex-direction: row;
+    padding-top: 0.75rem;
+}
+
+.list__group-item-grow {
+    flex-grow: 1;
+}
+
+.list__group-item-right {
+    text-align: right;
+}
+
 .list__item {
     position: relative;
     width: calc(100% - 28px);
@@ -856,6 +880,14 @@ progress::-webkit-progress-value {
     display: flex;
     flex-direction: row;
     padding-top: 0.75rem;
+}
+
+.request__group-item-grow {
+    flex-grow: 1;
+}
+
+.request__group-item-right {
+    text-align: right;
 }
 
 .request__item {

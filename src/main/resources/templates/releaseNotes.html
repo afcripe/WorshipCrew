@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<div class="container-fluid m-0 p-0" layout:fragment="content">
+
+    <div class="wrapper flex-grow-1">
+    <div id="mainContent" class="wrapper d-flex">
+    <div class="flex-fill p-1 pb-4 w-100 mx-2">
+
+        <div class="h4 p-2">Release Notes</div>
+
+        <div class="p-2">
+
+        <div class="h5">Beta 0.1.2</div>
+        <ul class="release-notes__list">
+            <li class="enbolden">Fixed - unable to add new user.</li>
+            <li>Fixed - cart 'Reason and Notes' is now included only once, them removed when cart is empty.</li>
+            <li>Fixed - CSS issue in Request and Support Modules where content was overflowing page.</li>
+            <li>Fixed - article title links to use underscores to be url safe.</li>
+            <li>Fixed - security to allow viewing of resource articles designated as 'Documentation' by all users.</li>
+            <li>Fixed - author and date information in resource article lists for display on smaller browser windows.</li>
+            <li class="enbolden">Updated - delineation between reqeust status request item status in order requests.</li>
+            <li class="enbolden">Added - release notes.</li>
+            <li class="enbolden">Added - header notification when an item is added to request cart form the store.</li>
+            <li class="enbolden">Added - category navigation to store item page.</li>
+            <li>Added - 'All Tickets' view for users with SUPPORT_SUPERVISOR role.</li>
+            <li>Added - 'All Requests' view for users with REQUEST_SUPERVISOR role.</li>
+            <li>Added - store item stats in store settings.</li>
+            <li>Added - resource article stats in resource settings.</li>
+            <li>Added - request stats in request settings.</li>
+            <li>Added - support ticket stats in support settings.</li>
+            <li>PWA - added resource links for articles when navigating by id.</li>
+            <li>PWA - added notification request to onLoad event.</li>
+            <li>PWA - article links now stay within the app.</li>
+            <li>PWA - added article links for copying to send to other users.</li>
+        </ul>
+
+        <div class="h5">Beta 0.1.1</div>
+        <ul class="release-notes__list">
+            <li>Fixed - website title in browser tab.</li>
+            <li>Fixed - store pagination page numbers to start with 1.</li>
+            <li>Fixed - store categories header pointer cursor.</li>
+            <li>Fixed - changed 'All Orders' in cart and profile to now read 'All Requests'</li>
+            <li>Fixed - save new resources that have no summary or body content.</li>
+            <li>Fixed - clearing image information after uploading form dialog in the resource edit page.</li>
+            <li>Fixed - copy image address in resource edit page missing beginning of address link.</li>
+            <li>Fixed - USER_WRITE role can only edit user permission the currently logged-in user has permission for.</li>
+            <li>Fixed - director access to campus and department sections of site settings.</li>
+            <li>Updated - resource folder list now only show folders one level deep.</li>
+            <li>Added - store pagination number of items to display selection.</li>
+            <li>Added - resource folder titles are now breadcrumb links.</li>
+            <li>Added - pin to top feature for articles to always show them a top of lists in folders.</li>
+            <li>Added - SupportAgents option for new ticket submissions in support settings.</li>
+        </ul>
+
+        </div>
+    </div>
+    </div>
+    </div>
+
+</div>
+
+</html>

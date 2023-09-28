@@ -81,6 +81,25 @@ public class SupportController {
         return "support/ticketList";
     }
 
+    @GetMapping("/openticketmanager")
+    public String goAllOpenTickets(Model model, HttpSession session) {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        String perm = permissionType(currentUser);
+        if (!Objects.equals(perm, "Admin")) {
+            model.addAttribute("msgError", "Access Denied!");
+            return redirectService.pathName(session, "/support");
+        }
+
+        List<Ticket> ticketList = ticketService.findAllOpen();
+
+        model.addAttribute("user", currentUser);
+        model.addAttribute("ticketList", ticketList);
+
+        redirectService.setHistory(session, "/support/openticketmanager");
+        return "support/openTicketManager";
+    }
+
     @GetMapping("/ticket/{id}")
     public String goTicket(@PathVariable String id, Model model, HttpSession session) {
         User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -351,7 +370,7 @@ public class SupportController {
         List<TicketCampus> campusItemList = new ArrayList<>();
         for (Campus campus : campusList) {
             TicketCampus campusItem = new TicketCampus(campus, new ArrayList<>());
-            if (departmentID.equals(0)) {
+            if (departmentID.equals(BigInteger.valueOf(0))) {
                 campusItem.setTicketList(ticketService.findAllByCampusAndCycle(campus.getId(), startDate, endDate));
             } else {
                 campusItem.setTicketList(ticketService.findAllByDepartmentAndCampusAndCycle(departmentID, campus.getId(), startDate, endDate));
@@ -467,7 +486,7 @@ public class SupportController {
         List<TicketDepartment> departmentItemList = new ArrayList<>();
         for (DepartmentRegional department : departmentList) {
             TicketDepartment departmentItem = new TicketDepartment(department, new ArrayList<>());
-            if (campusId.equals(0)) {
+            if (campusId.equals(BigInteger.valueOf(0))) {
                 departmentItem.setTicketList(ticketService.findAllByDepartmentAndCycle(department.getId(), startDate, endDate));
             } else {
                 departmentItem.setTicketList(ticketService.findAllByDepartmentAndCampusAndCycle(department.getId(), campusId, startDate, endDate));

@@ -22,13 +22,8 @@
             <div class="row py-1">
                 <div th:replace="~{components/cardCartItemLine :: cardFragment(${item})}">Your Cart is Empty</div>
             </div>
-            <div class="row py-1">
-                <div class="form-group">
-                    <label for="requestNote">Reason and Notes: * </label>
-                    <input type="text" id="requestNote" class="w-100" maxlength="255">
-                </div>
-            </div>
         </div>
+
         <div th:if="${#lists.isEmpty(cart.cartItems)}">
             <div class="row">
                 <div>Your Cart is Empty</div>
@@ -36,13 +31,21 @@
         </div>
 
         <div class="row pt-1" th:unless="${#lists.isEmpty(cart.cartItems)}">
-            <div class="col-10 text-right">
-                I acknowledge that I am accountable for the validity of this request and have provided an appropriate reason.
-                <input id="chkTerms" type="checkbox" onchange="changeTermsAgreement()">
+            <div class="row">
+                <div class="form-group">
+                    <label for="requestNote">Reason and Notes: * </label>
+                    <input type="text" id="requestNote" class="w-100" maxlength="255">
+                </div>
             </div>
-            <div class="col-2">
-                <button type="button" class="btn btn-sm btn-primary" style="float: right;" id="btnSend" disabled
-                        th:onclick="placeOrder([[${userId}]])">Send Request</button>
+            <div class="row">
+                <div class="col-10 text-right">
+                    I acknowledge that I am accountable for the validity of this request and have provided an appropriate reason.
+                    <input id="chkTerms" type="checkbox" onchange="changeTermsAgreement()">
+                </div>
+                <div class="col-2">
+                    <button type="button" class="btn btn-sm btn-primary" style="float: right;" id="btnSend" disabled
+                            th:onclick="placeOrder([[${userId}]])">Send Request</button>
+                </div>
             </div>
         </div>
         <div class="row py-0 text-center">
@@ -103,6 +106,9 @@
                     let itemID = id+"-item";
                     let itemEl = document.getElementById(itemID);
                     itemEl.remove();
+                }
+                if (data === 0) {
+                    window.location.reload();
                 }
             });
         }

@@ -11,7 +11,10 @@ export default class extends AbstractView {
         let myTickets = await getRemoteTicketsByUser(this.params.token);
         let tickets = await getRemoteTickets(this.params.token);
         let ticketsInclude = await getRemoteTicketsIncluded(this.params.token);
-        let returnHTML = `<h1>Tickets</h1>`;
+        let returnHTML = `<div class="list__group">
+                        <div class="list__group-item-grow title__module">Tickets</div>
+                        <div class="list__group-item-right">
+                        <span data-nav-all-tickets>View All</span></div></div>`;
 
         this.setAppProgress(50);
         if (myTickets.length > 0) {

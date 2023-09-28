@@ -147,10 +147,25 @@
         </form>
     </dialog>
 
+    <div id="addToCartTemplate" class="alert-fixed" style="display: none" onclick="clearAddToCartMessage()">
+        <div class="alert-success alert-fixed-success align-content-center">
+            <p style="text-align: center">Request Cart Updated!</p>
+            <script  th:inline="javascript">
+                fetch("/api/v1/app/removesuccessmsg");
+                setTimeout(() => {
+                    clearSuccess();
+                }, 3000);
+            </script>
+        </div>
+    </div>
+
     <script th:inline="javascript">
+        const cartAlertBox = document.getElementById('addToCartTemplate');
+
         function newItemDialog() {
             document.getElementById("newItemDialog").showModal();
         }
+
         async function addToCart(id, userid) {
             let counterId = id+"-counter";
             let detailsId = id+"-details";
@@ -174,7 +189,19 @@
             }).then(data => {
                 console.log(data);
                 updateCartCounter(data);
+                showAddToCartMessage();
             });
+        }
+
+        function showAddToCartMessage() {
+            cartAlertBox.style.display = 'block';
+            setTimeout(() => {
+                clearAddToCartMessage();
+            }, 2000);
+        }
+
+        function clearAddToCartMessage() {
+            cartAlertBox.style.display = 'none';
         }
     </script>
 

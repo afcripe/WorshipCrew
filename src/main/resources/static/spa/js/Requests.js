@@ -11,7 +11,10 @@ export default class extends AbstractView {
         let myRequests = await getRemoteUserRequests(this.params.token);
         let requests = await getRemoteRequests(this.params.token);
         let requestItems = await getRemoteRequestItems(this.params.token);
-        let returnHTML = `<h1>Requests</h1>`;
+        let returnHTML = `<div class="list__group">
+                        <div class="list__group-item-grow title__module">Requests</div>
+                        <div class="list__group-item-right">
+                        <span data-nav-all-requests>View All</span></div></div>`;
 
         this.setAppProgress(40);
         if (myRequests.length > 0) {

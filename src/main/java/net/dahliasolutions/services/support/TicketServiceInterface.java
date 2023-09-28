@@ -19,6 +19,7 @@ public interface TicketServiceInterface {
     Ticket createTicket(TicketNewModel model, User user, TicketImage image);
     Optional<Ticket> findById(String id);
     List<Ticket> findAll();
+    List<Ticket> findAllOpen();
     List<Ticket> findAllByUser(User user);
     List<Ticket> findAllByUserOpenOnly(User user);
     List<Ticket> findFirst5ByUser(User user);

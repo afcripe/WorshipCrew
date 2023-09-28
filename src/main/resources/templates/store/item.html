@@ -7,10 +7,37 @@
 
   <div th:replace="~{store/moduleHeader :: header}">Header</div>
 
-  <th:block th:if="${session.msg}">
-    <p th:text="${session.msg}"/>
-    <th:block th:text="${#session.removeAttribute('msg')}" />
-  </th:block>
+  <div class="wrapper flex-grow-1">
+    <div id="mainContent" class="wrapper d-flex">
+
+  <div id="storeCategoryNav" class="navbar navbar-light bg-light flex-fill px-2 pt-1 d-none d-md-block category-nav">
+    <h5 id="storeCategoryNavTitle" class="category-nav-title" onclick="clearCategory()">Categories</h5>
+    <ul class="navbar-nav pb-3" th:each="cat : ${categoryList}">
+      <li class="nav-item dropdown" th:id="*{cat.name}">
+        <a class="nav-link dropdown-toggle" href="#" th:onclick="selectCategory([[*{cat.name}]])"
+           th:id="*{cat.name}+'dropdown'" role="button"
+           data-bs-toggle="dropdown" th:text="*{cat.name}"></a>
+        <ul class="dropdown-menu category-dropdown-menu" th:aria-labelledby="*{cat.name}+'dropdown'"
+            th:unless="${#lists.isEmpty(cat.subCategoryList)}">
+          <th:block th:each="sub : ${cat.subCategoryList}">
+            <li>
+              <a class="dropdown-item" th:href="'/store/'+${cat.name}+'/'+${sub.name}" th:text="${sub.name}"></a>
+            </li>
+          </th:block>
+        </ul>
+
+        <ul class="dropdown-menu category-dropdown-menu" th:aria-labelledby="*{cat.name}+'dropdown'"
+            th:if="${#lists.isEmpty(cat.subCategoryList)}">
+          <li>
+            <a class="dropdown-item" th:href="'/store/'+${cat.name}+'/'+${cat.name}" th:text="${cat.name}"></a>
+          </li>
+        </ul>
+
+      </li>
+    </ul>
+  </div>
+
+<!--      <div class="flex-fill p-1 pb-4 w-100 mx-2">-->
 
   <div class="container">
 
@@ -92,6 +119,49 @@
           </div>
         </div>
       </div>
+
+    </div>
+  </div>
+
+      <script th:inline="javascript">
+        /*<![CDATA[*/
+        let selectedCategory = /*[[${selectedCategory}]]*/ "";
+        let selectedSubCategory = /*[[${selectedSubCategory}]]*/ "";
+        /*]]>*/
+
+        const dropdownNav = document.getElementById("storeCategoryNav");
+
+        // close categoryNavs
+        closeAllCategories()
+
+        function closeAllCategories() {
+          let dropdowns = dropdownNav.querySelectorAll('.dropdown');
+          dropdowns.forEach(function(el){
+            let dropdownMenuEl = el.querySelector('.dropdown-menu');
+            el.setAttribute('aria-expanded', 'false');
+            dropdownMenuEl.classList.remove('show');
+          })
+          openSelectedCategory();
+        }
+        function openSelectedCategory() {
+          debugger
+          if (selectedCategory != null) {
+            let dropdownEl = document.getElementById(selectedCategory);
+            let dropdownMenuEl = dropdownEl.querySelector('.dropdown-menu');
+            dropdownEl.setAttribute('aria-expanded', 'true');
+            dropdownMenuEl.classList.add('show');
+          }
+        }
+        function selectCategory(name) {
+          debugger
+          selectedCategory = name;
+          closeAllCategories();
+        }
+        function clearCategory() {
+          window.location.href="/store";
+        }
+      </script>
+
 
     </div>
   </div>

@@ -52,6 +52,9 @@
                         </th:block>
                         <li class="filter-nav-padding" th:onclick="navStorePageRight([[${storeItems.number}]], [[${storeItems.totalPages}]])"><i class="bi bi-caret-right-fill"></i></li>
                     </ul>
+
+                    <div class="filter-page-spacer"></div>
+
                     <select id="pageItemCount" class="filter-page-item-count" onchange="navStoreCount()">
                         <option value="5" th:selected="${storeItems.size} == '5'">5</option>
                         <option value="10" th:selected="${storeItems.size} == '10'">10</option>
@@ -61,7 +64,6 @@
                         <option value="40" th:selected="${storeItems.size} == '40'">40</option>
                         <option value="50" th:selected="${storeItems.size} == '50'">50</option>
                     </select>
-                    <div class="filter-page-spacer"></div>
                 </div>
             </div>
 

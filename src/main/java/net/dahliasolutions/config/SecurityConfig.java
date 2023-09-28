@@ -122,12 +122,12 @@ public class SecurityConfig {
                     auth.requestMatchers("/request/user/**").hasAnyAuthority("ADMIN_WRITE", "REQUEST_SUPERVISOR");
                     auth.requestMatchers("/request/settings/**").hasAnyAuthority("ADMIN_WRITE", "REQUEST_SUPERVISOR");
 
+                    auth.requestMatchers("/resource/article/**").permitAll();
                     auth.requestMatchers("/resource").hasAnyAuthority("ADMIN_WRITE", "RESOURCE_SUPERVISOR", "RESOURCE_WRITE", "RESOURCE_READ");
                     auth.requestMatchers("/resource/tag/**").hasAnyAuthority("ADMIN_WRITE", "RESOURCE_SUPERVISOR", "RESOURCE_WRITE", "RESOURCE_READ");
                     auth.requestMatchers("/resource/folder/**").hasAnyAuthority("ADMIN_WRITE", "RESOURCE_SUPERVISOR", "RESOURCE_WRITE", "RESOURCE_READ");
                     auth.requestMatchers("/resource/group/**").hasAnyAuthority("ADMIN_WRITE", "RESOURCE_SUPERVISOR", "RESOURCE_WRITE", "RESOURCE_READ");
                     auth.requestMatchers("/resource/search/**").hasAnyAuthority("ADMIN_WRITE", "RESOURCE_SUPERVISOR", "RESOURCE_WRITE", "RESOURCE_READ");
-                    auth.requestMatchers("/resource/article/**").hasAnyAuthority("ADMIN_WRITE", "RESOURCE_SUPERVISOR", "RESOURCE_WRITE", "RESOURCE_READ");
                     auth.requestMatchers("/resource/new/**").hasAnyAuthority("ADMIN_WRITE", "RESOURCE_SUPERVISOR", "RESOURCE_WRITE");
                     auth.requestMatchers("/resource/edit/**").hasAnyAuthority("ADMIN_WRITE", "RESOURCE_SUPERVISOR", "RESOURCE_WRITE");
                     auth.requestMatchers("/resource/settings").hasAnyAuthority("ADMIN_WRITE", "RESOURCE_SUPERVISOR");

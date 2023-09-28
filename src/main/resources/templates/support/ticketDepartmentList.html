@@ -9,29 +9,33 @@
 
     <div th:replace="~{support/moduleFilterDate :: filterDate}">Filter</div>
 
+    <div class="wrapper flex-grow-1">
+        <div id="mainContent" class="wrapper d-flex">
+        <div class="flex-fill p-1 pb-4 w-100 mx-2">
 
-    <div th:each="department : ${departmentItemList}">
-        <div class="row pt-5 py-2">
-            <div class="col">
-                <h4>
-                    <a th:href="'/support/department/'+*{#strings.replace(department.department.name,' ','_')}" style="text-decoration: none">
-                        <span th:text="*{department.department.name}" style="text-decoration: none"></span>
-                        (<span th:text="*{#lists.size(department.ticketList)}" style="text-decoration: none"></span>)
-                    </a>
-                    <i th:id="*{department.department.name}+'CaretRight'" class="bi bi-caret-right" th:onclick="toggleDepartment([[*{department.department.name}]])"></i>
-                    <i th:id="*{department.department.name}+'CaretDown'" class="bi bi-caret-down" style="display: none" th:onclick="toggleDepartment([[*{department.department.name}]])"></i>
-                </h4>
+
+            <div th:each="department : ${departmentItemList}">
+            <div class="row pt-5 py-2">
+                <div class="col">
+                    <h4>
+                        <a th:href="'/support/department/'+*{#strings.replace(department.department.name,' ','_')}" style="text-decoration: none">
+                            <span th:text="*{department.department.name}" style="text-decoration: none"></span>
+                            (<span th:text="*{#lists.size(department.ticketList)}" style="text-decoration: none"></span>)
+                        </a>
+                        <i th:id="*{department.department.name}+'CaretRight'" class="bi bi-caret-right" th:onclick="toggleDepartment([[*{department.department.name}]])"></i>
+                        <i th:id="*{department.department.name}+'CaretDown'" class="bi bi-caret-down" style="display: none" th:onclick="toggleDepartment([[*{department.department.name}]])"></i>
+                    </h4>
+                </div>
+            </div>
+            <div th:id="*{department.department.name}" class="row pt-2 pb-0 py-2" style="display: none">
+                <div class="row" th:each="orderItem : *{department.ticketList}">
+                    <div th:replace="~{components/cardTicketLine :: cardFragment(${orderItem})}">No Items</div>
+                </div>
             </div>
         </div>
-        <div th:id="*{department.department.name}" class="row pt-2 pb-0 py-2" style="display: none">
-            <div class="row" th:each="orderItem : *{department.ticketList}">
-                <div th:replace="~{components/cardTicketLine :: cardFragment(${orderItem})}">No Items</div>
-            </div>
-        </div>
-    </div>
 
 
-    <script th:inline="javascript">
+<script th:inline="javascript">
         function navToRequest(id) {
             window.location.href="/support/order/"+id;
         }
@@ -52,6 +56,10 @@
         }
     </script>
 
+
+        </div>
+        </div>
+    </div>
 </div>
 
 

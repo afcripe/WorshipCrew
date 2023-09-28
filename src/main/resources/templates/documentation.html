@@ -4,15 +4,15 @@
 
 <div class="container-fluid m-0 p-0" layout:fragment="content">
 
-    <div class="row">
+    <div class="wrapper flex-grow-1">
+    <div id="mainContent" class="wrapper d-flex">
+    <div class="flex-fill p-1 pb-4 w-100 mx-2">
 
-        <div class="flex-fill p-1 pb-4 w-100 mx-2">
+        <div th:utext="${wikiPost.body}"></div>
 
-            <div th:utext="${wikiPost.body}"></div>
-
-        </div>
-
-  </div>
+    </div>
+    </div>
+    </div>
 
 </div>
 

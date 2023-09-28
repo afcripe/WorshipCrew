@@ -9,42 +9,48 @@
 
     <div th:replace="~{support/moduleFilterDate :: filterDate}">Filter</div>
 
-    <div class="row pt-5 py-2">
-        <div class="col align-content-center">
-            <h3><span th:text="${department.name}"></span> Department</h3>
-        </div>
-    </div>
+    <div class="wrapper flex-grow-1">
+        <div id="mainContent" class="wrapper d-flex">
+        <div class="flex-fill p-1 pb-4 w-100 mx-2">
 
-    <div class="row pt-5 py-2">
-        <div class="col">
-            <h4>Items to Fulfill</h4>
-        </div>
-    </div>
-    <div class="row pt-2 pb-5 py-2">
-        <div class="row" th:if="${not #lists.isEmpty(openList)}" th:each="openItem : ${openList}">
-            <div th:replace="~{components/cardTicketLine :: cardFragment(${openItem})}">No Items</div>
-        </div>
-    </div>
+            <div class="row pt-5 py-2">
+                <div class="col align-content-center">
+                    <h3><span th:text="${department.name}"></span> Department</h3>
+                </div>
+            </div>
+
+            <div class="row pt-5 py-2">
+                <div class="col">
+                    <h4>Items to Fulfill</h4>
+                </div>
+            </div>
+            <div class="row pt-2 pb-5 py-2">
+                <div class="row" th:if="${not #lists.isEmpty(openList)}" th:each="openItem : ${openList}">
+                    <div th:replace="~{components/cardTicketLine :: cardFragment(${openItem})}">No Items</div>
+                </div>
+            </div>
+
+            <div class="row pt-5 py-2">
+                <div class="col">
+                    <h4>Items Fulfilled</h4>
+                </div>
+            </div>
+            <div class="row pt-2 pb-5 py-2">
+                <div class="row" th:if="${not #lists.isEmpty(closedList)}" th:each="closedItem : ${closedList}">
+                    <div th:replace="~{components/cardTicketLine :: cardFragment(${closedItem})}">No Items</div>
+                </div>
+            </div>
 
 
-    <div class="row pt-5 py-2">
-        <div class="col">
-            <h4>Items Fulfilled</h4>
-        </div>
-    </div>
-    <div class="row pt-2 pb-5 py-2">
-        <div class="row" th:if="${not #lists.isEmpty(closedList)}" th:each="closedItem : ${closedList}">
-            <div th:replace="~{components/cardTicketLine :: cardFragment(${closedItem})}">No Items</div>
-        </div>
-    </div>
-
-
-    <script th:inline="javascript">
+<script th:inline="javascript">
         function navToRequest(id) {
             window.location.href="/support/ticket/"+id;
         }
     </script>
 
+        </div>
+        </div>
+    </div>
 </div>
 
 

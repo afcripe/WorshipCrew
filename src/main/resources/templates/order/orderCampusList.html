@@ -9,7 +9,11 @@
 
     <div th:replace="~{order/moduleFilterDate :: filterDate}">Filter</div>
 
-    <div th:each="campus : ${campusItemList}">
+    <div class="wrapper flex-grow-1">
+        <div id="mainContent" class="wrapper d-flex">
+        <div class="flex-fill p-1 pb-4 w-100 mx-2">
+
+            <div th:each="campus : ${campusItemList}">
         <div class="row pt-5 py-2">
             <div class="col">
                 <h4>
@@ -29,8 +33,7 @@
         </div>
     </div>
 
-
-    <script th:inline="javascript">
+<script th:inline="javascript">
         function navToRequest(id) {
             window.location.href="/request/order/"+id;
         }
@@ -51,6 +54,10 @@
             }
         }
     </script>
+
+        </div>
+        </div>
+    </div>
 
 </div>
 

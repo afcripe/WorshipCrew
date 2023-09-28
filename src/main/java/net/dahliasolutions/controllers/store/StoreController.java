@@ -295,8 +295,12 @@ public class StoreController {
 
         if (storeItem.isPresent()) {
             model.addAttribute("storeItem", storeItem.get());
+            model.addAttribute("selectedCategory", storeItem.get().getCategory().getName());
+            model.addAttribute("selectedSubCategory", storeItem.get().getSubCategory().getName());
         } else {
             model.addAttribute("storeItem", new StoreItem());
+            model.addAttribute("selectedCategory", "");
+            model.addAttribute("selectedSubCategory", "");
         }
 
         return "store/item";

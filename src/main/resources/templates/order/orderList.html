@@ -7,57 +7,67 @@
 
     <div th:replace="~{order/moduleHeader :: header}">Header</div>
 
+    <div class="wrapper flex-grow-1">
+        <div id="mainContent" class="wrapper d-flex">
+        <div class="flex-fill p-1 pb-4 w-100 mx-2">
 
-    <div class="row p-2">
-        <div class="col">
-            <div class="h3" style="float: left">
-                Open Requests Only
+            <div class="row p-2">
+                <div class="support-list-header">
+                    <div class="support-list-title" >
+                        Open Requests
+                    </div>
+                    <div class="support-list-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'REQUEST_SUPERVISOR')}">
+                        <a href="/request/openrequestmanager" style="text-decoration: none">All Open Requests</a>
+                    </div>
+                    <div class="support-list-item">
+                        <a th:href="'/request/user/'+${user.id}" style="text-decoration: none">All My Requests</a>
+                    </div>
+                </div>
             </div>
-            <div class="h3" style="float: right">
-                <a th:href="'/request/user/'+${user.id}" style="text-decoration: none">All Requests</a>
+
+            <div class="row pt-3 py-2">
+                <div class="col">
+                    <h4>Items to Fulfill</h4>
+                </div>
             </div>
-        </div>
-    </div>
+            <div class="row pt-2 pb-5 py-2">
+                <div class="row py-1" th:if="${not #lists.isEmpty(openItemList)}" th:each="openItem : ${openItemList}">
+                    <div th:replace="~{components/cardOrderItemLineSummary :: cardFragment(${openItem})}">No Items</div>
+                </div>
+            </div>
 
-    <div class="row pt-3 py-2">
-        <div class="col">
-            <h4>Items to Fulfill</h4>
-        </div>
-    </div>
-    <div class="row pt-2 pb-5 py-2">
-        <div class="row py-1" th:if="${not #lists.isEmpty(openItemList)}" th:each="openItem : ${openItemList}">
-            <div th:replace="~{components/cardOrderItemLineSummary :: cardFragment(${openItem})}">No Items</div>
-        </div>
-    </div>
+            <div class="row pt-5 py-2">
+                <div class="col">
+                    <h4>Requests Sent to You</h4>
+                </div>
+            </div>
+            <div class="row pt-2 pb-5 py-2">
+                <div class="row py-1" th:if="${not #lists.isEmpty(openOrderList)}" th:each="openOrder : ${openOrderList}">
+                    <div th:replace="~{components/cardOrderLine :: cardFragment(${openOrder})}">No Requests to Display</div>
+                </div>
+            </div>
 
-    <div class="row pt-5 py-2">
-        <div class="col">
-            <h4>Requests Sent to You</h4>
-        </div>
-    </div>
-    <div class="row pt-2 pb-5 py-2">
-        <div class="row py-1" th:if="${not #lists.isEmpty(openOrderList)}" th:each="openOrder : ${openOrderList}">
-            <div th:replace="~{components/cardOrderLine :: cardFragment(${openOrder})}">No Requests to Display</div>
-        </div>
-    </div>
-
-    <div class="row pt-5 py-2">
-        <div class="col">
-            <h4>Requests You've been Included on</h4>
-        </div>
-    </div>
-    <div class="row pt-5 pb-5 py-2">
-        <div class="py-1" th:if="${not #lists.isEmpty(orderMentionList)}" th:each="orderMention : ${orderMentionList}">
-            <div th:replace="~{components/cardOrderLine :: cardFragment(${orderMention})}">No Requests to Display</div>
-        </div>
-    </div>
+            <div class="row pt-5 py-2">
+                <div class="col">
+                    <h4>Requests You've been Included on</h4>
+                </div>
+            </div>
+            <div class="row pt-5 pb-5 py-2">
+                <div class="py-1" th:if="${not #lists.isEmpty(orderMentionList)}" th:each="orderMention : ${orderMentionList}">
+                    <div th:replace="~{components/cardOrderLine :: cardFragment(${orderMention})}">No Requests to Display</div>
+                </div>
+            </div>
 
 
-    <script th:inline="javascript">
+<script th:inline="javascript">
         function navToRequest(id) {
             window.location.href="/request/order/"+id;
         }
     </script>
+
+        </div>
+        </div>
+    </div>
 
 </div>
 

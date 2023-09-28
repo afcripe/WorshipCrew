@@ -10,7 +10,7 @@ export default class extends AbstractView {
         this.setAppProgress(20);
         let post = await getRemoteResourcePost(this.params.id, this.params.token);
 
-        let returnHTML = htmlHomePage(post);
+        let returnHTML = htmlHomePage(post, this.params.id);
 
         this.setAppProgress(80);
         returnHTML = returnHTML.replaceAll("\n","");
@@ -53,12 +53,20 @@ async function getRemoteResourcePost(id, token) {
     return post;
 }
 
-function htmlHomePage(post) {
+function htmlHomePage(post, id) {
     let r =`<div class="resource__group">`;
     r+=`<div class="resource__title">`+post.title+`</div>`;
     r+=`</div>`;
     r+=`<div class="resource__group">`;
-    r+=`<div class="resource__subtitle">Author: `+post.author.fullName+`</div>`;
+    if (post.author.fullName !== null) {
+        r += `<div class="resource__subtitle">Author: ` + post.author.fullName + `</div>`;
+    } else {
+        r += `<div class="resource__subtitle">Author: ` + post.author.firstName + ` ` + post.author.lastName + `</div>`;
+    }
+    r+=`</div>`;
+    r+=`<div class="resource__group">`;
+    let thisLink = location.protocol+"//"+location.host+"/resource/article/"+id;
+    r += `<div class="resource__subtitle">URL: <a href="`+thisLink+`">Article: ` + id + `</a></div>`;
     r+=`</div>`;
     r+=`<div class="resource__group">`;
     r+=`<div class="resource__subtitle">Last Updated: `+formatDate(post.lastUpdated)+`</div>`;

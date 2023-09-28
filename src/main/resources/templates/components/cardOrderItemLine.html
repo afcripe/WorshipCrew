@@ -22,7 +22,7 @@
         </div>
         <div class="col-12">
           <div>
-            Status: <span th:text="*{itemStatus}"></span>
+            Item Status: <span th:text="*{itemStatus}"></span>
             <th:block th:if="${editable} or ${currentUserId} eq ${orderItem.supervisor.id}">
               <button class="btn btn-sm btn-primary" th:onclick="dialogChangeItemStatus([[*{id}]], [[*{itemStatus}]])">Change</button>
             </th:block>
@@ -30,7 +30,7 @@
         </div>
         <div class="col-12">
           <div>
-            Fulfilled By: <span th:text="*{supervisor.firstName} + ' ' + *{supervisor.lastName}"></span>
+            Item Fulfilled By: <span th:text="*{supervisor.firstName} + ' ' + *{supervisor.lastName}"></span>
             <button id="btnItemSupervisorSM" class="btn btn-sm btn-primary" onclick="dialogAssignPerson()">Change</button>
           </div>
         </div>
@@ -48,14 +48,14 @@
         </div>
         <div class="col-2">
           <div style="float: right">
-            items: <span th:text="*{count}"></span>
+            Items: <span th:text="*{count}"></span>
           </div>
         </div>
       </div>
       <div class="row">
         <div class="col-6">
           <div>
-            Status: <span th:text="*{itemStatus}"></span>
+            Item Status: <span th:text="*{itemStatus}"></span>
             <th:block th:if="${editable} or ${currentUserId} eq ${orderItem.supervisor.id}">
               <button class="btn btn-sm btn-primary" th:onclick="dialogChangeItemStatus([[*{id}]], [[*{itemStatus}]])">Change</button>
             </th:block>
@@ -63,7 +63,7 @@
         </div>
         <div class="col-6">
           <div>
-            Fulfilled By: <span th:text="*{supervisor.firstName} + ' ' + *{supervisor.lastName}"></span>
+            Item Fulfilled By: <span th:text="*{supervisor.firstName} + ' ' + *{supervisor.lastName}"></span>
             <button id="btnItemSupervisorLG" class="btn btn-sm btn-primary" th:onclick="dialogAssignPerson([[*{supervisor.id}]])">Change</button>
           </div>
         </div>

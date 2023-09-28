@@ -261,6 +261,13 @@
     overflow: hidden;
 }
 
+.article-topic-info-subheading {
+    padding-left: 0.5rem;
+    margin: 0;
+    font-size: x-small;
+    overflow: hidden;
+}
+
 .article-topic-info {
     padding: 0;
     margin: 0;
@@ -841,9 +848,9 @@
 }
 
 .filter-page-item-count {
-    height: 34px;
+    height: 2rem;
     border-radius: 5px;
-    margin-left: 16px;
+    margin-right: 2rem;
 }
 
 /* Folder Tree */
@@ -898,7 +905,28 @@ ul, #folderTree {
     display: block;
 }
 
-/* Support Ticket Styling */
+/* Support and Ticket Styling */
+
+.support-list-header {
+    display: flex;
+    flex-direction: row;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.support-list-title {
+    flex-grow: 1;
+    font-size: 2rem;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.support-list-item {
+    font-size: 1.4rem;
+    font-weight: 500;
+    line-height: 1.2;
+    margin-left: 1rem;
+}
 
 .card-hide-overflow {
     overflow-x: hidden;
@@ -1045,4 +1073,17 @@ ul, #folderTree {
     padding: 3px;
     border: 1px solid var(--dwc-border-color);
     border-radius: 5px;
+}
+
+.release-notes__list {
+    line-height: 1rem;
+    padding-bottom: 1rem;
+}
+
+.release-notes__list li {
+    list-style: disc;
+}
+
+.enbolden {
+    font-weight: bolder;
 }

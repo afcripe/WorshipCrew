@@ -21,7 +21,6 @@
                 <div th:each="topic : ${wikiPostList}">
                     <div class="mt-5 h5">
                         <span class="text-link" th:text="${#strings.capitalize(topic.folder)}" th:onclick="navToFolderTopic([[${topic.folder}]])"></span>
-                        <!--                                (<span th:text="${topic.postCount}"></span>)-->
                     </div>
                     <div class="article-topic-list">
                         <div th:each="post, pStat : ${topic.wikiPost}" th:object="${post}">
@@ -29,8 +28,12 @@
                                 <div class="article-topic-details">
                                     <div class="article-topic-title"><span th:text="${post.title}"></span></div>
                                     <div class="article-topic-summary"><span th:text="${post.summary}"></span></div>
+                                    <div class="article-topic-info-subheading d-block d-md-none">
+                                        Author: <span th:text="*{author.fullName}"></span>&nbsp;&nbsp;&nbsp;
+                                        Updated: <span th:text="*{#temporals.format(lastUpdated, 'MMM-dd-yyyy HH:mm')}"></span>
+                                    </div>
                                 </div>
-                                <div class="article-topic-info">
+                                <div class="article-topic-info d-none d-md-block">
                                     <div class="article-topic-author">Author: <span th:text="*{author.fullName}"></span></div>
                                     <div class="article-topic-date">Updated: <span th:text="*{#temporals.format(lastUpdated, 'MMM-dd-yyyy HH:mm')}"></span></div>
                                 </div>
@@ -147,7 +150,6 @@
 
         function setPageTitleLinks() {
             console.log(jsPageTitle);
-            debugger
             let titleArray = jsPageTitle.split("/");
             let titleEl = document.getElementById("resourcePageTitle");
 

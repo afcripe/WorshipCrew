@@ -651,6 +651,17 @@ const unsubscribe = () =>{
         });
 };
 
+const requestNotificationPermission = () => {
+    Notification.requestPermission()
+        .then((perm) => {
+            if (perm === 'granted') {
+                console.log("Permission Granted");
+            } else {
+                console.log("Permission Denied");
+            }
+        });
+}
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
@@ -817,7 +828,7 @@ document.addEventListener("DOMContentLoaded", () => {
             showRequestHistory(e.target.dataset.requestHistory, token);
         }
 
-        if ( e.target.matches("[data-form-request-acknowledge]")) {
+        if ( e.target.matches("[data-form-request-acknowledge]") ) {
             e.preventDefault();
             if (e.target.dataset.formRequestAcknowledge === "accept") {
                 postRequestAck();
@@ -825,6 +836,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 let d = document.getElementById("formRequest");
                 d.remove();
             }
+        }
+
+        if ( e.target.matches("[data-nav-all-requests]") ) {
+            e.preventDefault();
+            console.log("view all requests");
         }
 
         // Tickets
@@ -906,6 +922,11 @@ document.addEventListener("DOMContentLoaded", () => {
             if (e.target.dataset.formTicketNew === "submit") {
                 postTicketNew();
             }
+        }
+
+        if ( e.target.matches("[data-nav-all-tickets]") ) {
+            e.preventDefault();
+            console.log("view all tickets");
         }
 
         // resources
@@ -991,4 +1012,6 @@ document.addEventListener("DOMContentLoaded", () => {
     setModules();
 
     getLoggedIn();
+
+    requestNotificationPermission();
 });

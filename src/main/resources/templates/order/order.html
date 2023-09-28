@@ -19,7 +19,7 @@
                     <h4>Request Id: <span th:text="*{id}"></span></h4>
                 </div>
                 <div class="col-12 col-md-6 text-right">
-                    <button class="btn btn-sm btn-primary" th:onclick="dialogChangeStatus([[*{supervisor.id}]])">Status / Note</button>
+                    <button class="btn btn-sm btn-primary" th:onclick="dialogChangeStatus([[*{supervisor.id}]])">Request Status / Note</button>
                     <button id="btnIncludeSomeone" class="btn btn-sm btn-primary" th:onclick="dialogIncludePerson([[*{supervisor.id}]])">Include Someone</button>
                 </div>
 

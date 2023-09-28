@@ -255,7 +255,7 @@ public class WikiController {
         String folderFile = requestURL.split("/articles")[1];
         String[] folderList = folderFile.split("/");
         String postURLName = folderList[folderList.length-1];
-        String postName = postURLName.replace("-", " ");
+        String postName = postURLName.replace("_", " ");
         String folders = "";
         WikiPost post = new WikiPost();
             post.setPublished(false);
@@ -266,6 +266,10 @@ public class WikiController {
 
         Optional<WikiFolder> dir = wikiFolderService.findByFolder(folderFile);
         if (dir.isPresent()){
+            if(!articleViewPermission(currentUser)) {
+                session.setAttribute("msgError", "Access Denied Resources");
+                return redirectService.pathName(session, "/");
+            }
 
             List<GroupedWikiPostList> folderPosts = new ArrayList<>();
 
@@ -336,6 +340,13 @@ public class WikiController {
         if (!post.isPublished()) {
             session.setAttribute("msgError", "Access Denied to Article, Not Published");
             return redirectService.pathName(session, "/resource");
+        }
+
+        if(!articleViewPermission(currentUser)) {
+            if(!post.isAnonymous()) {
+                session.setAttribute("msgError", "Access Denied to Article, Not Published to Documentation");
+                return redirectService.pathName(session, "/resource");
+            }
         }
 
         model.addAttribute("wikiPost", post);
@@ -475,7 +486,7 @@ public class WikiController {
 
         String[] folderList = path.split("/");
         String postURLName = folderList[folderList.length-1];
-        String postName = postURLName.replace("-", " ");
+        String postName = postURLName.replace("_", " ");
         String folders = "";
         for ( int i=1; i<folderList.length-1; i++ ) {
             folders = folders + "/" + folderList[i];
@@ -509,6 +520,17 @@ public class WikiController {
         Collection<UserRoles> roles = currentUser.getUserRoles();
         for (UserRoles role : roles){
             if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("RESOURCE_SUPERVISOR")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean articleViewPermission(User currentUser){
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+        for (UserRoles role : roles){
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("RESOURCE_SUPERVISOR")
+                    || role.getName().equals("RESOURCE_WRITE") || role.getName().equals("RESOURCE_READ")) {
                 return true;
             }
         }

@@ -320,7 +320,7 @@
       editSubCategoryDisplay.style.display = "block";
       editSubIdDisplay.value = 0;
       editSubNameDisplay.value = "";
-    }message_users
+    }
 
     function editSub(id, name) {
       debugger
@@ -493,11 +493,10 @@
       });
     }
 
-    if (categorySelect.value !== "" && categorySelect.value > 0) {
-      editCatDisplay.style.display = "inline-block";
+    document.addEventListener("DOMContentLoaded", function() {
       clearSub();
-      getSubCategories()
-    }
+      getSubCategories();
+    });
 
   </script>
 

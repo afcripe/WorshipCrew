@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<div class="container-fluid m-0 py-0 px-0" layout:fragment="content">
+
+    <div th:replace="~{support/moduleHeader :: header}">Header</div>
+
+    <div class="wrapper flex-grow-1">
+    <div id="mainContent" class="wrapper d-flex">
+
+
+            <div class="flex-fill p-1 pb-4 w-100 mx-2">
+
+                <div class="row p-2">
+                    <div class="support-list-header">
+                        <div class="support-list-title" >
+                            All Open Tickets
+                        </div>
+                        <div class="support-list-item">
+                            <a href="/support" style="text-decoration: none">My Open Tickets</a>
+                        </div>
+                        <div class="support-list-item">
+                            <a th:href="'/support/user/'+${user.id}" style="text-decoration: none">All My Tickets</a>
+                        </div>
+                    </div>
+                </div>
+
+            <div class="row pt-5 pb-5 py-2">
+                <div class="py-1" th:if="${not #lists.isEmpty(ticketList)}" th:each="ticket : ${ticketList}">
+                    <div th:replace="~{components/cardTicketLine :: cardFragment(${ticket})}">No Tickets to Display</div>
+                </div>
+            </div>
+
+        </div>
+        </div>
+    </div>
+</div>
+
+
+</html>

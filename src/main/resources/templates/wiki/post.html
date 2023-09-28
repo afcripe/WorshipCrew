@@ -5,7 +5,13 @@
 
 <div class="container-fluid m-0 p-0" layout:fragment="content">
 
+    <th:block th:if="${#lists.contains(userRoles,'ADMIN_WRITE')
+                or #lists.contains(userRoles,'RESOURCE_SUPERVISOR')
+                or #lists.contains(userRoles,'RESOURCE_READ')
+                or #lists.contains(userRoles,'RESOURCE_WRITE')}">
     <div th:replace="~{wiki/moduleHeader :: header}">Header</div>
+    </th:block>
+
 
     <div class="mx-2" th:object="${wikiPost}">
 
@@ -26,7 +32,11 @@
                 <div th:utext="*{body}"></div>
             </div>
 
-            <div class="wiki-info col-12 col-md-3">
+            <div class="wiki-info col-12 col-md-3"
+                 th:if="${#lists.contains(userRoles,'ADMIN_WRITE')
+                or #lists.contains(userRoles,'RESOURCE_SUPERVISOR')
+                or #lists.contains(userRoles,'RESOURCE_READ')
+                or #lists.contains(userRoles,'RESOURCE_WRITE')}">
                 <div class="card m-1">
                     <div class="card-title h6 selectableItem m-2" onclick="toggleResourceInfo()">Article Info</div>
                     <hr class="pt-0">
@@ -46,7 +56,11 @@
                 </div>
             </div>
 
-            <div class="wiki-info-tab hide">
+            <div class="wiki-info-tab hide"
+                 th:if="${#lists.contains(userRoles,'ADMIN_WRITE')
+                or #lists.contains(userRoles,'RESOURCE_SUPERVISOR')
+                or #lists.contains(userRoles,'RESOURCE_READ')
+                or #lists.contains(userRoles,'RESOURCE_WRITE')}">
                 <div class="wiki-info-tab-title selectableItem" onclick="toggleResourceInfo()">
                     Tags
                 </div>
@@ -67,7 +81,7 @@
         const websiteDomain = /*[[${baseURL}]]*/ " ";
         /*]]>*/
 
-        let safeTitle = postTitle.replaceAll(" ","-");
+        let safeTitle = postTitle.replaceAll(" ","_");
         let postLinkText = "/resource/articles"+postFolder+"/"+safeTitle.toLowerCase();
         let postLink = websiteDomain+postLinkText;
         document.getElementById("articleLinkText").innerText = postLinkText;
@@ -78,7 +92,6 @@
         }
 
         function toggleResourceInfo() {
-            debugger
             let tab = document.querySelector(".wiki-info-tab");
             let info = document.querySelectorAll(".wiki-info");
             if (tab.classList.contains("hide")) {

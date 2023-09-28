@@ -132,6 +132,18 @@ public class TicketService implements TicketServiceInterface {
     }
 
     @Override
+    public List<Ticket> findAllOpen() {
+        List<Ticket> tickets = ticketRepository.findAll();
+        List<Ticket> openTickets = new ArrayList<>();
+        for (Ticket ticket : tickets) {
+            if (!ticket.getTicketStatus().equals(TicketStatus.Closed)) {
+                openTickets.add(ticket);
+            }
+        }
+        return openTickets;
+    }
+
+    @Override
     public List<Ticket> findAllByUser(User user) {
         return ticketRepository.findAllByUser(user);
     }
