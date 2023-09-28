@@ -47,6 +47,7 @@ public class NotificationMessageService implements NotificationMessageServiceInt
 
     @Override
     public NotificationMessage createMessage(NotificationMessage message) {
+        System.out.println(message);
         return messageRepository.save(message);
     }
 
@@ -295,8 +296,11 @@ public class NotificationMessageService implements NotificationMessageServiceInt
         // ToDo - Blackouts
 
         if (message.getModule().equals(EventModule.Request)) {
-            BigInteger orderId = new BigInteger(message.getModuleId());
-            OrderRequest newRequest = orderService.findById(orderId).get();
+            BigInteger orderId = BigInteger.valueOf(0);
+            if(!message.getModuleId().isBlank()) {
+                orderId = new BigInteger(message.getModuleId());
+            }
+            OrderRequest newRequest = orderService.findById(orderId).orElse(new OrderRequest());
             OrderItem requestItem = new OrderItem();
             if (!message.getItemId().equals(BigInteger.valueOf(0))) {
                 requestItem = orderItemService.findById(message.getItemId()).get();
@@ -336,7 +340,7 @@ public class NotificationMessageService implements NotificationMessageServiceInt
         }
 
         if (message.getModule().equals(EventModule.Support)) {
-            Ticket ticket = ticketService.findById(message.getModuleId()).get();
+            Ticket ticket = ticketService.findById(message.getModuleId()).orElse(new Ticket());
             TicketNote note = new TicketNote();
             if (!message.getNoteId().equals(BigInteger.valueOf(0))) {
                 note = ticketNoteService.findById(message.getNoteId()).get();

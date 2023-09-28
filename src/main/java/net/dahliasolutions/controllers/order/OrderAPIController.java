@@ -220,7 +220,7 @@ public class OrderAPIController {
                     new NotificationMessage(
                             null,
                             "The Status of a Request Item Changed",
-                            "",
+                            requestItem.get().getOrderRequest().getId().toString(),
                             requestItem.get().getId(),
                             null,
                             false,

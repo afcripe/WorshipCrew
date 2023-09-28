@@ -1,5 +1,6 @@
 package net.dahliasolutions.controllers.store;
 
+import io.netty.util.internal.StringUtil;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.*;
@@ -293,14 +294,21 @@ public class StoreController {
         redirectService.setHistory(session, "/store/item/"+id);
         Optional<StoreItem> storeItem = storeItemService.findById(id);
 
+        String catName = "";
+        String subCatName = "";
+
         if (storeItem.isPresent()) {
             model.addAttribute("storeItem", storeItem.get());
-            model.addAttribute("selectedCategory", storeItem.get().getCategory().getName());
-            model.addAttribute("selectedSubCategory", storeItem.get().getSubCategory().getName());
+            if (storeItem.get().getCategory() != null) {
+                model.addAttribute("selectedCategory", storeItem.get().getCategory().getName());
+            }
+            if (storeItem.get().getSubCategory() != null) {
+                model.addAttribute("selectedSubCategory", storeItem.get().getSubCategory().getName());
+            }
         } else {
             model.addAttribute("storeItem", new StoreItem());
-            model.addAttribute("selectedCategory", "");
-            model.addAttribute("selectedSubCategory", "");
+            model.addAttribute("selectedCategory", catName);
+            model.addAttribute("selectedSubCategory", subCatName);
         }
 
         return "store/item";
