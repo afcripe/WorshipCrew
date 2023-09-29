@@ -488,7 +488,6 @@ public class StoreController {
 
     @GetMapping("/imageManager")
     public String getImageManager(Model model, HttpSession session) {
-        redirectService.setHistory(session, "/store/settings");
         List<StoreImage> storeImageList = storedImageService.findAll();
         List<StoreImageModel> imageList = new ArrayList<>();
         for (StoreImage image : storeImageList) {
@@ -500,14 +499,17 @@ public class StoreController {
         List<StoreItem> storeItemList = storeItemService.findAll();
         for (StoreItem storeItem : storeItemList) {
             for (StoreImageModel img : imageList) {
-                if (storeItem.getImage().getId().equals(img.getId())) {
-                    img.setReferences(img.getReferences()+1);
+                if (storeItem.getImage() != null) {
+                    if (storeItem.getImage().getId().equals(img.getId())) {
+                        img.setReferences(img.getReferences() + 1);
+                    }
                 }
             }
         }
 
         model.addAttribute("imageList", imageList);
         model.addAttribute("showCategories", false);
+        redirectService.setHistory(session, "/store/settings");
         return "store/imageManager";
     }
 
