@@ -56,6 +56,23 @@
 
             <div class="wiki-info col-12 col-md-3">
                 <div class="wiki-info-headroom d-sm-none d-md-block"></div>
+
+                <div class="card m-1">
+                    <div class="card-title h6 selectableItem p-2" onclick="toggleResourceInfo()">Navigation</div>
+                    <div>
+                        <div>
+                            <ul>
+                                <li>Home</li>
+                                <li>Documentation
+                                    <ul>
+                                        <li>Procedures</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="card m-1">
                     <div class="card-title h6 selectableItem p-2" onclick="toggleResourceInfo()">Tags</div>
                     <hr>
@@ -81,6 +98,9 @@
                 </div>
                 <div class="wiki-info-tab-title selectableItem" onclick="toggleResourceInfo()">
                     Tags
+                </div>
+                <div class="wiki-info-tab-title selectableItem" onclick="toggleResourceInfo()">
+                    Navigation
                 </div>
             </div>
 
@@ -119,6 +139,7 @@
         function toggleResourceInfo() {
             let tab = document.querySelector(".wiki-info-tab-home");
             let info = document.querySelectorAll(".wiki-info");
+            let wikiBody = document.querySelector(".wiki-body");
             if (tab.classList.contains("hide")) {
                 tab.classList.remove("hide");
                 for (let key in info) {
@@ -128,6 +149,7 @@
                         console.log(info[key])
                     }
                 }
+                wikiBody.classList.add("wiki-body-padding");
                 tab.scrollIntoView();
             } else {
                 tab.classList.add("hide");
@@ -138,6 +160,7 @@
                         console.log(info[key])
                     }
                 }
+                wikiBody.classList.remove("wiki-body-padding");
                 info[0].scrollIntoView();
             }
         }
@@ -157,16 +180,11 @@
             titleEl.innerHTML = "";
             let crumb = "/resource/articles"
 
-            if (titleArray.length === 1) {
+            if (titleArray.length <= 1) {
                 titleEl.innerHTML += titleArray[0];
-            } if (titleArray.length === 2) {
-                // build title
-                for (let t = 1; t < titleArray.length; t++) {
-                    if (titleArray[t] !== "") {
-                        titleEl.innerHTML += "/ "+titleArray[t];
-                    }
-                }
-            } else if (titleArray.length > 2) {
+            } else {
+                // first link is resource home
+                titleEl.innerHTML += `\/&nbsp;<a href="/resource">resources</a>&nbsp;`;
                 // build breadcrumb
                 for (let a = 1; a < titleArray.length; a++) {
                     if (a < titleArray.length-1) {

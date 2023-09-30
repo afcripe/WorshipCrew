@@ -37,7 +37,25 @@
                 or #lists.contains(userRoles,'RESOURCE_SUPERVISOR')
                 or #lists.contains(userRoles,'RESOURCE_READ')
                 or #lists.contains(userRoles,'RESOURCE_WRITE')}">
+
                 <div class="card m-1">
+                    <div class="card-title h6 selectableItem p-2" onclick="toggleResourceInfo()">Navigation</div>
+                    <div>
+                        <div>
+                            <ul>
+                                <li>Home</li>
+                                <li>Documentation
+                                    <ul>
+                                        <li>Procedures</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card m-1">
+
                     <div class="card-title h6 selectableItem m-2" onclick="toggleResourceInfo()">Article Info</div>
                     <hr class="pt-0">
                     <span><u>Article Location:</u><a id="articleLink" href="#"><i class="bi bi-box-arrow-up-right"></i></a></span>
@@ -67,6 +85,9 @@
                 <div class="wiki-info-tab-title selectableItem" onclick="toggleResourceInfo()">
                     Article Info
                 </div>
+                <div class="wiki-info-tab-title selectableItem" onclick="toggleResourceInfo()">
+                    Navigation
+                </div>
             </div>
 
         </div>
@@ -94,6 +115,7 @@
         function toggleResourceInfo() {
             let tab = document.querySelector(".wiki-info-tab");
             let info = document.querySelectorAll(".wiki-info");
+            let wikiBody = document.querySelector(".wiki-body");
             if (tab.classList.contains("hide")) {
                 tab.classList.remove("hide");
                 for (let key in info) {
@@ -103,6 +125,7 @@
                         console.log(info[key])
                     }
                 }
+                wikiBody.classList.add("wiki-body-padding");
             } else {
                 tab.classList.add("hide");
                 for (let key in info) {
@@ -112,6 +135,7 @@
                         console.log(info[key])
                     }
                 }
+                wikiBody.classList.remove("wiki-body-padding");
             }
         }
 
