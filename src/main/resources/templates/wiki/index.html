@@ -59,18 +59,9 @@
 
                 <div class="card m-1">
                     <div class="card-title h6 selectableItem p-2" onclick="toggleResourceInfo()">Navigation</div>
-                    <div>
-                        <div>
-                            <ul>
-                                <li>Home</li>
-                                <li>Documentation
-                                    <ul>
-                                        <li>Procedures</li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
+
+                    <div id="navItemList"></div>
+
                 </div>
 
                 <div class="card m-1">
@@ -127,6 +118,11 @@
         }
         function navToPost(id) {
             window.location.href="/resource/article/"+id;
+        }
+        function navToNavLink(str) {
+            console.log(str);
+            debugger
+            window.location.href=str;
         }
         function navToRecent() {
             window.location.href="/resource/recent";
@@ -200,6 +196,67 @@
             }
         }
 
+        async function listNavItems() {
+            const response = await fetch('/api/v1/wiki/navigator/list', {
+                method: 'GET'
+            }).then(response => {
+                return response.json();
+            }).then(data => {
+                // remove currently displayed nav items
+                let navList = document.getElementById("navItemList");
+                while (navList.firstChild) {
+                    navList.removeChild(navList.firstChild);
+                }
+debugger
+                // create the list
+                let theList = document.createElement("ul");
+                let ulLevel = null;
+                let indent = 0;
+
+                // loop over return and create list
+                for (let i in data) {
+                    //loop each nav item and create dvi to show
+                    let item = data[i];
+                    // check if indenting
+                    if (item.indentationItem) {
+                        if (indent < 1) {
+                            ulLevel = document.createElement("ul");
+                            indent = 1;
+                        }
+                        // add list item indented ul
+                        let itemLI = document.createElement("li");
+                            itemLI.classList.add("selectableItem");
+                            itemLI.addEventListener("click", function(event) {
+                                navToNavLink(item.linkLocation);
+                            });
+                            itemLI.innerText = item.name;
+                        ulLevel.appendChild(itemLI);
+                    } else {
+                        if (indent > 0) {
+                            theList.appendChild(ulLevel);
+                            ulLevel = null;
+                            indent = 0;
+                        }
+                        // add list item
+                        let itemLI = document.createElement("li");
+                            itemLI.classList.add("selectableItem");
+                            itemLI.addEventListener("click", function (event) {
+                                navToNavLink(item.linkLocation);
+                            });
+                            itemLI.innerText = item.name;
+                        theList.appendChild(itemLI);
+                    }
+                }
+                if (indent > 0) {
+                    theList.appendChild(ulLevel);
+                    ulLevel = null;
+                    indent = 0;
+                }
+                navList.appendChild(theList);
+            });
+        }
+
+        listNavItems();
         setInfoShow();
         setPageTitleLinks();
 

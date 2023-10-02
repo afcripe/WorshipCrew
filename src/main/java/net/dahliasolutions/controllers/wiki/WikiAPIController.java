@@ -2,11 +2,14 @@ package net.dahliasolutions.controllers.wiki;
 
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.records.DoubleStringModel;
+import net.dahliasolutions.models.records.SingleBigIntegerModel;
+import net.dahliasolutions.models.records.SingleIntegerModel;
 import net.dahliasolutions.models.records.SingleStringModel;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.wiki.*;
 import net.dahliasolutions.services.AdminSettingsService;
 import net.dahliasolutions.services.wiki.WikiFolderService;
+import net.dahliasolutions.services.wiki.WikiNavigatorService;
 import net.dahliasolutions.services.wiki.WikiPostService;
 import net.dahliasolutions.services.wiki.WikiTagService;
 import org.springframework.security.core.Authentication;
@@ -28,6 +31,7 @@ public class WikiAPIController {
     private final WikiPostService wikiPostService;
     private final WikiFolderService wikiFolderService;
     private final WikiTagService wikiTagService;
+    private final WikiNavigatorService navigatorService;
     private final AdminSettingsService adminSettingsService;
 
     @PostMapping("/save")
@@ -270,5 +274,37 @@ public class WikiAPIController {
     public SingleStringModel updateStoreHome(@ModelAttribute SingleStringModel portalHomeModel) {
         adminSettingsService.setStoreHome(portalHomeModel.name());
         return portalHomeModel;
+    }
+
+    @GetMapping("/navigator/list")
+    public List<WikiNavigator> listNavigatorItems() {
+        List<WikiNavigator> allItems = navigatorService.findAll();
+        return allItems;
+    }
+
+    @PostMapping("/navigator/new")
+    public WikiNavigator newNavigatorItem(@ModelAttribute WikiNavigator navModel) {
+        WikiNavigator nav = navigatorService.createItem(navModel);
+        return nav;
+    }
+
+    @GetMapping("/navigator/get/{id}")
+    public WikiNavigator updateNavigatorItem(@PathVariable Integer id) {
+        Optional<WikiNavigator> navItem = navigatorService.findById(id);
+        if (navItem.isPresent()) {
+            return navItem.get();
+        }
+        return new WikiNavigator();
+    }
+
+    @PostMapping("/navigator/delete")
+    public SingleIntegerModel deleteNavigatorItem(@ModelAttribute SingleIntegerModel navModel) {
+        navigatorService.deleteById(navModel.id());
+        return navModel;
+    }
+
+    @PostMapping("/navigator/update")
+    public WikiNavigator updateNavigatorItem(@ModelAttribute WikiNavigator navModel) {
+        return navigatorService.save(navModel);
     }
 }

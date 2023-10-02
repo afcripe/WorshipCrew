@@ -61,8 +61,25 @@
       </div>
 
       <div class="col-12 col-lg-6">
-        <div class="card m-1">
-          <div class="card-title h6">Unpublished Articles</div>
+        <div class="card m-1 px-2">
+          <div class="card-title h5">Resource Navigator</div>
+          <div>
+            <button id="btnNewNavItem" class="btn btn-sm btn-wiki" onclick="showNewNavDialog()">New Nav Link</button>
+            Links can be to Article or Folders.
+            <hr>
+            <table id="navItemList" class="nav-item-table">
+              <tr id="navTableHeader" class="nav-item-table-row nav-item-table-header">
+                <th>Order</th>
+                <th>Name</th>
+                <th>Link</th>
+                <th>&nbsp;</th>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="card m-1 px-2">
+          <div class="card-title h5">Unpublished Articles</div>
           <div>
             <div class="row mx-2 p-1">
               <div class="col-8">
@@ -83,9 +100,141 @@
           </div>
         </div>
       </div>
-    </div>
 
   </div>
+
+    <dialog id="newNavItemDialog" class="upload-modal">
+      <script>
+        async function postNewNavItem() {
+          document.getElementById("btnNewItemSubmit").disabled = true;
+
+          let formData = new FormData();
+              formData.set("id", "0");
+              formData.set("name", document.getElementById('navName').value);
+              formData.set("linkLocation", document.getElementById('navLink').value);
+              formData.set("indentationItem", document.getElementById('navIndentLevel').checked);
+              formData.set("itemOrder", document.getElementById('navOrder').value);
+
+          const response = await fetch('/api/v1/wiki/navigator/new', {
+            method: 'POST',
+            body: formData
+          }).then(response => {
+            return response.json();
+          }).then(data => {
+            keyEscNavItem();
+            listNavItems();
+          });
+        }
+
+        function keyEscNavItem() {
+          document.getElementById("navName").value = "";
+          document.getElementById("navLink").value = "";
+          document.getElementById("navIndentLevel").checked =false;
+          document.getElementById("navOrder").value = 0;
+          document.getElementById("btnNewItemSubmit").disabled = false;
+          document.getElementById("newNavItemDialog").close();
+        }
+
+      </script>
+      <h2>New Navigation Menu Item</h2>
+      <form id="formNewNavItem" style="width: 300px; max-width: 450px">
+        <label for="navName" class="form-label">Name</label>
+        <input class="form-control" id="navName" placeholder="Name">
+
+        <label for="navLink" class="form-label">Link</label>
+        <input class="form-control" id="navLink" placeholder="Link">
+
+        <label for="navIndentLevel" class="form-label">Indentation Level</label>
+        <input class="form-check" id="navIndentLevel" type="checkbox">
+
+        <label for="navOrder" class="form-label">Item Position</label>
+        <input class="form-control" id="navOrder" value="0" type="number">
+
+        <div class="pt-2">
+          <button id="btnNewItemSubmit" type="button" class="btn btn-sm btn-wiki" onclick="postNewNavItem()">Add Item</button>
+          <button id="btnNewItemCancel" type="button" class="btn btn-sm btn-outline-wiki" onclick="keyEscNavItem()">Cancel</button>
+        </div>
+
+      </form>
+    </dialog>
+
+    <dialog id="newEditItemDialog" class="upload-modal">
+      <script>
+        async function loadEditNavItem(itemId) {
+          const response = await fetch('/api/v1/wiki/navigator/get/'+itemId, {
+            method: 'GET'
+          }).then(response => {
+            return response.json();
+          }).then(data => {
+            debugger
+            if (data.id === 0) {
+              keyEscEditNavItem();
+              alert("Item not found!");
+            } else {
+              document.getElementById('navIdEdit').value = data.id;
+              document.getElementById('navNameEdit').value = data.name;
+              document.getElementById('navLinkEdit').value = data.linkLocation;
+              document.getElementById('navIndentLevelEdit').checked = data.indentationItem;
+              document.getElementById('navOrderEdit').value = data.itemOrder;
+            }
+          });
+        }
+
+        async function postEditNavItem() {
+          document.getElementById("btnNewItemSubmitEdit").disabled = true;
+
+          let formData = new FormData();
+              formData.set("id", document.getElementById('navIdEdit').value);
+              formData.set("name", document.getElementById('navNameEdit').value);
+              formData.set("linkLocation", document.getElementById('navLinkEdit').value);
+              formData.set("indentationItem", document.getElementById('navIndentLevelEdit').checked);
+              formData.set("itemOrder", document.getElementById('navOrderEdit').value);
+
+          const response = await fetch('/api/v1/wiki/navigator/update', {
+            method: 'POST',
+            body: formData
+          }).then(response => {
+            return response.json();
+          }).then(data => {
+            keyEscEditNavItem();
+            listNavItems();
+          });
+        }
+
+        function keyEscEditNavItem() {
+          document.getElementById('navIdEdit').value = "0";
+          document.getElementById("navNameEdit").value = "";
+          document.getElementById("navLinkEdit").value = "";
+          document.getElementById("navIndentLevelEdit").checked = false;
+          document.getElementById("navOrderEdit").value = 0;
+          document.getElementById("btnNewItemSubmitEdit").disabled = false;
+          document.getElementById("newEditItemDialog").close();
+        }
+
+      </script>
+      <h2>Edit Navigation Menu Item</h2>
+      <form id="formNewNavItemEdit" style="width: 300px; max-width: 450px">
+        <input type="hidden" id="navIdEdit" value="0">
+
+        <label for="navNameEdit" class="form-label">Name</label>
+        <input class="form-control" id="navNameEdit" placeholder="Name">
+
+        <label for="navLinkEdit" class="form-label">Link</label>
+        <input class="form-control" id="navLinkEdit" placeholder="Link">
+
+        <label for="navIndentLevelEdit" class="form-label">Indentation Level</label>
+        <input class="form-check" id="navIndentLevelEdit" type="checkbox">
+
+        <label for="navOrderEdit" class="form-label">Item Position</label>
+        <input class="form-control" id="navOrderEdit" value="0" type="number">
+
+        <div class="pt-2">
+          <button id="btnNewItemSubmitEdit" type="button" class="btn btn-sm btn-wiki" onclick="postEditNavItem()">Update</button>
+          <button id="btnNewItemCancelEdit" type="button" class="btn btn-sm btn-outline-wiki" onclick="keyEscEditNavItem()">Cancel</button>
+        </div>
+
+      </form>
+    </dialog>
 
   <script>
     function navToPost(id) {
@@ -168,8 +317,109 @@
         bDocsHome.disabled = false;
       });
     }
+
+    function showNewNavDialog() {
+      document.getElementById("newNavItemDialog").showModal();
+    }
+
+    async function listNavItems() {
+      const response = await fetch('/api/v1/wiki/navigator/list', {
+        method: 'GET'
+      }).then(response => {
+        return response.json();
+      }).then(data => {
+        // remove currently displayed nav items
+        let navList = document.getElementById("navItemList");
+        let navListNodes = document.getElementById("navItemList").querySelectorAll("tr");
+        for (let q in navListNodes) {
+          if (q>=1) {
+            navListNodes[q].remove();
+          }
+        }
+
+        // loop over return and create list
+        for (let i in data) {
+          //loop each nav item and create dvi to show
+          let item = data[i];
+          let itemDiv = document.createElement("tr");
+              itemDiv.classList.add("nav-item-table-row");
+
+          let itemCount = document.createElement("td");
+              itemCount.classList.add("nav-item-table-cell");
+              itemCount.innerText = item.itemOrder;
+          itemDiv.appendChild(itemCount);
+
+          let itemName = document.createElement("td");
+              itemName.classList.add("nav-item-table-cell");
+            // add indentation icons
+            if (item.indentationItem){
+                let dIcon = document.createElement("i");
+                    dIcon.classList.add("bi");
+                    dIcon.classList.add("bi-arrow-return-right");
+                    dIcon.classList.add("return-character-padding");
+                itemName.appendChild(dIcon);
+              }
+              let dIconSpan = document.createElement("span");
+                  dIconSpan.innerText = item.name;
+              itemName.appendChild(dIconSpan);
+          itemDiv.appendChild(itemName);
+
+          let itemLink = document.createElement("td");
+              itemLink.classList.add("nav-item-table-cell-big");
+              itemLink.innerText = item.linkLocation;
+          itemDiv.appendChild(itemLink);
+
+          let itemButtons = document.createElement("td");
+              itemButtons.classList.add("nav-item-table-cell");
+          let btnDivs = document.createElement("div");
+              itemButtons.classList.add("nav-item-table-push-right");
+              let itemEdit = document.createElement("button");
+                  itemEdit.innerText = "Edit";
+                  itemEdit.classList.add("btn");
+                  itemEdit.classList.add("btn-sm");
+                  itemEdit.classList.add("btn-wiki");
+                  itemEdit.addEventListener("click", () => editNavItem(item.id));
+              btnDivs.appendChild(itemEdit);
+              let itemDelete = document.createElement("button");
+                  itemDelete.innerText = "X";
+                  itemDelete.classList.add("btn");
+                  itemDelete.classList.add("btn-sm");
+                  itemDelete.classList.add("btn-outline-wiki");
+                  itemDelete.addEventListener("click", () => deleteNavItem(item.id));
+              btnDivs.appendChild(itemDelete);
+
+              itemButtons.appendChild(btnDivs);
+          itemDiv.appendChild(itemButtons);
+
+          navList.appendChild(itemDiv);
+        }
+      });
+    }
+
+    function editNavItem(id) {
+      loadEditNavItem(id);
+      document.getElementById("newEditItemDialog").showModal();
+    }
+
+    async function deleteNavItem(id) {
+      let formData = new FormData();
+      formData.set("id", id);
+
+      const response = await fetch('/api/v1/wiki/navigator/delete', {
+        method: 'POST',
+        body: formData
+      }).then(response => {
+        return response.json();
+      }).then(data => {
+        listNavItems();
+      });
+    }
+
+    listNavItems();
+
   </script>
 
+  </div>
 </div>
 
 </html>

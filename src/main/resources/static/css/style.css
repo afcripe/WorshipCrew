@@ -1092,3 +1092,40 @@ ul, #folderTree {
 .enbolden {
     font-weight: bolder;
 }
+
+/* table styled flex container */
+
+.nav-item-table {
+    table-layout:fixed;
+    width:100%;
+}
+
+.nav-item-table-row {
+    display: table-row;
+}
+
+.nav-item-table-cell {
+    display: table-cell;
+    white-space: pre;
+}
+
+.nav-item-table-cell-big {
+    display: table-cell;
+    white-space: pre;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    width:100%;
+}
+
+.nav-item-table-header {
+    font-weight: bolder;
+    font-size: larger;
+}
+
+.nav-item-table-push-right {
+    text-align: right;
+}
+
+.return-character-padding {
+    padding-right: 0.3rem;
+}
