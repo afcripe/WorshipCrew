@@ -4,9 +4,12 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.data.StoreImageRepository;
 import net.dahliasolutions.models.store.StoreImage;
+import net.dahliasolutions.models.user.User;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,7 +41,14 @@ public class StoreImageService implements StoreImageServiceInterface {
 
     @Override
     public List<StoreImage> findAll() {
-        return storeImageRepository.findAll();
+        List<StoreImage> images = storeImageRepository.findAll();
+        Collections.sort(images, new Comparator<StoreImage>() {
+            @Override
+            public int compare(StoreImage image1, StoreImage image2) {
+                return image1.getName().compareToIgnoreCase(image2.getName());
+            }
+        });
+        return images;
     }
 
     @Override

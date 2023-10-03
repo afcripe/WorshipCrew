@@ -203,6 +203,50 @@
             </form>
           </dialog>
 
+          <dialog id="deleteDialog" class="upload-modal">
+            <script>
+              async function postDeleteItem() {
+                let formData = new FormData();
+                    formData.set("id", document.getElementById("id").value)
+
+                const response = await fetch('/api/v1/store/item/delete', {
+                  method: 'POST',
+                  body: formData
+                }).then(response => {
+                  return response.json();
+                }).then(data => {
+                  if (data.id > 0) {
+                    window.location.href="/store?page=0";
+                  } else {
+                    escapeDeleteItem();
+                    alert("Permission Denied!");
+                  }
+                });
+              }
+
+              function escapeDeleteItem() {
+                document.getElementById("deleteDialog").close();
+              }
+
+            </script>
+            <h2>Delete Store Item</h2>
+            <div class="flex-column">
+                <div class="row p-2">
+                  <div class="col">
+                    <p>Confirm deleting store item.</p>
+                  </div>
+                </div>
+
+                <div class="row p-2">
+                  <div class="col">
+                    <button id="btnDeleteSubmit" type="button" class="btn btn-sm btn-danger" onclick="postDeleteItem()">Submit</button>
+                    <button id="btnDeleteCancel" formmethod="dialog" type="butoon" class="btn btn-sm btn-outline-store" onclick="escapeDeleteItem()">Cancel</button>
+                  </div>
+                </div>
+
+            </div>
+          </dialog>
+
           <th:block th:if="${session.msg}">
             <p th:text="${session.msg}"/>
             <th:block th:text="${#session.removeAttribute('msg')}" />
@@ -213,6 +257,7 @@
             <div style="float: right">
               <button type="button" class="btn btn-store" onclick="submitForm()">Update</button>
               <button type="button" class="btn btn-outline-store" th:onclick="window.location.href=[[${session.redirectPath}]];">Back</button>
+              <button type="button" class="btn btn-outline-danger" th:onclick="deleteItem([[*{id}]])" th:if="${requestCount} < 1">Delete</button>
             </div>
           </div>
 
@@ -550,6 +595,11 @@
     document.getElementById("position").value = p;
     theForm.submit();
   }
+
+  async function deleteItem(id) {
+    document.getElementById("deleteDialog").showModal();
+  }
+
 </script>
 
 </div>

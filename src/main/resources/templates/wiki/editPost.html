@@ -496,6 +496,105 @@
             </div>
         </form>
     </dialog>
+    <dialog id="permissionDialog" class="upload-modal">
+        <script>
+            async function loadPermission() {
+                const response = await fetch('/api/v1/wiki/getpermissions/'+document.getElementById("postId").value, {
+                    method: 'GET'
+                }).then(response => {
+                    return response.json();
+                }).then(data => {
+                    console.log(data);
+                    debugger
+                    // clear old options
+                    let opts = document.getElementById("positionSelect").querySelectorAll("option");
+                    while (document.getElementById("positionSelect").options.length > 0) {
+                        document.getElementById("positionSelect").remove(0);
+                    }
+                    // add new options
+                    for (let o in data) {
+                        let opt = data[o];
+                        let optElement = document.createElement("option");
+                            optElement.value = opt.id;
+                            optElement.text = opt.name;
+                            if (opt.selected) {
+                                optElement.selected = true;
+                            }
+                        document.getElementById("positionSelect").appendChild(optElement);
+                    }
+
+                });
+            }
+
+            async function postPermission() {
+                document.getElementById('btnPermissionSubmit').setAttribute("disabled", "disabled");
+                document.getElementById('btnPermissionCancel').setAttribute("disabled", "disabled");
+
+                //format positions for submission
+                let pList = document.getElementById("positionSelect");
+                let collection = pList.selectedOptions;
+                let p = "";
+                let i = 0;
+                for (let i = 0; i < collection.length; i++) {
+                    p = p+collection[i].value+" ";
+                }
+
+                let formData = new FormData();
+                    formData.set("id", document.getElementById("postId").value);
+                    formData.set("name", p);
+
+                const response = await fetch('/api/v1/wiki/setpermissions', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    return response.json();
+                }).then(data => {
+                    escapePermission();
+                });
+            }
+
+            function escapePermission() {
+                // enable buttons and hide progress
+                document.getElementById('btnPermissionSubmit').removeAttribute("disabled");
+                document.getElementById('btnPermissionCancel').removeAttribute("disabled");
+                // clear form
+                document.getElementById('positions').value = "";
+                document.getElementById('positionSelect').value = "";
+                // close dialog
+                document.getElementById("permissionDialog").close();
+            }
+        </script>
+        <h2>Article Permissions</h2>
+        <div class="flex-column">
+            <form id="formPermission" method="dialog">
+
+                <div class="row p-2">
+                    <div class="col">
+                        <div>Select all positions with permission to view this article.</div>
+                        <div>Select no positions is the same as selecting all.</div>
+                    </div>
+                </div>
+
+                <div class="row p-2">
+                    <div class="col">
+                        <input type="hidden" id="positions" name="position">
+                        <select id="positionSelect" class="form-control-sm w-100" name="positionSelect" multiple>
+                            <option value="volunteer">Volunteer</option>
+                            <option value="director">Director</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row p-2">
+                    <div class="col">
+                        <button id="btnPermissionSubmit" type="button" class="btn btn-sm btn-wiki" onclick="postPermission()">Update</button>
+                        <button id="btnPermissionCancel" type="button" class="btn btn-sm btn-outline-wiki" onclick="escapePermission()">Cancel</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </dialog>
 
     <script th:inline="javascript">
         /*<![CDATA[*/
@@ -605,6 +704,11 @@
         function chooseImageClick() {
             document.getElementById("chooseDialog").showModal();
             loadImages();
+        }
+
+        function updatePermission() {
+            loadPermission();
+            document.getElementById("permissionDialog").showModal();
         }
     </script>
   </div>

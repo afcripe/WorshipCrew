@@ -4,7 +4,7 @@
       <div class="container-fluid w-100">
 
           <div class="navbar-nav mt-2 mx-2">
-            <a class="nav-link h3" href="/store">
+            <a class="nav-link h3" href="/store?page=0">
               <i class="bi bi-shop-window color-store"></i>
             </a>
           </div>
@@ -89,7 +89,7 @@
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0" th:each="cat : ${categoryList}">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                           data-bs-toggle="dropdown" aria-expanded="false" th:text="*{cat.name}"></a>
+                           data-bs-toggle="dropdown" aria-expanded="false"><span th:text="*{cat.name}" th:onclick="navCategory(this, [[*{cat.name}]])"></span></a>
                         <ul class="dropdown-menu category-dropdown-menu" aria-labelledby="navbarDropdown"
                             th:unless="${#lists.isEmpty(cat.subCategoryList)}">
                             <th:block th:each="sub : ${cat.subCategoryList}">
@@ -150,12 +150,6 @@
     <div id="addToCartTemplate" class="alert-fixed" style="display: none" onclick="clearAddToCartMessage()">
         <div class="alert-success alert-fixed-success align-content-center">
             <p style="text-align: center">Request Cart Updated!</p>
-            <script  th:inline="javascript">
-                fetch("/api/v1/app/removesuccessmsg");
-                setTimeout(() => {
-                    clearSuccess();
-                }, 3000);
-            </script>
         </div>
     </div>
 

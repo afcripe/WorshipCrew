@@ -16,16 +16,83 @@
       <tr>
         <th scope="col">Name</th>
         <th scope="col">Description</th>
+        <th scope="col" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')}"></th>
       </tr>
       </thead>
       <tbody>
       <tr th:each="uRole : ${roleList}">
         <td><span th:text="${uRole.name}"/></td>
         <td><span th:text="${uRole.description}"/></td>
+        <td th:if="${#lists.contains(userRoles,'ADMIN_WRITE')}">
+          <button class="btn btn-sm btn-outline-warning" th:onclick="editRole([[${uRole.id}]])">Edit</button>
+        </td>
       </tr>
       </tbody>
     </table>
   </div>
+
+  <dialog id="editDialog" class="upload-modal">
+    <script>
+      async function loadRole(id) {
+        const response = await fetch('/api/v1/user/role/'+id, {
+          method: 'GET'
+        }).then(response => {
+          return response.json();
+        }).then(data => {
+          console.log(data);
+          document.getElementById("roleId").value = data.id;
+          document.getElementById("roleDescription").value = data.description;
+        });
+      }
+      async function postRole() {
+        debugger
+        let formData = new FormData();
+            formData.set("id", document.getElementById("roleId").value)
+            formData.set("name", "")
+            formData.set("description", document.getElementById("roleDescription").value)
+
+        const response = await fetch('/api/v1/user/role/update', {
+          method: 'POST',
+          body: formData
+        }).then(response => {
+          return response.json();
+        }).then(data => {
+          window.location.reload();
+        });
+      }
+
+      function escapeUpdateRole() {
+        document.getElementById("deleteDialog").close();
+      }
+
+    </script>
+    <h2>Update Role Description</h2>
+    <div class="flex-column">
+      <div class="row p-2">
+        <div class="col">
+          <input type="hidden" id="roleId">
+          <textarea id="roleDescription"></textarea>
+        </div>
+      </div>
+
+      <div class="row p-2">
+        <div class="col">
+          <button id="btnDeleteSubmit" type="button" class="btn btn-sm btn-success" onclick="postRole()">Submit</button>
+          <button id="btnDeleteCancel" formmethod="dialog" type="butoon" class="btn btn-sm btn-outline-warning" onclick="escapeUpdateRole()">Cancel</button>
+        </div>
+      </div>
+
+    </div>
+  </dialog>
+
+  <script>
+    function editRole(id) {
+      debugger
+      loadRole(id);
+      document.getElementById("editDialog").showModal();
+    }
+  </script>
+
 </div>
 
 </html>

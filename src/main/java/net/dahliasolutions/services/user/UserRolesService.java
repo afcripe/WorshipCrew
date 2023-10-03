@@ -21,7 +21,11 @@ public class UserRolesService implements UserRolesServiceInterface{
     @Override
     public void createRole(String name, String description) {
         UserRoles role = new UserRoles(null, name, description);
+        rolesRepository.save(role);
+    }
 
+    @Override
+    public void save(UserRoles role) {
         rolesRepository.save(role);
     }
 

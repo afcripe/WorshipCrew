@@ -669,7 +669,7 @@ const requestNotificationPermission = () => {
 const sendToClipboard = async (str) => {
     navigator.clipboard.writeText(str)
         .then((prom) => {
-            alert(str+" copied to clipboard.");
+            console.log(prom);
         });
 }
 

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+
+<div th:fragment="cardFragment(imageItem)">
+  <div class="card" th:object="${imageItem}" th:id="'img-' + *{id}">
+
+    <script th:inline="javascript">
+      function navToItem(location) {
+        window.open(location, '_blank');
+      }
+    </script>
+
+    <div class="row mt-2" >
+      <div class="col-3" style="vertical-align: center">
+        <img th:src="@{*{image.fileLocation}}" class="store_line_image mr-2 align-content-center"
+             style="float: left" th:onclick="navToItem([[*{image.fileLocation}]])">&nbsp;
+        <h6 th:id="'name-' + *{id}" th:text="*{image.name}" class=" align-content-center"></h6>
+      </div>
+      <div class="col-6" style="overflow-x: clip">
+        <p th:id="'desc-' + *{id}" th:text="*{image.description}" style="overflow: clip; max-height: 1.5em;"></p>
+      </div>
+      <div class="col-3">
+        References: <span th:text="*{image.references}"></span>
+        <i th:id="'caret-'+*{id}" class="bi bi-caret-right-square image-manager__caret" th:onclick="itemOpen([[*{id}]])"></i>
+        <i th:id="'caret-open-'+*{id}" class="bi bi-caret-down-square image-manager__caret-hide" th:onclick="itemOpen([[*{id}]])"></i>
+        <button id="btnEdit" class="btn btn-sm btn-store ml-2" type="button"
+                th:onclick="editeImage([[*{id}]])">Edit</button>
+        <button id="btnDelete" class="btn btn-sm btn-outline-store ml-2" type="button"
+                th:onclick="deleteImage('img-[[*{id}]]', [[*{id}]])">X</button>
+      </div>
+    </div>
+
+    <div th:id="'items-'+*{id}" class="row image-manager__item image-manager__item-hide">
+      <div th:each="storeItem : *{items}" class="selectableItem" th:onclick="navStoreItem([[${storeItem.id}]])">
+        Item <span th:text="${storeItem.id}"></span>: <span th:text="${storeItem.name}"></span>
+      </div>
+    </div>
+
+
+    <script>
+
+      function itemOpen(id) {
+        let divId = "items-"+id;
+        let caretId = "caret-"+id;
+        let caretOpenId = "caret-open-"+id;
+        let itemDiv = document.getElementById(divId);
+        let caretDiv = document.getElementById(caretId);
+        let caretOpenDiv = document.getElementById(caretOpenId);
+
+        if (caretDiv.classList.contains("image-manager__caret-hide")) {
+          caretDiv.classList.remove("image-manager__caret-hide");
+          caretOpenDiv.classList.add("image-manager__caret-hide");
+          itemDiv.classList.add("image-manager__item-hide");
+        } else {
+          caretDiv.classList.add("image-manager__caret-hide");
+          caretOpenDiv.classList.remove("image-manager__caret-hide");
+          itemDiv.classList.remove("image-manager__item-hide");
+        }
+      }
+
+      function navStoreItem(id) {
+        window.location.href="/store/item/"+id;
+      }
+
+    </script>
+
+  </div>
+
+
+</div>
+
+</html>

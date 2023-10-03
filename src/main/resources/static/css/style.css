@@ -688,6 +688,7 @@
     padding: 2px;
     object-fit: contain;
     aspect-ratio: 1 / 1;
+    cursor: pointer;
 }
 .store_card_image {
     width: 50%;
@@ -744,6 +745,25 @@
 
 .nav-login a{
     color: var(--dwc-login-color) !important;
+}
+
+/* image manager */
+
+.image-manager__item {
+    visibility: visible;
+    height: auto;
+}
+.image-manager__item-hide {
+    visibility: hidden;
+    height: 0;
+}
+
+.image-manager__caret {
+    display: inline-block;
+}
+
+.image-manager__caret-hide {
+    display: none;
 }
 
 /* Autocomplete Order Search */

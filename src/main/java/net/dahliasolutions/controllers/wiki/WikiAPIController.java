@@ -1,13 +1,13 @@
 package net.dahliasolutions.controllers.wiki;
 
 import lombok.RequiredArgsConstructor;
-import net.dahliasolutions.models.records.DoubleStringModel;
-import net.dahliasolutions.models.records.SingleBigIntegerModel;
-import net.dahliasolutions.models.records.SingleIntegerModel;
-import net.dahliasolutions.models.records.SingleStringModel;
+import net.dahliasolutions.models.position.Position;
+import net.dahliasolutions.models.position.PositionSelectedModel;
+import net.dahliasolutions.models.records.*;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.wiki.*;
 import net.dahliasolutions.services.AdminSettingsService;
+import net.dahliasolutions.services.position.PositionService;
 import net.dahliasolutions.services.wiki.WikiFolderService;
 import net.dahliasolutions.services.wiki.WikiNavigatorService;
 import net.dahliasolutions.services.wiki.WikiPostService;
@@ -32,6 +32,7 @@ public class WikiAPIController {
     private final WikiFolderService wikiFolderService;
     private final WikiTagService wikiTagService;
     private final WikiNavigatorService navigatorService;
+    private final PositionService positionService;
     private final AdminSettingsService adminSettingsService;
 
     @PostMapping("/save")
@@ -61,6 +62,7 @@ public class WikiAPIController {
                 newPost.setHideInfo(info);
                 newPost.setPinToTop(pin);
                 newPost.setTagList(new ArrayList<>());
+                newPost.setPositionList(new ArrayList<>());
             return wikiPostService.createWikiPost(newPost).getId();
         }
 
@@ -306,5 +308,54 @@ public class WikiAPIController {
     @PostMapping("/navigator/update")
     public WikiNavigator updateNavigatorItem(@ModelAttribute WikiNavigator navModel) {
         return navigatorService.save(navModel);
+    }
+
+    @GetMapping("/getpermissions/{id}")
+    public List<PositionSelectedModel> updateNavigatorItem(@PathVariable BigInteger id) {
+        List<Position> positionList = positionService.findAll();
+        List<PositionSelectedModel> positions = new ArrayList<>();
+
+        Optional<WikiPost> post = wikiPostService.findById(id);
+        if (post.isPresent()) {
+            for (Position pos : positionList) {
+                PositionSelectedModel posSelect = new PositionSelectedModel(
+                        pos.getId(),
+                        pos.getLevel(),
+                        pos.getName(),
+                        false
+                );
+                if (post.get().getPositionList().contains(pos)) {
+                    posSelect.setSelected(true);
+                }
+                positions.add(posSelect);
+            }
+        }
+        return positions;
+    }
+
+    @PostMapping("/setpermissions")
+    public SingleBigIntegerModel updatePostPermissions(@ModelAttribute BigIntegerStringModel postModel) {
+        Optional<WikiPost> post = wikiPostService.findById(postModel.id());
+        if (post.isPresent()) {
+            List<String> items = Arrays.asList(postModel.name().split("\s"));
+            ArrayList<Position> pl = new ArrayList<>();
+            for (String s : items) {
+                if (!s.equals("")) {
+                    try {
+                        int i = Integer.parseInt(s);
+                        Optional<Position> p = positionService.findById(BigInteger.valueOf(i));
+                        if (p.isPresent()) {
+                            pl.add(p.get());
+                        }
+                    } catch (Error e) {
+                        System.out.println(e);
+                    }
+                }
+            }
+
+            post.get().setPositionList(pl);
+            wikiPostService.save(post.get());
+        }
+        return new SingleBigIntegerModel(postModel.id());
     }
 }

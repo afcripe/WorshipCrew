@@ -194,4 +194,19 @@ public class UserAPIController {
         return searchReturn;
     }
 
+    @GetMapping("/role/{id}")
+    public UserRoles getUserRole(@PathVariable BigInteger id) {
+        return userRolesService.findById(id).get();
+    }
+
+    @PostMapping("/role/update")
+    public UserRoles getUserRole(@ModelAttribute UserRoles roleModel) {
+        Optional<UserRoles> role = userRolesService.findById(roleModel.getId());
+        if (role.isPresent()) {
+            role.get().setDescription(roleModel.getDescription());
+            userRolesService.save(role.get());
+        }
+        return roleModel;
+    }
+
 }

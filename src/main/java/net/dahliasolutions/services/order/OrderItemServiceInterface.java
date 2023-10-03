@@ -21,6 +21,7 @@ public interface OrderItemServiceInterface {
     List<OrderItem> findAllByDepartmentAndCycle(BigInteger departmentId, LocalDateTime startDate, LocalDateTime endDate);
     List<OrderItem> findAllBySupervisorAndCycle(BigInteger userId, LocalDateTime startDate, LocalDateTime endDate);
     List<OrderItem> findAllBySupervisorOpenOnly(User user);
+    List<OrderItem> findAllByProductId(BigInteger productId);
     void save(OrderItem orderItem);
     void deleteById(BigInteger id);
 

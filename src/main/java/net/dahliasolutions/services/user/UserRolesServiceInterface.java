@@ -9,6 +9,7 @@ import java.util.Optional;
 public interface UserRolesServiceInterface {
 
     void createRole(String name, String description);
+    void save(UserRoles role);
     Optional<UserRoles> findByName(String name);
     List<UserRoles> findAll();
     Optional<UserRoles> findById(BigInteger id);

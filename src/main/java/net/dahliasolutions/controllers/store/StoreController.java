@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.*;
 import net.dahliasolutions.models.department.DepartmentRegional;
+import net.dahliasolutions.models.order.OrderItem;
 import net.dahliasolutions.models.position.Position;
 import net.dahliasolutions.models.position.PositionSelectedModel;
 import net.dahliasolutions.models.records.BigIntegerStringModel;
@@ -14,6 +15,7 @@ import net.dahliasolutions.models.user.UserRoles;
 import net.dahliasolutions.models.wiki.WikiPost;
 import net.dahliasolutions.services.*;
 import net.dahliasolutions.services.department.DepartmentRegionalService;
+import net.dahliasolutions.services.order.OrderItemService;
 import net.dahliasolutions.services.position.PositionService;
 import net.dahliasolutions.services.store.*;
 import net.dahliasolutions.services.user.UserService;
@@ -49,6 +51,7 @@ public class StoreController {
     private final WikiPostService wikiPostService;
     private final NotificationService notificationService;
     private final StoreSettingService storeSettingService;
+    private final OrderItemService orderItemService;
     private final EventService eventService;
 
     @ModelAttribute
@@ -58,7 +61,7 @@ public class StoreController {
         List<StoreCategory> categoryList = categoryService.findAll();
 
         model.addAttribute("moduleTitle", "Store");
-        model.addAttribute("moduleLink", "/store");
+        model.addAttribute("moduleLink", "/store?page=0");
         model.addAttribute("userId", user.getId());
         model.addAttribute("categoryList", categoryList);
         model.addAttribute("showCategories", true);
@@ -76,14 +79,28 @@ public class StoreController {
         User user = (User) auth.getPrincipal();
         DepartmentRegional department = departmentService.findByName(user.getDepartment().getName()).get();
 
+        // get last used pages items or set default
+        Object currentSessionPage = session.getAttribute("sessionPage");
+        if (session.getAttribute("sessionPage") == null) {
+            session.setAttribute("sessionPage", String.valueOf(0));
+        }
+        Object currentSessionElements = session.getAttribute("sessionElements");
+        if (session.getAttribute("sessionElements") == null) {
+            session.setAttribute("sessionElements", String.valueOf(15));
+        }
+
         // create pageable request
-        if (page.isEmpty()) {
-            page = Optional.of(0);
+        if (page.isPresent()) {
+            session.setAttribute("sessionPage", page.get());
         }
-        if (elements.isEmpty()){
-            elements = Optional.of(15);
+        if (elements.isPresent()){
+            session.setAttribute("sessionElements", elements.get());
         }
-        Pageable pageRequest = PageRequest.of(page.get(), elements.get());
+
+        Pageable pageRequest = PageRequest.of(
+                Integer.parseInt(session.getAttribute("sessionPage").toString()),
+                Integer.parseInt(session.getAttribute("sessionElements").toString())
+        );
 
         Page<StoreItem> itemList = null;
         // create loop to make sure page is not out of bounds
@@ -103,7 +120,10 @@ public class StoreController {
                     itemList = storeItemService.findAllByAvailable(true, pageRequest);
                 }
             }
-            
+
+            if (itemList.getTotalPages() == 0) {
+                break;
+            }
             if (itemList.getNumber() >= itemList.getTotalPages()) {
                 pageRequest = PageRequest.of(0, elements.get());
             } else {
@@ -117,8 +137,76 @@ public class StoreController {
         return "store/index";
     }
 
+    @GetMapping("/{category}")
+    public String goStoreCategory(@RequestParam Optional<Integer> page, @RequestParam Optional<Integer> elements, @PathVariable String category, Model model, HttpSession session) {
+        AdminSettings adminSettings = adminSettingsService.getAdminSettings();
+
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        DepartmentRegional department = departmentService.findByName(user.getDepartment().getName()).get();
+
+        Optional<StoreCategory> storeCategory = categoryService.findByName(category);
+
+        // get last used pages items or set default
+        Object currentSessionPage = session.getAttribute("sessionPage");
+        if (session.getAttribute("sessionPage") == null) {
+            session.setAttribute("sessionPage", String.valueOf(0));
+        }
+        Object currentSessionElements = session.getAttribute("sessionElements");
+        if (session.getAttribute("sessionElements") == null) {
+            session.setAttribute("sessionElements", String.valueOf(15));
+        }
+
+        // create pageable request
+        if (page.isPresent()) {
+            session.setAttribute("sessionPage", page.get());
+        }
+        if (elements.isPresent()){
+            session.setAttribute("sessionElements", elements.get());
+        }
+
+        Pageable pageRequest = PageRequest.of(
+                Integer.parseInt(session.getAttribute("sessionPage").toString()),
+                Integer.parseInt(session.getAttribute("sessionElements").toString())
+        );
+
+        Page<StoreItem> itemList = null;
+        // create loop to make sure page is not out of bounds
+        for (int loop = 1; loop < 2; loop++) {
+            if (allowByAdmin()) {
+                itemList = storeItemService.findAllByAvailableAndCategory(true, storeCategory.get(), pageRequest);
+            } else {
+                if (adminSettings.isRestrictStorePosition() && adminSettings.isRestrictStoreDepartment()) {
+                    itemList = storeItemService.findAllByAvailableAndCategoryAndDepartmentAndPositionList(true, storeCategory.get(), department, user.getPosition(), pageRequest);
+                } else if (adminSettings.isRestrictStorePosition()) {
+                    itemList = storeItemService.findAllByAvailableAndCategoryAndPositionList(true, storeCategory.get(), user.getPosition(), pageRequest);
+                } else if (adminSettings.isRestrictStoreDepartment()) {
+                    itemList = storeItemService.findAllByAvailableAndCategoryAndDepartment(true, storeCategory.get(), department, pageRequest);
+                } else {
+                    itemList = storeItemService.findAllByAvailableAndCategory(true, storeCategory.get(), pageRequest);
+                }
+            }
+
+            if (itemList.getTotalPages() == 0) {
+                break;
+            }
+            if (itemList.getNumber() >= itemList.getTotalPages()) {
+                pageRequest = PageRequest.of(0, elements.get());
+            } else {
+                break;
+            }
+
+        }
+
+
+        model.addAttribute("storeItems", itemList);
+        model.addAttribute("selectedCategory", category);
+        model.addAttribute("selectedSubCategory", "");
+        redirectService.setHistory(session, "/store/"+category);
+        return "store/index";
+    }
+
     @GetMapping("/{category}/{subCategory}")
-    public String goStoreCategory(@RequestParam Optional<Integer> page, @RequestParam Optional<Integer> elements, @PathVariable String category, @PathVariable Optional<String> subCategory, Model model, HttpSession session) {
+    public String goStoreCategorySub(@RequestParam Optional<Integer> page, @RequestParam Optional<Integer> elements, @PathVariable String category, @PathVariable Optional<String> subCategory, Model model, HttpSession session) {
         AdminSettings adminSettings = adminSettingsService.getAdminSettings();
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -131,14 +219,28 @@ public class StoreController {
         Optional<StoreCategory> storeCategory = categoryService.findByName(category);
         Optional<StoreSubCategory> storeSubCategory = subCategoryService.findByNameAndCategoryId(subName, storeCategory.get().getId());
 
+        // get last used pages items or set default
+        Object currentSessionPage = session.getAttribute("sessionPage");
+        if (session.getAttribute("sessionPage") == null) {
+            session.setAttribute("sessionPage", String.valueOf(0));
+        }
+        Object currentSessionElements = session.getAttribute("sessionElements");
+        if (session.getAttribute("sessionElements") == null) {
+            session.setAttribute("sessionElements", String.valueOf(15));
+        }
+
         // create pageable request
-        if (page.isEmpty()) {
-            page = Optional.of(0);
+        if (page.isPresent()) {
+            session.setAttribute("sessionPage", page.get());
         }
-        if (elements.isEmpty()){
-            elements = Optional.of(15);
+        if (elements.isPresent()){
+            session.setAttribute("sessionElements", elements.get());
         }
-        Pageable pageRequest = PageRequest.of(page.get(), elements.get());
+
+        Pageable pageRequest = PageRequest.of(
+                Integer.parseInt(session.getAttribute("sessionPage").toString()),
+                Integer.parseInt(session.getAttribute("sessionElements").toString())
+        );
 
         Page<StoreItem> itemList = null;
         // create loop to make sure page is not out of bounds
@@ -177,6 +279,10 @@ public class StoreController {
                 }
             }
 
+
+            if (itemList.getTotalPages() == 0) {
+                break;
+            }
             if (itemList.getNumber() >= itemList.getTotalPages()) {
                 pageRequest = PageRequest.of(0, elements.get());
             } else {
@@ -362,7 +468,17 @@ public class StoreController {
             }
         }
 
+        // count requests for item
+        List<OrderItem> items = orderItemService.findAllByProductId(storeItem.get().getId());
+        int orderCount = 1;
+        if (!allowByAdmin()) {
+            orderCount = 1;
+        } else {
+            orderCount = items.size();
+        }
+
         model.addAttribute("storeItem", storeItem.get());
+        model.addAttribute("requestCount", orderCount);
         model.addAttribute("positionList", positionList);
         model.addAttribute("departmentList", departmentRegionalList);
         model.addAttribute("categoryList", categoryList);
@@ -489,25 +605,31 @@ public class StoreController {
     @GetMapping("/imageManager")
     public String getImageManager(Model model, HttpSession session) {
         List<StoreImage> storeImageList = storedImageService.findAll();
-        List<StoreImageModel> imageList = new ArrayList<>();
+        // create new managerList
+        List<StoreImageManager> managerList = new ArrayList<>();
         for (StoreImage image : storeImageList) {
+            // add each image to the list
             StoreImageModel imageModel = new StoreImageModel(image.getId(), image.getName(), image.getDescription(),
                     image.getFileLocation(), 0);
-            imageList.add(imageModel);
+            StoreImageManager manager = new StoreImageManager(image.getId(), imageModel, new ArrayList<>());
+            managerList.add(manager);
         }
 
         List<StoreItem> storeItemList = storeItemService.findAll();
+        // loop through the store items and process only those with images
         for (StoreItem storeItem : storeItemList) {
-            for (StoreImageModel img : imageList) {
+            for (StoreImageManager mgr : managerList) {
+                // loop through the managerList and update when image is found
                 if (storeItem.getImage() != null) {
-                    if (storeItem.getImage().getId().equals(img.getId())) {
-                        img.setReferences(img.getReferences() + 1);
+                    if (storeItem.getImage().getId().equals(mgr.getId())) {
+                        mgr.getImage().setReferences(mgr.getImage().getReferences() + 1);
+                        mgr.getItems().add(storeItem);
                     }
                 }
             }
         }
 
-        model.addAttribute("imageList", imageList);
+        model.addAttribute("imageList", managerList);
         model.addAttribute("showCategories", false);
         redirectService.setHistory(session, "/store/settings");
         return "store/imageManager";

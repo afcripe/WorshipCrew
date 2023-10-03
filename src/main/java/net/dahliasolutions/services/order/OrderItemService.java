@@ -70,6 +70,11 @@ public class OrderItemService implements OrderItemServiceInterface {
     }
 
     @Override
+    public List<OrderItem> findAllByProductId(BigInteger productId) {
+        return orderItemRepository.findAllByProductId(productId);
+    }
+
+    @Override
     public void save(OrderItem orderItem) {
         orderItemRepository.save(orderItem);
     }

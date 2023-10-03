@@ -5,10 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.dahliasolutions.models.position.Position;
 import net.dahliasolutions.models.user.User;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -42,4 +44,7 @@ public class WikiPost {
 
     @ManyToMany
     private List<WikiTag> tagList;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Collection<Position> positionList;
 }

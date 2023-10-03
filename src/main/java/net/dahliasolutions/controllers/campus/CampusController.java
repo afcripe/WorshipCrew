@@ -92,6 +92,12 @@ public class CampusController {
         }
 
         List<DepartmentCampus> departmentList = departmentCampusService.findAllByCampus(campus.get());
+        Collections.sort(departmentList, new Comparator<DepartmentCampus>() {
+            @Override
+            public int compare(DepartmentCampus dep1, DepartmentCampus dep2) {
+                return dep1.getName().compareToIgnoreCase(dep2.getName());
+            }
+        });
 
         model.addAttribute("user", user);
         model.addAttribute("campusEdit", campusEdit());

@@ -83,6 +83,8 @@ public class WikiController {
             }
 
             List<WikiPost> posts = wikiPostService.findAllByFolder(p);
+            // filter posts for permission
+            posts = positionFilterList(user, posts);
             int pinned = 0;
             for (WikiPost post : posts) {
                 if (post.isPinToTop()) {
@@ -148,7 +150,8 @@ public class WikiController {
         }
 
         List<WikiPost> wikiPostList = wikiPostService.findRecent();
-        List<WikiFolder> folderList = wikiFolderService.findAll();
+        // filter posts for permission
+        wikiPostList = positionFilterList(user, wikiPostList);
 
         List<WikiTag> tags = wikiTagService.findAll();
         List<WikiTagReference> tagList = new ArrayList<>();
@@ -179,7 +182,7 @@ public class WikiController {
 
     @GetMapping("/tag/{id}")
     public String getByTags(@PathVariable BigInteger id, Model model, HttpSession session) {
-        redirectService.setHistory(session, "/resource");
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<WikiTag> wikiTag = wikiTagService.findById(id);
         if (wikiTag.isEmpty()) {
             session.setAttribute("msgError", "Tag not Found.");
@@ -187,15 +190,19 @@ public class WikiController {
         }
 
         List<WikiPost> wikiPostList = wikiPostService.findAllByTagId(id);
+        // filter posts for permission
+        wikiPostList = positionFilterList(user, wikiPostList);
 
 
         model.addAttribute("wikiPostList", wikiPostList);
         model.addAttribute("tag", wikiTag.get());
+        redirectService.setHistory(session, "/resource");
         return "wiki/tagPosts";
     }
 
     @GetMapping("/folder/{name}")
     public String getByFolder(@PathVariable String name, Model model, HttpSession session) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         redirectService.setHistory(session, "/resource");
         Optional<WikiFolder> wikiFolder = wikiFolderService.findByFolder("/"+name);
         if (wikiFolder.isEmpty()) {
@@ -204,6 +211,8 @@ public class WikiController {
         }
 
         List<WikiPost> wikiPostList = wikiPostService.findAllByFolder("/"+name);
+        // filter posts for permission
+        wikiPostList = positionFilterList(user, wikiPostList);
 
 
         model.addAttribute("wikiPostList", wikiPostList);
@@ -213,9 +222,11 @@ public class WikiController {
 
     @GetMapping("/group")
     public String getGroupedArticles(Model model, HttpSession session) {
-        redirectService.setHistory(session, "/resource");
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         List<WikiPost> wikiPostList = wikiPostService.findAll();
         List<WikiFolder> folders = wikiFolderService.findAll();
+        // filter posts for permission
+        wikiPostList = positionFilterList(user, wikiPostList);
 
         List<GroupedWikiPostList> postList = new ArrayList<>();
         for ( WikiFolder folder : folders ) {
@@ -230,6 +241,7 @@ public class WikiController {
         }
 
         model.addAttribute("wikiPostList", postList);
+        redirectService.setHistory(session, "/resource");
         return "wiki/index";
     }
 
@@ -241,6 +253,12 @@ public class WikiController {
             session.setAttribute("msgError", "Article not Found.");
             return redirectService.pathName(session, "/resource");
         }
+        // filter post for permission
+        if (!positionFilterPost(currentUser, wikiPost.get())) {
+            session.setAttribute("msgError", "Access Denied.");
+            return redirectService.pathName(session, "/resource");
+        }
+
         model.addAttribute("wikiPost", wikiPost.get());
         model.addAttribute("wikiPostEditor", postEditor(currentUser, wikiPost.get().getAuthor()));
         return "wiki/post";
@@ -286,6 +304,8 @@ public class WikiController {
             }
 
             List<WikiPost> wikiPostList = wikiPostService.findAllByFolder(dir.get().getFolder());
+            // filter posts for permission
+            wikiPostList = positionFilterList(currentUser, wikiPostList);
             int pinned = 0;
             for (WikiPost p : wikiPostList) {
                 if (p.isPinToTop()) {
@@ -373,6 +393,7 @@ public class WikiController {
             wikiPost.setHideInfo(false);
             wikiPost.setPinToTop(false);
             wikiPost.setTagList(new ArrayList<>());
+            wikiPost.setPositionList(new ArrayList<>());
 
         model.addAttribute("wikiPost", wikiPost);
         return "wiki/editPost";
@@ -440,20 +461,26 @@ public class WikiController {
 
     @GetMapping("/recent")
     public String getRecentArticles(Model model, HttpSession session) {
-        redirectService.setHistory(session, "/resource/recent");
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         List<WikiPost> wikiPostList = wikiPostService.findRecent();
+        // filter posts for permission
+        wikiPostList = positionFilterList(currentUser, wikiPostList);
 
         model.addAttribute("wikiPostList", wikiPostList);
         model.addAttribute("searchTerm", "");
+        redirectService.setHistory(session, "/resource/recent");
         return "wiki/searchResults";
     }
 
     @GetMapping("/search/{searchTerm}")
     public String searchArticle(@PathVariable String searchTerm, Model model, HttpSession session) {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         redirectService.setHistory(session, "/resource/search/title/"+searchTerm);
         String searcher = URLDecoder.decode(searchTerm, StandardCharsets.UTF_8);
+
         List<WikiPost> wikiPostList = wikiPostService.searchAll(searcher);
-        List<WikiFolder> folderList = wikiFolderService.findAll();
+        // filter posts for permission
+        wikiPostList = positionFilterList(currentUser, wikiPostList);
 
         List<WikiTag> tags = wikiTagService.findAll();
         List<WikiTagReference> tagList = new ArrayList<>();
@@ -515,7 +542,7 @@ public class WikiController {
         return false;
     }
     private boolean postEditor(User currentUser, User author){
-        if(currentUser.equals(author)) { return true; }
+        if(currentUser.getId().equals(author.getId())) { return true; }
 
         Collection<UserRoles> roles = currentUser.getUserRoles();
         for (UserRoles role : roles){
@@ -535,5 +562,55 @@ public class WikiController {
             }
         }
         return false;
+    }
+
+    private boolean positionFilterPost(User currentUser, WikiPost post) {
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+        for (UserRoles role : roles){
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("RESOURCE_SUPERVISOR")) {
+                return true;
+            }
+        }
+        if (post.getPositionList().isEmpty()) {
+            return true;
+        }
+        if (post.getPositionList().contains(currentUser.getPosition())) {
+            return true;
+        }
+        if (post.getAuthor().getId().equals(currentUser.getId())) {
+            return true;
+        }
+        return false;
+    }
+
+    private List<WikiPost> positionFilterList(User currentUser, List<WikiPost> posts) {
+        List<WikiPost> returnList = new ArrayList<>();
+
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+        for (WikiPost post : posts) {
+            for (UserRoles role : roles){
+                if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("RESOURCE_SUPERVISOR")) {
+                    if (!returnList.contains(post)) {
+                        returnList.add(post);
+                    }
+                }
+            }
+            if (post.getPositionList().isEmpty()) {
+                if (!returnList.contains(post)) {
+                    returnList.add(post);
+                }
+            }
+            if (post.getPositionList().contains(currentUser.getPosition())) {
+                if (!returnList.contains(post)) {
+                    returnList.add(post);
+                }
+            }
+            if (post.getAuthor().getId().equals(currentUser.getId())) {
+                if (!returnList.contains(post)) {
+                    returnList.add(post);
+                }
+            }
+        }
+        return returnList;
     }
 }

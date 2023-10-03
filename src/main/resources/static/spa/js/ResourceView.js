@@ -66,7 +66,7 @@ function htmlHomePage(post, id) {
     r+=`</div>`;
     r+=`<div class="resource__group">`;
     let thisLink = location.protocol+"//"+location.host+"/resource/article/"+id;
-    r += `<div class="resource__subtitle">URL: <span style="text-decoration: underline;" data-nav-copy="`+thisLink+`">Article: ` + id + `</span></div>`;
+    r += `<div class="resource__subtitle">URL: <span style="text-decoration: underline;" data-nav-copy="`+thisLink+`">Article: ` + post.title + `</span></div>`;
     r+=`</div>`;
     r+=`<div class="resource__group">`;
     r+=`<div class="resource__subtitle">Last Updated: `+formatDate(post.lastUpdated)+`</div>`;

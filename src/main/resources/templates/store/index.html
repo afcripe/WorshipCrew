@@ -17,7 +17,7 @@
                 <li class="nav-item dropdown" th:id="*{cat.name}">
                     <a class="nav-link dropdown-toggle" href="#" th:onclick="selectCategory([[*{cat.name}]])"
                        th:id="*{cat.name}+'dropdown'" role="button"
-                       data-bs-toggle="dropdown" th:text="*{cat.name}"></a>
+                       data-bs-toggle="dropdown"><span th:text="*{cat.name}" th:onclick="navCategory(this, [[*{cat.name}]])"></span></a>
                     <ul class="dropdown-menu category-dropdown-menu" th:aria-labelledby="*{cat.name}+'dropdown'"
                         th:unless="${#lists.isEmpty(cat.subCategoryList)}">
                         <th:block th:each="sub : ${cat.subCategoryList}">
@@ -41,7 +41,7 @@
 
         <div class="flex-fill p-1 pb-4 w-100 mx-2">
 
-            <div class="row mt-2">
+            <div class="row mt-2" th:if="${storeItems.totalPages} > 0">
                 <div class="filter-page d-flex">
                     <div class="filter-page-spacer"></div>
                     <ul class="filter-nav-links">
@@ -136,13 +136,15 @@
                 dropdownMenuEl.classList.add('show');
             }
         }
+        function navCategory(el, name) {
+            window.location="/store/"+name;
+        }
         function selectCategory(name) {
-            debugger
             selectedCategory = name;
             closeAllCategories();
         }
         function clearCategory() {
-            window.location.href="/store";
+            window.location.href="/store?page=0";
         }
 
         function navToItem(id) {

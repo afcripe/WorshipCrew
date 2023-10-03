@@ -41,6 +41,7 @@ public class StoreAPIController {
     private final AdminSettingsService adminSettingsService;
     private final UserService userService;
     private final StoreSettingService storeSettingService;
+    private final StoreImageService storeImageService;
     private final EventService eventService;
 
     @GetMapping("")
@@ -236,7 +237,6 @@ public class StoreAPIController {
         return item;
     }
 
-
     @PostMapping("/storesetting/update")
     public String updateSettingNotify(@ModelAttribute SingleStringModel notifyModel, @ModelAttribute SingleBigIntegerModel userModel) {
         RequestNotifyTarget target = RequestNotifyTarget.valueOf(notifyModel.name());
@@ -250,6 +250,36 @@ public class StoreAPIController {
         return "true";
     }
 
+    @GetMapping("/image/{id}")
+    public StoreImage getStoreImage(@PathVariable BigInteger id) {
+        Optional<StoreImage> image = storeImageService.findById(id);
+        return image.orElseGet(StoreImage::new);
+
+    }
+
+    @PostMapping("/image/update")
+    public StoreImage updateStoreImage(@ModelAttribute StoreImage img) {
+        Optional<StoreImage> image = storeImageService.findById(img.getId());
+        if (image.isPresent()) {
+            image.get().setName(img.getName());
+            image.get().setDescription(img.getDescription());
+            storeImageService.save(image.get());
+            return image.get();
+        }
+        return img;
+    }
+
+
+    @PostMapping("/item/delete")
+    public SingleBigIntegerModel deleteStoreItem(@ModelAttribute SingleBigIntegerModel item) {
+        if (allowByAdmin()) {
+            storeItemService.deleteById(item.id());
+            return item;
+        }
+        return new SingleBigIntegerModel(BigInteger.valueOf(0));
+    }
+
+
     /*  Determine Edit Permissions */
     private boolean allowByAdmin(){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -257,7 +287,7 @@ public class StoreAPIController {
         Collection<UserRoles> roles = user.getUserRoles();
 
         for (UserRoles role : roles){
-            if (role.getName().equals("ADMIN_WRITE")) {
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("STORE_SUPERVISOR")) {
                 return true;
             }
         }
