@@ -208,9 +208,12 @@
                     try {imgNode.classList.remove("grid_image_selected_primary")}
                     catch (error) {console.log("not an image")}
                 }
+                debugger
                 element.classList.add("grid_image_selected_primary");
                 let imageFullURL = element.src;
-                let imageURL = imageFullURL.substring(websiteDomain.length, imageFullURL.length);
+                let urlArray = imageFullURL.split(".com");
+                // let imageURL = imageFullURL.substring(websiteDomain.length, imageFullURL.length);
+                let imageURL = urlArray[urlArray.length-1];
                 navigator.clipboard.writeText(imageURL);
                 if (type > 1) { dialogOK(); }
             }

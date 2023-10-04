@@ -21,6 +21,7 @@ import net.dahliasolutions.services.store.*;
 import net.dahliasolutions.services.user.UserService;
 import net.dahliasolutions.services.wiki.WikiPostService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -132,6 +133,59 @@ public class StoreController {
             
         }
  
+        model.addAttribute("storeItems", itemList);
+        redirectService.setHistory(session, "/store");
+        return "store/index";
+    }
+
+    @GetMapping("/unavailable")
+    public String goUnavailable(@RequestParam Optional<Integer> page, @RequestParam Optional<Integer> elements, Model model, HttpSession session) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!allowByAdmin()) {
+            session.setAttribute("msgError", "Access Denied!");
+            redirectService.pathName(session, "/store");
+        }
+
+        // get last used pages items or set default
+        Object currentSessionPage = session.getAttribute("sessionPage");
+        if (session.getAttribute("sessionPage") == null) {
+            session.setAttribute("sessionPage", String.valueOf(0));
+        }
+        Object currentSessionElements = session.getAttribute("sessionElements");
+        if (session.getAttribute("sessionElements") == null) {
+            session.setAttribute("sessionElements", String.valueOf(15));
+        }
+
+        // create pageable request
+        if (page.isPresent()) {
+            session.setAttribute("sessionPage", page.get());
+        }
+        if (elements.isPresent()){
+            session.setAttribute("sessionElements", elements.get());
+        }
+
+        Pageable pageRequest = PageRequest.of(
+                Integer.parseInt(session.getAttribute("sessionPage").toString()),
+                Integer.parseInt(session.getAttribute("sessionElements").toString())
+        );
+
+        Page<StoreItem> itemList = null;
+        // create loop to make sure page is not out of bounds
+        for (int loop = 1; loop < 2; loop++) {
+            //itemList = storeItemService.findAllByAvailableAndPositionListContainsAndDepartment(user.getPosition(), department.getId());
+            itemList = storeItemService.findAllByAvailable(false, pageRequest);
+
+            if (itemList.getTotalPages() == 0) {
+                break;
+            }
+            if (itemList.getNumber() >= itemList.getTotalPages()) {
+                pageRequest = PageRequest.of(0, elements.get());
+            } else {
+                break;
+            }
+
+        }
+
         model.addAttribute("storeItems", itemList);
         redirectService.setHistory(session, "/store");
         return "store/index";
@@ -645,7 +699,7 @@ public class StoreController {
         DepartmentRegional department = departmentService.findByName(user.getDepartment().getName()).get();
 
         List<StoreItem> searchList = storeItemService.searchAll(searcher);
-        List<StoreItem> itemList = storeItemService.searchAll(searcher);
+        List<StoreItem> itemList = new ArrayList<>();
         if (allowByAdmin()) {
             itemList = searchList;
         } else {
@@ -674,7 +728,28 @@ public class StoreController {
             }
         }
 
-        model.addAttribute("storeItems", itemList);
+
+        // get last used pages items or set default
+        Object currentSessionPage = session.getAttribute("sessionPage");
+        if (session.getAttribute("sessionPage") == null) {
+            session.setAttribute("sessionPage", String.valueOf(0));
+        }
+        Object currentSessionElements = session.getAttribute("sessionElements");
+        if (session.getAttribute("sessionElements") == null) {
+            session.setAttribute("sessionElements", String.valueOf(15));
+        }
+
+        Pageable pageRequest = PageRequest.of(
+                Integer.parseInt(session.getAttribute("sessionPage").toString()),
+                Integer.parseInt(session.getAttribute("sessionElements").toString())
+        );
+
+        // convert to page
+        final int start = Integer.parseInt(session.getAttribute("sessionPage").toString());
+        final int end = Math.min(start + Integer.parseInt(session.getAttribute("sessionElements").toString()), itemList.size());
+        Page<StoreItem> pagedList = new PageImpl<>(itemList.subList(start, end), pageRequest, itemList.size());
+
+        model.addAttribute("storeItems", pagedList);
         model.addAttribute("searchTerm", searcher);
         redirectService.setHistory(session, "/store/search/title/"+searchTerm);
         return "store/index";
