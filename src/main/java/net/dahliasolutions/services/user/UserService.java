@@ -201,6 +201,11 @@ public class UserService implements UserServiceInterface{
     }
 
     @Override
+    public List<User> findAllByDepartmentCampusAndDeleted(DepartmentCampus department, boolean deleted) {
+        return userRepository.findAllByDepartmentAndDeleted(department, deleted);
+    }
+
+    @Override
     public List<User> findAllByActivated() {
         return userRepository.findAllByActivated(true);
     }

@@ -14,6 +14,7 @@ import ResourceArticle from "./ResourceArticle.js";
 import ResourceFolder from "./ResourceFolder.js";
 import Users from "./Users.js";
 import UserView from "./UserView.js";
+import UserNew from "./UserNew.js";
 import SearchView from "./SearchView.js";
 
 import { postLogin, renewToken } from "./Login.js";
@@ -21,6 +22,7 @@ import { toggleDetail, showTicketAgents, updateAgent, updateNote, updateTicketSt
 import { postNewTicket } from "./TicketNew.js";
 import { imageDialog } from "./ImageView.js";
 import { postUpdateAuth, showUserEdit, postUpdateUser } from "./UserView.js";
+import { postNewUser } from "./UserNew.js";
 import { updateRequest, updateRequestItem, showRequestHistory, updateSupervisor, updateRequestAgent, updateRequestItemAgent, postRequestStatus, postRequestItemStatus, postRequestAddAgent, postRequestItemAddAgent, postRequestAddSupervisor, postRequestRemoveSupervisor, postRequestAcknowledged } from "./RequestView.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
 import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-messaging.js";
@@ -107,6 +109,7 @@ const router = async () => {
         { path: "/app/resourceFolder/:id", view: ResourceFolder },
         { path: "/app/users", view: Users },
         { path: "/app/user/:id", view: UserView },
+        { path: "/app/userNew", view: UserNew },
         { path: "/app/settings", view: Settings }
     ];
 
@@ -445,6 +448,15 @@ const postUserAuth = async (id, auth) => {
 const postUserUpdate = async (id) => {
     let theUser = await postUpdateUser(id, token);
     navigateTo("/app/user/"+theUser.id);
+}
+
+const postUserNew = async (id) => {
+    let theNewUser = await postNewUser(token);
+    if (theNewUser.id === 0) {
+        alert(theNewUser.name);
+    } else {
+        navigateTo("/app/user/" + theNewUser.id);
+    }
 }
 
 
@@ -977,6 +989,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // users
 
+        if ( e.target.matches("[data-user-new]")) {
+            e.preventDefault();
+            navigateTo("/app/userNew");
+        }
         if ( e.target.matches("[data-user-link]")) {
             e.preventDefault();
             navigateTo("/app/user/"+e.target.dataset.userLink);
@@ -992,6 +1008,14 @@ document.addEventListener("DOMContentLoaded", () => {
         if ( e.target.matches("[data-from-user-edit]")) {
             e.preventDefault();
             postUserUpdate(e.target.dataset.fromUserEdit);
+        }
+        if ( e.target.matches("[data-from-user-new]")) {
+            e.preventDefault();
+            if (e.target.dataset.fromUserNew === "new") {
+                postUserNew();
+            } else {
+                navigateTo("/app/users")
+            }
         }
 
         // settings

@@ -401,6 +401,8 @@
                 </div>
               </div>
 
+              <input id="resourceLink" name="resourceLink" type="hiddn" th:value="*{resourceLink}">
+
             </form>
 
           </div>
@@ -413,6 +415,13 @@
           </div>
 
           <div class="card-body">
+
+            <div id="itemResource" class="pt-2">
+              <label for="resourceLinkField"></label>
+              <input id="resourceLinkField" type="text" th:value="*{resourceLink}">
+            </div>
+            <hr>
+
             <div id="editOption" class="pt-4">
               <input id="optionId" type="hidden" value="0">
               <input id="optionName" type="text" onkeyup="submitOption()" class="form-control" style="width: 200px; display: inline-block;">
@@ -584,6 +593,8 @@
   function submitForm() {
     let theForm = document.getElementById("itemForm");
     let pList = document.getElementById("positionSelect");
+
+    document.getElementById("resourceLink").value = document.getElementById("resourceLinkField").value;
 
     let collection = pList.selectedOptions;
     let p = "";

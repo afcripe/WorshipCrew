@@ -196,7 +196,7 @@ public class UserController {
     public String getDeletedUsers(Model model, HttpSession session) {
         User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String permission = permissionType(currentUser);
-        List<User> userList = userList(currentUser);
+        List<User> userList = userList(currentUser, true);
         Collections.sort(userList, new Comparator<User>() {
             @Override
             public int compare(User user1, User user2) {
@@ -698,6 +698,25 @@ public class UserController {
                 break;
             default:
                 userList = userService.findAllByDepartmentCampus(currentUser.getDepartment());
+        }
+        return userList;
+    }
+
+    private List<User> userList(User currentUser, boolean deleted) {
+        String permission = permissionType(currentUser);
+        List<User> userList;
+        switch (permission){
+            case "All Users":
+                userList = userService.findAllByDeleted(deleted);
+                break;
+            case "Department Users":
+                userList = userService.findAllByDepartmentAndDeleted(currentUser.getDepartment().getRegionalDepartment(), deleted);
+                break;
+            case "Campus Users":
+                userList = userService.findAllByCampusAndDeleted(currentUser.getCampus(), deleted);
+                break;
+            default:
+                userList = userService.findAllByDepartmentCampusAndDeleted(currentUser.getDepartment(), deleted);
         }
         return userList;
     }

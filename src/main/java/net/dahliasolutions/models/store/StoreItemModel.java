@@ -13,6 +13,7 @@ public record StoreItemModel(
         BigInteger category,
         BigInteger subCategory,
         BigInteger department,
-        String position
+        String position,
+        String resourceLink
         ) {
 }

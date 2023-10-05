@@ -27,6 +27,7 @@ public class StoreItem {
     private boolean specialOrder;
     private boolean available;
     private int leadTime;
+    private String resourceLink;
 
     @Column(name = "description", columnDefinition = "text")
     private String description;

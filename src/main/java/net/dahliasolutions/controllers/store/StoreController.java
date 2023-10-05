@@ -20,10 +20,7 @@ import net.dahliasolutions.services.position.PositionService;
 import net.dahliasolutions.services.store.*;
 import net.dahliasolutions.services.user.UserService;
 import net.dahliasolutions.services.wiki.WikiPostService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -100,7 +97,8 @@ public class StoreController {
 
         Pageable pageRequest = PageRequest.of(
                 Integer.parseInt(session.getAttribute("sessionPage").toString()),
-                Integer.parseInt(session.getAttribute("sessionElements").toString())
+                Integer.parseInt(session.getAttribute("sessionElements").toString()),
+                Sort.by("name").ascending()
         );
 
         Page<StoreItem> itemList = null;
@@ -166,7 +164,8 @@ public class StoreController {
 
         Pageable pageRequest = PageRequest.of(
                 Integer.parseInt(session.getAttribute("sessionPage").toString()),
-                Integer.parseInt(session.getAttribute("sessionElements").toString())
+                Integer.parseInt(session.getAttribute("sessionElements").toString()),
+                Sort.by("name").ascending()
         );
 
         Page<StoreItem> itemList = null;
@@ -220,7 +219,8 @@ public class StoreController {
 
         Pageable pageRequest = PageRequest.of(
                 Integer.parseInt(session.getAttribute("sessionPage").toString()),
-                Integer.parseInt(session.getAttribute("sessionElements").toString())
+                Integer.parseInt(session.getAttribute("sessionElements").toString()),
+                Sort.by("name").ascending()
         );
 
         Page<StoreItem> itemList = null;
@@ -293,7 +293,8 @@ public class StoreController {
 
         Pageable pageRequest = PageRequest.of(
                 Integer.parseInt(session.getAttribute("sessionPage").toString()),
-                Integer.parseInt(session.getAttribute("sessionElements").toString())
+                Integer.parseInt(session.getAttribute("sessionElements").toString()),
+                Sort.by("name").ascending()
         );
 
         Page<StoreItem> itemList = null;
@@ -430,6 +431,7 @@ public class StoreController {
         }
 
         storeItem.setPositionList(pl);
+        storeItem.setResourceLink(storeItemModel.resourceLink());
 
         StoreItem newItem = storeItemService.createStoreItem(storeItem);
         session.setAttribute("msgSuccess", "Item successfully added.");
@@ -590,6 +592,7 @@ public class StoreController {
         }
 
         storeItem.get().setPositionList(pl);
+        storeItem.get().setResourceLink(storeItemModel.resourceLink());
 
         storeItemService.save(storeItem.get());
         session.setAttribute("msgSuccess", "Item successfully updated.");
@@ -741,7 +744,8 @@ public class StoreController {
 
         Pageable pageRequest = PageRequest.of(
                 Integer.parseInt(session.getAttribute("sessionPage").toString()),
-                Integer.parseInt(session.getAttribute("sessionElements").toString())
+                Integer.parseInt(session.getAttribute("sessionElements").toString()),
+                Sort.by("name").ascending()
         );
 
         // convert to page

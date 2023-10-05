@@ -8,12 +8,23 @@ export default class extends AbstractView {
 
     async getHtml() {
         this.setAppProgress(20);
-        let userList = await getRemoteUserList(this.params.token)
-        let returnHTML = htmlUsers(userList);
+        let userList = await getRemoteUserList(this.params.token);
+        let permission = await getRemoteEditPermission(this.params.id, this.params.token);
+
+        let returnHTML = `<div class="list__group"><div class="list__group-item-grow title__module">Users</div>`;
+
+        if (permission.name === 'ADMIN_WRITE' || permission.name === 'USER_SUPERVISOR'|| permission.name === 'USER_WRITE') {
+            returnHTML += `<div class="list__group-item-right">
+                        <i class="bi bi-person-add title__modul-item" data-user-new></i>
+                        </div></div>`;
+        }
+        returnHTML += `</div>`;
+
+        returnHTML += htmlUsers(userList, permission);
 
         this.setAppProgress(80);
         returnHTML = returnHTML.replaceAll("\n","");
-        return returnHTML.replaceAll("\n","");
+        return returnHTML;
     }
 
     async getNotification() {
@@ -52,8 +63,23 @@ async function getRemoteUserList(token) {
     return userList;
 }
 
-function htmlUsers(userList) {
-    let r =`<h1>Users</h1>`;
+async function getRemoteEditPermission(id, token) {
+    const response = await fetch('/api/v1/app/users/editpermission', {
+        headers: {
+            authorization: "Bearer "+token
+        }
+    });
+    const perm = await response.json();
+    const status = response.status;
+    return perm;
+}
+
+function htmlUsers(userList, permission) {
+    let r = "";
+        // `<div className="list__group">
+        //     <div className="list__group-item-grow title__module">Users</div>
+        //     <div className="list__group-item-right">New User</div></div>`;
+
     for (let u in userList) {
         let user = userList[u];
         r+=`<div class="user-group" data-user-link="`+user.id+`">`;

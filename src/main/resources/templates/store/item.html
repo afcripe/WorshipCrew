@@ -79,6 +79,11 @@
 
             <span class="store-item-description" th:text="*{description}"></span>
 
+            <div th:if="${#lists.contains(userRoles,'RESOURCE_READ') or #lists.contains(userRoles,'RESOURCE_READ')
+                          || #lists.contains(userRoles,'RESOURCE_SUPERVISOR') or #lists.contains(userRoles,'ADMIN_WRITE')}">
+              Resource Article: <a th:href="*{resourceLink}" th:text="*{resourceLink}"></a>
+            </div>
+
           </div>
         </div>
 
