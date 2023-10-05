@@ -64,10 +64,10 @@
                           onchange="updateAuth('RESOURCE_WRITE')"> Create Resources</p>
                 <p><input type="checkbox" id="inputAuthStoreRead"
                           th:disabled="${!#lists.contains(userRoles,'STORE_READ') or !#lists.contains(userRoles,'USER_WRITE')}"
-                          onchange="updateAuth('STORE_READ')"> View Store</p>
+                          onchange="updateAuth('STORE_READ')"> View Store and Submit Requests</p>
                 <p><input type="checkbox" id="inputAuthStoreWrite"
                           th:disabled="${!#lists.contains(userRoles,'STORE_WRITE') or !#lists.contains(userRoles,'USER_WRITE')}"
-                          onchange="updateAuth('STORE_WRITE')"> Add Store Items</p>
+                          onchange="updateAuth('STORE_WRITE')"> Add and Edit Store Items</p>
                 <p><input type="checkbox" id="inputAuthSupportWrite"
                           th:disabled="${!#lists.contains(userRoles,'SUPPORT_WRITE') or !#lists.contains(userRoles,'USER_WRITE')}"
                           onchange="updateAuth('SUPPORT_WRITE')"> Submit Support Tickets</p>

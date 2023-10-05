@@ -233,8 +233,12 @@ public class MobileAppAPIController {
 
         // search for users
         List<User> users = userService.searchAllByFullName(searchTerm);
+        List<User> userList = userList(apiUser.getUser());
         for (User user : users) {
-            r.add(new UniversalAppSearchModel("user", user.getId().toString(), user.getFullName(), ""));
+            // only send users allowed to be viewed
+            if (userList.contains(user)) {
+                r.add(new UniversalAppSearchModel("user", user.getId().toString(), user.getFullName(), ""));
+            }
         }
 
         // search for tickets
@@ -243,10 +247,13 @@ public class MobileAppAPIController {
             r.add(new UniversalAppSearchModel("ticket", ticket.getId(), ticket.getUser().getFullName(), ticket.getTicketDetail()));
         }
 
-        // search for tickets
+        // search for resource
         List<WikiPost> wikiPosts = wikiPostService.searchByTitle(searchTerm);
         for (WikiPost post : wikiPosts) {
-            r.add(new UniversalAppSearchModel("resource", post.getId().toString(), post.getTitle(), post.getSummary()));
+            // only include if user has permission
+            if (positionFilterPost(apiUser.getUser(), post)) {
+                r.add(new UniversalAppSearchModel("resource", post.getId().toString(), post.getTitle(), post.getSummary()));
+            }
         }
 
 
@@ -257,7 +264,7 @@ public class MobileAppAPIController {
         } catch (NumberFormatException nfe) {
             isNumber = false;
         }
-
+        // search for request
         if (isNumber) {
             BigInteger orderId = new BigInteger(searchTerm);
             List<OrderRequest> requests = orderService.searchAllById(orderId);
@@ -315,6 +322,105 @@ public class MobileAppAPIController {
                 System.out.println(e);
             }
         }
+    }
+
+    private boolean positionFilterPost(User currentUser, WikiPost post) {
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+        for (UserRoles role : roles){
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("RESOURCE_SUPERVISOR")) {
+                return true;
+            }
+        }
+        if (post.getPositionList().isEmpty()) {
+            return true;
+        }
+        if (post.getPositionList().contains(currentUser.getPosition())) {
+            return true;
+        }
+        if (post.getAuthor().getId().equals(currentUser.getId())) {
+            return true;
+        }
+        return false;
+    }
+
+    private List<WikiPost> positionFilterList(User currentUser, List<WikiPost> posts) {
+        List<WikiPost> returnList = new ArrayList<>();
+
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+        for (WikiPost post : posts) {
+            for (UserRoles role : roles){
+                if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("RESOURCE_SUPERVISOR")) {
+                    if (!returnList.contains(post)) {
+                        returnList.add(post);
+                    }
+                }
+            }
+            if (post.getPositionList().isEmpty()) {
+                if (!returnList.contains(post)) {
+                    returnList.add(post);
+                }
+            }
+            if (post.getPositionList().contains(currentUser.getPosition())) {
+                if (!returnList.contains(post)) {
+                    returnList.add(post);
+                }
+            }
+            if (post.getAuthor().getId().equals(currentUser.getId())) {
+                if (!returnList.contains(post)) {
+                    returnList.add(post);
+                }
+            }
+        }
+        return returnList;
+    }
+
+    private List<User> userList(User currentUser) {
+        String permission = permissionType(currentUser);
+        List<User> userList;
+        switch (permission){
+            case "All Users":
+                userList = userService.findAll();
+                break;
+            case "Department Users":
+                userList = userService.findAllByDepartmentAndDeleted(currentUser.getDepartment().getRegionalDepartment(), false);
+                break;
+            case "Campus Users":
+                userList = userService.findAllByCampus(currentUser.getCampus());
+                break;
+            default:
+                userList = userService.findAllByDepartmentCampus(currentUser.getDepartment());
+        }
+        return userList;
+    }
+
+    private String permissionType(User currentUser) {
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+        String typeString = "Campus Users";
+        int priority = 0;
+        for (UserRoles role : roles) {
+            if (role.getName().equals("USER_WRITE") || role.getName().equals("USER_READ")) {
+                if (priority < 1) {
+                    typeString = "Campus Department Users";
+                    priority = 1;
+                }
+            } else if (role.getName().equals("CAMPUS_WRITE") || role.getName().equals("CAMPUS_READ")) {
+                if (priority < 2) {
+                    typeString = "Campus Users";
+                    priority = 2;
+                }
+            }   else if (role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")) {
+                if (priority < 3) {
+                    typeString = "Department Users";
+                    priority = 3;
+                }
+            } else if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_SUPERVISOR")) {
+                if (priority < 4) {
+                    typeString = "All Users";
+                    priority = 4;
+                }
+            }
+        }
+        return typeString;
     }
 
 }

@@ -1159,3 +1159,11 @@ progress::-webkit-progress-value {
     padding-bottom: 0.5rem;
     padding-top: 0.5rem;
 }
+
+.user-edit__div {
+    position: relative;
+}
+
+.user-edit__content {
+    overflow-y: scroll;
+}

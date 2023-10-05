@@ -9,7 +9,6 @@ export default class extends AbstractView {
     async getHtml() {
         this.setAppProgress(20);
         let post = await getRemoteResourceArticle(this.params.id, this.params.token);
-
         let returnHTML = htmlHomePage(post, this.params.id);
 
         this.setAppProgress(80);
@@ -55,6 +54,13 @@ async function getRemoteResourceArticle(id, token) {
     });
     const post = await response.json();
     const status = response.status;
+    if (status !== 200) {
+        let author = {"firstName": "","lastName": "","fullName": ""};
+        post.title = "Access Denied!";
+        post.author = author;
+        post.body = "No Content.";
+    }
+
     return post;
 }
 
@@ -84,9 +90,11 @@ function htmlHomePage(post, id) {
 }
 
 function formatDate(dte) {
-    let strDate = dte.split("T")[0];
-    let strTime = dte.split("T")[1];
-    let partsDate = strDate.split("-");
-    let partTime = strTime.split(":");
-    return strDate + " " + partTime[0] + ":" + partTime[1];
+    if (dte !== null) {
+        let strDate = dte.split("T")[0];
+        let strTime = dte.split("T")[1];
+        let partsDate = strDate.split("-");
+        let partTime = strTime.split(":");
+        return strDate + " " + partTime[0] + ":" + partTime[1];
+    }
 }

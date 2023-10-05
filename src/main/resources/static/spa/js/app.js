@@ -20,6 +20,7 @@ import { postLogin, renewToken } from "./Login.js";
 import { toggleDetail, showTicketAgents, updateAgent, updateNote, updateTicketStatus, postTicketNote, postTicketStatus, postTicketAddAgent, postTicketRemoveAgent, updateTicketSLA, postTicketSLA, postTicketAccept } from "./TicketView.js";
 import { postNewTicket } from "./TicketNew.js";
 import { imageDialog } from "./ImageView.js";
+import { postUpdateAuth, showUserEdit, postUpdateUser } from "./UserView.js";
 import { updateRequest, updateRequestItem, showRequestHistory, updateSupervisor, updateRequestAgent, updateRequestItemAgent, postRequestStatus, postRequestItemStatus, postRequestAddAgent, postRequestItemAddAgent, postRequestAddSupervisor, postRequestRemoveSupervisor, postRequestAcknowledged } from "./RequestView.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
 import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-messaging.js";
@@ -435,6 +436,15 @@ const postTicketNew = async () => {
     let rsp = await postNewTicket(token);
     updateAppProgress(101);
     navigateTo("/app/ticket/"+rsp);
+}
+
+const postUserAuth = async (id, auth) => {
+    await postUpdateAuth(id, auth, token);
+}
+
+const postUserUpdate = async (id) => {
+    let theUser = await postUpdateUser(id, token);
+    navigateTo("/app/user/"+theUser.id);
 }
 
 
@@ -970,6 +980,18 @@ document.addEventListener("DOMContentLoaded", () => {
         if ( e.target.matches("[data-user-link]")) {
             e.preventDefault();
             navigateTo("/app/user/"+e.target.dataset.userLink);
+        }
+        if ( e.target.matches("[data-user-update-auth]")) {
+            // e.preventDefault();
+            postUserAuth(e.target.dataset.userUpdateId, e.target.dataset.userUpdateAuth);
+        }
+        if ( e.target.matches("[data-user-edit]")) {
+            e.preventDefault();
+            showUserEdit(e.target.dataset.userUpdateId, token);
+        }
+        if ( e.target.matches("[data-from-user-edit]")) {
+            e.preventDefault();
+            postUserUpdate(e.target.dataset.fromUserEdit);
         }
 
         // settings

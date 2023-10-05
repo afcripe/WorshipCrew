@@ -149,6 +149,13 @@ public class UserAPIController {
             } else {
                 userListReturn = userService.findAll();
             }
+            // make sure campus director is available
+            Optional<User> campDir = userService.findById(campusDep.get().getDirectorId());
+            if (campDir.isPresent()) {
+                if (!userListReturn.contains(campDir.get())) {
+                    userListReturn.add(campDir.get());
+                }
+            }
         }
 
         // make sure regional director is available

@@ -369,6 +369,12 @@ public class WikiController {
             }
         }
 
+        // filter post for permission
+        if (!positionFilterPost(currentUser, post)) {
+            session.setAttribute("msgError", "Access Denied.");
+            return redirectService.pathName(session, "/resource");
+        }
+
         model.addAttribute("wikiPost", post);
         model.addAttribute("wikiPostEditor", postEditor(currentUser, post.getAuthor()));
         return "wiki/post";

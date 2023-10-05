@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.APIUser;
 import net.dahliasolutions.models.records.*;
 import net.dahliasolutions.models.user.User;
+import net.dahliasolutions.models.user.UserRoles;
 import net.dahliasolutions.models.wiki.*;
 import net.dahliasolutions.services.JwtService;
 import net.dahliasolutions.services.user.UserService;
@@ -88,6 +89,7 @@ public class MobileAppAPIResourceController {
             }
 
             List<WikiPost> posts = wikiPostService.findAllByFolder(p);
+            posts = positionFilterList(apiUser.getUser(), posts);
             int pinned = 0;
             for (WikiPost post : posts) {
                 if (post.isPinToTop()) {
@@ -118,6 +120,10 @@ public class MobileAppAPIResourceController {
         Optional<WikiPost> wikiPost = wikiPostService.findById(id);
         if (wikiPost.isEmpty()) {
             return new ResponseEntity<>(new WikiPost(), HttpStatus.BAD_REQUEST);
+        }
+        // only return if user has permission
+        if (!positionFilterPost(apiUser.getUser(), wikiPost.get())) {
+            return new ResponseEntity<>(new WikiPost(), HttpStatus.FORBIDDEN);
         }
 
         return new ResponseEntity<>(wikiPost.get(), HttpStatus.OK);
@@ -155,6 +161,10 @@ public class MobileAppAPIResourceController {
                 post = p;
             }
         }
+        // only return if user has permission
+        if (!positionFilterPost(apiUser.getUser(), post)) {
+            return new ResponseEntity<>(new WikiPost(), HttpStatus.FORBIDDEN);
+        }
 
         return new ResponseEntity<>(post, HttpStatus.OK);
 
@@ -182,6 +192,7 @@ public class MobileAppAPIResourceController {
         }
 
         List<WikiPost> posts = wikiPostService.findAllByFolder(folder);
+        posts = positionFilterList(apiUser.getUser(), posts);
         int pinned = 0;
         for (WikiPost post : posts) {
             if (post.isPinToTop()) {
@@ -217,5 +228,55 @@ public class MobileAppAPIResourceController {
             }
         }
         return new APIUser(false, new User());
+    }
+
+    private boolean positionFilterPost(User currentUser, WikiPost post) {
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+        for (UserRoles role : roles){
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("RESOURCE_SUPERVISOR")) {
+                return true;
+            }
+        }
+        if (post.getPositionList().isEmpty()) {
+            return true;
+        }
+        if (post.getPositionList().contains(currentUser.getPosition())) {
+            return true;
+        }
+        if (post.getAuthor().getId().equals(currentUser.getId())) {
+            return true;
+        }
+        return false;
+    }
+
+    private List<WikiPost> positionFilterList(User currentUser, List<WikiPost> posts) {
+        List<WikiPost> returnList = new ArrayList<>();
+
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+        for (WikiPost post : posts) {
+            for (UserRoles role : roles){
+                if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("RESOURCE_SUPERVISOR")) {
+                    if (!returnList.contains(post)) {
+                        returnList.add(post);
+                    }
+                }
+            }
+            if (post.getPositionList().isEmpty()) {
+                if (!returnList.contains(post)) {
+                    returnList.add(post);
+                }
+            }
+            if (post.getPositionList().contains(currentUser.getPosition())) {
+                if (!returnList.contains(post)) {
+                    returnList.add(post);
+                }
+            }
+            if (post.getAuthor().getId().equals(currentUser.getId())) {
+                if (!returnList.contains(post)) {
+                    returnList.add(post);
+                }
+            }
+        }
+        return returnList;
     }
 }

@@ -149,6 +149,7 @@
             let tab = document.querySelector(".wiki-info-tab-home");
             let info = document.querySelectorAll(".wiki-info");
             let wikiBody = document.querySelector(".wiki-body");
+            debugger
             if (tab.classList.contains("hide")) {
                 tab.classList.remove("hide");
                 for (let key in info) {
@@ -159,7 +160,6 @@
                     }
                 }
                 wikiBody.classList.add("wiki-body-padding");
-                tab.scrollIntoView();
             } else {
                 tab.classList.add("hide");
                 for (let key in info) {
@@ -170,12 +170,14 @@
                     }
                 }
                 wikiBody.classList.remove("wiki-body-padding");
-                info[0].scrollIntoView();
+                if (window.innerWidth < 884) {
+                    info[0].scrollIntoView();
+                }
             }
         }
 
         function setInfoShow() {
-            if (window.innerWidth < 768) {
+            if (window.innerWidth < 884) {
                 toggleResourceInfo();
             }
         }
