@@ -309,7 +309,7 @@ function htmlEditor(user, director, campusList, deptList, posList, dirList) {
     r+=`</div>`;
 
     r+=`<div class="user__detail">`;
-    r+=`Phone: <input id="frmUserPhone" type="text" class="form-control" value="`+user.contactPhone+`">`;
+    r+=`Phone: <input id="frmUserPhone" type="tel" class="form-control" value="`+user.contactPhone+`">`;
     r+=`</div>`;
 
     r+=`<div class="user__detail">`;

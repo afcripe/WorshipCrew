@@ -83,7 +83,9 @@ public class OrderController {
         List<OrderRequest> orders = orderService.findAll();
         List<OrderRequest> orderList = new ArrayList<>();
         for (OrderRequest order : orders) {
-            if (!order.getOrderStatus().equals(OrderStatus.Complete) || !order.getOrderStatus().equals(OrderStatus.Cancelled)) {
+            if (order.getOrderStatus().equals(OrderStatus.Complete) || order.getOrderStatus().equals(OrderStatus.Cancelled)) {
+                // closed order
+            } else {
                 orderList.add(order);
             }
         }
@@ -107,10 +109,9 @@ public class OrderController {
         Integer completeRequests = 0;
         Integer openRequests = 0;
         for (OrderRequest request : requests) {
-            if (request.getOrderStatus().equals(OrderStatus.Complete)) {
+            if (request.getOrderStatus().equals(OrderStatus.Complete) || request.getOrderStatus().equals(OrderStatus.Cancelled)) {
                 completeRequests++;
-            }
-            if (!request.getOrderStatus().equals(OrderStatus.Complete) || !request.getOrderStatus().equals(OrderStatus.Cancelled)) {
+            } else {
                 openRequests++;
             }
         }
@@ -379,12 +380,20 @@ public class OrderController {
         }
         // get Edit permission
         boolean editable = false;
+        boolean requestClosed = false;
         if (allowEdit(request.get())) {
             editable = true;
         }
+        // determine if open
+        if (request.get().getOrderStatus().equals(OrderStatus.Complete)
+                || request.get().getOrderStatus().equals(OrderStatus.Cancelled)) {
+            requestClosed = true;
+        }
+
         List<OrderNote> noteList = orderNoteService.findByOrderId(id);
 
         model.addAttribute("editable", editable);
+        model.addAttribute("requestClosed", requestClosed);
         model.addAttribute("currentUserId", user.getId());
         model.addAttribute("currentSuperId", request.get().getSupervisor().getId());
         model.addAttribute("orderRequest", request.get());

@@ -124,7 +124,7 @@ function htmlUser(campusList, deptList, posList, dirList) {
     r +=`<div class="user-edit__div"><div class="user-edit__content">`;
 
     r+=`<div class="user__detail">`;
-    r+=`E-mail / Username: <input id="frmUserName" type="text" class="form-control">`;
+    r+=`E-mail / Username: <input id="frmUserName" type="email" class="form-control">`;
     r+=`</div>`;
 
     r+=`<div class="user__detail">`;
@@ -136,7 +136,7 @@ function htmlUser(campusList, deptList, posList, dirList) {
     r+=`</div>`;
 
     r+=`<div class="user__detail">`;
-    r+=`Phone: <input id="frmUserPhone" type="text" class="form-control">`;
+    r+=`Phone: <input id="frmUserPhone" type="tel" class="form-control">`;
     r+=`</div>`;
 
     r+=`<div class="user__detail">`;

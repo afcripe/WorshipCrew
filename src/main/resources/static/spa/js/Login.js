@@ -84,7 +84,7 @@ function formatHTML(username) {
     return ` <h1>Login</h1>
             <form>
             <div class="form-content">
-                <input id="formLogin-username" type="text" class="form-control" value="`+username+`" placeholder="E-mail">
+                <input id="formLogin-username" type="email" class="form-control" value="`+username+`" placeholder="E-mail">
                 <input id="formLogin-password" type="password" class="form-control" placeholder="Password">
                 <button type="submit" class="btn btn-sm btn-wiki" data-form-submit="formLogin">Login</button>
             </div>

@@ -207,7 +207,7 @@ public class UserAPIController {
     }
 
     @PostMapping("/role/update")
-    public UserRoles getUserRole(@ModelAttribute UserRoles roleModel) {
+    public UserRoles setUserRole(@ModelAttribute UserRoles roleModel) {
         Optional<UserRoles> role = userRolesService.findById(roleModel.getId());
         if (role.isPresent()) {
             role.get().setDescription(roleModel.getDescription());

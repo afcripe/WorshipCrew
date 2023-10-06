@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://thymeleaf.org">
 
-<div th:fragment="cardFragment(orderItem, currentUserId)">
+<div th:fragment="cardFragment(orderItem, currentUserId, requestClosed)">
   <div th:id="*{productId}+'-item'" class="card p-2" th:object="${orderItem}">
 
     <div class="d-block d-lg-none">
@@ -24,14 +24,14 @@
           <div>
             Item Status: <span th:text="*{itemStatus}"></span>
             <th:block th:if="${editable} or ${currentUserId} eq ${orderItem.supervisor.id}">
-              <button class="btn btn-sm btn-primary" th:onclick="dialogChangeItemStatus([[*{id}]], [[*{itemStatus}]])">Change</button>
+              <button class="btn btn-sm btn-primary" th:unless="${requestClosed}" th:onclick="dialogChangeItemStatus([[*{id}]], [[*{itemStatus}]])">Change</button>
             </th:block>
           </div>
         </div>
         <div class="col-12">
           <div>
             Item Fulfilled By: <span th:text="*{supervisor.firstName} + ' ' + *{supervisor.lastName}"></span>
-            <button id="btnItemSupervisorSM" class="btn btn-sm btn-primary" onclick="dialogAssignPerson()">Change</button>
+            <button id="btnItemSupervisorSM" class="btn btn-sm btn-primary" th:unless="${requestClosed}" onclick="dialogAssignPerson()">Change</button>
           </div>
         </div>
       </div>
@@ -57,14 +57,14 @@
           <div>
             Item Status: <span th:text="*{itemStatus}"></span>
             <th:block th:if="${editable} or ${currentUserId} eq ${orderItem.supervisor.id}">
-              <button class="btn btn-sm btn-primary" th:onclick="dialogChangeItemStatus([[*{id}]], [[*{itemStatus}]])">Change</button>
+              <button class="btn btn-sm btn-primary" th:unless="${requestClosed}" th:onclick="dialogChangeItemStatus([[*{id}]], [[*{itemStatus}]])">Change</button>
             </th:block>
           </div>
         </div>
         <div class="col-6">
           <div>
             Item Fulfilled By: <span th:text="*{supervisor.firstName} + ' ' + *{supervisor.lastName}"></span>
-            <button id="btnItemSupervisorLG" class="btn btn-sm btn-primary" th:onclick="dialogAssignPerson([[*{supervisor.id}]])">Change</button>
+            <button id="btnItemSupervisorLG" class="btn btn-sm btn-primary" th:unless="${requestClosed}" th:onclick="dialogAssignPerson([[*{supervisor.id}]])">Change</button>
           </div>
         </div>
       </div>
