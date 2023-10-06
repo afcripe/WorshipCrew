@@ -55,6 +55,14 @@
                 <span class="card-text" th:text="${userPosition}"></span>
               </div>
             </div>
+            <div class="row p-2" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'STORE_SUPERVISOR')
+                  or #lists.contains(userRoles,'RESOURCE_SUPERVISOR') or #lists.contains(userRoles,'USER_SUPERVISOR')
+                  or #lists.contains(userRoles,'SUPPORT_SUPERVISOR') or #lists.contains(userRoles,'REQUEST_SUPERVISOR')}">
+              <div class="col-12">
+                For simple management tasks, The PWA is available for mobile devices.<br>
+                <a th:href="${baseURL}+'/app'" th:text="${baseURL}+'/app'"></a>
+              </div>
+            </div>
 
           </div>
         </div>

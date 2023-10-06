@@ -2,6 +2,8 @@ package net.dahliasolutions.controllers;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import net.dahliasolutions.models.AdminSettings;
+import net.dahliasolutions.models.AppServer;
 import net.dahliasolutions.models.order.OrderNote;
 import net.dahliasolutions.models.order.OrderRequest;
 import net.dahliasolutions.models.user.ChangePasswordModel;
@@ -32,6 +34,7 @@ public class ProfileController {
     private final RedirectService redirectService;
     private final OrderService orderService;
     private final OrderNoteService orderNoteService;
+    private final AppServer appServer;
 
     @ModelAttribute
     public void addAttributes(Model model) {
@@ -50,6 +53,7 @@ public class ProfileController {
         model.addAttribute("user", user);
         model.addAttribute("userPosition", user.getPosition().getName());
         model.addAttribute("orderList", orderList);
+        model.addAttribute("baseURL",appServer.getBaseURL());
         return "profile/index";
     }
 
