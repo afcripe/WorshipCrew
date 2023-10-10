@@ -6,16 +6,16 @@
 
 <div class="container-fluid m-0 p-0" layout:fragment="content">
 
-    <div th:replace="~{store/moduleHeader :: header}">Header</div>
+    <div th:replace="~{wiki/moduleHeader :: header}">Header</div>
 
     <div class="mx-2">
 
         <div class="row mt-2">
 
-            <h1 class="color-store">Store Image Manager</h1>
+            <h1 class="color-wiki">Resource Image Manager</h1>
 
             <div th:each="item : ${imageList}">
-                <div th:replace="~{components/cardImageManagerLine :: cardFragment(${item})}">List</div>
+                <div th:replace="~{components/cardIResourcemageLine :: cardFragment(${item})}">List</div>
             </div>
 
         </div>
@@ -26,7 +26,7 @@
         <script>
             async function loadImage(id) {
                 debugger
-                const response = await fetch('/api/v1/store/image/'+id)
+                const response = await fetch('/api/v1/wiki/image/'+id)
                 .then(response => {
                     return response.json();
                 }).then(data => {
@@ -95,8 +95,8 @@
 
                 <div class="row p-2">
                     <div class="col">
-                        <button id="btnUpdate" type="button" class="btn btn-sm btn-store" onclick="postImage()">Update</button>
-                        <button id="btnCancel" type="button" class="btn btn-sm btn-outline-store" onclick="KeyEscapeDialog()">Cancel</button>
+                        <button id="btnUpdate" type="button" class="btn btn-sm btn-wiki" onclick="postImage()">Update</button>
+                        <button id="btnCancel" type="button" class="btn btn-sm btn-outline-wiki" onclick="KeyEscapeDialog()">Cancel</button>
                     </div>
                 </div>
 
@@ -106,7 +106,7 @@
 
     <script>
         function deleteImage(el, id) {
-            fetch('/api/v1/contentmanager/store/removeimage/'+id).then(response => {
+            fetch('/api/v1/contentmanager/wiki/removeimage/'+id).then(response => {
                 document.getElementById(el).remove();
             })
         }

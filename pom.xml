@@ -10,7 +10,7 @@
     </parent>
     <groupId>net.dahliasolutions</groupId>
     <artifactId>DestinyExchange</artifactId>
-    <version>0.1.7</version>
+    <version>0.1.8</version>
     <name>DestinyExchange</name>
     <description>Destiny Exchange Website</description>
     <properties>

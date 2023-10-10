@@ -4,14 +4,12 @@ import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.position.Position;
 import net.dahliasolutions.models.position.PositionSelectedModel;
 import net.dahliasolutions.models.records.*;
+import net.dahliasolutions.models.store.StoreImage;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.wiki.*;
 import net.dahliasolutions.services.AdminSettingsService;
 import net.dahliasolutions.services.position.PositionService;
-import net.dahliasolutions.services.wiki.WikiFolderService;
-import net.dahliasolutions.services.wiki.WikiNavigatorService;
-import net.dahliasolutions.services.wiki.WikiPostService;
-import net.dahliasolutions.services.wiki.WikiTagService;
+import net.dahliasolutions.services.wiki.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +29,7 @@ public class WikiAPIController {
     private final WikiPostService wikiPostService;
     private final WikiFolderService wikiFolderService;
     private final WikiTagService wikiTagService;
+    private final WikiImageService wikiImageService;
     private final WikiNavigatorService navigatorService;
     private final PositionService positionService;
     private final AdminSettingsService adminSettingsService;
@@ -357,5 +356,24 @@ public class WikiAPIController {
             wikiPostService.save(post.get());
         }
         return new SingleBigIntegerModel(postModel.id());
+    }
+
+    @GetMapping("/image/{id}")
+    public WikiImage getStoreImage(@PathVariable BigInteger id) {
+        Optional<WikiImage> image = wikiImageService.findById(id);
+        return image.orElseGet(WikiImage::new);
+
+    }
+
+    @PostMapping("/image/update")
+    public WikiImage updateStoreImage(@ModelAttribute WikiImage img) {
+        Optional<WikiImage> image = wikiImageService.findById(img.getId());
+        if (image.isPresent()) {
+            image.get().setName(img.getName());
+            image.get().setDescription(img.getDescription());
+            wikiImageService.save(image.get());
+            return image.get();
+        }
+        return img;
     }
 }

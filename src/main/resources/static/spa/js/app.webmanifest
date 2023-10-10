@@ -1,8 +1,8 @@
 
 {
   "name": "Destiny Worship Crew",
-  "short_name": "DW Crew",
-  "description": "Portal for managing Destiny Crew Requests and Tickets.",
+  "short_name": "Crew",
+  "description": "Portal for managing Destiny Worship Crew Requests and Tickets.",
   "theme_color": "#369fcc",
   "background_color": "#363636",
   "display": "standalone",
