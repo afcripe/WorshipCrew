@@ -159,6 +159,8 @@ const router = async () => {
 
     document.querySelector("#app").innerHTML = await view.getHtml();
 
+    document.querySelector("#app").scrollTop = 0;
+
     updateAppProgress(101);
 
     await view.getNotification(token, username);

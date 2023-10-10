@@ -4,12 +4,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.*;
+import net.dahliasolutions.models.store.StoreImage;
+import net.dahliasolutions.models.store.StoreImageManager;
+import net.dahliasolutions.models.store.StoreImageModel;
+import net.dahliasolutions.models.store.StoreItem;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
 import net.dahliasolutions.models.wiki.*;
 import net.dahliasolutions.services.AdminSettingsService;
 import net.dahliasolutions.services.RedirectService;
 import net.dahliasolutions.services.wiki.WikiFolderService;
+import net.dahliasolutions.services.wiki.WikiImageService;
 import net.dahliasolutions.services.wiki.WikiPostService;
 import net.dahliasolutions.services.wiki.WikiTagService;
 import org.springframework.security.core.Authentication;
@@ -36,6 +41,7 @@ public class WikiController {
     private final RedirectService redirectService;
     private final WikiFolderService wikiFolderService;
     private final WikiTagService wikiTagService;
+    private final WikiImageService wikiImageService;
     private final AdminSettingsService adminSettingsService;
     private final AppServer appServer;
 
@@ -463,6 +469,28 @@ public class WikiController {
         }
         model.addAttribute("folderList", refList);
         return "wiki/folderManager";
+    }
+
+    @GetMapping("/imageManager")
+    public String getImageManager(Model model, HttpSession session) {
+        List<WikiImage> imageList = wikiImageService.findAll();
+        // create new managerList
+        List<WikiImageManager> managerList = new ArrayList<>();
+        for (WikiImage image : imageList) {
+            // add each image to the list
+            WikiImageModel imageModel = new WikiImageModel(image.getId(), image.getName(), image.getDescription(),
+                    image.getFileLocation(), 0);
+            WikiImageManager manager = new WikiImageManager(
+                    image.getId(),
+                    imageModel,
+                    wikiPostService.searchAll(image.getFileLocation()));
+            manager.getImage().setReferences(manager.getItems().size());
+            managerList.add(manager);
+        }
+
+        model.addAttribute("imageList", managerList);
+        redirectService.setHistory(session, "/resource/settings");
+        return "wiki/imageManager";
     }
 
     @GetMapping("/recent")

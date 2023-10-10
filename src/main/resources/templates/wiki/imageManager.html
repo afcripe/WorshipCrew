@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<div class="container-fluid m-0 p-0" layout:fragment="content">
+
+    <div th:replace="~{store/moduleHeader :: header}">Header</div>
+
+    <div class="mx-2">
+
+        <div class="row mt-2">
+
+            <h1 class="color-store">Store Image Manager</h1>
+
+            <div th:each="item : ${imageList}">
+                <div th:replace="~{components/cardImageManagerLine :: cardFragment(${item})}">List</div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <dialog id="editImageDialog" class="upload-modal">
+        <script>
+            async function loadImage(id) {
+                debugger
+                const response = await fetch('/api/v1/store/image/'+id)
+                .then(response => {
+                    return response.json();
+                }).then(data => {
+                    console.log(data);
+                    document.getElementById("imageId").value = data.id;
+                    document.getElementById('imageName').value = data.name;
+                    document.getElementById('imageDescription').value = data.description;
+                });
+            }
+
+            async function postImage() {
+                document.getElementById('btnUpdate').disabled = true;
+                let formData = new FormData();
+                    formData.set("id", document.getElementById('imageId').value)
+                    formData.set("name", document.getElementById('imageName').value)
+                    formData.set("description", document.getElementById('imageDescription').value)
+                    formData.set("fileLocation", "")
+
+                const response = await fetch('/api/v1/store/image/update', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    return response.json();
+                }).then(data => {
+                    debugger
+                    let divName = "name-"+data.id;
+                    let divDesc = "desc-"+data.id;
+                    document.getElementById(divName).innerText = data.name;
+                    document.getElementById(divDesc).innerText = data.description;
+                    KeyEscapeDialog();
+                });
+            }
+
+            function KeyEscapeDialog() {
+                // enable buttons and hide progress
+                document.getElementById('btnUpdate').disabled = false;
+                document.getElementById('imageId').value = 0;
+                document.getElementById('imageName').value = "";
+                document.getElementById('imageDescription').innerText = "";
+                // close dialog
+                document.getElementById("editImageDialog").close();
+            }
+
+        </script>
+        <h2>Upload Image</h2>
+        <div class="flex-column">
+            <form id="formEditImage" method="dialog">
+                <input type="hidden" id="imageId">
+                <div class="row p-2">
+                    <div class="col">
+                        <label for="imageName" class="form-label">Name:</label>
+                    </div>
+                    <div class="col">
+                        <input class="form-control" id="imageName">
+                    </div>
+                </div>
+                <div class="row p-2">
+                    <div class="col">
+                        <label for="imageDescription" class="form-label">Description:</label>
+                    </div>
+                    <div class="col">
+                        <input class="form-control" id="imageDescription">
+                    </div>
+                </div>
+
+
+                <div class="row p-2">
+                    <div class="col">
+                        <button id="btnUpdate" type="button" class="btn btn-sm btn-store" onclick="postImage()">Update</button>
+                        <button id="btnCancel" type="button" class="btn btn-sm btn-outline-store" onclick="KeyEscapeDialog()">Cancel</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </dialog>
+
+    <script>
+        function deleteImage(el, id) {
+            fetch('/api/v1/contentmanager/store/removeimage/'+id).then(response => {
+                document.getElementById(el).remove();
+            })
+        }
+
+        function editeImage(id) {
+            loadImage(id);
+            document.getElementById("editImageDialog").showModal();
+        }
+    </script>
+
+  </div>
+
+</html>
