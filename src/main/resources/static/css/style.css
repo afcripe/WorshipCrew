@@ -29,6 +29,12 @@
     --dwc-support-selected: #835acc;
     --dwc-support-accent: #e5d7fd;
 
+    --dwc-msg: #0de819;
+    --dwc-msg-focus: #0ac519;
+    --dwc-msg-active: #09b918;
+    --dwc-msg-disable: #0de81e;
+    --dwc-msg-selected: #4acc55;
+
     --dwc-edit-color: #198754;
 
     --dwc-body-color: #212529;
@@ -638,6 +644,66 @@
     background-color: transparent;
 }
 
+.color-msg {
+    color: var(--dwc-msg);
+}
+
+.btn-msg {
+    color: #fff;
+    background-color: var(--dwc-msg);
+    border-color:  var(--dwc-msg);
+}
+.btn-msg:hover {
+    color: #fff;
+    background-color: var(--dwc-msg-focus);
+    border-color: var(--dwc-msg-active);
+}
+.btn-check:focus + .btn-msg, .btn-msg:focus {
+    color: #fff;
+    background-color: var(--dwc-msg-focus);
+    border-color: var(--dwc-msg-active);
+    box-shadow: 0 0 0 0.25rem  rgba(var(--dwc-msg), 0.5);
+}
+.btn-check:checked + .btn-msg, .btn-check:active + .btn-msg, .btn-msg:active, .btn-msg.active, .show > .btn-msg.dropdown-toggle {
+    color: #fff;
+    background-color: var(--dwc-msg-active);
+    border-color: var(--dwc-msg-focus);
+}
+.btn-check:checked + .btn-msg:focus, .btn-check:active + .btn-msg:focus, .btn-msg:active:focus, .btn-msg.active:focus, .show > .btn-msg.dropdown-toggle:focus {
+    box-shadow: 0 0 0 0.25rem rgba(var(--dwc-msg), 0.5);
+}
+.btn-msg:disabled, .btn-msg.disabled {
+    color: #fff;
+    background-color: var(--dwc-msg-active);
+    border-color: var(--dwc-msg-active);
+}
+
+
+.btn-outline-msg {
+    color: var(--dwc-msg-active);
+    border-color: var(--dwc-msg-active);
+}
+.btn-outline-msg:hover {
+    color: #fff;
+    background-color: var(--dwc-msg-active);
+    border-color: var(--dwc-msg-active);
+}
+.btn-check:focus + .btn-outline-msg, .btn-outline-msg:focus {
+    box-shadow: 0 0 0 0.25rem rgba(var(--dwc-msg-active), 0.5);
+}
+.btn-check:checked + .btn-outline-msg, .btn-check:active + .btn-outline-msg, .btn-outline-msg:active, .btn-outline-msg.active, .btn-outline-msg.dropdown-toggle.show {
+    color: #fff;
+    background-color: var(--dwc-msg-active);
+    border-color: var(--dwc-msg-active);
+}
+.btn-check:checked + .btn-outline-msg:focus, .btn-check:active + .btn-outline-msg:focus, .btn-outline-msg:active:focus, .btn-outline-msg.active:focus, .btn-outline-msg.dropdown-toggle.show:focus {
+    box-shadow: 0 0 0 0.25rem rgba(var(--dwc-msg-active), 0.5);
+}
+.btn-outline-msg:disabled, .btn-outline-msg.disabled {
+    color: var(--dwc-msg-active);
+    background-color: transparent;
+}
+
 .generic-icon {
     color: var(--dwc-body-color);
 }
@@ -1162,4 +1228,14 @@ ul, #folderTree {
 
 .return-character-padding {
     padding-right: 0.3rem;
+}
+
+/* messaging styles */
+
+.messageUnread {
+    font-weight: bold;
+}
+
+.messageRead {
+    font-weight: normal;
 }

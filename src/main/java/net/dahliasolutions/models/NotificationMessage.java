@@ -29,6 +29,12 @@ public class NotificationMessage {
     private boolean sent;
     private LocalDateTime dateSent;
 
+    @Column(columnDefinition = "boolean default true")
+    private boolean read;
+
+    @Column(columnDefinition = "numeric default 0")
+    private BigInteger fromUserId;
+
     @Enumerated
     private EventModule module;
 

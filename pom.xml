@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>net.dahliasolutions</groupId>
-    <artifactId>DestinyExchange</artifactId>
-    <version>0.1.8</version>
-    <name>DestinyExchange</name>
-    <description>Destiny Exchange Website</description>
+    <artifactId>WorshipCrew</artifactId>
+    <version>0.2.0</version>
+    <name>WorshipCrew</name>
+    <description>Worship Crew Web App</description>
     <properties>
         <java.version>18</java.version>
     </properties>

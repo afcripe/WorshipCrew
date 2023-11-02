@@ -12,7 +12,11 @@ public interface NotificationMessageServiceInterface {
     NotificationMessage createEventMessage(NotificationMessage message, User usr);
     BrowserMessage sendMessage(NotificationMessage message);
     List<NotificationMessage> getUnsentMessages();
+    List<NotificationMessage> getUserAll(User user);
+    List<NotificationMessage> getUserUnread(User user);
+    List<NotificationMessage> getUserRead(User user);
     void save(NotificationMessage message);
     void sendAllMessages();
+    void setMessageRead();
 
 }

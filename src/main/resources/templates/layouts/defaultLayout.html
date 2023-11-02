@@ -85,6 +85,7 @@
                         <a class="list-group-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')
                             or #lists.contains(userRoles,'SUPPORT_READ') or #lists.contains(userRoles,'SUPPORT_WRITE')
                             or #lists.contains(userRoles,'SUPPORT_AGENT') or #lists.contains(userRoles,'SUPPORT_SUPERVISOR')}" href="/support">Support</a>
+                        <a class="list-group-item" href="/messaging">Messaging</a>
                     </div>
                     <div class="list-group" sec:authorize="isAuthenticated()">
                         <a class="list-group-item" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'REQUEST_SUPERVISOR')
@@ -122,6 +123,9 @@
                             or #lists.contains(userRoles,'SUPPORT_READ') or #lists.contains(userRoles,'SUPPORT_WRITE')
                             or #lists.contains(userRoles,'SUPPORT_AGENT') or #lists.contains(userRoles,'SUPPORT_SUPERVISOR')}" href="/support">
                             <i class="bi bi-life-preserver"></i>
+                        </a>
+                        <a class="list-group-item p-1" href="/messaging">
+                            <i class="bi bi-envelope"></i>
                         </a>
                     </div>
                     <div class="list-group pb-3" sec:authorize="isAuthenticated()">

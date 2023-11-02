@@ -53,6 +53,10 @@
             <a class="nav-link" style="color: #eeeeee !important;" href="/request">Requests</a>
           </li>
           <li class="nav-item d-block d-sm-none" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'USER_SUPERVISOR')
+                                                or #lists.contains(userRoles,'USER_WRITE')}">
+            <a class="nav-link" style="color: #eeeeee !important;" href="/messaging">Messaging</a>
+          </li>
+          <li class="nav-item d-block d-sm-none" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'USER_SUPERVISOR')
                                                 or #lists.contains(userRoles,'DIRECTOR_READ') or #lists.contains(userRoles,'DIRECTOR_WRITE')
                                                 or #lists.contains(userRoles,'CAMPUS_READ') or #lists.contains(userRoles,'CAMPUS_WRITE')}">
             <a class="nav-link" style="color: #eeeeee !important;" href="/admin">Settings</a>

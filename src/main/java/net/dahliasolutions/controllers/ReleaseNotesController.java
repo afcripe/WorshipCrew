@@ -41,4 +41,16 @@ public class ReleaseNotesController {
         redirectService.setHistory(session, "/releasenotes");
         return "releaseNotes";
     }
+
+    @GetMapping("/roadmap")
+    public String getRoadMap(Model model, HttpSession session) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println(auth.getPrincipal().toString());
+        if (auth.getPrincipal().toString().equals("anonymousUser")) {
+            return "redirect:/";
+        }
+
+        redirectService.setHistory(session, "/releasenotes/roadMap");
+        return "roadMap";
+    }
 }

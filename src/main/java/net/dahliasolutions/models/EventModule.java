@@ -10,5 +10,6 @@ public enum EventModule {
     Department,
     Position,
     Admin,
+    Messaging,
     Any
 }

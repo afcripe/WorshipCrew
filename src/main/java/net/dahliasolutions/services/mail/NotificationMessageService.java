@@ -89,6 +89,21 @@ public class NotificationMessageService implements NotificationMessageServiceInt
     }
 
     @Override
+    public List<NotificationMessage> getUserAll(User user) {
+        return messageRepository.findAllByUser(user);
+    }
+
+    @Override
+    public List<NotificationMessage> getUserUnread(User user) {
+        return messageRepository.findAllByUserAndRead(user, false);
+    }
+
+    @Override
+    public List<NotificationMessage> getUserRead(User user) {
+        return messageRepository.findAllByUserAndRead(user, true);
+    }
+
+    @Override
     public void save(NotificationMessage message) {
         messageRepository.save(message);
     }
@@ -99,6 +114,11 @@ public class NotificationMessageService implements NotificationMessageServiceInt
         for (NotificationMessage message : unsentMessages) {
             sendMessage(message);
         }
+    }
+
+    @Override
+    public void setMessageRead() {
+        // ToDo - mark message as read
     }
 
     private BrowserMessage sendPush(NotificationMessage message) {

@@ -10,5 +10,6 @@ public enum EventType {
     Closed,
     Deleted,
     DeadlineApproaching,
-    DeadlinePassed
+    DeadlinePassed,
+    Custom
 }

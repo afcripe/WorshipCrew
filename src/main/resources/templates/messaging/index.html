@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<div class="container-fluid m-0 p-0" layout:fragment="content">
+
+    <div th:replace="~{messaging/moduleHeader :: header}">Header</div>
+
+    <div class="container my-3">
+
+        <h1 class="color-msg">Messages</h1>
+
+        <div class="mx-3">
+            <button class="btn btn-sm btn-outline-msg" onclick="toggleSystemMessages()">Toggle System Messages</button>
+        </div>
+
+        <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">From</th>
+                            <th scope="col">Subject</th>
+                            <th scope="col">Sent</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(messageList)}">
+                            <td colspan="3">Popular we are not.</td>
+                        </tr>
+                        <tr th:each="msg : ${messageList}" class="selectableItem" style="cursor: pointer"
+                            th:classappend="*{msg.read} ? messageRead : messageUnread">
+                            <td>
+                                <span th:text="*{msg.fromUser}"></span><br>
+                            </td>
+                            <td>
+                                <span th:text="*{msg.subject}"></span>
+                            </td>
+                            <td>
+                                <span th:text="*{#temporals.format(msg.dateSent, 'MMM-dd-yyyy')}"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+    </div>
+
+    <script>
+        let params = (new URL(document.location)).searchParams;
+
+        function toggleSystemMessages() {
+
+            if (params.has('system')) {
+                params.delete('system');
+                window.location = '/messaging';
+            } else {
+                params.set('system', '');
+                window.location = '/messaging?system';
+            }
+            // window.location.reload();
+        }
+    </script>
+
+</div>
+
+</html>

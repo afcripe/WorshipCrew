@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<div class="container-fluid m-0 p-0" layout:fragment="content">
+
+    <div class="wrapper flex-grow-1">
+    <div id="mainContent" class="wrapper d-flex">
+    <div class="flex-fill p-1 pb-4 w-100 mx-2">
+
+        <div class="p-2">
+            <div class="h4 d-inline">Roadmap</div>
+            <span>&nbsp;&nbsp;&nbsp;</span>
+            <div class="h5 d-inline">
+                <a href="/releasenotes"><i class="bi bi-journal-text" title="Release Notes"></i></a>
+                <i class="bi bi-sign-merge-left" title="Road Map"></i>
+            </div>
+        </div>
+
+        <div class="p-2">
+
+            <div class="h5">2023 Q4</div>
+            <ul class="release-notes__list">
+                <li>Send E-mail to users and groups</li>
+                <li>Blackout dates for notifications (cache messages during service times)</li>
+            </ul>
+
+            <div class="h5">2024 Q1</div>
+            <ul class="release-notes__list">
+                <li>Support ticket approaching deadline notifications</li>
+                <li>Submit support tickets through E-mail</li>
+                <li>Detailed Reporting</li>
+                <li>Advanced filtering for system notifications</li>
+            </ul>
+
+            <div class="h5">2024 Q2</div>
+            <ul class="release-notes__list">
+                <li>PWA for mobile store browsing and request submissions</li>
+                <li>Advanced image manager and optimizations</li>
+            </ul>
+
+        </div>
+    </div>
+    </div>
+    </div>
+
+</div>
+
+</html>

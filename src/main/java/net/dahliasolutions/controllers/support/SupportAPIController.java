@@ -226,6 +226,8 @@ public class SupportAPIController {
                                 false,
                                 false,
                                 null,
+                                false,
+                                BigInteger.valueOf(0),
                                 EventModule.Support,
                                 EventType.Updated,
                                 ticket.get().getAgent(),
