@@ -19,6 +19,7 @@ public class NotificationMessageModel {
     private boolean read;
     private String fromUser;
     private String module;
+    private String messageBody;
 
     @Override
     public String toString() {

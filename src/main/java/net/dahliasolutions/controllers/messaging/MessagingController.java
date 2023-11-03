@@ -76,7 +76,8 @@ public class MessagingController {
                             message.getDateSent(),
                             message.isRead(),
                             sendingUser,
-                            message.getModule().toString()
+                            message.getModule().toString(),
+                            ""
                     );
                     modelList.add(messageModel);
                 }
@@ -87,7 +88,8 @@ public class MessagingController {
                         message.getDateSent(),
                         message.isRead(),
                         sendingUser,
-                        message.getModule().toString()
+                        message.getModule().toString(),
+                        ""
                 );
                 modelList.add(messageModel);
             }

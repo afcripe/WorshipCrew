@@ -11,41 +11,114 @@
 
         <h1 class="color-msg">Messages</h1>
 
-        <div class="mx-3">
+        <div class="m-3">
             <button class="btn btn-sm btn-outline-msg" onclick="toggleSystemMessages()">Toggle System Messages</button>
+            <button class="btn btn-sm btn-outline-msg" onclick="toggleMessageReader()">Toggle Reader</button>
         </div>
 
-        <table class="table table-striped">
+        <div class="message-container">
+            <div id="msgList" class="message-list">
+                <table class="table table-striped">
                     <thead>
-                        <tr>
-                            <th scope="col">From</th>
-                            <th scope="col">Subject</th>
-                            <th scope="col">Sent</th>
-                        </tr>
+                    <tr>
+                        <th scope="col">From</th>
+                        <th scope="col">Subject</th>
+                        <th scope="col">Sent</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        <tr th:if="${#lists.isEmpty(messageList)}">
-                            <td colspan="3">Popular we are not.</td>
-                        </tr>
-                        <tr th:each="msg : ${messageList}" class="selectableItem" style="cursor: pointer"
-                            th:classappend="*{msg.read} ? messageRead : messageUnread">
-                            <td>
-                                <span th:text="*{msg.fromUser}"></span><br>
-                            </td>
-                            <td>
-                                <span th:text="*{msg.subject}"></span>
-                            </td>
-                            <td>
-                                <span th:text="*{#temporals.format(msg.dateSent, 'MMM-dd-yyyy')}"/>
-                            </td>
-                        </tr>
+                    <tr th:if="${#lists.isEmpty(messageList)}">
+                        <td colspan="3">Popular we are not.</td>
+                    </tr>
+                    <tr th:each="msg : ${messageList}" class="selectableItem" style="cursor: pointer" th:id="*{msg.fromUser}+'-msg'"
+                        th:classappend="*{msg.read} ? messageRead : messageUnread" th:onclick="getMessage([[*{msg.id}]])">
+                        <td>
+                            <span th:text="*{msg.fromUser}"></span><br>
+                        </td>
+                        <td>
+                            <span th:text="*{msg.subject}"></span>
+                        </td>
+                        <td>
+                            <span th:text="*{#temporals.format(msg.dateSent, 'MMM-dd-yyyy')}"/>
+                        </td>
+                    </tr>
                     </tbody>
                 </table>
+            </div>
+            <div id="msgReader" class="message-reader">
+                <div class="message-titleBar">
+                    <div id="msgTitle" class="message-titleText">
+                        E-mail Message
+                    </div>
+                    <div class="message-titleBtn">
+                        <i class="bi bi-x-square selectableItem" onclick="toggleMessageReader()"></i>
+                    </div>
+                </div>
+
+                <div class="message-body">
+                    <div>
+                        <div>From: <span id="msgViewerFrom"></span></div>
+                        <div>Date: <span id="msgViewerDate"></span></div>
+                        <div>Subject: <span id="msgViewerSubj"></span></div>
+                    </div>
+                    <hr>
+                    <span id="msgViewerBody"> -- Body -- </span>
+                </div>
+            </div>
+        </div>
 
     </div>
 
     <script>
         let params = (new URL(document.location)).searchParams;
+
+        async function getMessage(id) {
+            const msgViewer = document.getElementById('msgReader');
+            const msgTitleEl = document.getElementById('msgTitle');
+            const msgFromEl = document.getElementById('msgViewerFrom');
+            const msgDateEl = document.getElementById('msgViewerDate');
+            const msgSubjEl = document.getElementById('msgViewerSubj');
+            const msgBodyEl = document.getElementById('msgViewerBody');
+
+            if (msgViewer.classList.contains('message-reader__expand-half')
+                || msgViewer.classList.contains('message-reader__expand-full')) {
+                msgViewer.classList.remove('message-reader__show');
+            }
+
+            const response = await fetch('/api/v1/messaging/message/'+id
+            ).then(response => {
+                return response.json();
+            }).then(data => {
+                console.log(data);
+                msgTitleEl.innerText = data.subject;
+                msgSubjEl.innerText = data.subject;
+                msgFromEl.innerText = data.fromUser;
+                msgDateEl.innerText = formatDate(data.dateSent);
+                // msgBodyEl.innerText = data.messageBody;
+                msgBodyEl.innerText = 'The retrieved message body.';
+
+                if (msgViewer.classList.contains('message-reader__expand-half')
+                    || msgViewer.classList.contains('message-reader__expand-full')) {
+                    msgViewer.classList.add('message-reader__show');
+                } else {
+                    toggleMessageReader();
+                }
+            });
+            let rowID = id+'-msg';
+            const msgRow = document.getElementById(rowID);
+            try {
+                msgRow.classList.remove('messageRead');
+                msgRow.classList.add('messageUnread');
+            } catch (e) {}
+        }
+
+        function formatDate(dte) {
+            let strDate = dte.split("T")[0];
+            let strTime = dte.split("T")[1];
+            let partsDate = strDate.split("-");
+            let partTime = strTime.split(":");
+            return strDate + " " + partTime[0] + ":" + partTime[1];
+        }
 
         function toggleSystemMessages() {
 
@@ -58,6 +131,71 @@
             }
             // window.location.reload();
         }
+
+        function toggleMessageReader() {
+            const msgList = document.getElementById('msgList');
+            const msgViewer = document.getElementById('msgReader');
+            if (window.innerWidth < 768) {
+                if (msgViewer.classList.contains('message-reader__expand-full')) {
+                    msgList.classList.remove('message-list__expand-full');
+                    msgViewer.classList.remove('message-reader__expand-full');
+                    setTimeout(() => {
+                        msgViewer.classList.remove('message-reader__show');
+                        msgList.classList.remove('message-list__hide');
+                    }, 400);
+                } else {
+                    msgList.classList.add('message-list__expand-full');
+                    msgViewer.classList.add('message-reader__expand-full');
+                    setTimeout(() => {
+                        msgViewer.classList.add('message-reader__show');
+                        msgList.classList.add('message-list__hide');
+                    }, 400);
+                }
+            } else {
+                if (msgViewer.classList.contains('message-reader__expand-half')) {
+                    msgList.classList.remove('message-list__expand-half');
+                    msgViewer.classList.remove('message-reader__expand-half');
+                    setTimeout(() => {
+                        msgViewer.classList.remove('message-reader__show');
+                    }, 400);
+                } else {
+                    msgList.classList.add('message-list__expand-half');
+                    msgViewer.classList.add('message-reader__expand-half');
+                    setTimeout(() => {
+                        msgViewer.classList.add('message-reader__show');
+                    }, 400);
+                }
+            }
+        }
+
+        function changeViewer () {
+            const msgList = document.getElementById('msgList');
+            const msgViewer = document.getElementById('msgReader');
+            if (window.innerWidth < 768) {
+                if(msgViewer.classList.contains('message-reader__expand-half')) {
+                    msgList.classList.remove('message-list__expand-half');
+                    msgViewer.classList.remove('message-reader__expand-half');
+                    msgList.classList.add('message-list__expand-full');
+                    msgViewer.classList.add('message-reader__expand-full');
+                    setTimeout(() => {
+                        msgList.classList.add('message-list__hide');
+                    }, 400);
+                }
+            } else {
+                if (msgViewer.classList.contains('message-reader__expand-full')) {
+                    msgList.classList.remove('message-list__expand-full');
+                    msgViewer.classList.remove('message-reader__expand-full');
+                    msgList.classList.add('message-list__expand-half');
+                    msgViewer.classList.add('message-reader__expand-half');
+                    setTimeout(() => {
+                        msgList.classList.remove('message-list__hide');
+                    }, 400);
+                }
+            }
+        }
+
+        window.addEventListener("resize", changeViewer);
+
     </script>
 
 </div>

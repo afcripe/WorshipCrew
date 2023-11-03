@@ -27,6 +27,7 @@ import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -101,6 +102,11 @@ public class NotificationMessageService implements NotificationMessageServiceInt
     @Override
     public List<NotificationMessage> getUserRead(User user) {
         return messageRepository.findAllByUserAndRead(user, true);
+    }
+
+    @Override
+    public Optional<NotificationMessage> findById(BigInteger id) {
+        return messageRepository.findById(id);
     }
 
     @Override

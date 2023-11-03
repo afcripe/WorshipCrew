@@ -29,11 +29,12 @@
     --dwc-support-selected: #835acc;
     --dwc-support-accent: #e5d7fd;
 
-    --dwc-msg: #0de819;
-    --dwc-msg-focus: #0ac519;
-    --dwc-msg-active: #09b918;
-    --dwc-msg-disable: #0de81e;
-    --dwc-msg-selected: #4acc55;
+    --dwc-msg: #0bc515;
+    --dwc-msg-focus: #08a815;
+    --dwc-msg-active: #079413;
+    --dwc-msg-disable: #0ac419;
+    --dwc-msg-selected: #3eab47;
+    --dwc-msg-accent: #d7fdd9;
 
     --dwc-edit-color: #198754;
 
@@ -1238,4 +1239,91 @@ ul, #folderTree {
 
 .messageRead {
     font-weight: normal;
+}
+
+.message-container {
+    height: auto;
+    width: auto;
+}
+
+.message-list {
+    display: inline;
+    float: left;
+    border: 0.1rem solid grey;
+    border-radius: 5px;
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+    visibility: visible;
+    transition-property: visibility, width, opacity;
+    transition-duration: 0s, 0.8s, 0.4s;
+}
+
+.message-list__expand-half {
+    width: 50%;
+    opacity: 1;
+}
+
+.message-list__expand-full{
+    width: 0;
+    opacity: 0;
+}
+
+.message-list__hide {
+    height: 0;
+    visibility: hidden;
+}
+
+.message-reader {
+    display: inline;
+    float: right;
+    border: 0.1rem solid grey;
+    border-radius: 5px;
+    height: 100%;
+    width: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition-property: visibility, width, opacity;
+    transition-duration: 0s, 0.8s, 0.4s;
+    transition-delay: 0s, 0s, 0.4s;
+}
+
+.message-reader__expand-half {
+    width: 50%;
+    opacity: 1;
+}
+
+.message-reader__expand-full {
+    width: 100%;
+    opacity: 1;
+}
+
+.message-reader__show {
+    visibility: visible;
+}
+
+.message-titleBar {
+    position: relative;
+    padding: 0.5rem;
+    width: 100%;
+    background-color: var(--dwc-msg-accent);
+}
+
+.message-titleText {
+    font-size: 2rem;
+    margin-right: 2.6rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.message-titleBtn {
+    position: absolute;
+    top: 0;
+    right: 0.4rem;
+    font-size: 2rem;
+}
+
+.message-body {
+    padding: 0.5rem;
 }

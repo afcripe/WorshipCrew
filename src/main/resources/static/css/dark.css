@@ -9,6 +9,8 @@
 
     --dwc-dropdown-hover-dark: #838383;
     --dwc-select-hover-dark: #36385b;
+
+    --dwc-msg-accent-dark: #3d493d;
 }
 
 
@@ -150,4 +152,8 @@
 .dark .upload-modal {
     background-color: var(--dwc-body-bg-dark);
     color: var(--dwc-body-color-dark);
+}
+
+.dark .message-titleBar {
+    background-color: var(--dwc-msg-accent-dark);
 }
