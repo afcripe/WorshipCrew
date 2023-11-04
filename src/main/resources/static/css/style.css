@@ -1233,12 +1233,16 @@ ul, #folderTree {
 
 /* messaging styles */
 
-.messageUnread {
-    font-weight: bold;
+.messageDefault {
+    font-weight: normal;
 }
 
 .messageRead {
     font-weight: normal;
+}
+
+.messageUnread {
+    font-weight: bold;
 }
 
 .message-container {
@@ -1311,7 +1315,7 @@ ul, #folderTree {
 
 .message-titleText {
     font-size: 2rem;
-    margin-right: 2.6rem;
+    margin-right: 4rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1319,9 +1323,14 @@ ul, #folderTree {
 
 .message-titleBtn {
     position: absolute;
+    display: inline-block;
     top: 0;
     right: 0.4rem;
     font-size: 2rem;
+}
+
+.message-button {
+    display: inline-block;
 }
 
 .message-body {

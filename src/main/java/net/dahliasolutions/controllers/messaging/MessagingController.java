@@ -43,15 +43,21 @@ public class MessagingController {
     }
 
     @GetMapping("")
-    public String getMessagingHome(@RequestParam Optional<String> system, Model model, HttpSession session) {
+    public String getMessagingHome(@RequestParam Optional<String> system, @RequestParam Optional<String> read, Model model, HttpSession session) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) auth.getPrincipal();
 
         // set default messages to display
         boolean showSystemMsg = false;
+        boolean showAllMsg = false;
         if (system.isPresent()) {
             if (!system.get().toLowerCase().equals("false")) {
                 showSystemMsg = true;
+            }
+        }
+        if (read.isPresent()) {
+            if (!read.get().toLowerCase().equals("false")) {
+                showAllMsg = true;
             }
         }
 
@@ -70,6 +76,43 @@ public class MessagingController {
 
             if (message.getFromUserId().equals(BigInteger.valueOf(0))) {
                 if (showSystemMsg) {
+                    if (showAllMsg) {
+                        NotificationMessageModel messageModel = new NotificationMessageModel(
+                                message.getId(),
+                                message.getSubject(),
+                                message.getDateSent(),
+                                message.isRead(),
+                                sendingUser,
+                                message.getModule().toString(),
+                                ""
+                        );
+                        modelList.add(messageModel);
+                    } else if (!message.isRead()) {
+                        NotificationMessageModel messageModel = new NotificationMessageModel(
+                                message.getId(),
+                                message.getSubject(),
+                                message.getDateSent(),
+                                message.isRead(),
+                                sendingUser,
+                                message.getModule().toString(),
+                                ""
+                        );
+                        modelList.add(messageModel);
+                    }
+                }
+            } else {
+                if (showAllMsg) {
+                    NotificationMessageModel messageModel = new NotificationMessageModel(
+                            message.getId(),
+                            message.getSubject(),
+                            message.getDateSent(),
+                            message.isRead(),
+                            sendingUser,
+                            message.getModule().toString(),
+                            ""
+                    );
+                    modelList.add(messageModel);
+                } else if (!message.isRead()) {
                     NotificationMessageModel messageModel = new NotificationMessageModel(
                             message.getId(),
                             message.getSubject(),
@@ -81,17 +124,6 @@ public class MessagingController {
                     );
                     modelList.add(messageModel);
                 }
-            } else {
-                NotificationMessageModel messageModel = new NotificationMessageModel(
-                        message.getId(),
-                        message.getSubject(),
-                        message.getDateSent(),
-                        message.isRead(),
-                        sendingUser,
-                        message.getModule().toString(),
-                        ""
-                );
-                modelList.add(messageModel);
             }
 
         }

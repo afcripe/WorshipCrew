@@ -12,8 +12,9 @@
         <h1 class="color-msg">Messages</h1>
 
         <div class="m-3">
-            <button class="btn btn-sm btn-outline-msg" onclick="toggleSystemMessages()">Toggle System Messages</button>
-            <button class="btn btn-sm btn-outline-msg" onclick="toggleMessageReader()">Toggle Reader</button>
+            <button id="tglUnread" class="btn btn-sm btn-outline-msg" onclick="toggleUnread()">Unread</button>
+            <button id="tglSystem" class="btn btn-sm btn-outline-msg" onclick="toggleSystemMessages()">System Messages</button>
+<!--            <button class="btn btn-sm btn-outline-msg" onclick="toggleMessageReader()">Toggle Reader</button>-->
         </div>
 
         <div class="message-container">
@@ -30,7 +31,7 @@
                     <tr th:if="${#lists.isEmpty(messageList)}">
                         <td colspan="3">Popular we are not.</td>
                     </tr>
-                    <tr th:each="msg : ${messageList}" class="selectableItem" style="cursor: pointer" th:id="*{msg.fromUser}+'-msg'"
+                    <tr th:each="msg : ${messageList}" class="messageDefault selectableItem" style="cursor: pointer" th:id="*{msg.id}+'-msg'"
                         th:classappend="*{msg.read} ? messageRead : messageUnread" th:onclick="getMessage([[*{msg.id}]])">
                         <td>
                             <span th:text="*{msg.fromUser}"></span><br>
@@ -51,9 +52,13 @@
                         E-mail Message
                     </div>
                     <div class="message-titleBtn">
-                        <i class="bi bi-x-square selectableItem" onclick="toggleMessageReader()"></i>
+                        <i id="iconRead" class="bi bi-envelope-open message-button selectableItem" onclick="setMessageUnread()"></i>
+                        <i id="iconUnread" class="bi bi-envelope message-button selectableItem" onclick="setMessageRead()"></i>
+                        <i class="bi bi-x-square selectableItem message-button" onclick="toggleMessageReader()"></i>
                     </div>
                 </div>
+
+                <input id="msgViewerId" type="hidden">
 
                 <div class="message-body">
                     <div>
@@ -70,16 +75,22 @@
     </div>
 
     <script>
+        const btnUnread = document.getElementById('tglUnread');
+        const btnSystem = document.getElementById('tglSystem');
+
+        const msgViewer = document.getElementById('msgReader');
+        const msgIdEl = document.getElementById('msgViewerId');
+        const msgTitleEl = document.getElementById('msgTitle');
+        const msgFromEl = document.getElementById('msgViewerFrom');
+        const msgDateEl = document.getElementById('msgViewerDate');
+        const msgSubjEl = document.getElementById('msgViewerSubj');
+        const msgBodyEl = document.getElementById('msgViewerBody');
+        const msgReadIc = document.getElementById('iconRead');
+        const msgUnreadIc = document.getElementById('iconUnread');
+
         let params = (new URL(document.location)).searchParams;
 
         async function getMessage(id) {
-            const msgViewer = document.getElementById('msgReader');
-            const msgTitleEl = document.getElementById('msgTitle');
-            const msgFromEl = document.getElementById('msgViewerFrom');
-            const msgDateEl = document.getElementById('msgViewerDate');
-            const msgSubjEl = document.getElementById('msgViewerSubj');
-            const msgBodyEl = document.getElementById('msgViewerBody');
-
             if (msgViewer.classList.contains('message-reader__expand-half')
                 || msgViewer.classList.contains('message-reader__expand-full')) {
                 msgViewer.classList.remove('message-reader__show');
@@ -90,12 +101,22 @@
                 return response.json();
             }).then(data => {
                 console.log(data);
+                msgIdEl.value = data.id;
                 msgTitleEl.innerText = data.subject;
                 msgSubjEl.innerText = data.subject;
                 msgFromEl.innerText = data.fromUser;
                 msgDateEl.innerText = formatDate(data.dateSent);
                 // msgBodyEl.innerText = data.messageBody;
                 msgBodyEl.innerText = 'The retrieved message body.';
+                // display envelope
+
+                if (data.read) {
+                    msgReadIc.style.display = 'inline-block';
+                    msgUnreadIc.style.display = 'none';
+                } else {
+                    msgReadIc.style.display = 'none';
+                    msgUnreadIc.style.display = 'inline-block';
+                }
 
                 if (msgViewer.classList.contains('message-reader__expand-half')
                     || msgViewer.classList.contains('message-reader__expand-full')) {
@@ -104,12 +125,46 @@
                     toggleMessageReader();
                 }
             });
+
             let rowID = id+'-msg';
-            const msgRow = document.getElementById(rowID);
-            try {
-                msgRow.classList.remove('messageRead');
-                msgRow.classList.add('messageUnread');
-            } catch (e) {}
+            let msgRow = document.getElementById(rowID);
+            if (msgRow.classList.contains('messageUnread')) {
+                await setMessageRead(id);
+            }
+        }
+
+        async function setMessageRead(id) {
+            let msgID = msgIdEl.value;
+            const response = await fetch('/api/v1/messaging/readstate/read/'+msgID
+            ).then(response => {
+                return response.json();
+            }).then(data => {
+                console.log(data);
+                msgReadIc.style.display = 'inline-block';
+                msgUnreadIc.style.display = 'none';
+                let rowID = msgID+'-msg';
+                let msgRow = document.getElementById(rowID);
+                if (msgRow.classList.contains('messageUnread')) {
+                    msgRow.classList.remove('messageUnread');
+                }
+            });
+        }
+
+        async function setMessageUnread(id) {
+            let msgID = msgIdEl.value;
+            const response = await fetch('/api/v1/messaging/readstate/unread/'+msgID
+            ).then(response => {
+                return response.json();
+            }).then(data => {
+                console.log(data);
+                msgReadIc.style.display = 'none';
+                msgUnreadIc.style.display = 'inline-block';
+                let rowID = msgID+'-msg';
+                let msgRow = document.getElementById(rowID);
+                if (!msgRow.classList.contains('messageUnread')) {
+                    msgRow.classList.add('messageUnread');
+                }
+            });
         }
 
         function formatDate(dte) {
@@ -120,16 +175,22 @@
             return strDate + " " + partTime[0] + ":" + partTime[1];
         }
 
-        function toggleSystemMessages() {
+        function toggleUnread() {
+            if (params.has('read')) {
+                params.delete('read');
+            } else {
+                params.set('read', 'true');
+            }
+            window.location='/messaging?'+params.toString();
+        }
 
+        function toggleSystemMessages() {
             if (params.has('system')) {
                 params.delete('system');
-                window.location = '/messaging';
             } else {
-                params.set('system', '');
-                window.location = '/messaging?system';
+                params.set('system', 'true');
             }
-            // window.location.reload();
+            window.location='/messaging?'+params.toString();
         }
 
         function toggleMessageReader() {
@@ -192,6 +253,17 @@
                     }, 400);
                 }
             }
+        }
+
+        if (params.has('read')) {
+            // btnUnread.textContent = 'Hide Unread';
+            btnUnread.classList.remove('btn-outline-msg');
+            btnUnread.classList.add('btn-msg');
+        }
+        if (params.has('system')) {
+            // btnSystem.textContent = 'Hide System Messages';
+            btnSystem.classList.remove('btn-outline-msg');
+            btnSystem.classList.add('btn-msg');
         }
 
         window.addEventListener("resize", changeViewer);

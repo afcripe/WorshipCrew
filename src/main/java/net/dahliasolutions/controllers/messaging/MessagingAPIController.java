@@ -54,4 +54,26 @@ public class MessagingAPIController {
         }
         return message;
     }
+
+    @GetMapping("/readstate/read/{id}")
+    public int setMessageReadById(@PathVariable BigInteger id) {
+        Optional<NotificationMessage> notification = notificationMessageService.findById(id);
+        if (notification.isPresent()) {
+            notification.get().setRead(true);
+            notificationMessageService.save(notification.get());
+            return 1;
+        }
+        return 0;
+    }
+
+    @GetMapping("/readstate/unread/{id}")
+    public int setMessageUnreadById(@PathVariable BigInteger id) {
+        Optional<NotificationMessage> notification = notificationMessageService.findById(id);
+        if (notification.isPresent()) {
+            notification.get().setRead(false);
+            notificationMessageService.save(notification.get());
+            return 1;
+        }
+        return 0;
+    }
 }
