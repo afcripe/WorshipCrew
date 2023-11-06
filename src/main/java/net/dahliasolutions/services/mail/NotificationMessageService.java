@@ -41,8 +41,6 @@ public class NotificationMessageService implements NotificationMessageServiceInt
     private final OrderNoteService orderNoteService;
     private final TicketService ticketService;
     private final TicketNoteService ticketNoteService;
-    private final StoreItemService storeItemService;
-    private final UserService userService;
     private final AppEventService appEventService;
     private final AppServer appServer;
 

@@ -1326,13 +1326,22 @@ ul, #folderTree {
     display: inline-block;
     top: 0;
     right: 0.4rem;
-    font-size: 2rem;
+    font-size: 1.5rem;
 }
 
 .message-button {
     display: inline-block;
 }
 
-.message-body {
+.message-body__container {
     padding: 0.5rem;
+}
+
+.message-header {
+    font-family: monospace;
+    font-size: smaller;
+}
+
+.message-body {
+
 }

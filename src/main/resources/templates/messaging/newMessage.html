@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<div class="container-fluid m-0 p-0" layout:fragment="content">
+
+    <script src="https://cdn.tiny.cloud/1/d34njokcv44llbkidi9xzg4nygezokgli9hsheb7tk7zkqxk/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+
+    <div th:replace="~{messaging/moduleHeader :: header}">Header</div>
+
+    <div class="container my-3" th:object="${message}">
+
+        <h1 class="color-msg">New Message</h1>
+
+        <div class="m-3">
+            <form id="frmSendMessage">
+                <div class="row p-2">
+                    <div class="col-xs-12 col-sm-3">
+                        <label for="sendToSelect" class="form-label">
+                            To:
+                            <i class="bi bi-card-list h4" onclick="messageToGroup()"></i>
+                        </label>
+                    </div>
+                    <div class="col-xs-12 col-sm-9">
+                        <select id="sendToSelect" class="form-control-sm w-100" name="sendToSelect" multiple>
+<!--                            <option th:each="u : ${userList}" th:value="${u.id}" th:text="${u.fullName}"-->
+<!--                                    th:selected="${u.selected} == true"></option>-->
+                        </select>
+                    </div>
+                </div>
+                <div class="row p-2">
+                    <div class="col-xs-12 col-sm-3">
+                        <label for="sendSubject" class="form-label">Subject:</label>
+                    </div>
+                    <div class="col-xs-12 col-sm-9">
+                        <input type="text" class="form-control" id="sendSubject" name="sendSubject">
+                    </div>
+                </div>
+                <div class="row p-2">
+                    <div class="col-xs-12">
+                        <button type="button" class="btn btn-sm btn-primary" onclick="messageDraft()">Save Draft</button>
+                        <button type="button" class="btn btn-sm btn-success" onclick="messageSend()">Send</button>
+                        <button type="button" class="btn btn-sm btn-warning" th:onclick="window.location.href=[[${session.redirectPath}]];">Cancel</button>
+                    </div>
+                </div>
+
+                <dvi class="row">
+                    <div class="col">
+                        <textarea id="sendBody" text="" style="width:100%; height: calc(100vh - 175px)"></textarea>
+                        <script>
+                            tinymce.init({
+                                selector: '#sendBody',
+                                plugins: 'link lists image media code',
+                                toolbar: 'alignleft aligncenter alignright alignjustify | formatselect | bullist numlist | outdent indent | link code',
+                                toolbar_mode: 'floating',
+                                relative_urls: false,
+                                remove_script_host: true,
+                                document_base_url: 'http://localhost:8081/',
+                                tinycomments_author: 'Post Author'
+                            });
+                        </script>
+                    </div>
+                </dvi>
+            </form>
+        </div>
+
+        <dialog id="selectGroupDialog" class="upload-modal">
+            <script>
+                async function loadGroups() {
+                    const selectGroup = document.getElementById('groupSelect');
+                    for (let g=0; selectGroup.options.length > 0; g++) {
+                        selectGroup.options.remove(0);
+                    }
+
+                    const response = await fetch('/api/v1/messaging/messagegroups'
+                    ).then(response => {
+                        return response.json();
+                    }).then(data => {
+                        console.log(data);
+                        for (let i in data) {
+                            let grp = data[i];
+                            let newOpt = document.createElement('option');
+                                newOpt.value = grp;
+                                newOpt.text = grp;
+                            document.getElementById('groupSelect').appendChild(newOpt);
+                        }
+                    });
+                }
+
+                function selectGroup(element, type) {
+                    console.log(element);
+                    debugger
+                    const chooser = document.getElementById("pictureChooser");
+                    let imgArray = chooser.querySelectorAll("img");
+
+                    for(let key in imgArray) {
+                        let imgNode = imgArray[key];
+                        try {imgNode.classList.remove("grid_image_selected")}
+                        catch (error) {console.log("not an image")}
+                    }
+                    element.classList.add("grid_image_selected");
+                    let imageID = element.id.replace(/id-/g,'');
+                    document.getElementById("selectedImageId").value = imageID;
+                    document.getElementById("selectedImageName").value = element.alt;
+                    if (type > 1) { dialogOK(); }
+                }
+
+                function dialogOK() {
+                    document.getElementById('image').value = document.getElementById("selectedImageId").value;
+                    document.getElementById('imageName').innerText = document.getElementById("selectedImageName").value;
+                    document.getElementById("chooseDialog").close();
+                }
+
+                function dialogGroupOk() {
+                    document.getElementById("selectGroupDialog").close();
+                }
+
+                function dialogGroupClose() {
+                    document.getElementById("selectGroupDialog").close();
+                }
+
+            </script>
+            <form method="dialog">
+
+                <div id="groupChooser">
+                    <select id="groupSelect">
+                        <option value="one"></option>
+                        <option value="two"></option>
+                    </select>
+                </div>
+
+                <div class="d-flex">
+                    <button type="button" class="btn btn-sm btn-msg m-2"
+                            onclick="dialogGroupOk()">OK</button>
+                    <button type="button" class="btn btn-sm btn-outline-danger m-2"
+                            onclick="dialogGroupClose()">Cancel</button>
+                </div>
+            </form>
+        </dialog>
+
+    </div>
+
+    <script>
+        const dialogToGroup = document.getElementById('selectGroupDialog');
+
+        function messageToGroup() {
+            loadGroups();
+            dialogToGroup.showModal();
+        }
+        function messageDraft() {
+
+        }
+
+        function messageSend() {
+
+        }
+    </script>
+
+</div>
+
+</html>

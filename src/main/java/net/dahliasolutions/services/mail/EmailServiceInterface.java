@@ -28,5 +28,6 @@ public interface EmailServiceInterface {
     BrowserMessage sendUserUpdateTicket(EmailDetails emailDetails, Ticket ticket, TicketNote ticketNote);
     BrowserMessage sendAgentUpdateTicket(EmailDetails emailDetails, Ticket ticket, TicketNote ticketNote);
     BrowserMessage sendSystemNotification(EmailDetails emailDetails, AppEvent event);
+    BrowserMessage sendCustomMessage(EmailDetails emailDetails, BigInteger messageId);
     void sendStatement(User user);
 }

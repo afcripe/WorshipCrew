@@ -60,14 +60,14 @@
 
                 <input id="msgViewerId" type="hidden">
 
-                <div class="message-body">
-                    <div>
+                <div class="message-body__container">
+                    <div class="message-header">
                         <div>From: <span id="msgViewerFrom"></span></div>
                         <div>Date: <span id="msgViewerDate"></span></div>
                         <div>Subject: <span id="msgViewerSubj"></span></div>
                     </div>
                     <hr>
-                    <span id="msgViewerBody"> -- Body -- </span>
+                    <div id="msgViewerBody" class="message-body"> -- Body -- </div>
                 </div>
             </div>
         </div>
@@ -106,10 +106,8 @@
                 msgSubjEl.innerText = data.subject;
                 msgFromEl.innerText = data.fromUser;
                 msgDateEl.innerText = formatDate(data.dateSent);
-                // msgBodyEl.innerText = data.messageBody;
-                msgBodyEl.innerText = 'The retrieved message body.';
-                // display envelope
 
+                // display envelope
                 if (data.read) {
                     msgReadIc.style.display = 'inline-block';
                     msgUnreadIc.style.display = 'none';
@@ -118,6 +116,30 @@
                     msgUnreadIc.style.display = 'inline-block';
                 }
 
+                // if (msgViewer.classList.contains('message-reader__expand-half')
+                //     || msgViewer.classList.contains('message-reader__expand-full')) {
+                //     msgViewer.classList.add('message-reader__show');
+                // } else {
+                //     toggleMessageReader();
+                // }
+            });
+
+            let rowID = id+'-msg';
+            let msgRow = document.getElementById(rowID);
+            if (msgRow.classList.contains('messageUnread')) {
+                await setMessageRead(id);
+            }
+
+            // get body
+            getMessageBody(id);
+        }
+
+        async function getMessageBody(id) {
+            const response = await fetch('/messaging/content/'+id
+            ).then(response => {
+                return response.text();
+            }).then(html => {
+                msgBodyEl.innerHTML = html;
                 if (msgViewer.classList.contains('message-reader__expand-half')
                     || msgViewer.classList.contains('message-reader__expand-full')) {
                     msgViewer.classList.add('message-reader__show');

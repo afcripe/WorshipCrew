@@ -3,9 +3,9 @@ package net.dahliasolutions.services.mail;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
-import net.dahliasolutions.data.MailerLinksRepository;
 import net.dahliasolutions.models.*;
 import net.dahliasolutions.models.mail.EmailDetails;
+import net.dahliasolutions.models.mail.MailerCustomMessage;
 import net.dahliasolutions.models.mail.MailerLinks;
 import net.dahliasolutions.models.order.OrderItem;
 import net.dahliasolutions.models.order.OrderNote;
@@ -30,7 +30,8 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
-@Service@RequiredArgsConstructor
+@Service
+@RequiredArgsConstructor
 public class EmailService implements EmailServiceInterface{
 
     private final JavaMailSender javaMailSender;
@@ -38,6 +39,7 @@ public class EmailService implements EmailServiceInterface{
     private final AuthService authService;
     private final UserService userService;
     private final MailerLinksService mailerLinksService;
+    private final MailerCustomMessageService customMessageService;
     private final AppServer appServer;
 
     @Value("${spring.mail.username}") private String sender;
@@ -450,6 +452,36 @@ public class EmailService implements EmailServiceInterface{
             return new BrowserMessage("msgSuccess", "E-mail sent.");
         } catch (Exception e) {
             return new BrowserMessage("msgError", e.getMessage());
+        }
+    }
+
+    @Override
+    public BrowserMessage sendCustomMessage(EmailDetails emailDetails, BigInteger messageId) {
+        // get message
+        Optional<MailerCustomMessage> customMessage = customMessageService.findById(messageId);
+        if (customMessage.isPresent()) {
+            // set template variables
+            Context context = new Context();
+            context.setVariable("baseURL", appServer.getBaseURL());
+            context.setVariable("notification", customMessage.get());
+
+            // create mail message
+            MimeMessage message = javaMailSender.createMimeMessage();
+
+            try {
+                message.setFrom(new InternetAddress(sender));
+                message.setRecipients(MimeMessage.RecipientType.TO, emailDetails.getRecipient());
+                message.setSubject(emailDetails.getSubject());
+                // Set the email's content to be the HTML template
+                message.setContent(templateEngine.process("mailer/mailCustomNotification", context), "text/html; charset=utf-8");
+
+                javaMailSender.send(message);
+                return new BrowserMessage("msgSuccess", "E-mail sent.");
+            } catch (Exception e) {
+                return new BrowserMessage("msgError", e.getMessage());
+            }
+        } else {
+            return new BrowserMessage("msgError", "No message found!");
         }
     }
 

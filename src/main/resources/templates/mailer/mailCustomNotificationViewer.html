@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+
+    <link rel="icon" type="image/x-icon" href="@{/img/favicon.ico}">
+
+    <style>
+        .card{background: transparent; border: #4b5257 solid 0.1rem; border-radius: 0.3rem; padding: 1rem 1rem 1rem 1rem;}
+        .card-header{position:relative;padding:0.5rem 0.5rem;margin-bottom:1rem;border:1px solid transparent;border-radius:0.3rem; background-color: #212529; color: white;vertical-align: center}
+        .card-header-text{color: #8fcafe}
+        .float-left{float: left;}
+        .float-right{float: right;}
+        .emphasis{font-weight: bold;}
+        .de-emphasize{(font-size: 0.5rem;)}
+        .table{width:100%;margin-bottom:1rem;vertical-align:top;}
+        .table th{text-align: left;}
+    </style>
+</head>
+
+<body class="container-fluid d-flex flex-column min-vh-100">
+
+<!-- Content -->
+
+<div th:utext="${notification.messageBody}"></div>
+
+<br />
+
+<!-- Footer -->
+<div>
+    <img th:src="${baseURL}+'/img/favicon.png'" alt="dwc" width="32" class="float-left" />
+    &nbsp;Destiny Worship Crew
+</div>
+
+</body>
+
+</html>
