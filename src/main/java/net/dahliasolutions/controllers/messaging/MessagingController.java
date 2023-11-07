@@ -170,13 +170,14 @@ public class MessagingController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) auth.getPrincipal();
 
-        List<UserSelectedModel> userList = new ArrayList<>();
-        List<User> users = userService.findAll();
+        List<UserSelectedModel> selectedUserList = new ArrayList<>();
+        List<User> users = userList(user);
         for (User u : users) {
-            userList.add(new UserSelectedModel(u.getId(), u.getFullName(),false));
+            selectedUserList.add(new UserSelectedModel(u.getId(), u.getFullName(),false));
         }
 
-        model.addAttribute("userList", userList);
+        model.addAttribute("userList", selectedUserList);
+        model.addAttribute("groupList", permissionList(user));
         model.addAttribute("message", new MailerCustomMessage());
 
         redirectService.setHistory(session, "/messaging");
@@ -309,6 +310,58 @@ public class MessagingController {
     }
 
     // get edit permission
+    private List<String> permissionList(User currentUser) {
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+
+        List<String> permList = new ArrayList<>();
+        permList.add("All Users");
+
+        for (UserRoles role : roles) {
+            if (role.getName().equals("CAMPUS_WRITE") || role.getName().equals("CAMPUS_READ")
+                    || role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_SUPERVISOR")) {
+                permList.add("Campus Users");
+                permList.add("Campus Department Directors");
+            }
+            if (role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")
+                    || role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_SUPERVISOR")) {
+                permList.add("Department Users");
+                if (!permList.contains("Campus Department Directors")) {permList.add("Campus Department Directors");}
+            }
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_SUPERVISOR")) {
+                permList.add("Campus Directors");
+                permList.add("Regional Department Directors");
+            }
+
+            /*
+
+            if (role.getName().equals("USER_WRITE") || role.getName().equals("USER_READ")
+                    || role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_SUPERVISOR")) {
+                permList.add("NA");
+            }
+
+                select Individuals
+
+                campus department users
+
+                campus
+                    campus users
+                    campus department users
+                    campus department Directors
+
+                department
+                    department users
+                    department campus users
+                    department campus Directors
+
+                campus leads
+                department lead
+                all users
+
+             */
+
+        }
+        return permList;
+    }
     private String permissionType(User currentUser) {
         Collection<UserRoles> roles = currentUser.getUserRoles();
         String typeString = "Campus Users";

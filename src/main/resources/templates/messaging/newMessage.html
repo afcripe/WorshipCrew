@@ -17,16 +17,15 @@
             <form id="frmSendMessage">
                 <div class="row p-2">
                     <div class="col-xs-12 col-sm-3">
-                        <label for="sendToSelect" class="form-label">
-                            To:
-                            <i class="bi bi-card-list h4" onclick="messageToGroup()"></i>
+                        <label for="sendToLabel" class="form-label">
+                            <button type="button" class="btn btn-sm btn-outline-generic" onclick="messageToGroup()">
+                                To: <i class="bi bi-card-list h5 selectableItem"></i>
+                            </button>
                         </label>
                     </div>
                     <div class="col-xs-12 col-sm-9">
-                        <select id="sendToSelect" class="form-control-sm w-100" name="sendToSelect" multiple>
-<!--                            <option th:each="u : ${userList}" th:value="${u.id}" th:text="${u.fullName}"-->
-<!--                                    th:selected="${u.selected} == true"></option>-->
-                        </select>
+                        <input id="sendToLabel" class="form-control" name="sendToLabel" type="text" disabled>
+                        <input id="sendTo" class="form-control" type="hidden">
                     </div>
                 </div>
                 <div class="row p-2">
@@ -45,7 +44,7 @@
                     </div>
                 </div>
 
-                <dvi class="row">
+                <div class="row">
                     <div class="col">
                         <textarea id="sendBody" text="" style="width:100%; height: calc(100vh - 175px)"></textarea>
                         <script>
@@ -61,58 +60,139 @@
                             });
                         </script>
                     </div>
-                </dvi>
+                </div>
             </form>
         </div>
 
         <dialog id="selectGroupDialog" class="upload-modal">
             <script>
-                async function loadGroups() {
-                    const selectGroup = document.getElementById('groupSelect');
-                    for (let g=0; selectGroup.options.length > 0; g++) {
-                        selectGroup.options.remove(0);
+                async function updateGroup() {
+                    let getCampus;
+                    let getDepartment;
+                    let selectedGroup = document.getElementById('groupSelect');
+                    document.getElementById('campusChooser').style.display = "none";
+                    document.getElementById('departmentChooser').style.display = "none";
+                    document.getElementById('userChooser').style.display = "none";
+
+                    if (selectedGroup.value === "Campus Users"
+                        || selectedGroup.value === "Department Users"
+                        || selectedGroup.value === "Campus Department Directors") {
+                        getCampus = await loadCampuses();
+                        getDepartment = await loadDepartments();
                     }
 
-                    const response = await fetch('/api/v1/messaging/messagegroups'
+                    if (selectedGroup.value === "Campus Directors") {
+                        getCampus =  await loadCampuses();
+                    }
+
+                    if (selectedGroup.value === "Regional Department Directors") {
+                        getDepartment = await loadDepartments();
+                    }
+                    console.log(getCampus);
+                    console.log(getDepartment);
+                    debugger
+                    await loadUsers();
+                }
+
+                async function loadCampuses() {
+                    const selectCampus = document.getElementById('campusSelect');
+                    for (let c=0; selectCampus.options.length > 0; c++) {
+                        selectCampus.options.remove(0);
+                    }
+
+                    const campusResponse = await fetch('/api/v1/messaging/campuslist'
                     ).then(response => {
                         return response.json();
                     }).then(data => {
-                        console.log(data);
                         for (let i in data) {
-                            let grp = data[i];
+                            let cmp = data[i];
                             let newOpt = document.createElement('option');
-                                newOpt.value = grp;
-                                newOpt.text = grp;
-                            document.getElementById('groupSelect').appendChild(newOpt);
+                                newOpt.value = cmp;
+                                newOpt.text = cmp;
+                            document.getElementById('campusSelect').appendChild(newOpt);
                         }
+                        document.getElementById('campusSelect')[0].selected = true;
+                        document.getElementById('campusChooser').style.display = "block";
                     });
+                    return document.getElementById('campusSelect')[0].value;
                 }
 
-                function selectGroup(element, type) {
-                    console.log(element);
-                    debugger
-                    const chooser = document.getElementById("pictureChooser");
-                    let imgArray = chooser.querySelectorAll("img");
+                async function loadDepartments() {
 
-                    for(let key in imgArray) {
-                        let imgNode = imgArray[key];
-                        try {imgNode.classList.remove("grid_image_selected")}
-                        catch (error) {console.log("not an image")}
+                    const selectDepartment = document.getElementById('departmentSelect');
+                    for (let d=0; selectDepartment.options.length > 0; d++) {
+                        selectDepartment.options.remove(0);
                     }
-                    element.classList.add("grid_image_selected");
-                    let imageID = element.id.replace(/id-/g,'');
-                    document.getElementById("selectedImageId").value = imageID;
-                    document.getElementById("selectedImageName").value = element.alt;
-                    if (type > 1) { dialogOK(); }
+
+                    const departmentResponse = await fetch('/api/v1/messaging/departmentlist'
+                    ).then(response => {
+                        return response.json();
+                    }).then(data => {
+                        for (let i in data) {
+                            let dpt = data[i];
+                            let newOpt = document.createElement('option');
+                                newOpt.value = dpt;
+                                newOpt.text = dpt;
+                            document.getElementById('departmentSelect').appendChild(newOpt);
+                        }
+                        document.getElementById('departmentSelect')[0].selected = true;
+                        document.getElementById('departmentChooser').style.display = "block";
+                    });
+                    return document.getElementById('departmentSelect')[0].value;
                 }
 
-                function dialogOK() {
-                    document.getElementById('image').value = document.getElementById("selectedImageId").value;
-                    document.getElementById('imageName').innerText = document.getElementById("selectedImageName").value;
-                    document.getElementById("chooseDialog").close();
+                async function loadUsers() {
+                    const selectUser = document.getElementById('usersSelect');
+                    for (let u=0; selectUser.options.length > 0; u++) {
+                        selectUser.options.remove(0);
+                    }
+
+                    let formData = new FormData();
+                    formData.set("campus", document.getElementById('campusSelect').value);
+                    formData.set("department", document.getElementById('departmentSelect').value);
+                    formData.set("listType", document.getElementById('groupSelect').value);
+
+                    const response = await fetch('/api/v1/messaging/userlist', {
+                        method: 'POST',
+                        body: formData
+                    }).then(response => {
+                        return response.json();
+                    }).then(data => {
+                        for (let i in data) {
+                            let user = data[i];
+                            let newOpt = document.createElement('option');
+                                newOpt.value = user.id;
+                                newOpt.text = user.fullName;
+                            document.getElementById('usersSelect').appendChild(newOpt);
+                        }
+                        document.getElementById('usersSelect')[0].selected = true;
+                        document.getElementById('userChooser').style.display = "block";
+                    });
+                    return true;
                 }
 
                 function dialogGroupOk() {
+                    debugger
+                    const selectUser = document.getElementById('usersSelect');
+                    let selectedName = "";
+                    let selectedValues = "";
+                    let selectAll = false;
+                    for (let i=0; i<selectUser.options.length; i++) {
+                        if (i === 0) {
+                            if (selectUser.options[i].selected) {
+                                selectAll = true;
+                            }
+                        } else if (selectUser.options[i].selected || selectAll) {
+                            // set value
+                            if (selectedValues.length>0) {selectedValues+=", ";}
+                            selectedValues+=selectUser.options[i].value;
+                            // set name
+                            if (selectedName.length>0) {selectedName+=", ";}
+                            selectedName+=selectUser.options[i].text;
+                        }
+                    }
+                    document.getElementById('sendToLabel').value = selectedName;
+                    document.getElementById('sendTo').value = selectedValues;
                     document.getElementById("selectGroupDialog").close();
                 }
 
@@ -124,9 +204,29 @@
             <form method="dialog">
 
                 <div id="groupChooser">
-                    <select id="groupSelect">
-                        <option value="one"></option>
-                        <option value="two"></option>
+                    Select Group:
+                    <select id="groupSelect" class="form-control-sm w-100" onchange="updateGroup()">
+                        <option th:each="group : ${groupList}" th:value="${group}" th:text="${group}"></option>
+                    </select>
+                </div>
+
+                <div id="campusChooser">
+                    Select Campus:
+                    <select id="campusSelect" class="form-control-sm w-100" onchange="loadUsers()" multiple>
+<!--                        <option th:each="u : ${userList}" th:value="${u.id}" th:text="${u.fullName}"></option>-->
+                    </select>
+                </div>
+                <div id="departmentChooser">
+                    Select Department:
+                    <select id="departmentSelect" class="form-control-sm w-100" onchange="loadUsers()" multiple>
+                        <option th:each="u : ${userList}" th:value="${u.id}" th:text="${u.fullName}"></option>
+                    </select>
+                </div>
+
+                <div id="userChooser">
+                    Select Users:
+                    <select id="usersSelect" class="form-control-sm w-100" multiple>
+                        <option th:each="u : ${userList}" th:value="${u.id}" th:text="${u.fullName}"></option>
                     </select>
                 </div>
 
@@ -141,11 +241,15 @@
 
     </div>
 
-    <script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const websiteDomain = /*[[${baseURL}]]*/ " ";
+        /*]]>*/
+
         const dialogToGroup = document.getElementById('selectGroupDialog');
 
         function messageToGroup() {
-            loadGroups();
+            updateGroup();
             dialogToGroup.showModal();
         }
         function messageDraft() {
