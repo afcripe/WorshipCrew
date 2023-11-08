@@ -66,13 +66,16 @@ public class MessagingController {
     }
 
     @GetMapping("")
-    public String getMessagingHome(@RequestParam Optional<String> system, @RequestParam Optional<String> read, Model model, HttpSession session) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) auth.getPrincipal();
+    public String getMessagingHome(
+            @RequestParam Optional<String> system, @RequestParam Optional<String> read, @RequestParam Optional<String> draft,
+            Model model, HttpSession session) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         // set default messages to display
         boolean showSystemMsg = false;
         boolean showAllMsg = false;
+        boolean showDraft = false;
+
         if (system.isPresent()) {
             if (!system.get().toLowerCase().equals("false")) {
                 showSystemMsg = true;
@@ -83,22 +86,53 @@ public class MessagingController {
                 showAllMsg = true;
             }
         }
+        if (draft.isPresent()) {
+            if (!draft.get().toLowerCase().equals("false")) {
+                showDraft = true;
+            }
+        }
 
         // get user messages
         List<NotificationMessage> notificationMessageList = notificationMessageService.getUserAll(user);
 
         // convert to message model
         List<NotificationMessageModel> modelList = new ArrayList<>();
-        for (NotificationMessage message : notificationMessageList) {
-            // set from name
-            Optional<User> fromUser = userService.findById(message.getFromUserId());
-            String sendingUser = "System Message";
-            if (fromUser.isPresent()) {
-                sendingUser = fromUser.get().getFullName();
-            }
+        if (!showDraft) {
+            for (NotificationMessage message : notificationMessageList) {
+                // set from name
+                Optional<User> fromUser = userService.findById(message.getFromUserId());
+                String sendingUser = "System Message";
+                if (fromUser.isPresent()) {
+                    sendingUser = fromUser.get().getFullName();
+                }
 
-            if (message.getFromUserId().equals(BigInteger.valueOf(0))) {
-                if (showSystemMsg) {
+                if (message.getFromUserId().equals(BigInteger.valueOf(0))) {
+                    if (showSystemMsg) {
+                        if (showAllMsg) {
+                            NotificationMessageModel messageModel = new NotificationMessageModel(
+                                    message.getId(),
+                                    message.getSubject(),
+                                    message.getDateSent(),
+                                    message.isRead(),
+                                    sendingUser,
+                                    message.getModule().toString(),
+                                    ""
+                            );
+                            modelList.add(messageModel);
+                        } else if (!message.isRead()) {
+                            NotificationMessageModel messageModel = new NotificationMessageModel(
+                                    message.getId(),
+                                    message.getSubject(),
+                                    message.getDateSent(),
+                                    message.isRead(),
+                                    sendingUser,
+                                    message.getModule().toString(),
+                                    ""
+                            );
+                            modelList.add(messageModel);
+                        }
+                    }
+                } else {
                     if (showAllMsg) {
                         NotificationMessageModel messageModel = new NotificationMessageModel(
                                 message.getId(),
@@ -123,39 +157,35 @@ public class MessagingController {
                         modelList.add(messageModel);
                     }
                 }
-            } else {
-                if (showAllMsg) {
-                    NotificationMessageModel messageModel = new NotificationMessageModel(
-                            message.getId(),
-                            message.getSubject(),
-                            message.getDateSent(),
-                            message.isRead(),
-                            sendingUser,
-                            message.getModule().toString(),
-                            ""
-                    );
-                    modelList.add(messageModel);
-                } else if (!message.isRead()) {
-                    NotificationMessageModel messageModel = new NotificationMessageModel(
-                            message.getId(),
-                            message.getSubject(),
-                            message.getDateSent(),
-                            message.isRead(),
-                            sendingUser,
-                            message.getModule().toString(),
-                            ""
-                    );
-                    modelList.add(messageModel);
-                }
-            }
 
+            }
+        } else {
+            List<MailerCustomMessage> customMessages = mailerCustomMessageService.findByUserAndDraft(user, true);
+            for (MailerCustomMessage msg : customMessages) {
+                NotificationMessageModel messageModel = new NotificationMessageModel(
+                        msg.getId(),
+                        msg.getSubject(),
+                        null,
+                        false,
+                        "(Draft)",
+                        EventModule.Messaging.toString(),
+                        ""
+                );
+                modelList.add(messageModel);
+            }
         }
 
         // sort by date and revers to put new on top
         Collections.sort(modelList, new Comparator<NotificationMessageModel>() {
             @Override
             public int compare(NotificationMessageModel msg1, NotificationMessageModel msg2) {
-                return msg1.getDateSent().compareTo(msg2.getDateSent());
+                int i;
+                try {
+                    i = msg1.getDateSent().compareTo(msg2.getDateSent());
+                } catch (Exception e) {
+                    i = 1;
+                }
+                return i;
             }
         });
         Collections.reverse(modelList);

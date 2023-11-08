@@ -34,13 +34,14 @@
                     <tr th:each="msg : ${messageList}" class="messageDefault selectableItem" style="cursor: pointer" th:id="*{msg.id}+'-msg'"
                         th:classappend="*{msg.read} ? messageRead : messageUnread" th:onclick="getMessage([[*{msg.id}]])">
                         <td>
-                            <span th:text="*{msg.fromUser}"></span><br>
+                            <span th:id="*{msg.id}+'-from'" th:text="*{msg.fromUser}"></span><br>
                         </td>
                         <td>
                             <span th:text="*{msg.subject}"></span>
                         </td>
                         <td>
-                            <span th:text="*{#temporals.format(msg.dateSent, 'MMM-dd-yyyy')}"/>
+                            <span th:text="*{#temporals.format(msg.dateSent, 'MMM-dd-yyyy')}"></span>
+                            <span th:if="*{msg.fromUser} == '(Draft)'">Not Sent</span>
                         </td>
                     </tr>
                     </tbody>
@@ -77,6 +78,7 @@
     <script>
         const btnUnread = document.getElementById('tglUnread');
         const btnSystem = document.getElementById('tglSystem');
+        const btnDrafts = document.getElementById('tglDrafts');
 
         const msgViewer = document.getElementById('msgReader');
         const msgIdEl = document.getElementById('msgViewerId');
@@ -91,6 +93,14 @@
         let params = (new URL(document.location)).searchParams;
 
         async function getMessage(id) {
+            // if draft, go to composer
+            let fromID = id + '-from';
+            let messageFrom = document.getElementById(fromID);
+            if (messageFrom.innerText === '(Draft)') {
+                window.location.href='/messaging/new/'+id;
+            }
+
+            // if not draft, open message
             if (msgViewer.classList.contains('message-reader__expand-half')
                 || msgViewer.classList.contains('message-reader__expand-full')) {
                 msgViewer.classList.remove('message-reader__show');
@@ -190,6 +200,7 @@
         }
 
         function formatDate(dte) {
+            if (dte === null) { return "Sending..."; }
             let strDate = dte.split("T")[0];
             let strTime = dte.split("T")[1];
             let partsDate = strDate.split("-");
@@ -198,6 +209,9 @@
         }
 
         function toggleUnread() {
+            if (params.has('draft')) {
+                params.delete('draft');
+            }
             if (params.has('read')) {
                 params.delete('read');
             } else {
@@ -207,6 +221,9 @@
         }
 
         function toggleSystemMessages() {
+            if (params.has('draft')) {
+                params.delete('draft');
+            }
             if (params.has('system')) {
                 params.delete('system');
             } else {
@@ -216,7 +233,18 @@
         }
 
         function toggleDrafts() {
-            // ToDo
+            if (params.has('system')) {
+                params.delete('system');
+            }
+            if (params.has('read')) {
+                params.delete('read');
+            }
+            if (params.has('draft')) {
+                params.delete('draft');
+            } else {
+                params.set('draft', 'true');
+            }
+            window.location='/messaging?'+params.toString();
         }
 
         function toggleMessageReader() {
@@ -290,6 +318,11 @@
             // btnSystem.textContent = 'Hide System Messages';
             btnSystem.classList.remove('btn-outline-msg');
             btnSystem.classList.add('btn-msg');
+        }
+        if (params.has('draft')) {
+            // btnSystem.textContent = 'Hide System Messages';
+            btnDrafts.classList.remove('btn-outline-primary');
+            btnDrafts.classList.add('btn-primary');
         }
 
         window.addEventListener("resize", changeViewer);

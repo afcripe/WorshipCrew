@@ -2,8 +2,6 @@ package net.dahliasolutions.services.mail;
 
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.data.CustomMessageRepository;
-import net.dahliasolutions.models.NotificationMessage;
-import net.dahliasolutions.models.department.DepartmentRegional;
 import net.dahliasolutions.models.mail.MailerCustomMessage;
 import net.dahliasolutions.models.mail.MailerCustomMessageModel;
 import net.dahliasolutions.models.user.User;
@@ -102,5 +100,10 @@ public class MailerCustomMessageService implements MailerCustomMessageServiceInt
                 user.get(),
                 toUsers
         );
+    }
+
+    @Override
+    public void deleteById(BigInteger id) {
+        customMessageRepository.deleteById(id);
     }
 }

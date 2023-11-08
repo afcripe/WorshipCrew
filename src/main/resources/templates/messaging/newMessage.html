@@ -44,8 +44,13 @@
                             Save Draft
                             <i id="savingIcon" class="bi bi-file-earmark-arrow-up" style="visibility: hidden;"></i>
                         </button>
-                        <button type="button" class="btn btn-sm btn-success" onclick="messageSend()">Send</button>
+                        <button type="button" class="btn btn-sm btn-success" onclick="messageSend()">
+                            Send
+                            <i id="sendIcon" class="bi bi-send" style="visibility: hidden;"></i>
+                        </button>
                         <button type="button" class="btn btn-sm btn-warning" th:onclick="window.location.href=[[${session.redirectPath}]];">Cancel</button>
+                        &nbsp;&nbsp;&nbsp;
+                        <button type="button" class="btn btn-sm btn-danger" onclick="messageDelete()">Delete</button>
                     </div>
                 </div>
 
@@ -254,6 +259,7 @@
 
         const dialogToGroup = document.getElementById('selectGroupDialog');
         const iconSaving = document.getElementById('savingIcon');
+        const iconSending = document.getElementById('sendIcon');
 
         function messageToGroup() {
             updateGroup();
@@ -261,7 +267,6 @@
         }
 
         async function messageDraft() {
-            debugger
             iconSaving.style.visibility = 'visible';
             let myContent = tinyMCE.activeEditor.getContent();
 
@@ -280,16 +285,49 @@
             }).then(response => {
                 return response.json();
             }).then(data => {
-                console.log(data);
-                debugger
                 document.getElementById('sendId').value = data.id;
                 iconSaving.style.visibility = 'hidden';
             });
         }
 
-        function messageSend() {
+        async function messageSend() {
+            iconSending.style.visibility = 'visible';
+            let myContent = tinyMCE.activeEditor.getContent();
 
+            let formData = new FormData();
+                formData.set("id", document.getElementById('sendId').value);
+                formData.set("subject", document.getElementById('sendSubject').value);
+                formData.set("draft", "true");
+                formData.set("messageBody", myContent);
+                formData.set("userId", document.getElementById('sendUser').value);
+                formData.set("toUsersId", document.getElementById('sendTo').value);
+                formData.set("toUsersName", document.getElementById('sendToLabel').value);
+
+            const saveDraft = await fetch('/api/v1/messaging/send', {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                return response.json();
+            }).then(data => {
+                iconSending.style.visibility = 'hidden';
+                window.location.href='/messaging';
+            });
         }
+
+        async function messageDelete() {
+            let formData = new FormData();
+                formData.set("id", document.getElementById('sendId').value);
+
+            const saveDraft = await fetch('/api/v1/messaging/delete', {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                return response.json();
+            }).then(data => {
+                window.location.href='/messaging';
+            });
+        }
+
     </script>
 
 </div>

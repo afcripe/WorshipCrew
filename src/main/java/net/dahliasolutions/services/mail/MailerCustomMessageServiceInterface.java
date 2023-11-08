@@ -18,4 +18,5 @@ public interface MailerCustomMessageServiceInterface {
     List<MailerCustomMessage> findByUserAndDraft(User user, boolean draft);
     MailerCustomMessageModel convertEntityToModel(MailerCustomMessage entity);
     MailerCustomMessage convertModelToEntity(MailerCustomMessageModel model);
+    void deleteById(BigInteger id);
 }

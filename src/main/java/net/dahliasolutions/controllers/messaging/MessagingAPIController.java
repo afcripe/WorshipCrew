@@ -2,6 +2,8 @@ package net.dahliasolutions.controllers.messaging;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import net.dahliasolutions.models.EventModule;
+import net.dahliasolutions.models.EventType;
 import net.dahliasolutions.models.NotificationMessage;
 import net.dahliasolutions.models.NotificationMessageModel;
 import net.dahliasolutions.models.campus.Campus;
@@ -43,10 +45,50 @@ public class MessagingAPIController {
 
     @PostMapping("/save")
     public SingleBigIntegerModel saveDraft(@ModelAttribute MailerCustomMessageModel messageModel) {
-        // if new message, prep for first save
         // convert model to entity
         MailerCustomMessage message = mailerCustomMessageService.convertModelToEntity(messageModel);
         // save message
+        return new SingleBigIntegerModel(mailerCustomMessageService.save(message).getId());
+    }
+
+    @PostMapping("/delete")
+    public SingleBigIntegerModel deleteDraft(@ModelAttribute SingleBigIntegerModel messageModel) {
+        mailerCustomMessageService.deleteById(messageModel.id());
+        return messageModel;
+    }
+
+    @PostMapping("/send")
+    public SingleBigIntegerModel sendMessage(@ModelAttribute MailerCustomMessageModel messageModel) {
+        // convert model to entity and save
+        MailerCustomMessage message = mailerCustomMessageService.convertModelToEntity(messageModel);
+        message = mailerCustomMessageService.save(message);
+
+        // loop over to users and send message
+        for (User user : message.getToUsers()) {
+            NotificationMessage returnMsg = notificationMessageService.createMessage(
+                    new NotificationMessage(
+                            null,
+                            message.getSubject(),
+                            "0",
+                            BigInteger.valueOf(0),
+                            null,
+                            false,
+                            false,
+                            null,
+                            false,
+                            message.getUser().getId(),
+                            EventModule.Messaging,
+                            EventType.Custom,
+                            user,
+                            message.getId()
+                    ));
+        }
+
+        // remove draft designation
+        message.setDraft(false);
+        mailerCustomMessageService.save(message);
+
+        // return id
         return new SingleBigIntegerModel(mailerCustomMessageService.save(message).getId());
     }
 

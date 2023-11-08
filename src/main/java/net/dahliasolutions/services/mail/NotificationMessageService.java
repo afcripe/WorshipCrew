@@ -73,8 +73,9 @@ public class NotificationMessageService implements NotificationMessageServiceInt
             }
         }
 
+        System.out.println(notificationStatus);
+
         if (notificationStatus.getMsgType().equals("msgSuccess")) {
-            System.out.println(notificationStatus);
             message.setDateSent(LocalDateTime.now());
             message.setSent(true);
             messageRepository.save(message);
@@ -335,29 +336,29 @@ public class NotificationMessageService implements NotificationMessageServiceInt
                 //send event email
                 EmailDetails emailEventDetails =
                         new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
-                emailService.sendSystemNotification(emailEventDetails, appEvent);
+                notificationStatus = emailService.sendSystemNotification(emailEventDetails, appEvent);
             } else {
                 switch (message.getType()) {
                     case New -> {
                         EmailDetails emailDetailsSupervisor =
                                 new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
-                        emailService.sendSupervisorRequest(emailDetailsSupervisor, newRequest, message.getUser().getId());
+                        notificationStatus = emailService.sendSupervisorRequest(emailDetailsSupervisor, newRequest, message.getUser().getId());
                     }
                     case NewItem -> {
                         EmailDetails emailDetailsSupervisor =
                                 new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
-                        emailService.sendSupervisorItemRequest(emailDetailsSupervisor, requestItem, requestItem.getOrderRequest().getSupervisor().getId());
+                        notificationStatus = emailService.sendSupervisorItemRequest(emailDetailsSupervisor, requestItem, requestItem.getOrderRequest().getSupervisor().getId());
                     }
                     case ItemUpdated -> {
                         OrderNote note = orderNoteService.findById(message.getNoteId()).get();
                         EmailDetails emailDetailsSupervisor =
                                 new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
-                        emailService.sendItemUpdate(emailDetailsSupervisor, requestItem, note);
+                        notificationStatus = emailService.sendItemUpdate(emailDetailsSupervisor, requestItem, note);
                     }
                     case Updated -> {
                         EmailDetails emailDetailsSupervisor =
                                 new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
-                        emailService.sendUserRequest(emailDetailsSupervisor, newRequest);
+                        notificationStatus = emailService.sendUserRequest(emailDetailsSupervisor, newRequest);
                     }
                 }
             }
@@ -374,17 +375,17 @@ public class NotificationMessageService implements NotificationMessageServiceInt
                 case New -> {
                     EmailDetails emailDetailsAgent =
                             new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
-                    emailService.sendAgentTicket(emailDetailsAgent, ticket, note, message.getUser().getId());
+                    notificationStatus = emailService.sendAgentTicket(emailDetailsAgent, ticket, note, message.getUser().getId());
                 }
                 case NewList -> {
                     EmailDetails emailDetailsAgent =
                             new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
-                    emailService.sendAgentListTicket(emailDetailsAgent, ticket, note, message.getUser().getId());
+                    notificationStatus = emailService.sendAgentListTicket(emailDetailsAgent, ticket, note, message.getUser().getId());
                 }
                 case Updated -> {
                     EmailDetails emailDetailsAgent =
                             new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null );
-                    emailService.sendAgentUpdateTicket(emailDetailsAgent, ticket, note);
+                    notificationStatus = emailService.sendAgentUpdateTicket(emailDetailsAgent, ticket, note);
                 }
             }
 
@@ -399,10 +400,9 @@ public class NotificationMessageService implements NotificationMessageServiceInt
                 //send event email
                 EmailDetails emailEventDetails =
                         new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
-                emailService.sendSystemNotification(emailEventDetails, appEvent);
+                notificationStatus = emailService.sendSystemNotification(emailEventDetails, appEvent);
             }
         }
-
 
         if (message.getModule().equals(EventModule.User)) {
 //            BigInteger userId = new BigInteger(message.getModuleId());
@@ -413,11 +413,17 @@ public class NotificationMessageService implements NotificationMessageServiceInt
                 //send event email
                 EmailDetails emailEventDetails =
                         new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
-                emailService.sendSystemNotification(emailEventDetails, appEvent);
+                notificationStatus = emailService.sendSystemNotification(emailEventDetails, appEvent);
             }
         }
 
-        return new BrowserMessage("msgSuccess", "Message Sent.");
+        if (message.getModule().equals(EventModule.Messaging)) {
+            EmailDetails emailEventDetails =
+                    new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
+            notificationStatus = emailService.sendCustomMessage(emailEventDetails, message.getNoteId());
+        }
+
+        return notificationStatus;
     }
 }
 

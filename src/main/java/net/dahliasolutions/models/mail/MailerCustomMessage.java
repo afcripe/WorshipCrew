@@ -27,9 +27,9 @@ public class MailerCustomMessage {
     @Column(name = "messageBody", columnDefinition = "text")
     private String messageBody;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     private User user;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<User> toUsers;
 }
