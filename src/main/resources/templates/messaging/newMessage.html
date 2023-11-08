@@ -19,13 +19,15 @@
                     <div class="col-xs-12 col-sm-3">
                         <label for="sendToLabel" class="form-label">
                             <button type="button" class="btn btn-sm btn-outline-generic" onclick="messageToGroup()">
-                                To: <i class="bi bi-card-list h5 selectableItem"></i>
+                                To: <i class="bi bi-card-list h5"></i>
                             </button>
                         </label>
                     </div>
                     <div class="col-xs-12 col-sm-9">
-                        <input id="sendToLabel" class="form-control" name="sendToLabel" type="text" disabled>
-                        <input id="sendTo" class="form-control" type="hidden">
+                        <input id="sendToLabel" class="form-control" name="sendToLabel" type="text" th:value="*{toUsersName}" disabled>
+                        <input id="sendTo" class="form-control" type="hidden" th:value="*{toUsersId}">
+                        <input id="sendId" class="form-control" type="hidden" th:value="*{id}">
+                        <input id="sendUser" class="form-control" type="hidden" th:value="*{userId}">
                     </div>
                 </div>
                 <div class="row p-2">
@@ -33,12 +35,15 @@
                         <label for="sendSubject" class="form-label">Subject:</label>
                     </div>
                     <div class="col-xs-12 col-sm-9">
-                        <input type="text" class="form-control" id="sendSubject" name="sendSubject">
+                        <input type="text" class="form-control" id="sendSubject" name="sendSubject" th:value="*{subject}">
                     </div>
                 </div>
                 <div class="row p-2">
                     <div class="col-xs-12">
-                        <button type="button" class="btn btn-sm btn-primary" onclick="messageDraft()">Save Draft</button>
+                        <button type="button" class="btn btn-sm btn-primary" onclick="messageDraft()">
+                            Save Draft
+                            <i id="savingIcon" class="bi bi-file-earmark-arrow-up" style="visibility: hidden;"></i>
+                        </button>
                         <button type="button" class="btn btn-sm btn-success" onclick="messageSend()">Send</button>
                         <button type="button" class="btn btn-sm btn-warning" th:onclick="window.location.href=[[${session.redirectPath}]];">Cancel</button>
                     </div>
@@ -46,7 +51,7 @@
 
                 <div class="row">
                     <div class="col">
-                        <textarea id="sendBody" text="" style="width:100%; height: calc(100vh - 175px)"></textarea>
+                        <textarea id="sendBody" th:text="*{messageBody}" style="width:100%; height: calc(100vh - 175px)"></textarea>
                         <script>
                             tinymce.init({
                                 selector: '#sendBody',
@@ -90,7 +95,6 @@
                     }
                     console.log(getCampus);
                     console.log(getDepartment);
-                    debugger
                     await loadUsers();
                 }
 
@@ -152,27 +156,29 @@
                     formData.set("department", document.getElementById('departmentSelect').value);
                     formData.set("listType", document.getElementById('groupSelect').value);
 
-                    const response = await fetch('/api/v1/messaging/userlist', {
+                    const response = await fetch('/api/v1/messaging/userlist/'+document.getElementById('sendId').value, {
                         method: 'POST',
                         body: formData
                     }).then(response => {
                         return response.json();
                     }).then(data => {
+                        let noneSelected = true;
                         for (let i in data) {
                             let user = data[i];
                             let newOpt = document.createElement('option');
                                 newOpt.value = user.id;
                                 newOpt.text = user.fullName;
+                                newOpt.selected = user.selected;
+                            if (user.selected) { noneSelected = false; }
                             document.getElementById('usersSelect').appendChild(newOpt);
                         }
-                        document.getElementById('usersSelect')[0].selected = true;
+                        if (noneSelected) { document.getElementById('usersSelect')[0].selected = true; }
                         document.getElementById('userChooser').style.display = "block";
                     });
                     return true;
                 }
 
                 function dialogGroupOk() {
-                    debugger
                     const selectUser = document.getElementById('usersSelect');
                     let selectedName = "";
                     let selectedValues = "";
@@ -247,13 +253,38 @@
         /*]]>*/
 
         const dialogToGroup = document.getElementById('selectGroupDialog');
+        const iconSaving = document.getElementById('savingIcon');
 
         function messageToGroup() {
             updateGroup();
             dialogToGroup.showModal();
         }
-        function messageDraft() {
 
+        async function messageDraft() {
+            debugger
+            iconSaving.style.visibility = 'visible';
+            let myContent = tinyMCE.activeEditor.getContent();
+
+            let formData = new FormData();
+                formData.set("id", document.getElementById('sendId').value);
+                formData.set("subject", document.getElementById('sendSubject').value);
+                formData.set("draft", "true");
+                formData.set("messageBody", myContent);
+                formData.set("userId", document.getElementById('sendUser').value);
+                formData.set("toUsersId", document.getElementById('sendTo').value);
+                formData.set("toUsersName", document.getElementById('sendToLabel').value);
+
+            const saveDraft = await fetch('/api/v1/messaging/save', {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                return response.json();
+            }).then(data => {
+                console.log(data);
+                debugger
+                document.getElementById('sendId').value = data.id;
+                iconSaving.style.visibility = 'hidden';
+            });
         }
 
         function messageSend() {

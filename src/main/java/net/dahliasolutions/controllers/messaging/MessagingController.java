@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.*;
 import net.dahliasolutions.models.mail.EmailDetails;
 import net.dahliasolutions.models.mail.MailerCustomMessage;
+import net.dahliasolutions.models.mail.MailerCustomMessageModel;
 import net.dahliasolutions.models.mail.MessageGroupEnum;
 import net.dahliasolutions.models.order.OrderItem;
 import net.dahliasolutions.models.order.OrderNote;
@@ -41,6 +42,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class MessagingController {
 
+    private final MailerCustomMessageService mailerCustomMessageService;
     private final NotificationMessageService notificationMessageService;
     private final UserService userService;
     private final RedirectService redirectService;
@@ -167,18 +169,31 @@ public class MessagingController {
 
     @GetMapping("/new")
     public String getMessagingCreate(Model model, HttpSession session) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) auth.getPrincipal();
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        List<UserSelectedModel> selectedUserList = new ArrayList<>();
-        List<User> users = userList(user);
-        for (User u : users) {
-            selectedUserList.add(new UserSelectedModel(u.getId(), u.getFullName(),false));
+        model.addAttribute("groupList", permissionList(user));
+        model.addAttribute("message", new MailerCustomMessageModel(
+                BigInteger.valueOf(0), "", true, "", user.getId(), "", ""));
+
+        redirectService.setHistory(session, "/messaging");
+        return "messaging/newMessage";
+    }
+
+
+    @GetMapping("/new/{id}")
+    public String getMessagingEdit(@PathVariable BigInteger id, Model model, HttpSession session) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        MailerCustomMessageModel messageModel;
+        Optional<MailerCustomMessage> message = mailerCustomMessageService.findById(id);
+        if (message.isPresent()) {
+            messageModel = mailerCustomMessageService.convertEntityToModel(message.get());
+        } else {
+            messageModel = new MailerCustomMessageModel(BigInteger.valueOf(0), "", true, "", user.getId(), "", "");
         }
 
-        model.addAttribute("userList", selectedUserList);
         model.addAttribute("groupList", permissionList(user));
-        model.addAttribute("message", new MailerCustomMessage());
+        model.addAttribute("message", messageModel);
 
         redirectService.setHistory(session, "/messaging");
         return "messaging/newMessage";

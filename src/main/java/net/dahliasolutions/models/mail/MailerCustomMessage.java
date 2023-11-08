@@ -30,6 +30,6 @@ public class MailerCustomMessage {
     @OneToOne(fetch = FetchType.EAGER)
     private User user;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     private List<User> toUsers;
 }

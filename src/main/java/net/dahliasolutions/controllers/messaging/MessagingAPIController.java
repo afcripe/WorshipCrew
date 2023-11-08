@@ -7,8 +7,11 @@ import net.dahliasolutions.models.NotificationMessageModel;
 import net.dahliasolutions.models.campus.Campus;
 import net.dahliasolutions.models.department.DepartmentCampus;
 import net.dahliasolutions.models.department.DepartmentRegional;
+import net.dahliasolutions.models.mail.MailerCustomMessage;
+import net.dahliasolutions.models.mail.MailerCustomMessageModel;
 import net.dahliasolutions.models.mail.MessageGroupEnum;
 import net.dahliasolutions.models.position.Position;
+import net.dahliasolutions.models.records.SingleBigIntegerModel;
 import net.dahliasolutions.models.records.UserListFilterModel;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
@@ -16,6 +19,7 @@ import net.dahliasolutions.models.user.UserSelectedModel;
 import net.dahliasolutions.services.campus.CampusService;
 import net.dahliasolutions.services.department.DepartmentCampusService;
 import net.dahliasolutions.services.department.DepartmentRegionalService;
+import net.dahliasolutions.services.mail.MailerCustomMessageService;
 import net.dahliasolutions.services.mail.NotificationMessageService;
 import net.dahliasolutions.services.user.UserService;
 import org.springframework.security.core.Authentication;
@@ -30,11 +34,21 @@ import java.util.*;
 @RequiredArgsConstructor
 public class MessagingAPIController {
 
+    private final MailerCustomMessageService mailerCustomMessageService;
     private final NotificationMessageService notificationMessageService;
     private final CampusService campusService;
     private final DepartmentRegionalService departmentRegionalService;
     private final DepartmentCampusService departmentCampusService;
     private final UserService userService;
+
+    @PostMapping("/save")
+    public SingleBigIntegerModel saveDraft(@ModelAttribute MailerCustomMessageModel messageModel) {
+        // if new message, prep for first save
+        // convert model to entity
+        MailerCustomMessage message = mailerCustomMessageService.convertModelToEntity(messageModel);
+        // save message
+        return new SingleBigIntegerModel(mailerCustomMessageService.save(message).getId());
+    }
 
     @GetMapping("/message/{id}")
     public NotificationMessageModel getMessageById(@PathVariable BigInteger id) {
@@ -107,10 +121,17 @@ public class MessagingAPIController {
         return returnList;
     }
 
-    @PostMapping("/userlist")
-    public List<UserSelectedModel> getMessageListUsers(@ModelAttribute UserListFilterModel listFilter) {
+    @PostMapping("/userlist/{id}")
+    public List<UserSelectedModel> getMessageListUsers(@PathVariable BigInteger id, @ModelAttribute UserListFilterModel listFilter) {
         System.out.println(listFilter);
         User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        List<User> currentToUsers = new ArrayList<>();
+        Optional<MailerCustomMessage> message = mailerCustomMessageService.findById(id);
+        if (message.isPresent()) {
+            currentToUsers = message.get().getToUsers();
+        }
+
         List<Campus> campusList = new ArrayList<>();
         List<DepartmentRegional> departmentList = new ArrayList<>();
         List<User> users = new ArrayList<>();
@@ -233,7 +254,11 @@ public class MessagingAPIController {
             selectUsers.add(new UserSelectedModel(BigInteger.valueOf(0), "All", false));
         }
         for (User user : users) {
-            selectUsers.add(new UserSelectedModel(user.getId(), user.getFullName(), false));
+            UserSelectedModel tempUser = new UserSelectedModel(user.getId(), user.getFullName(), false);
+            if (currentToUsers.contains(user)) {
+                tempUser.setSelected(true);
+            }
+            selectUsers.add(tempUser);
         }
         return selectUsers;
     }
