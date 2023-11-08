@@ -31,7 +31,9 @@
         <div class="col-12">
           <div>
             Item Fulfilled By: <span th:text="*{supervisor.firstName} + ' ' + *{supervisor.lastName}"></span>
-            <button id="btnItemSupervisorSM" class="btn btn-sm btn-primary" th:unless="${requestClosed}" onclick="dialogAssignPerson()">Change</button>
+            <th:block th:if="${editable} or ${currentUserId} eq ${orderItem.supervisor.id}">
+              <button id="btnItemSupervisorSM" class="btn btn-sm btn-primary" th:unless="${requestClosed}" onclick="dialogAssignPerson()">Change</button>
+            </th:block>
           </div>
         </div>
       </div>
@@ -64,7 +66,9 @@
         <div class="col-6">
           <div>
             Item Fulfilled By: <span th:text="*{supervisor.firstName} + ' ' + *{supervisor.lastName}"></span>
-            <button id="btnItemSupervisorLG" class="btn btn-sm btn-primary" th:unless="${requestClosed}" th:onclick="dialogAssignPerson([[*{supervisor.id}]])">Change</button>
+            <th:block th:if="${editable} or ${currentUserId} eq ${orderItem.supervisor.id}">
+              <button id="btnItemSupervisorLG" class="btn btn-sm btn-primary" th:unless="${requestClosed}" th:onclick="dialogAssignPerson([[*{supervisor.id}]])">Change</button>
+            </th:block>
           </div>
         </div>
       </div>

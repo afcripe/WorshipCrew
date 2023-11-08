@@ -71,7 +71,7 @@
     <br><br>
 
     <div>
-        <div class="emphasis float-left">Service Level: <span class="emphasis" th:text="*{sla}"></span></div>
+        <div class="emphasis float-left">Service Level: <span class="emphasis" th:if="${sla != null && sla.name != null}" th:text="*{sla.name}"></span></div>
         <div class="float-right">Ticket Due: <span class="emphasis" th:text="*{#temporals.format(ticketDue, 'MMM-dd-yyyy hh:mm')}"></span></div>
     </div>
 

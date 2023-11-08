@@ -43,7 +43,12 @@
     <br><br>
 
     <div>
-        <div><span class="emphasis" th:text="*{sla.name}"></span></div>
+        <div th:if="${sla != null && sla.name != null}" >
+            <span class="emphasis" th:text="*{sla.name}"></span>
+        </div>
+        <div th:unless="${sla != null && sla.name != null}" >
+            <span class="emphasis"> SLA not defined</span>
+        </div>
     </div>
 
     <br><br>

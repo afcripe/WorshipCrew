@@ -93,7 +93,7 @@
     </div>
 
     <div class="row py-2" th:each="item : *{requestItems}">
-        <div th:replace="~{components/cardOrderItemLine :: cardFragment(${item}, ${orderRequest.user.id})}">Your Order is Empty</div>
+        <div th:replace="~{components/cardOrderItemLine :: cardFragment(${item}, ${orderRequest.user.id}, ${editable})}">Your Order is Empty</div>
     </div>
 
 
