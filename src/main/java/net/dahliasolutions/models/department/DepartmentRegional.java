@@ -16,7 +16,8 @@ import java.math.BigInteger;
 public class DepartmentRegional {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "department_regional_gen")
+    @SequenceGenerator(name = "department_regional_gen", sequenceName = "department_regional_seq", allocationSize = 1)
     private BigInteger id;
     private String name;
     private BigInteger directorId;
