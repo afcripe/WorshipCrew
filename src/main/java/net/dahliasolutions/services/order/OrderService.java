@@ -64,8 +64,8 @@ public class OrderService implements OrderServiceInterface {
         Optional<OrderRequest> orderRequest = orderRepository.findById(id);
         if (orderRequest.isPresent()) {
             orderRequest.get().setRequestItems(orderItemRepository.findAllByOrderRequest(orderRequest.get()));
+            orderRequest.get().setItemCount(orderRequest.get().getItemCount());
         }
-        orderRequest.get().setItemCount(orderRequest.get().getItemCount());
         return orderRequest;
     }
 

@@ -18,7 +18,7 @@ import java.math.BigInteger;
 public class UserNotificationSubscribe {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "user_notification_subscribe_gen")
     @SequenceGenerator(name = "user_notification_subscribe_gen", sequenceName = "user_notification_subscribe_seq", allocationSize = 1)
     private BigInteger id;
 

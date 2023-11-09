@@ -17,7 +17,7 @@ import java.math.BigInteger;
 public class DepartmentCampus {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "department_campus_generator")
     @SequenceGenerator(name = "department_campus_generator", sequenceName = "department_campus_seq", allocationSize = 1)
     private BigInteger id;
     private String name;

@@ -26,8 +26,8 @@ import java.util.List;
 public class User implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @SequenceGenerator(name = "user_gen", sequenceName = "user_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_details_gen")
+    @SequenceGenerator(name = "user_details_gen", sequenceName = "user_details_seq", allocationSize = 1)
     private BigInteger id;
 
     private String username;

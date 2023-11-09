@@ -20,7 +20,7 @@ import java.util.List;
 public class OrderRequest {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "order_request_gen")
     @SequenceGenerator(name = "order_request_gen", sequenceName = "order_request_seq", allocationSize = 1)
     private BigInteger id;
     private LocalDateTime requestDate;

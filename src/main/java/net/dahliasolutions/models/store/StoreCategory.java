@@ -18,7 +18,7 @@ import java.util.List;
 public class StoreCategory {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "store_category_gen")
     @SequenceGenerator(name = "store_category_gen", sequenceName = "store_category_seq", allocationSize = 1)
     private BigInteger id;
     private String name;

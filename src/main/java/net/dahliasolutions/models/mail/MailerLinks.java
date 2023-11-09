@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class MailerLinks {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "mailer_links_generator")
     @SequenceGenerator(name = "mailer_links_generator", sequenceName = "mailer_links_seq", allocationSize = 1)
     private BigInteger id;
     private BigInteger userId;

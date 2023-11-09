@@ -18,8 +18,8 @@ import java.util.List;
 public class NotificationMessage {
 
     @Id
-    @SequenceGenerator(name = "notification_msg_gen", sequenceName = "notification_msg_gen", allocationSize = 1)
     @GeneratedValue(generator = "notification_msg_gen", strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "notification_msg_gen", sequenceName = "notification_msg_sec", allocationSize = 1)
     private BigInteger id;
     private String subject;
     private String moduleId;

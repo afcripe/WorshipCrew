@@ -17,7 +17,7 @@ import java.math.BigInteger;
 public class StoreSubCategory {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "store_sub_category_gen")
     @SequenceGenerator(name = "store_sub_category_gen", sequenceName = "store_sub_category_gen", allocationSize = 1)
     private BigInteger id;
     private String name;

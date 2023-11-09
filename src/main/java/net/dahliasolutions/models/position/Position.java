@@ -17,7 +17,7 @@ import java.math.BigInteger;
 public class Position {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "position_gen")
     @SequenceGenerator(name = "position_gen", sequenceName = "position_seq", allocationSize = 1)
     private BigInteger id;
     private int level;

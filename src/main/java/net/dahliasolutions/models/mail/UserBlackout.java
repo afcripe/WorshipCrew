@@ -17,7 +17,7 @@ import java.time.LocalTime;
 public class UserBlackout {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "user_blackout_generator")
     @SequenceGenerator(name = "user_blackout_generator", sequenceName = "user_blackout_seq", allocationSize = 1)
     private BigInteger id;
     private int blackoutYear;

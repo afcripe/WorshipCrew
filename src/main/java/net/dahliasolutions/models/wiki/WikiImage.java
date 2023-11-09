@@ -16,7 +16,7 @@ import java.math.BigInteger;
 public class WikiImage {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "wiki_image_gen")
     @SequenceGenerator(name = "wiki_image_gen", sequenceName = "wiki_image_seq", allocationSize = 1)
     private BigInteger id;
     private String name;

@@ -16,7 +16,7 @@ import java.math.BigInteger;
 public class TicketPriority {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "ticket_priority_gen")
     @SequenceGenerator(name = "ticket_priority_gen", sequenceName = "ticket_priority_seq", allocationSize = 1)
     private BigInteger id;
     private int displayOrder;

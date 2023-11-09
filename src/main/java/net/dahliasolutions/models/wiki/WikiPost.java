@@ -21,7 +21,7 @@ import java.util.List;
 public class WikiPost {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "wiki_post_gen")
     @SequenceGenerator(name = "wiki_post_gen", sequenceName = "wiki_post_seq", allocationSize = 1)
     private BigInteger id;
     private String title;

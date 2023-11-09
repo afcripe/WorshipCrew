@@ -18,8 +18,8 @@ import java.util.List;
 public class MailerCustomMessage {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @SequenceGenerator(name = "mailer_custom_message_generator", sequenceName = "mailer_custom_message_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mailer_custom_message_gen")
+    @SequenceGenerator(name = "mailer_custom_message_gen", sequenceName = "mailer_custom_message_seq", allocationSize = 1)
     private BigInteger id;
     private String subject;
     private boolean draft;

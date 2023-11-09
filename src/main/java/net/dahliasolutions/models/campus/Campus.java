@@ -16,8 +16,8 @@ import java.math.BigInteger;
 public class Campus {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @SequenceGenerator(name = "campus_generator", sequenceName = "campus_gseq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "campus_generator")
+    @SequenceGenerator(name = "campus_generator", sequenceName = "campus_seq", allocationSize = 1)
     private BigInteger id;
     private String name;
     private String city;

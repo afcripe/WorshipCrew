@@ -20,7 +20,7 @@ import java.math.BigInteger;
 public class CartItem {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "cart_item_gen")
     @SequenceGenerator(name = "cart_item_gen", sequenceName = "cart_item_seq", allocationSize = 1)
     private BigInteger id;
     private BigInteger productId;

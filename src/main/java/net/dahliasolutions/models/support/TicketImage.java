@@ -16,7 +16,7 @@ import java.math.BigInteger;
 public class TicketImage {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ticket_image_gen")
     @SequenceGenerator(name = "ticket_image_gen", sequenceName = "ticket_image_seq", allocationSize = 1)
     private BigInteger id;
     private String name;

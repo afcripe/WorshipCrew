@@ -16,7 +16,7 @@ import java.math.BigInteger;
 public class StoreImage {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "store_image_gen")
     @SequenceGenerator(name = "store_image_gen", sequenceName = "store_image_seq", allocationSize = 1)
     private BigInteger id;
     private String name;

@@ -16,7 +16,7 @@ import java.math.BigInteger;
 public class WikiTagReference {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "wiki_tag_reference_gen")
     @SequenceGenerator(name = "wiki_tag_reference_gen", sequenceName = "wiki_tag_reference_seq", allocationSize = 1)
     private BigInteger id;
     private String name;

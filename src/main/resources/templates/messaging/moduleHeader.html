@@ -10,8 +10,9 @@
         </div>
 
         <div class="navbar-nav mx-2">
-          <a class="btn btn-sm btn-msg" th:if="${#lists.contains(userRoles,'ADMIN_WRITE') or #lists.contains(userRoles,'USER_SUPERVISOR')
-                                          or #lists.contains(userRoles,'USER_WRITE')}" href="/messaging/new">
+          <a class="btn btn-sm btn-msg" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')
+                or #lists.contains(userRoles,'DIRECTOR_WRITE') or #lists.contains(userRoles,'CAMPUS_WRITE')
+                or #lists.contains(userRoles,'USER_WRITE') or #lists.contains(userRoles,'USER_SUPERVISOR')}" href="/messaging/new">
             <i class="bi bi-envelope-plus"></i>
           </a>
         </div>

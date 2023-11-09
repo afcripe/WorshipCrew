@@ -3,19 +3,15 @@ package net.dahliasolutions.controllers.messaging;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.*;
-import net.dahliasolutions.models.mail.EmailDetails;
 import net.dahliasolutions.models.mail.MailerCustomMessage;
 import net.dahliasolutions.models.mail.MailerCustomMessageModel;
-import net.dahliasolutions.models.mail.MessageGroupEnum;
 import net.dahliasolutions.models.order.OrderItem;
 import net.dahliasolutions.models.order.OrderNote;
 import net.dahliasolutions.models.order.OrderRequest;
-import net.dahliasolutions.models.position.PermissionTemplate;
 import net.dahliasolutions.models.support.Ticket;
 import net.dahliasolutions.models.support.TicketNote;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
-import net.dahliasolutions.models.user.UserSelectedModel;
 import net.dahliasolutions.services.RedirectService;
 import net.dahliasolutions.services.mail.AppEventService;
 import net.dahliasolutions.services.mail.MailerCustomMessageService;
@@ -31,11 +27,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.thymeleaf.context.Context;
 
 import java.math.BigInteger;
 import java.util.*;
-import java.util.stream.Stream;
 
 @Controller
 @RequestMapping("/messaging")
@@ -364,17 +358,17 @@ public class MessagingController {
         for (UserRoles role : roles) {
             if (role.getName().equals("CAMPUS_WRITE") || role.getName().equals("CAMPUS_READ")
                     || role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_SUPERVISOR")) {
-                permList.add("Campus Users");
-                permList.add("Campus Department Directors");
+                if (!permList.contains("Campus Users")) { permList.add("Campus Users"); }
+                if (!permList.contains("Campus Department Directors")) { permList.add("Campus Department Directors"); }
             }
             if (role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")
                     || role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_SUPERVISOR")) {
-                permList.add("Department Users");
+                if (!permList.contains("Department Users")) { permList.add("Department Users"); }
                 if (!permList.contains("Campus Department Directors")) {permList.add("Campus Department Directors");}
             }
             if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_SUPERVISOR")) {
-                permList.add("Campus Directors");
-                permList.add("Regional Department Directors");
+                if (!permList.contains("Campus Directors")) { permList.add("Campus Directors"); }
+                if (!permList.contains("Campus Directors")) { permList.add("Campus Directors"); }
             }
 
             /*

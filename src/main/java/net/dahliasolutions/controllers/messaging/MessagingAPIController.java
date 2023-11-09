@@ -1,6 +1,5 @@
 package net.dahliasolutions.controllers.messaging;
 
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.EventModule;
 import net.dahliasolutions.models.EventType;
@@ -11,8 +10,6 @@ import net.dahliasolutions.models.department.DepartmentCampus;
 import net.dahliasolutions.models.department.DepartmentRegional;
 import net.dahliasolutions.models.mail.MailerCustomMessage;
 import net.dahliasolutions.models.mail.MailerCustomMessageModel;
-import net.dahliasolutions.models.mail.MessageGroupEnum;
-import net.dahliasolutions.models.position.Position;
 import net.dahliasolutions.models.records.SingleBigIntegerModel;
 import net.dahliasolutions.models.records.UserListFilterModel;
 import net.dahliasolutions.models.user.User;
@@ -24,7 +21,6 @@ import net.dahliasolutions.services.department.DepartmentRegionalService;
 import net.dahliasolutions.services.mail.MailerCustomMessageService;
 import net.dahliasolutions.services.mail.NotificationMessageService;
 import net.dahliasolutions.services.user.UserService;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 

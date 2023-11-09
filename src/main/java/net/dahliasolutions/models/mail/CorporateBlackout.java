@@ -17,7 +17,7 @@ import java.time.LocalTime;
 public class CorporateBlackout {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "corporate_blackout_generator")
     @SequenceGenerator(name = "corporate_blackout_generator", sequenceName = "corporate_blackout_seq", allocationSize = 1)
     private BigInteger id;
     private int blackoutYear;

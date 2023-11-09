@@ -14,7 +14,7 @@ import java.math.BigInteger;
 public class UserRoles {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "user_roles_gen")
     @SequenceGenerator(name = "user_roles_gen", sequenceName = "user_roles_seq", allocationSize = 1)
     private BigInteger id;
     private String name;

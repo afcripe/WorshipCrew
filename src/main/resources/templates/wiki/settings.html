@@ -142,17 +142,25 @@
       </script>
       <h2>New Navigation Menu Item</h2>
       <form id="formNewNavItem" style="width: 300px; max-width: 450px">
-        <label for="navName" class="form-label">Name</label>
-        <input class="form-control" id="navName" placeholder="Name">
+        <div class="form-group pb-3">
+          <label for="navName" class="form-label">Name</label>
+          <input class="form-control" id="navName" placeholder="Name">
+        </div>
 
-        <label for="navLink" class="form-label">Link</label>
-        <input class="form-control" id="navLink" placeholder="Link">
+        <div class="form-group pb-3">
+          <label for="navLink" class="form-label">Link</label>
+          <input class="form-control" id="navLink" placeholder="Link">
+        </div>
 
-        <label for="navIndentLevel" class="form-label">Indentation Level</label>
-        <input class="form-check" id="navIndentLevel" type="checkbox">
+        <div class="form-group pb-3">
+          <label for="navIndentLevel" class="form-label d-inline">Indent</label>
+          <input class="form-check d-inline" id="navIndentLevel" type="checkbox">
+        </div>
 
-        <label for="navOrder" class="form-label">Item Position</label>
-        <input class="form-control" id="navOrder" value="0" type="number">
+        <div class="form-group pb-3">
+          <label for="navOrder" class="form-label">Item Position</label>
+          <input class="form-control" id="navOrder" value="0" type="number">
+        </div>
 
         <div class="pt-2">
           <button id="btnNewItemSubmit" type="button" class="btn btn-sm btn-wiki" onclick="postNewNavItem()">Add Item</button>

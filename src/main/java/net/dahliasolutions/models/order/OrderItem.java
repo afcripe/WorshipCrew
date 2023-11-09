@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 public class OrderItem {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "order_item_gen")
     @SequenceGenerator(name = "order_item_gen", sequenceName = "order_item_seq", allocationSize = 1)
     private BigInteger id;
     private BigInteger productId;

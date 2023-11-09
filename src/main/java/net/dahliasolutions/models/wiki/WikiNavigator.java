@@ -16,7 +16,7 @@ import java.math.BigInteger;
 public class WikiNavigator {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "wiki_navigator_gen")
     @SequenceGenerator(name = "wiki_navigator_gen", sequenceName = "wiki_navigator_seq", allocationSize = 1)
     private Integer id;
     private Integer itemOrder;

@@ -20,7 +20,7 @@ import java.util.List;
 public class StoreItem {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "store_item_gen")
     @SequenceGenerator(name = "store_item_gen", sequenceName = "store_item_seq", allocationSize = 1)
     private BigInteger id;
     private String name;

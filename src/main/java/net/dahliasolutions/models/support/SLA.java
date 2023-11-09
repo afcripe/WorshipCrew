@@ -14,7 +14,7 @@ import java.math.BigInteger;
 public class SLA {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "sla_gen")
     @SequenceGenerator(name = "sla_gen", sequenceName = "sla_seq", allocationSize = 1)
     private BigInteger id;
     private String name;

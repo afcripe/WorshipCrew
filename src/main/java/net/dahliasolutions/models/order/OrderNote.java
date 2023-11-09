@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class OrderNote {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "order_note_gen")
     @SequenceGenerator(name = "order_note_gen", sequenceName = "order_note_seq", allocationSize = 1)
     private BigInteger id;
     private BigInteger orderId;

@@ -322,43 +322,48 @@ public class NotificationMessageService implements NotificationMessageServiceInt
 
         if (message.getModule().equals(EventModule.Request)) {
             BigInteger orderId = BigInteger.valueOf(0);
-            if(!message.getModuleId().isBlank()) {
+            if (!message.getModuleId().isBlank()) {
                 orderId = new BigInteger(message.getModuleId());
             }
-            OrderRequest newRequest = orderService.findById(orderId).orElse(new OrderRequest());
+            Optional<OrderRequest> newRequest = orderService.findById(orderId);
             OrderItem requestItem = new OrderItem();
             if (!message.getItemId().equals(BigInteger.valueOf(0))) {
                 requestItem = orderItemService.findById(message.getItemId()).get();
             }
 
-            if (message.getEventId() != null) {
-                AppEvent appEvent = appEventService.findAppEventById(message.getEventId()).get();
-                //send event email
-                EmailDetails emailEventDetails =
-                        new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
-                notificationStatus = emailService.sendSystemNotification(emailEventDetails, appEvent);
+            if (newRequest.isEmpty()) {
+                // if no order found, delete message without attempting to send
+                messageRepository.deleteById(message.getId());
             } else {
-                switch (message.getType()) {
-                    case New -> {
-                        EmailDetails emailDetailsSupervisor =
-                                new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
-                        notificationStatus = emailService.sendSupervisorRequest(emailDetailsSupervisor, newRequest, message.getUser().getId());
-                    }
-                    case NewItem -> {
-                        EmailDetails emailDetailsSupervisor =
-                                new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
-                        notificationStatus = emailService.sendSupervisorItemRequest(emailDetailsSupervisor, requestItem, requestItem.getOrderRequest().getSupervisor().getId());
-                    }
-                    case ItemUpdated -> {
-                        OrderNote note = orderNoteService.findById(message.getNoteId()).get();
-                        EmailDetails emailDetailsSupervisor =
-                                new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
-                        notificationStatus = emailService.sendItemUpdate(emailDetailsSupervisor, requestItem, note);
-                    }
-                    case Updated -> {
-                        EmailDetails emailDetailsSupervisor =
-                                new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
-                        notificationStatus = emailService.sendUserRequest(emailDetailsSupervisor, newRequest);
+                if (message.getEventId() != null) {
+                    AppEvent appEvent = appEventService.findAppEventById(message.getEventId()).get();
+                    //send event email
+                    EmailDetails emailEventDetails =
+                            new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
+                    notificationStatus = emailService.sendSystemNotification(emailEventDetails, appEvent);
+                } else {
+                    switch (message.getType()) {
+                        case New -> {
+                            EmailDetails emailDetailsSupervisor =
+                                    new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
+                            notificationStatus = emailService.sendSupervisorRequest(emailDetailsSupervisor, newRequest.get(), message.getUser().getId());
+                        }
+                        case NewItem -> {
+                            EmailDetails emailDetailsSupervisor =
+                                    new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
+                            notificationStatus = emailService.sendSupervisorItemRequest(emailDetailsSupervisor, requestItem, requestItem.getOrderRequest().getSupervisor().getId());
+                        }
+                        case ItemUpdated -> {
+                            OrderNote note = orderNoteService.findById(message.getNoteId()).get();
+                            EmailDetails emailDetailsSupervisor =
+                                    new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
+                            notificationStatus = emailService.sendItemUpdate(emailDetailsSupervisor, requestItem, note);
+                        }
+                        case Updated -> {
+                            EmailDetails emailDetailsSupervisor =
+                                    new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
+                            notificationStatus = emailService.sendUserRequest(emailDetailsSupervisor, newRequest.get());
+                        }
                     }
                 }
             }

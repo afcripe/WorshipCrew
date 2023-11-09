@@ -13,7 +13,7 @@ import java.math.BigInteger;
 public class WikiTag {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "wiki_tag_gen")
     @SequenceGenerator(name = "wiki_tag_gen", sequenceName = "wiki_tag_seq", allocationSize = 1)
     private BigInteger id;
     private String name;
