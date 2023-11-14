@@ -98,6 +98,7 @@ public class SecurityConfig {
                     auth.requestMatchers("/passwordreset").permitAll();
                     auth.requestMatchers("/mailer").permitAll();
                     auth.requestMatchers("/mailer/*").permitAll();
+                    auth.requestMatchers("/app/mailer/**").permitAll();
 
                     auth.requestMatchers("/css/**").permitAll();
                     auth.requestMatchers("/img/**").permitAll();

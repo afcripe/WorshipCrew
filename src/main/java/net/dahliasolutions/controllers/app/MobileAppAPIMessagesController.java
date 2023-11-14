@@ -188,39 +188,35 @@ public class MobileAppAPIMessagesController {
     }
 
     @GetMapping("/message/{id}")
-    public  ResponseEntity<SingleStringModel> getMessageBodyContent(@PathVariable BigInteger id, Model model, HttpServletRequest request) {
+    public  ResponseEntity<NotificationMessageModel> getMessageBodyContent(@PathVariable BigInteger id, Model model, HttpServletRequest request) {
 
         APIUser apiUser = getUserFromToken(request);
         if (!apiUser.isValid()) {
-            return new ResponseEntity<>(new SingleStringModel(""), HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(new NotificationMessageModel(), HttpStatus.FORBIDDEN);
         }
 
         // get message
         Optional<NotificationMessage> message = notificationMessageService.findById(id);
+        NotificationMessageModel messageModel = new NotificationMessageModel();
+
         if (message.isPresent()) {
-            switch (message.get().getModule()) {
-                case Messaging:
-                    EventType newEvent = EventType.Custom;
-                    System.out.println(newEvent);
-                    message.get().setType(newEvent);
-                    notificationMessageService.save(message.get());
-                    // get message
-                    Optional<MailerCustomMessage> customMessage = mailerCustomMessageService.findById(message.get().getNoteId());
-                    model.addAttribute("baseURL", appServer.getBaseURL());
-                    model.addAttribute("messageId", id);
-                    if (customMessage.isPresent()) {
-                        model.addAttribute("notification", customMessage.get());
-                    } else {
-                        model.addAttribute("notification", new MailerCustomMessage());
-                    }
-                return new ResponseEntity<>(new SingleStringModel(customMessage.get().getMessageBody()), HttpStatus.OK);
+            Optional<User> fromUser = userService.findById(message.get().getFromUserId());
+            String sendingUser = "System Message";
+            if (fromUser.isPresent()) {
+                sendingUser = fromUser.get().getFullName();
             }
+
+            messageModel = new NotificationMessageModel(
+                    message.get().getId(),
+                    message.get().getSubject(),
+                    message.get().getDateSent(),
+                    message.get().isRead(),
+                    sendingUser,
+                    message.get().getModule().toString(),
+                    ""
+            );
         }
-
-        // determine template
-
-        // return template
-        return new ResponseEntity<>(new SingleStringModel(""), HttpStatus.OK);
+        return new ResponseEntity<>(messageModel, HttpStatus.OK);
 
     }
 

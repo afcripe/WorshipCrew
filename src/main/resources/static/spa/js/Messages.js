@@ -97,7 +97,8 @@ async function getRemoteMessages(token, read, system) {
 
 async function showRemoteMessage(id, token) {
     let msg = await getRemoteMessagesById(id, token);
-    let returnHTML = htmlMessage(msg);
+    let msgBody = await getRemoteMessagesBody(id);
+    let returnHTML = htmlMessage(msg, msgBody);
     returnHTML = returnHTML.replaceAll("\n","");
 
     let dialog=document.createElement("dialog");
@@ -124,6 +125,11 @@ async function getRemoteMessagesById(id, token) {
     return await response.json();
 }
 
+async function getRemoteMessagesBody(id) {
+    const response = await fetch('/app/mailer/content/'+id);
+    return await response.text();
+}
+
 function htmlMessageLine(msg) {
     let r = "";
     r+=`<div class="list__item" data-msg-message="`+msg.id+`">`;
@@ -144,15 +150,33 @@ function htmlMessageLine(msg) {
     return r;
 }
 
-function htmlMessage(msg) {
+function htmlMessage(msg, msgBody) {
     let r=`<div class="history-viewer__div"><div class="history-viewer__content">`;
 
-    r+=`<div class="request__item-detail">Message Template Detail</div>`;
+    r+=`<div class="list__item" data-msg-message="`+msg.id+`">`;
+    r+=`<div class="list__Item-line">`;
+    r+=`<div class="item-label item-33">From:</div>`;
+    r+=`<div class="item-label ">`+msg.fromUser+`</div>`;
+    r+=`</div>`;
+
+    r+=`<div class="list__Item-line">`;
+    r+=`<div class="item-label item-33">Date:</div>`;
+    r+=`<div class="item-label ">`+formatDate(msg.dateSent)+`</div>`;
+    r+=`</div>`;
+
+    r+=`<div class="list__Item-line">`;
+    r+=`<div class="item-label item-33">Subject:</div>`;
+    r+=`<div class="item-label ">`+msg.subject+`</div>`;
+    r+=`</div></div>`;
+
+    r+=`<div class="item__hr"><hr></div>`;
+
+    r+=`<div>`+msgBody+`</div>`;
 
     r+=`</div></div>`;
 
     r+=`<div class="history-viewer__close">`;
-    r+=`<div class="request__item-field-grow">Message</div>`;
+    r+=`<div class="message__title">`+msg.subject+`</div>`;
     r+=`<div class="request__item-field-right"><button id="btnViewerClose" class="btn btn-sm btn-outline-support">close</button></div>`;
     r+=`</div></div>`;
 

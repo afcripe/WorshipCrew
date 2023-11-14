@@ -766,6 +766,10 @@ progress::-webkit-progress-value {
     flex-direction: row;
 }
 
+.item-label {
+    font-size: 1rem;
+}
+
 .item-id {
     font-weight: bold;
     font-size: 1rem;
@@ -807,6 +811,10 @@ progress::-webkit-progress-value {
     border: 2px solid var(--dwc-border-color);
     border-radius: 5px;
     background-color: var(--dwc-body-bg);
+}
+
+.item-33 {
+    width: 33%;
 }
 
 .item__hr {
@@ -1232,4 +1240,13 @@ progress::-webkit-progress-value {
 
 .user-edit__content {
     overflow-y: scroll;
+}
+
+.message__title {
+    font-size: 1.5rem;
+    flex-grow: 1;
+    height: 1.6rem;
+    font-weight: bold;
+    text-align: left;
+    overflow-x: hidden;
 }

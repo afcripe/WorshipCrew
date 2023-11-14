@@ -2,29 +2,32 @@ package net.dahliasolutions.controllers.mail;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import net.dahliasolutions.models.AppEvent;
-import net.dahliasolutions.models.BrowserMessage;
-import net.dahliasolutions.models.EventModule;
-import net.dahliasolutions.models.EventType;
+import net.dahliasolutions.models.*;
 import net.dahliasolutions.models.mail.EmailDetails;
+import net.dahliasolutions.models.mail.MailerCustomMessage;
 import net.dahliasolutions.models.mail.MailerLinks;
 import net.dahliasolutions.models.order.OrderItem;
 import net.dahliasolutions.models.order.OrderNote;
 import net.dahliasolutions.models.order.OrderRequest;
 import net.dahliasolutions.models.order.OrderStatus;
+import net.dahliasolutions.models.records.SingleStringModel;
 import net.dahliasolutions.models.support.Ticket;
 import net.dahliasolutions.models.support.TicketNote;
 import net.dahliasolutions.models.user.ChangePasswordModel;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.services.EventService;
 import net.dahliasolutions.services.mail.EmailService;
+import net.dahliasolutions.services.mail.MailerCustomMessageService;
 import net.dahliasolutions.services.mail.MailerLinksService;
+import net.dahliasolutions.services.mail.NotificationMessageService;
 import net.dahliasolutions.services.order.OrderItemService;
 import net.dahliasolutions.services.order.OrderNoteService;
 import net.dahliasolutions.services.order.OrderService;
 import net.dahliasolutions.services.support.TicketNoteService;
 import net.dahliasolutions.services.support.TicketService;
 import net.dahliasolutions.services.user.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -48,6 +51,9 @@ public class EmailController {
     private final TicketNoteService ticketNoteService;
     private final EmailService emailService;
     private final EventService eventService;
+    private final MailerCustomMessageService mailerCustomMessageService;
+    private final NotificationMessageService notificationMessageService;
+    private final AppServer appServer;
 
     @GetMapping("")
     public String testMailer(){
@@ -129,6 +135,7 @@ public class EmailController {
         model.addAttribute("errorMessage", "Link not valid for setting password!");
         return "error";
     }
+
 
     private void updateOrderRequest(MailerLinks mailerLinks) {
         Optional<OrderRequest> orderRequest = orderService.findById(mailerLinks.getServiceId());
