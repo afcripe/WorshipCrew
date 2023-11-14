@@ -92,6 +92,7 @@ public class EmailService implements EmailServiceInterface{
 
         Context context = new Context();
         context.setVariable("userDetails", userService.findById(id).orElse(null));
+        context.setVariable("messageId", emailDetails.getMessageId());
         context.setVariable("baseURL", appServer.getBaseURL());
         context.setVariable("welcomeLink", appServer.getBaseURL()+"/mailer/"+linkString);
         context.setVariable("emailSubject", emailDetails.getSubject());
@@ -125,6 +126,7 @@ public class EmailService implements EmailServiceInterface{
 
         Context context = new Context();
         context.setVariable("baseURL", appServer.getBaseURL());
+        context.setVariable("messageId", emailDetails.getMessageId());
         context.setVariable("resetLink", appServer.getBaseURL()+"/mailer/"+linkString);
         context.setVariable("emailSubject", emailDetails.getSubject());
         context.setVariable("userId", id);
@@ -157,6 +159,7 @@ public class EmailService implements EmailServiceInterface{
         // set template variables
         Context context = new Context();
         context.setVariable("baseURL", appServer.getBaseURL());
+        context.setVariable("messageId", emailDetails.getMessageId());
         context.setVariable("orderRequest", orderRequest);
         context.setVariable("emailSubject", emailDetails.getSubject());
 
@@ -184,6 +187,7 @@ public class EmailService implements EmailServiceInterface{
         // set template variables
         Context context = new Context();
         context.setVariable("baseURL", appServer.getBaseURL());
+        context.setVariable("messageId", emailDetails.getMessageId());
         context.setVariable("orderRequest", orderRequest);
         context.setVariable("emailSubject", emailDetails.getSubject());
         context.setVariable("webLink", appServer.getBaseURL()+"/mailer/"+linkString);
@@ -219,6 +223,7 @@ public class EmailService implements EmailServiceInterface{
         // set template variables
         Context context = new Context();
         context.setVariable("baseURL", appServer.getBaseURL());
+        context.setVariable("messageId", emailDetails.getMessageId());
         context.setVariable("requestItem", orderItem);
         context.setVariable("emailSubject", emailDetails.getSubject());
         context.setVariable("webLink", appServer.getBaseURL()+"/mailer/"+linkString);
@@ -253,6 +258,7 @@ public class EmailService implements EmailServiceInterface{
         // set template variables
         Context context = new Context();
         context.setVariable("baseURL", appServer.getBaseURL());
+        context.setVariable("messageId", emailDetails.getMessageId());
         context.setVariable("requestItem", orderItem);
         context.setVariable("orderNote", orderNote);
         context.setVariable("emailSubject", emailDetails.getSubject());
@@ -280,6 +286,7 @@ public class EmailService implements EmailServiceInterface{
         // set template variables
         Context context = new Context();
         context.setVariable("baseURL", appServer.getBaseURL());
+        context.setVariable("messageId", emailDetails.getMessageId());
         context.setVariable("ticket", ticket);
         context.setVariable("ticketNote", ticketNote);
         context.setVariable("emailSubject", emailDetails.getSubject());
@@ -308,6 +315,7 @@ public class EmailService implements EmailServiceInterface{
         // set template variables
         Context context = new Context();
         context.setVariable("baseURL", appServer.getBaseURL());
+        context.setVariable("messageId", emailDetails.getMessageId());
         context.setVariable("ticket", ticket);
         context.setVariable("ticketNote", ticketNote);
         context.setVariable("emailSubject", emailDetails.getSubject());
@@ -344,6 +352,7 @@ public class EmailService implements EmailServiceInterface{
         // set template variables
         Context context = new Context();
         context.setVariable("baseURL", appServer.getBaseURL());
+        context.setVariable("messageId", emailDetails.getMessageId());
         context.setVariable("ticket", ticket);
         context.setVariable("ticketNote", ticketNote);
         context.setVariable("agentList", ticket.getAgentList());
@@ -380,6 +389,7 @@ public class EmailService implements EmailServiceInterface{
         // set template variables
         Context context = new Context();
         context.setVariable("baseURL", appServer.getBaseURL());
+        context.setVariable("messageId", emailDetails.getMessageId());
         context.setVariable("ticket", ticket);
         context.setVariable("ticketNote", ticketNote);
         context.setVariable("emailSubject", emailDetails.getSubject());
@@ -408,6 +418,7 @@ public class EmailService implements EmailServiceInterface{
         // set template variables
         Context context = new Context();
         context.setVariable("baseURL", appServer.getBaseURL());
+        context.setVariable("messageId", emailDetails.getMessageId());
         context.setVariable("ticket", ticket);
         context.setVariable("ticketNote", ticketNote);
         context.setVariable("emailSubject", emailDetails.getSubject());
@@ -435,6 +446,7 @@ public class EmailService implements EmailServiceInterface{
         // set template variables
         Context context = new Context();
         context.setVariable("baseURL", appServer.getBaseURL());
+        context.setVariable("messageId", emailDetails.getMessageId());
         context.setVariable("notification", event);
         context.setVariable("emailSubject", emailDetails.getSubject());
 
@@ -463,6 +475,7 @@ public class EmailService implements EmailServiceInterface{
             // set template variables
             Context context = new Context();
             context.setVariable("baseURL", appServer.getBaseURL());
+            context.setVariable("messageId", emailDetails.getMessageId());
             context.setVariable("notification", customMessage.get());
 
             // create mail message

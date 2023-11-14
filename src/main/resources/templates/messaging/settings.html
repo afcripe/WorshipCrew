@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<div class="container-fluid m-0 p-0" layout:fragment="content">
+
+
+  <div th:replace="~{messaging/moduleHeader :: header}">Header</div>
+
+  <div class="container my-3">
+
+    <div class="row">
+
+      <!-- Corporate Blackout Dates -->
+      <div class="card" style="max-width: 650px;">
+
+          <div class="card-title m-4">
+            <button class="btn btn-sm btn-support" style="float: right;" onclick="newPriority()">New</button>
+            <h4>Corporate Blackout Dates</h4>
+            <p>Schedule times to hold messages for uninterrupted services.</p>
+          </div>
+
+          <div class="card-body">
+            <table>
+              <tr>
+                <th class="p-1">Date</th>
+                <th class="p-1">Time</th>
+                <th class="p-1">Length</th>
+              </tr>
+              <tr>
+                <td class="p-1">11-11-2023</td>
+                <td class="p-1">8:30 AM</td>
+                <td class="p-1">4 hours</td>
+              </tr>
+            </table>
+          </div>
+
+        </div>
+
+
+    </div>
+
+  </div>
+
+
+  <script>
+
+  </script>
+
+</div>
+
+</html>

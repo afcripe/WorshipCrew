@@ -415,7 +415,9 @@ public class UserController {
         // Send Password E-mail
         AdminSettings adminSettings = adminService.getAdminSettings();
         userService.createUser(user);
-        EmailDetails emailDetails = new EmailDetails(user.getContactEmail(),
+        EmailDetails emailDetails = new EmailDetails(
+                BigInteger.valueOf(0),
+                user.getContactEmail(),
                 "Welcome to " + adminSettings.getCompanyName(),
                 "Welcome to " + adminSettings.getCompanyName(), null);
         BrowserMessage msg = emailService.sendWelcomeMail(emailDetails, user.getId());

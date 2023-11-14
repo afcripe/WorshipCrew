@@ -216,7 +216,7 @@ public class SupportController {
         Ticket ticket = ticketService.createTicket(ticketNewModel, currentUser, ticketImage);
 
         EmailDetails emailDetailsUser =
-                new EmailDetails(currentUser.getContactEmail(),"Your New Support Ticket", "", null );
+                new EmailDetails(BigInteger.valueOf(0), currentUser.getContactEmail(),"Your New Support Ticket", "", null );
         BrowserMessage returnMsg = emailService.sendUserTicket(emailDetailsUser, ticket, ticket.getNotes().get(0));
 
         // determine if agent or agent list

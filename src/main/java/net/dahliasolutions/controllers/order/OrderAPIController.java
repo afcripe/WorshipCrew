@@ -80,7 +80,7 @@ public class OrderAPIController {
                 orderService.save(orderRequest.get());
 
                 EmailDetails emailDetailsUser =
-                        new EmailDetails(orderRequest.get().getSupervisor().getContactEmail(),"Request Cancelled", "", null );
+                        new EmailDetails(BigInteger.valueOf(0), orderRequest.get().getSupervisor().getContactEmail(),"Request Cancelled", "", null );
                 BrowserMessage returnMsg = emailService.sendUserRequest(emailDetailsUser, orderRequest.get());
 
                 // Notify supervisor
@@ -165,7 +165,7 @@ public class OrderAPIController {
         }
 
         EmailDetails emailDetailsUser =
-                new EmailDetails(user.getContactEmail(),"Your Request Has Been Updated", "", null );
+                new EmailDetails(BigInteger.valueOf(0), user.getContactEmail(),"Your Request Has Been Updated", "", null );
         BrowserMessage returnMsg = emailService.sendUserRequest(emailDetailsUser, orderRequest.get());
 
         // send any additional notifications
@@ -214,7 +214,7 @@ public class OrderAPIController {
                     user));
             // Email everyone
             EmailDetails emailDetailsUser =
-                    new EmailDetails(requestItem.get().getOrderRequest().getUser().getContactEmail(),"The Status of a Request Item Changed", "", null );
+                    new EmailDetails(BigInteger.valueOf(0), requestItem.get().getOrderRequest().getUser().getContactEmail(),"The Status of a Request Item Changed", "", null );
             BrowserMessage returnMsg = emailService.sendItemUpdate(emailDetailsUser, requestItem.get(), orderNote);
 
             // Notify supervisor

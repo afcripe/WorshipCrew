@@ -366,6 +366,26 @@ async function postTicketRemoveAgent(ticketId, userId, token) {
     await showTicketAgents(ticketId, token);
 }
 
+async function showMessage(messageID, token) {
+    let agents = await getRemoteTicketAgents(ticketID, token);
+    let returnHTML = htmlAgents(agents, ticketID);
+    returnHTML = returnHTML.replaceAll("\n","");
+
+    let dialog=document.createElement("dialog");
+    dialog.id="agentViewer";
+    dialog.classList.add("history-viewer__dialog");
+
+    dialog.innerHTML = returnHTML;
+
+    document.getElementById("app").appendChild(dialog);
+    document.getElementById("btnViewerClose").addEventListener("click", (event) => {
+        event.preventDefault();
+        document.getElementById("agentViewer").remove();
+    });
+
+    dialog.showModal();
+}
+
 // HTML //
 
 function htmlTicket(tkt) {

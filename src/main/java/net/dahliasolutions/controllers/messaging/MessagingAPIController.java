@@ -82,7 +82,6 @@ public class MessagingAPIController {
 
         // remove draft designation
         message.setDraft(false);
-        mailerCustomMessageService.save(message);
 
         // return id
         return new SingleBigIntegerModel(mailerCustomMessageService.save(message).getId());

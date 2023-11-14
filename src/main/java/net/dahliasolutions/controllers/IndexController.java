@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 
@@ -97,7 +98,7 @@ public class IndexController {
             return "forgotPassword";
         }
         EmailDetails emailDetails =
-                new EmailDetails(user.getContactEmail(),"Password Reset", "", null );
+                new EmailDetails(BigInteger.valueOf(0), user.getContactEmail(),"Password Reset", "", null );
 
         BrowserMessage returnMsg = emailService.sendPasswordResetMail(emailDetails, user.getId());
         session.setAttribute(returnMsg.getMsgType(), returnMsg.getMessage());

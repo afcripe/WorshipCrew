@@ -149,7 +149,7 @@ public class EmailController {
                     supervisor.get()));
 
             EmailDetails emailDetailsUser =
-                    new EmailDetails(user.getContactEmail(),"Your Request Has Been Received", "", null );
+                    new EmailDetails(BigInteger.valueOf(0), user.getContactEmail(),"Your Request Has Been Received", "", null );
             BrowserMessage returnMsg = emailService.sendUserRequest(emailDetailsUser, orderRequest.get());
         }
 
@@ -178,7 +178,7 @@ public class EmailController {
                     supervisor.get()));
 
             EmailDetails emailDetailsSupervisor =
-                    new EmailDetails(OrderSupervisor.getContactEmail(),"Request Item was Received", "", null );
+                    new EmailDetails(BigInteger.valueOf(0), OrderSupervisor.getContactEmail(),"Request Item was Received", "", null );
             BrowserMessage returnMsg2 = emailService.sendUserRequest(emailDetailsSupervisor, requestItem.get().getOrderRequest());
         }
 

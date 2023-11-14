@@ -13,11 +13,13 @@ public class AppUserPermissionModel {
     private boolean requestMod;
     private boolean ticketMod;
     private boolean resourceMod;
+    private boolean messagesMod;
 
     public AppUserPermissionModel() {
         this.userMod = false;
         this.requestMod = false;
         this.ticketMod = false;
         this.resourceMod = false;
+        this.messagesMod = false;
     }
 }

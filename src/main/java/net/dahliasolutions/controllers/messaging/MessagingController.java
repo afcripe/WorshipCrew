@@ -8,8 +8,7 @@ import net.dahliasolutions.models.mail.MailerCustomMessageModel;
 import net.dahliasolutions.models.order.OrderItem;
 import net.dahliasolutions.models.order.OrderNote;
 import net.dahliasolutions.models.order.OrderRequest;
-import net.dahliasolutions.models.support.Ticket;
-import net.dahliasolutions.models.support.TicketNote;
+import net.dahliasolutions.models.support.*;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
 import net.dahliasolutions.services.RedirectService;
@@ -45,7 +44,6 @@ public class MessagingController {
     private final OrderNoteService orderNoteService;
     private final TicketService ticketService;
     private final TicketNoteService ticketNoteService;
-    private final MailerCustomMessageService customMessageService;
     private final AppEventService appEventService;
     private final AppServer appServer;
 
@@ -170,7 +168,7 @@ public class MessagingController {
         }
 
         // sort by date and revers to put new on top
-        Collections.sort(modelList, new Comparator<NotificationMessageModel>() {
+        modelList.sort(new Comparator<NotificationMessageModel>() {
             @Override
             public int compare(NotificationMessageModel msg1, NotificationMessageModel msg2) {
                 int i;
@@ -244,6 +242,7 @@ public class MessagingController {
                         AppEvent appEvent = appEventService.findAppEventById(message.get().getEventId()).get();
                         // return appEvent body
                         model.addAttribute("baseURL", appServer.getBaseURL());
+                        model.addAttribute("messageId", id);
                         model.addAttribute("notification", appEvent);
                         model.addAttribute("emailSubject", message.get().getSubject());
                         return "mailer/mailNotification";
@@ -251,6 +250,7 @@ public class MessagingController {
                         switch (message.get().getType()) {
                             case New -> {
                                 model.addAttribute("baseURL", appServer.getBaseURL());
+                                model.addAttribute("messageId", id);
                                 model.addAttribute("orderRequest", requestItem);
                                 model.addAttribute("emailSubject", message.get().getSubject());
                                 model.addAttribute("webLink", "/request/order/"+newRequest.getId());
@@ -258,6 +258,7 @@ public class MessagingController {
                             }
                             case NewItem -> {
                                 model.addAttribute("baseURL", appServer.getBaseURL());
+                                model.addAttribute("messageId", id);
                                 model.addAttribute("requestItem", requestItem);
                                 model.addAttribute("emailSubject", message.get().getSubject());
                                 model.addAttribute("webLink", "/request/order/"+newRequest.getId());
@@ -266,6 +267,7 @@ public class MessagingController {
                             case ItemUpdated -> {
                                 OrderNote note = orderNoteService.findById(message.get().getNoteId()).get();
                                 model.addAttribute("baseURL", appServer.getBaseURL());
+                                model.addAttribute("messageId", id);
                                 model.addAttribute("requestItem", requestItem);
                                 model.addAttribute("orderNote", note);
                                 model.addAttribute("emailSubject", message.get().getSubject());
@@ -273,6 +275,7 @@ public class MessagingController {
                             }
                             case Updated -> {
                                 model.addAttribute("baseURL", appServer.getBaseURL());
+                                model.addAttribute("messageId", id);
                                 model.addAttribute("orderRequest", requestItem);
                                 model.addAttribute("emailSubject", message.get().getSubject());
                                 return "mailer/mailUserRequest";
@@ -290,6 +293,7 @@ public class MessagingController {
                     switch (message.get().getType()) {
                         case New -> {
                             model.addAttribute("baseURL", appServer.getBaseURL());
+                            model.addAttribute("messageId", id);
                             model.addAttribute("ticket", ticket);
                             model.addAttribute("ticketNote", note);
                             model.addAttribute("emailSubject", message.get().getSubject());
@@ -298,6 +302,7 @@ public class MessagingController {
                         }
                         case NewList -> {
                             model.addAttribute("baseURL", appServer.getBaseURL());
+                            model.addAttribute("messageId", id);
                             model.addAttribute("ticket", ticket);
                             model.addAttribute("ticketNote", note);
                             model.addAttribute("agentList", ticket.getAgentList());
@@ -307,6 +312,7 @@ public class MessagingController {
                         }
                         case Updated -> {
                             model.addAttribute("baseURL", appServer.getBaseURL());
+                            model.addAttribute("messageId", id);
                             model.addAttribute("ticket", ticket);
                             model.addAttribute("ticketNote", note);
                             model.addAttribute("emailSubject", message.get().getSubject());
@@ -319,6 +325,7 @@ public class MessagingController {
                     if (message.get().getEventId() != null) {
                         AppEvent appEvent = appEventService.findAppEventById(message.get().getEventId()).get();
                         model.addAttribute("baseURL", appServer.getBaseURL());
+                        model.addAttribute("messageId", id);
                         model.addAttribute("notification", appEvent);
                         model.addAttribute("emailSubject", message.get().getSubject());
                         return "mailer/mailNotification";
@@ -330,8 +337,9 @@ public class MessagingController {
                     message.get().setType(newEvent);
                     notificationMessageService.save(message.get());
                     // get message
-                    Optional<MailerCustomMessage> customMessage = customMessageService.findById(message.get().getNoteId());
+                    Optional<MailerCustomMessage> customMessage = mailerCustomMessageService.findById(message.get().getNoteId());
                     model.addAttribute("baseURL", appServer.getBaseURL());
+                    model.addAttribute("messageId", id);
                     if (customMessage.isPresent()) {
                         model.addAttribute("notification", customMessage.get());
                     } else {
@@ -346,6 +354,13 @@ public class MessagingController {
         // return template
         return "mailer/mailNotification";
 
+    }
+
+    @GetMapping("/settings")
+    public String goSupportSettings(Model model, HttpSession session) {
+
+        redirectService.setHistory(session, "/messaging/settings");
+        return "messaging/settings";
     }
 
     // get edit permission

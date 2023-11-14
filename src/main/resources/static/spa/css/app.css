@@ -32,11 +32,12 @@
     --dwc-support-title-1: rgba(225, 171, 250, 0.3);
     --dwc-support-title-2: rgba(144, 144, 144, 0.4);
 
-    --dwc-msg: #0de819;
-    --dwc-msg-focus: #0ac519;
-    --dwc-msg-active: #09b918;
-    --dwc-msg-disable: #0de81e;
-    --dwc-msg-selected: #4acc55;
+    --dwc-msg: #0bc515;
+    --dwc-msg-focus: #08a815;
+    --dwc-msg-active: #079413;
+    --dwc-msg-disable: #0ac419;
+    --dwc-msg-selected: #3eab47;
+    --dwc-msg-accent: #d7fdd9;
 
     --dwc-cancel: #f82105;
     --dwc-cancel-focus: #d0210a;

@@ -31,12 +31,13 @@
 <div th:utext="${notification.messageBody}"></div>
 
 <br />
+<img th:src="${baseURL}+'/api/v1/app/html/pixel/'+${messageId}" alt="" width="1" />
 
 <!-- Footer -->
 <div>
     <a th:href="${baseURL}" style="text-decoration: none;">
-    <img th:src="${baseURL}+'/img/favicon.png'" alt="dwc" width="32" class="float-left" />
-    &nbsp;Destiny Worship Crew
+        <img th:src="${baseURL}+'/img/favicon.png'" alt="crew" width="32" class="float-left" />
+        &nbsp;Destiny Worship Crew
     </a>
 </div>
 

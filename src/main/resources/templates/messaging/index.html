@@ -11,8 +11,11 @@
 
         <h1 class="color-msg">Messages</h1>
 
-        <div class="m-3">
-            <button id="tglUnread" class="btn btn-sm btn-outline-msg" onclick="toggleUnread()">Unread</button>
+        <div class="my-3">
+            <button id="tglInbox" class="btn btn-sm btn-outline-msg" onclick="toggleInbox()">
+                <i class="bi bi-envelope color-msg"></i>
+            </button>
+            <button id="tglUnread" class="btn btn-sm btn-outline-msg" onclick="toggleUnread()">Read Messages</button>
             <button id="tglSystem" class="btn btn-sm btn-outline-msg" onclick="toggleSystemMessages()">System Messages</button>
             <button id="tglDrafts" class="btn btn-sm btn-outline-primary" onclick="toggleDrafts()">Drafts</button>
         </div>
@@ -208,6 +211,14 @@
             return strDate + " " + partTime[0] + ":" + partTime[1];
         }
 
+        function toggleNew() {
+            window.location='/messaging/new';
+        }
+
+        function toggleInbox() {
+            window.location='/messaging';
+        }
+
         function toggleUnread() {
             if (params.has('draft')) {
                 params.delete('draft');
@@ -308,6 +319,7 @@
                 }
             }
         }
+
 
         if (params.has('read')) {
             // btnUnread.textContent = 'Hide Unread';

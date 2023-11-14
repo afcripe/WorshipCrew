@@ -30,7 +30,8 @@ public class SchedulingConfig {
 //        }
     }
 
-    @Scheduled(cron="0 0/2 * * * ?", zone="America/Chicago")
+//    @Scheduled(cron="0 0/2 * * * ?", zone="America/Chicago")
+    @Scheduled(cron="0 * * * * ?", zone="America/Chicago")
     public void runEvery2Minutes() {
         messageService.sendAllMessages();
 //        System.out.println("Run Task Every 2 Minutes");

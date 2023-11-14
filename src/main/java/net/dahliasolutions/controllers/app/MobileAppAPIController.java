@@ -77,6 +77,7 @@ public class MobileAppAPIController {
                     || role.getName().equals("RESOURCE_WRITE") || role.getName().equals("RESOURCE_READ")) {
                 mods.setResourceMod(true);
             }
+            mods.setMessagesMod(true);
         }
 
         return new ResponseEntity<>(mods, HttpStatus.OK);

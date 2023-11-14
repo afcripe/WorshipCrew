@@ -9,13 +9,22 @@
           </a>
         </div>
 
-        <div class="navbar-nav mx-2">
-          <a class="btn btn-sm btn-msg" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')
+<!--          <div class="navbar-nav mt-2 mx-2" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')-->
+<!--                    or #lists.contains(userRoles,'DIRECTOR_WRITE') or #lists.contains(userRoles,'CAMPUS_WRITE')-->
+<!--                    or #lists.contains(userRoles,'USER_SUPERVISOR')}">-->
+<!--              <a class="nav-link h3" href="/messaging/settings">-->
+<!--                  <i class="bi bi-gear color-msg"></i>-->
+<!--              </a>-->
+<!--          </div>-->
+
+        <div class="navbar-nav mx-2" th:if="${#lists.contains(userRoles,'ADMIN_WRITE')
                 or #lists.contains(userRoles,'DIRECTOR_WRITE') or #lists.contains(userRoles,'CAMPUS_WRITE')
-                or #lists.contains(userRoles,'USER_WRITE') or #lists.contains(userRoles,'USER_SUPERVISOR')}" href="/messaging/new">
+                or #lists.contains(userRoles,'USER_WRITE') or #lists.contains(userRoles,'USER_SUPERVISOR')}">
+          <a class="btn btn-sm btn-msg" href="/messaging/new">
             <i class="bi bi-envelope-plus"></i>
           </a>
         </div>
+
         <div class="navbar-nav mt-2 mx-2 flex-grow-1 d-block d-none d-sm-block text-center">
           <a id="moduleHeaderTitle" class="h3 moduleTitle" rhef="/">DWC</a>
         </div>

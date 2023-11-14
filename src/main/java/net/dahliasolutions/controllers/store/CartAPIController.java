@@ -193,7 +193,7 @@ public class CartAPIController {
 
         // E-mail User
         EmailDetails emailDetailsUser =
-                new EmailDetails(user.get().getContactEmail(),"Your Request", "", null );
+                new EmailDetails(BigInteger.valueOf(0), user.get().getContactEmail(),"Your Request", "", null );
         BrowserMessage returnMsg = emailService.sendUserRequest(emailDetailsUser, orderRequest);
 
         // Notify supervisor

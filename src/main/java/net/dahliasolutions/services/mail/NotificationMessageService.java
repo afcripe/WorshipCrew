@@ -339,29 +339,29 @@ public class NotificationMessageService implements NotificationMessageServiceInt
                     AppEvent appEvent = appEventService.findAppEventById(message.getEventId()).get();
                     //send event email
                     EmailDetails emailEventDetails =
-                            new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
+                            new EmailDetails(message.getId(), message.getUser().getContactEmail(), message.getSubject(), "", null);
                     notificationStatus = emailService.sendSystemNotification(emailEventDetails, appEvent);
                 } else {
                     switch (message.getType()) {
                         case New -> {
                             EmailDetails emailDetailsSupervisor =
-                                    new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
+                                    new EmailDetails(message.getId(), message.getUser().getContactEmail(), message.getSubject(), "", null);
                             notificationStatus = emailService.sendSupervisorRequest(emailDetailsSupervisor, newRequest.get(), message.getUser().getId());
                         }
                         case NewItem -> {
                             EmailDetails emailDetailsSupervisor =
-                                    new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
+                                    new EmailDetails(message.getId(), message.getUser().getContactEmail(), message.getSubject(), "", null);
                             notificationStatus = emailService.sendSupervisorItemRequest(emailDetailsSupervisor, requestItem, requestItem.getOrderRequest().getSupervisor().getId());
                         }
                         case ItemUpdated -> {
                             OrderNote note = orderNoteService.findById(message.getNoteId()).get();
                             EmailDetails emailDetailsSupervisor =
-                                    new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
+                                    new EmailDetails(message.getId(), message.getUser().getContactEmail(), message.getSubject(), "", null);
                             notificationStatus = emailService.sendItemUpdate(emailDetailsSupervisor, requestItem, note);
                         }
                         case Updated -> {
                             EmailDetails emailDetailsSupervisor =
-                                    new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
+                                    new EmailDetails(message.getId(), message.getUser().getContactEmail(), message.getSubject(), "", null);
                             notificationStatus = emailService.sendUserRequest(emailDetailsSupervisor, newRequest.get());
                         }
                     }
@@ -379,17 +379,17 @@ public class NotificationMessageService implements NotificationMessageServiceInt
             switch (message.getType()) {
                 case New -> {
                     EmailDetails emailDetailsAgent =
-                            new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
+                            new EmailDetails(message.getId(), message.getUser().getContactEmail(), message.getSubject(), "", null);
                     notificationStatus = emailService.sendAgentTicket(emailDetailsAgent, ticket, note, message.getUser().getId());
                 }
                 case NewList -> {
                     EmailDetails emailDetailsAgent =
-                            new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
+                            new EmailDetails(message.getId(), message.getUser().getContactEmail(), message.getSubject(), "", null);
                     notificationStatus = emailService.sendAgentListTicket(emailDetailsAgent, ticket, note, message.getUser().getId());
                 }
                 case Updated -> {
                     EmailDetails emailDetailsAgent =
-                            new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null );
+                            new EmailDetails(message.getId(), message.getUser().getContactEmail(), message.getSubject(), "", null );
                     notificationStatus = emailService.sendAgentUpdateTicket(emailDetailsAgent, ticket, note);
                 }
             }
@@ -404,7 +404,7 @@ public class NotificationMessageService implements NotificationMessageServiceInt
                 AppEvent appEvent = appEventService.findAppEventById(message.getEventId()).get();
                 //send event email
                 EmailDetails emailEventDetails =
-                        new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
+                        new EmailDetails(message.getId(), message.getUser().getContactEmail(), message.getSubject(), "", null);
                 notificationStatus = emailService.sendSystemNotification(emailEventDetails, appEvent);
             }
         }
@@ -417,14 +417,14 @@ public class NotificationMessageService implements NotificationMessageServiceInt
                 AppEvent appEvent = appEventService.findAppEventById(message.getEventId()).get();
                 //send event email
                 EmailDetails emailEventDetails =
-                        new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
+                        new EmailDetails(message.getId(), message.getUser().getContactEmail(), message.getSubject(), "", null);
                 notificationStatus = emailService.sendSystemNotification(emailEventDetails, appEvent);
             }
         }
 
         if (message.getModule().equals(EventModule.Messaging)) {
             EmailDetails emailEventDetails =
-                    new EmailDetails(message.getUser().getContactEmail(), message.getSubject(), "", null);
+                    new EmailDetails(message.getId(), message.getUser().getContactEmail(), message.getSubject(), "", null);
             notificationStatus = emailService.sendCustomMessage(emailEventDetails, message.getNoteId());
         }
 

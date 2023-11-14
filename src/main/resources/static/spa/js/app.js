@@ -15,6 +15,7 @@ import ResourceFolder from "./ResourceFolder.js";
 import Users from "./Users.js";
 import UserView from "./UserView.js";
 import UserNew from "./UserNew.js";
+import Messages from "./Messages.js";
 import SearchView from "./SearchView.js";
 
 import { postLogin, renewToken } from "./Login.js";
@@ -26,6 +27,7 @@ import { postNewUser } from "./UserNew.js";
 import { updateRequest, updateRequestItem, showRequestHistory, updateSupervisor, updateRequestAgent, updateRequestItemAgent, postRequestStatus, postRequestItemStatus, postRequestAddAgent, postRequestItemAddAgent, postRequestAddSupervisor, postRequestRemoveSupervisor, postRequestAcknowledged } from "./RequestView.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
 import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-messaging.js";
+import { showRemoteMessage } from "./Messages.js";
 
 let appTheme = "dark";
 let username = "";
@@ -110,6 +112,8 @@ const router = async () => {
         { path: "/app/users", view: Users },
         { path: "/app/user/:id", view: UserView },
         { path: "/app/userNew", view: UserNew },
+        { path: "/app/messages", view: Messages },
+        { path: "/app/messages/:readMessages/:systemMessages", view: Messages },
         { path: "/app/settings", view: Settings }
     ];
 
@@ -470,6 +474,7 @@ const setModules = async () => {
     const modTicket = document.getElementById("modTicket");
     const modTicketNew = document.getElementById("modTicketNew");
     const modResource = document.getElementById("modResource");
+    const modMessages = document.getElementById("modMessages");
 
     const response = await fetch('/api/v1/app/getmodules', {
         method: 'GET',
@@ -509,7 +514,6 @@ const setModules = async () => {
                 modTicketNew.classList.add("module__hide");
             } catch (e) {}
         }
-
         if (data.resourceMod) {
             try {
                 modResource.classList.remove("module__hide");
@@ -519,6 +523,15 @@ const setModules = async () => {
                 modResource.classList.add("module__hide");
             } catch (e) {}
         }
+        if (data.messagesMod) {
+            try {
+                modMessages.classList.remove("module__hide");
+            } catch (e) {}
+        } else {
+            try {
+                modMessages.classList.add("module__hide");
+            } catch (e) {}
+        }
     } else {
         try {
             modUser.classList.add("module__hide");
@@ -526,6 +539,7 @@ const setModules = async () => {
             modTicket.classList.add("module__hide");
             modTicketNew.classList.add("module__hide");
             modResource.classList.add("module__hide");
+            modMessages.classList.add("module__hide");
         } catch (e) {}
     }
 
@@ -767,6 +781,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if ( e.target.matches("[data-settings-theme]")) {
             // toggleTheme(e.target.dataset.settingsTheme);
             toggleTheme(e.target.dataset.settingsTheme);
+        }
+        if ( e.target.matches("[data-msg-message]")) {
+            showRemoteMessage(e.target.dataset.msgMessage, token);
         }
         if ( e.target.matches("[data-settings-logout]")) {
             localStorage.setItem("token", "");
@@ -1020,8 +1037,21 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        // settings
+        // messages
+        if ( e.target.matches("[data-msg-tgl-read]")) {
+            e.preventDefault();
+            let pRead = e.target.dataset.msgTglRead !== "true";
+            let pSystem = document.getElementById("tglSystem").dataset.msgTglSystem === "true";
+            navigateTo("/app/messages/"+pRead+"/"+pSystem);
+        }
+        if ( e.target.matches("[data-msg-tgl-system]")) {
+            e.preventDefault();
+            let pRead = document.getElementById("tglUnread").dataset.msgTglRead === "true";
+            let pSystem = e.target.dataset.msgTglSystem !== "true";
+            navigateTo("/app/messages/"+pRead+"/"+pSystem);
+        }
 
+        // settings
         if ( e.target.matches("[data-settings-notify-true]")) {
             e.preventDefault();
             subscribe();
