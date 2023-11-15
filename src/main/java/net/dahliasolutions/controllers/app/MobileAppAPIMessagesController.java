@@ -188,7 +188,7 @@ public class MobileAppAPIMessagesController {
     }
 
     @GetMapping("/message/{id}")
-    public  ResponseEntity<NotificationMessageModel> getMessageBodyContent(@PathVariable BigInteger id, Model model, HttpServletRequest request) {
+    public  ResponseEntity<NotificationMessageModel> getMessageBodyContent(@PathVariable BigInteger id, HttpServletRequest request) {
 
         APIUser apiUser = getUserFromToken(request);
         if (!apiUser.isValid()) {
@@ -220,6 +220,40 @@ public class MobileAppAPIMessagesController {
 
     }
 
+
+    @GetMapping("/readstate/read/{id}")
+    public ResponseEntity<SingleIntModel> setMessageReadById(@PathVariable BigInteger id, HttpServletRequest request) {
+
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new SingleIntModel(0), HttpStatus.FORBIDDEN);
+        }
+
+        Optional<NotificationMessage> notification = notificationMessageService.findById(id);
+        if (notification.isPresent()) {
+            notification.get().setRead(true);
+            notificationMessageService.save(notification.get());
+            return new ResponseEntity<>(new SingleIntModel(1), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(new SingleIntModel(0), HttpStatus.OK);
+    }
+
+    @GetMapping("/readstate/unread/{id}")
+    public ResponseEntity<SingleIntModel> setMessageUnreadById(@PathVariable BigInteger id, HttpServletRequest request) {
+
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new SingleIntModel(0), HttpStatus.FORBIDDEN);
+        }
+
+        Optional<NotificationMessage> notification = notificationMessageService.findById(id);
+        if (notification.isPresent()) {
+            notification.get().setRead(false);
+            notificationMessageService.save(notification.get());
+            return new ResponseEntity<>(new SingleIntModel(1), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(new SingleIntModel(0), HttpStatus.OK);
+    }
 
     private APIUser getUserFromToken(HttpServletRequest request) {
         final String authHeader = request.getHeader("Authorization");

@@ -19,9 +19,18 @@ export default class extends AbstractView {
         }
 
         let messageList = await getRemoteMessages(this.params.token, pRead, pSystem);
+
         let returnHTML = `<div class="list__group">
-                        <div class="list__group-item-grow title__module">Messages</div>
-                        <div class="list__group-item-right">`;
+                                <div class="list__group-item-grow title__module">Messages
+                            </div>
+                            <div class="list__group-item-right">
+                                <i id="tglNewMessage"
+                                    class="bi bi-envelope-plus color-msg selectableItem message-titleBtn" data-msg-tgl-new></i>
+                            </div></div>`;
+
+
+        returnHTML += `<div class="list__group">
+                        <div class="list__group-item-grow">`;
         if (pRead) {
             returnHTML += `<button id="tglUnread" class="btn btn-sm btn-msg" data-msg-tgl-read="true">Read</button>`;
         } else {
@@ -33,7 +42,13 @@ export default class extends AbstractView {
         } else {
             returnHTML += `<button id="tglSystem" class="btn btn-sm btn-outline-msg" data-msg-tgl-system="false">System</button>`;
         }
+        returnHTML += `&nbsp;`;
+        returnHTML += `<button id="tglDrafts" class="btn btn-sm btn-outline-wiki" data-msg-tgl-drafts="true">Drafts</button>`;
+        // returnHTML += `<button id="tglDrafts" class="btn btn-sm btn-wiki" data-msg-tgl-drafts="false">Drafts</button>`;
         returnHTML += `</div></div>`;
+
+
+
 
         this.setAppProgress(50);
         returnHTML += `<br>`;
@@ -108,10 +123,24 @@ async function showRemoteMessage(id, token) {
     dialog.innerHTML = returnHTML;
 
     document.getElementById("app").appendChild(dialog);
+
+    document.getElementById("btnViewerRead").addEventListener("click", (event) => {
+        event.preventDefault();
+        setMessageRead(id, token);
+        // document.getElementById("messageViewer").remove();
+    });
+    document.getElementById("btnViewerUnread").addEventListener("click", (event) => {
+        event.preventDefault();
+        setMessageUnread(id, token);
+        // document.getElementById("messageViewer").remove();
+    });
+
     document.getElementById("btnViewerClose").addEventListener("click", (event) => {
         event.preventDefault();
         document.getElementById("messageViewer").remove();
     });
+
+    let data = setMessageRead(id, token);
 
     dialog.showModal();
 }
@@ -130,7 +159,51 @@ async function getRemoteMessagesBody(id) {
     return await response.text();
 }
 
+async function setMessageRead(id, token) {
+    document.getElementById("btnViewerRead").style.display = 'none';
+    document.getElementById("btnViewerUnread").style.display = 'inline-block';
+
+    const response = await fetch('/api/v1/app/messages/readstate/read/'+id, {
+        headers: {
+            authorization: "Bearer "+token
+        }
+    });
+    let data = await response.json();
+
+    try {
+        let divID = "icnRead-"+id;
+        document.getElementById(divID).style.display = 'none';
+        return data.id;
+    } catch (e) {
+        console.log("error marking message read")
+        return 0;
+    }
+
+}
+
+async function setMessageUnread(id, token) {
+    document.getElementById("btnViewerUnread").style.display = 'none';
+    document.getElementById("btnViewerRead").style.display = 'inline-block';
+
+    const response = await fetch('/api/v1/app/messages/readstate/unread/'+id, {
+        headers: {
+            authorization: "Bearer "+token
+        }
+    });
+    let data = await response.json();
+
+    try {
+        let divID = "icnRead-"+id;
+        document.getElementById(divID).style.display = 'inline-block';
+        return data.id;
+    } catch (e) {
+        console.log("error marking message read")
+        return 0;
+    }
+}
+
 function htmlMessageLine(msg) {
+    let readIcon = "icnRead-"+msg.id;
     let r = "";
     r+=`<div class="list__item" data-msg-message="`+msg.id+`">`;
 
@@ -143,7 +216,16 @@ function htmlMessageLine(msg) {
     r+=`<div class="item-date" data-msg-message="`+msg.id+`">`+formatDate(msg.dateSent)+`</div>`;
 
     r+=`</div><div class="list__Item-line" data-msg-message="`+msg.id+`">`;
-    r+=`<div class="item-detail" data-msg-message="`+msg.id+`">`+msg.subject+`</div>`;
+    r+=`<div class="message__item-detail" data-msg-message="`+msg.id+`">`+msg.subject+`</div>`;
+    r+=`<div class="item-date" data-msg-message="`+msg.id+`">
+            <i id="`+readIcon+`" class="bi bi-envelope"`;
+    if (msg.read) {
+        r+=` style="display: none;"`;
+    } else {
+        r+=` style="display: inline-block;"`;
+    }
+    r+=`></i>
+        </div>`;
 
     r+=`</div></div>`;
 
@@ -177,7 +259,15 @@ function htmlMessage(msg, msgBody) {
 
     r+=`<div class="history-viewer__close">`;
     r+=`<div class="message__title">`+msg.subject+`</div>`;
-    r+=`<div class="request__item-field-right"><button id="btnViewerClose" class="btn btn-sm btn-outline-support">close</button></div>`;
+    r+=`<div class="request__item-field-right">
+            <button id="btnViewerRead" class="btn btn-sm btn-outline-msg">
+               <i class="bi bi-envelope-open selectableItem"></i>
+            </button>
+            <button id="btnViewerUnread" class="btn btn-sm btn-outline-msg">
+                <i class="bi bi-envelope message-button selectableItem"></i>
+            </button>
+            <button id="btnViewerClose" class="btn btn-sm btn-outline-msg">close</button>
+        </div>`;
     r+=`</div></div>`;
 
     return r;
