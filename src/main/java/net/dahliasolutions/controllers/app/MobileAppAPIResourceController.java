@@ -140,7 +140,7 @@ public class MobileAppAPIResourceController {
         // split folder and name
         String[] folderList = stringModel.name().split("/");
         String postURLName = folderList[folderList.length-1];
-        String postName = postURLName.replace("-", " ");
+        String postName = postURLName.replace("_", " ");
         String folders = "";
         WikiPost post = new WikiPost();
                 post.setPublished(false);

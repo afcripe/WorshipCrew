@@ -7,6 +7,7 @@ import net.dahliasolutions.models.*;
 import net.dahliasolutions.models.campus.Campus;
 import net.dahliasolutions.models.department.DepartmentRegional;
 import net.dahliasolutions.models.mail.MailerCustomMessage;
+import net.dahliasolutions.models.mail.MailerCustomMessageModel;
 import net.dahliasolutions.models.order.OrderItem;
 import net.dahliasolutions.models.order.OrderNote;
 import net.dahliasolutions.models.order.OrderRequest;
@@ -188,7 +189,7 @@ public class MobileAppAPIMessagesController {
     }
 
     @GetMapping("/message/{id}")
-    public  ResponseEntity<NotificationMessageModel> getMessageBodyContent(@PathVariable BigInteger id, HttpServletRequest request) {
+    public ResponseEntity<NotificationMessageModel> getMessageBodyContent(@PathVariable BigInteger id, HttpServletRequest request) {
 
         APIUser apiUser = getUserFromToken(request);
         if (!apiUser.isValid()) {
@@ -218,6 +219,25 @@ public class MobileAppAPIMessagesController {
         }
         return new ResponseEntity<>(messageModel, HttpStatus.OK);
 
+    }
+
+
+    @GetMapping("/draft/{id}")
+    public ResponseEntity<MailerCustomMessageModel> getDraftContent(@PathVariable BigInteger id, HttpServletRequest request) {
+
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new MailerCustomMessageModel(), HttpStatus.FORBIDDEN);
+        }
+
+        MailerCustomMessageModel messageModel;
+        Optional<MailerCustomMessage> message = mailerCustomMessageService.findById(id);
+        if (message.isPresent()) {
+            messageModel = mailerCustomMessageService.convertEntityToModel(message.get());
+        } else {
+            messageModel = new MailerCustomMessageModel(BigInteger.valueOf(0), "", true, "", apiUser.getUser().getId(), "", "");
+        }
+        return new ResponseEntity<>(messageModel, HttpStatus.OK);
     }
 
 

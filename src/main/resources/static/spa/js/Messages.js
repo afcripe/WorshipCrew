@@ -11,40 +11,51 @@ export default class extends AbstractView {
 
         let pRead = false;
         let pSystem = false;
+        let pDraft = false;
         if (!!this.params.readMessages) {
             pRead = this.params.readMessages === "true";
         }
         if (!!this.params.systemMessages) {
             pSystem = this.params.systemMessages === "true";
         }
+        if (!!this.params.draftMessages) {
+            pDraft = this.params.draftMessages === "true";
+        }
 
-        let messageList = await getRemoteMessages(this.params.token, pRead, pSystem);
+        let messageList = await getRemoteMessages(this.params.token, pRead, pSystem, pDraft);
 
         let returnHTML = `<div class="list__group">
                                 <div class="list__group-item-grow title__module">Messages
-                            </div>
-                            <div class="list__group-item-right">
-                                <i id="tglNewMessage"
-                                    class="bi bi-envelope-plus color-msg selectableItem message-titleBtn" data-msg-tgl-new></i>
-                            </div></div>`;
+                        </div>
+                        <div class="list__group-item-right">
+                            <i id="tglNewMessage"
+                            class="bi bi-envelope-plus color-msg selectableItem message-titleBtn" data-msg-draft="0"></i>
+                        </div></div>`;
 
 
         returnHTML += `<div class="list__group">
                         <div class="list__group-item-grow">`;
-        if (pRead) {
+        returnHTML += `<button id="tglInbox" class="btn btn-sm btn-outline-msg" data-msg-tgl-inbox>
+                            <i class="bi bi-envelope color-msg" data-msg-tgl-inbox></i>
+                        </button>`;
+        returnHTML += `&nbsp;`;
+        if (pRead && !pDraft) {
             returnHTML += `<button id="tglUnread" class="btn btn-sm btn-msg" data-msg-tgl-read="true">Read</button>`;
         } else {
             returnHTML += `<button id="tglUnread" class="btn btn-sm btn-outline-msg" data-msg-tgl-read="false">Read</button>`;
         }
         returnHTML += `&nbsp;`;
-        if (pSystem) {
+        if (pSystem && !pDraft) {
             returnHTML += `<button id="tglSystem" class="btn btn-sm btn-msg" data-msg-tgl-system="true">System</button>`;
         } else {
             returnHTML += `<button id="tglSystem" class="btn btn-sm btn-outline-msg" data-msg-tgl-system="false">System</button>`;
         }
         returnHTML += `&nbsp;`;
-        returnHTML += `<button id="tglDrafts" class="btn btn-sm btn-outline-wiki" data-msg-tgl-drafts="true">Drafts</button>`;
-        // returnHTML += `<button id="tglDrafts" class="btn btn-sm btn-wiki" data-msg-tgl-drafts="false">Drafts</button>`;
+        if (pDraft) {
+            returnHTML += `<button id="tglDrafts" class="btn btn-sm btn-wiki" data-msg-tgl-draft="true">Drafts</button>`;
+        } else {
+            returnHTML += `<button id="tglDrafts" class="btn btn-sm btn-outline-wiki" data-msg-tgl-draft="false">Drafts</button>`;
+        }
         returnHTML += `</div></div>`;
 
 
@@ -55,7 +66,11 @@ export default class extends AbstractView {
         if (messageList.length > 0) {
             for (let n in messageList) {
                 let msg = messageList[n];
-                returnHTML += htmlMessageLine(msg);
+                if (msg.fromUser === "(Draft)") {
+                    returnHTML += htmlDraftLine(msg);
+                } else {
+                    returnHTML += htmlMessageLine(msg);
+                }
             }
         }
 
@@ -89,7 +104,7 @@ function setAppProgress(prg) {
     }
 }
 
-async function getRemoteMessages(token, read, system) {
+async function getRemoteMessages(token, read, system, draft) {
     let msgParams = "";
     if (read) {
         msgParams.length>0 ? msgParams+="&" : msgParams+="?";
@@ -98,6 +113,10 @@ async function getRemoteMessages(token, read, system) {
     if (system) {
         msgParams.length>0 ? msgParams+="&" : msgParams+="?";
         msgParams += "system=true";
+    }
+    if (draft) {
+        msgParams.length>0 ? msgParams+="&" : msgParams+="?";
+        msgParams += "draft=true";
     }
 
     const response = await fetch('/api/v1/app/messages/listnew'+msgParams, {
@@ -218,13 +237,37 @@ function htmlMessageLine(msg) {
     r+=`</div><div class="list__Item-line" data-msg-message="`+msg.id+`">`;
     r+=`<div class="message__item-detail" data-msg-message="`+msg.id+`">`+msg.subject+`</div>`;
     r+=`<div class="item-date" data-msg-message="`+msg.id+`">
-            <i id="`+readIcon+`" class="bi bi-envelope"`;
+            <i id="`+readIcon+`" class="bi bi-envelope" data-msg-message="`+msg.id+`"`;
     if (msg.read) {
         r+=` style="display: none;"`;
     } else {
         r+=` style="display: inline-block;"`;
     }
     r+=`></i>
+        </div>`;
+
+    r+=`</div></div>`;
+
+    return r;
+}
+
+function htmlDraftLine(msg) {
+    let readIcon = "icnRead-"+msg.id;
+    let r = "";
+    r+=`<div class="list__item" data-msg-draft="`+msg.id+`">`;
+
+    r+=`<div class="list__Item-line" data-msg-draft="`+msg.id+`">`;
+
+    r+=`<div class="item-id" data-msg-draft="`+msg.id+`">`+msg.fromUser+`</div>`;
+
+    r+=`<div class="item-user" data-msg-draft="`+msg.id+`">&nbsp;</div>`;
+
+    r+=`<div class="item-date" data-msg-draft="`+msg.id+`">Not Sent</div>`;
+
+    r+=`</div><div class="list__Item-line" data-msg-draft="`+msg.id+`">`;
+    r+=`<div class="message__item-detail" data-msg-draft="`+msg.id+`">`+msg.subject+`</div>`;
+    r+=`<div class="item-date" data-msg-draft="`+msg.id+`">
+            <i id="`+readIcon+`" class="bi bi-envelope" style="display: none;" data-msg-draft="`+msg.id+`"></i>
         </div>`;
 
     r+=`</div></div>`;

@@ -102,7 +102,7 @@ public class EmailService implements EmailServiceInterface{
         try {
             message.setFrom(new InternetAddress(sender));
             message.setRecipients(MimeMessage.RecipientType.TO, emailDetails.getRecipient());
-            message.setSubject(emailDetails.getSubject());
+            message.setSubject("[no-reply] "+emailDetails.getSubject());
             // Set the email's content to be the HTML template
             message.setContent(templateEngine.process("mailer/mailWelcome", context), "text/html; charset=utf-8");
 
@@ -136,7 +136,7 @@ public class EmailService implements EmailServiceInterface{
         try {
             message.setFrom(new InternetAddress(sender));
             message.setRecipients(MimeMessage.RecipientType.TO, emailDetails.getRecipient());
-            message.setSubject(emailDetails.getSubject());
+            message.setSubject("[no-reply] "+emailDetails.getSubject());
             // Set the email's content to be the HTML template
             message.setContent(templateEngine.process("mailer/mailPasswordReset", context), "text/html; charset=utf-8");
 
@@ -169,7 +169,7 @@ public class EmailService implements EmailServiceInterface{
         try {
             message.setFrom(new InternetAddress(sender));
             message.setRecipients(MimeMessage.RecipientType.TO, emailDetails.getRecipient());
-            message.setSubject(emailDetails.getSubject());
+            message.setSubject("[no-reply] "+emailDetails.getSubject());
             // Set the email's content to be the HTML template
             message.setContent(templateEngine.process("mailer/mailUserRequest", context), "text/html; charset=utf-8");
 
@@ -198,7 +198,7 @@ public class EmailService implements EmailServiceInterface{
         try {
             message.setFrom(new InternetAddress(sender));
             message.setRecipients(MimeMessage.RecipientType.TO, emailDetails.getRecipient());
-            message.setSubject(emailDetails.getSubject());
+            message.setSubject("[no-reply] "+emailDetails.getSubject());
             // Set the email's content to be the HTML template
             message.setContent(templateEngine.process("mailer/mailSupervisorRequest", context), "text/html; charset=utf-8");
 
@@ -234,7 +234,7 @@ public class EmailService implements EmailServiceInterface{
         try {
             message.setFrom(new InternetAddress(sender));
             message.setRecipients(MimeMessage.RecipientType.TO, emailDetails.getRecipient());
-            message.setSubject(emailDetails.getSubject());
+            message.setSubject("[no-reply] "+emailDetails.getSubject());
             // Set the email's content to be the HTML template
             message.setContent(templateEngine.process("mailer/mailItemRequest", context), "text/html; charset=utf-8");
 
@@ -269,7 +269,7 @@ public class EmailService implements EmailServiceInterface{
         try {
             message.setFrom(new InternetAddress(sender));
             message.setRecipients(MimeMessage.RecipientType.TO, emailDetails.getRecipient());
-            message.setSubject(emailDetails.getSubject());
+            message.setSubject("[no-reply] "+emailDetails.getSubject());
             // Set the email's content to be the HTML template
             message.setContent(templateEngine.process("mailer/mailItemUpdate", context), "text/html; charset=utf-8");
 
@@ -297,7 +297,7 @@ public class EmailService implements EmailServiceInterface{
         try {
             message.setFrom(new InternetAddress(sender));
             message.setRecipients(MimeMessage.RecipientType.TO, emailDetails.getRecipient());
-            message.setSubject(emailDetails.getSubject());
+            message.setSubject("[no-reply] "+emailDetails.getSubject());
             // Set the email's content to be the HTML template
             message.setContent(templateEngine.process("mailer/mailUserTicket", context), "text/html; charset=utf-8");
 
@@ -327,7 +327,7 @@ public class EmailService implements EmailServiceInterface{
         try {
             message.setFrom(new InternetAddress(sender));
             message.setRecipients(MimeMessage.RecipientType.TO, emailDetails.getRecipient());
-            message.setSubject(emailDetails.getSubject());
+            message.setSubject("[no-reply] "+emailDetails.getSubject());
             // Set the email's content to be the HTML template
             message.setContent(templateEngine.process("mailer/mailAgentTicket", context), "text/html; charset=utf-8");
 
@@ -365,7 +365,7 @@ public class EmailService implements EmailServiceInterface{
         try {
             message.setFrom(new InternetAddress(sender));
             message.setRecipients(MimeMessage.RecipientType.TO, emailDetails.getRecipient());
-            message.setSubject(emailDetails.getSubject());
+            message.setSubject("[no-reply] "+emailDetails.getSubject());
             // Set the email's content to be the HTML template
             message.setContent(templateEngine.process("mailer/mailAgentListTicket", context), "text/html; charset=utf-8");
 
@@ -400,7 +400,7 @@ public class EmailService implements EmailServiceInterface{
         try {
             message.setFrom(new InternetAddress(sender));
             message.setRecipients(MimeMessage.RecipientType.TO, emailDetails.getRecipient());
-            message.setSubject(emailDetails.getSubject());
+            message.setSubject("[no-reply] "+emailDetails.getSubject());
             // Set the email's content to be the HTML template
             message.setContent(templateEngine.process("mailer/mailUserUpdateTicket", context), "text/html; charset=utf-8");
 
@@ -429,7 +429,7 @@ public class EmailService implements EmailServiceInterface{
         try {
             message.setFrom(new InternetAddress(sender));
             message.setRecipients(MimeMessage.RecipientType.TO, emailDetails.getRecipient());
-            message.setSubject(emailDetails.getSubject());
+            message.setSubject("[no-reply] "+emailDetails.getSubject());
             // Set the email's content to be the HTML template
             message.setContent(templateEngine.process("mailer/mailAgentUpdateTicket", context), "text/html; charset=utf-8");
 
@@ -456,7 +456,7 @@ public class EmailService implements EmailServiceInterface{
         try {
             message.setFrom(new InternetAddress(sender));
             message.setRecipients(MimeMessage.RecipientType.TO, emailDetails.getRecipient());
-            message.setSubject(emailDetails.getSubject());
+            message.setSubject("[no-reply] "+emailDetails.getSubject());
             // Set the email's content to be the HTML template
             message.setContent(templateEngine.process("mailer/mailNotification", context), "text/html; charset=utf-8");
 
@@ -484,7 +484,7 @@ public class EmailService implements EmailServiceInterface{
             try {
                 message.setFrom(new InternetAddress(sender));
                 message.setRecipients(MimeMessage.RecipientType.TO, emailDetails.getRecipient());
-                message.setSubject(emailDetails.getSubject());
+                message.setSubject("[no-reply] "+emailDetails.getSubject());
                 // Set the email's content to be the HTML template
                 message.setContent(templateEngine.process("mailer/mailCustomNotification", context), "text/html; charset=utf-8");
 
@@ -498,26 +498,4 @@ public class EmailService implements EmailServiceInterface{
         }
     }
 
-    @Override
-    public void sendStatement(User user) {
-
-        // set template variables
-        Context context = new Context();
-        context.setVariable("baseURL", appServer.getBaseURL());
-
-        // create mail message
-        MimeMessage message = javaMailSender.createMimeMessage();
-
-        try {
-            message.setFrom(new InternetAddress(sender));
-            message.setRecipients(MimeMessage.RecipientType.TO, user.getContactEmail());
-            message.setSubject("Volunteer Schedule");
-            // Set the email's content to be the HTML template
-            message.setContent(templateEngine.process("mailer/mailScheduleStatement", context), "text/html; charset=utf-8");
-
-            javaMailSender.send(message);
-        } catch (Exception e) {
-            System.out.println("error sending statement");
-        }
-    }
 }

@@ -16,6 +16,7 @@ import Users from "./Users.js";
 import UserView from "./UserView.js";
 import UserNew from "./UserNew.js";
 import Messages from "./Messages.js";
+import MessagesNew from "./MessagesNew.js";
 import SearchView from "./SearchView.js";
 
 import { postLogin, renewToken } from "./Login.js";
@@ -113,7 +114,8 @@ const router = async () => {
         { path: "/app/user/:id", view: UserView },
         { path: "/app/userNew", view: UserNew },
         { path: "/app/messages", view: Messages },
-        { path: "/app/messages/:readMessages/:systemMessages", view: Messages },
+        { path: "/app/messages/:readMessages/:systemMessages/:draftMessages", view: Messages },
+        { path: "/app/messagesNew/:id", view: MessagesNew },
         { path: "/app/settings", view: Settings }
     ];
 
@@ -785,6 +787,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if ( e.target.matches("[data-msg-message]")) {
             showRemoteMessage(e.target.dataset.msgMessage, token);
         }
+        if ( e.target.matches("[data-msg-draft]")) {
+            navigateTo("/app/messagesNew/"+e.target.dataset.msgDraft);
+        }
         if ( e.target.matches("[data-settings-logout]")) {
             localStorage.setItem("token", "");
             localStorage.setItem("firstName", "");
@@ -1038,17 +1043,30 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // messages
+        if ( e.target.matches("[data-msg-tgl-inbox]")) {
+            e.preventDefault();
+            navigateTo("/app/messages/false/false/false");
+        }
         if ( e.target.matches("[data-msg-tgl-read]")) {
             e.preventDefault();
             let pRead = e.target.dataset.msgTglRead !== "true";
             let pSystem = document.getElementById("tglSystem").dataset.msgTglSystem === "true";
-            navigateTo("/app/messages/"+pRead+"/"+pSystem);
+            let pDraft = "false";
+            navigateTo("/app/messages/"+pRead+"/"+pSystem+"/"+pDraft);
         }
         if ( e.target.matches("[data-msg-tgl-system]")) {
             e.preventDefault();
             let pRead = document.getElementById("tglUnread").dataset.msgTglRead === "true";
             let pSystem = e.target.dataset.msgTglSystem !== "true";
-            navigateTo("/app/messages/"+pRead+"/"+pSystem);
+            let pDraft = "false";
+            navigateTo("/app/messages/"+pRead+"/"+pSystem+"/"+pDraft);
+        }
+        if ( e.target.matches("[data-msg-tgl-draft]")) {
+            e.preventDefault();
+            let pRead = document.getElementById("tglUnread").dataset.msgTglRead === "true";
+            let pSystem = document.getElementById("tglSystem").dataset.msgTglSystem === "true";
+            let pDraft = e.target.dataset.msgTglDraft !== "true";
+            navigateTo("/app/messages/"+pRead+"/"+pSystem+"/"+pDraft);
         }
 
         // settings
