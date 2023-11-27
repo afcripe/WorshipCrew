@@ -2,6 +2,7 @@ package net.dahliasolutions.controllers.store;
 
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.*;
+import net.dahliasolutions.models.department.DepartmentRegional;
 import net.dahliasolutions.models.mail.EmailDetails;
 import net.dahliasolutions.models.order.OrderItem;
 import net.dahliasolutions.models.order.OrderRequest;
@@ -11,6 +12,7 @@ import net.dahliasolutions.models.records.SingleStringModel;
 import net.dahliasolutions.models.store.*;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.services.EventService;
+import net.dahliasolutions.services.department.DepartmentRegionalService;
 import net.dahliasolutions.services.mail.EmailService;
 import net.dahliasolutions.services.mail.NotificationMessageService;
 import net.dahliasolutions.services.order.OrderService;
@@ -40,6 +42,7 @@ public class CartAPIController {
     private final NotificationMessageService messageService;
     private final StoreSettingService storeSettingService;
     private final EventService eventService;
+    private final DepartmentRegionalService departmentRegionalService;
 
     @GetMapping("{id}")
     public Cart getCart(@PathVariable BigInteger id) {
@@ -134,7 +137,8 @@ public class CartAPIController {
     public SingleBigIntegerModel placeOrder(@ModelAttribute BigIntegerStringModel cartModel) {
         Cart cart = cartService.findById(cartModel.id());
         Optional<User> user = userService.findById(cart.getId());
-        User fulfillmentAgent;
+        User fulfillmentAgent = null;
+        boolean splitOrder = false;
 
         String reasonForRequest = "None Given";
         if (cartModel.name() != null) {
@@ -160,17 +164,62 @@ public class CartAPIController {
             case CampusDirector:
                 fulfillmentAgent = userService.findById(user.get().getCampus().getDirectorId()).get();
                 break;
+            case ItemDepartmentDirector:
+                splitOrder = true;
+                break;
             default:
                 fulfillmentAgent = user.get().getDirector();
                 break;
         }
 
-        // create order
-        OrderRequest orderRequest = orderService.createOrder(cart);
-        orderRequest.setRequestNote(reasonForRequest);
-        orderRequest.setSupervisor(fulfillmentAgent);
+        // creat list of orders to place
+        List<OrderRequest> orderRequests = new ArrayList<>();
 
-        for (CartItem item : cart.getCartItems()) {
+        // decide if we need to split up the order
+        if (splitOrder) {
+            // list departments
+            List<DepartmentRegional> departmentRegionalList = departmentRegionalService.findAll();
+            // find items for each department
+            for (DepartmentRegional dep : departmentRegionalService.findAll()) {
+                // create new order for each found department
+                List<CartItem> depItems = cartItemService.findAllByCartAndAndDepartment(cart, dep);
+                if (!depItems.isEmpty()) {
+                    OrderRequest orderRequest = orderService.createOrder(cart);
+                    orderRequest.setRequestNote(reasonForRequest);
+                    orderRequest.setSupervisor(userService.findById(dep.getDirectorId()).orElse(null));
+                    // add order items from depItems
+                    for (CartItem item : depItems) {
+                        OrderItem orderItem = new OrderItem(
+                                null,
+                                item.getProductId(),
+                                item.getProductName(),
+                                item.getDetails(),
+                                item.getCount(),
+                                item.isSpecialOrder(),
+                                item.isAvailable(),
+                                item.getLeadTime(),
+                                orderRequest.getRequestDate(),
+                                item.getDepartment(),
+                                orderRequest.getOrderStatus(),
+                                orderRequest.getSupervisor(),
+                                item.getImage(),
+                                orderRequest
+                        );
+                        orderRequest.getRequestItems().add(orderItem);
+                    }
+                    // save request
+                    orderRequest = orderService.save(orderRequest);
+                    // add orderRequest to orders Array
+                    orderRequests.add(orderRequest);
+                }
+            }
+        } else {
+            // create order for all items
+            OrderRequest orderRequest = orderService.createOrder(cart);
+            orderRequest.setRequestNote(reasonForRequest);
+            orderRequest.setSupervisor(fulfillmentAgent);
+
+            for (CartItem item : cart.getCartItems()) {
                 OrderItem orderItem = new OrderItem(
                         null,
                         item.getProductId(),
@@ -187,58 +236,54 @@ public class CartAPIController {
                         item.getImage(),
                         orderRequest
                 );
-            orderRequest.getRequestItems().add(orderItem);
+                orderRequest.getRequestItems().add(orderItem);
+            }
+            // save request
+            orderRequest = orderService.save(orderRequest);
+            // add orderRequest to orders Array
+            orderRequests.add(orderRequest);
         }
-        orderService.save(orderRequest);
 
-        // E-mail User
-        EmailDetails emailDetailsUser =
-                new EmailDetails(BigInteger.valueOf(0), user.get().getContactEmail(),"Your Request", "", null );
-        BrowserMessage returnMsg = emailService.sendUserRequest(emailDetailsUser, orderRequest);
+        // loop through orders and send
+        for (OrderRequest req : orderRequests) {
+            // E-mail User
+            EmailDetails emailDetailsUser =
+                    new EmailDetails(BigInteger.valueOf(0), user.get().getContactEmail(), "Your Request", "", null);
+            BrowserMessage returnMsg = emailService.sendUserRequest(emailDetailsUser, req);
 
-        // Notify supervisor
-        NotificationMessage returnMsg2 = messageService.createMessage(
-                new NotificationMessage(
-                        null,
-                        "A New Request",
-                        orderRequest.getId().toString(),
-                        BigInteger.valueOf(0),
-                        null,
-                        false,
-                        false,
-                        null,
-                        false,
-                        BigInteger.valueOf(0),
-                        EventModule.Request,
-                        EventType.New,
-                        orderRequest.getSupervisor(),
-                        BigInteger.valueOf(0)
-                ));
+            // Notify supervisor
+            NotificationMessage returnMsg2 = messageService.createMessage(
+                    new NotificationMessage(
+                            null,
+                            "A New Request",
+                            req.getId().toString(),
+                            BigInteger.valueOf(0),
+                            null,
+                            false,
+                            false,
+                            null,
+                            false,
+                            BigInteger.valueOf(0),
+                            EventModule.Request,
+                            EventType.New,
+                            req.getSupervisor(),
+                            BigInteger.valueOf(0)
+                    ));
 
-//        EmailDetails emailDetailsSupervisor =
-//                new EmailDetails(orderRequest.getSupervisor().getContactEmail(),"A New Request", "", null );
-//        BrowserMessage returnMsg2 = emailService.sendSupervisorRequest(emailDetailsSupervisor, orderRequest, orderRequest.getSupervisor().getId());
+            // send any additional notifications
+            AppEvent notifyEvent = eventService.createEvent(new AppEvent(
+                    null,
+                    "New Request",
+                    "A new request has been placed by " + user.get().getFullName(),
+                    req.getId().toString(),
+                    EventModule.Request,
+                    EventType.New,
+                    new ArrayList<>()
+            ));
+        }
 
-        // send any additional notifications
-        AppEvent notifyEvent = eventService.createEvent(new AppEvent(
-                null,
-                "New Request",
-                "A new request has been placed by "+user.get().getFullName(),
-                orderRequest.getId().toString(),
-                EventModule.Request,
-                EventType.New,
-                new ArrayList<>()
-        ));
-
-//        String userFullName = user.get().getFirstName()+" "+user.get().getLastName();
-//        String eventName = "A New Request by "+userFullName;
-//        String superFullName = orderRequest.getSupervisor().getFirstName()+" "+orderRequest.getSupervisor().getLastName();
-//        String eventDesc = "A New Request has been placed by "+userFullName+
-//                ", and sent to "+superFullName+" for fulfillment";
-//        AppEvent e = new AppEvent(null, eventName, eventDesc, orderRequest.getId().toString(), "", EventModule.Request, EventType.New);
-//        eventService.dispatchEvent(e);
-
+        // empty the cart
         cartService.emptyCart(cartModel.id());
-        return new SingleBigIntegerModel(orderRequest.getId());
+        return new SingleBigIntegerModel(orderRequests.get(0).getId());
     }
 }

@@ -6,4 +6,5 @@ public enum RequestNotifyTarget {
     CampusDepartmentDirector,
     CampusDirector,
     Supervisor,
+    ItemDepartmentDirector
 }
