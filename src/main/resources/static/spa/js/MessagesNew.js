@@ -52,6 +52,38 @@ async function getRemoteDraftById(id, token) {
     return await response.json();
 }
 
+
+async function showRemoteTo(token) {
+    let groups = await getRemoteGroupList(token);
+    let returnHTML = htmlToGroup(groups);
+    returnHTML = returnHTML.replaceAll("\n","");
+
+    let dialog=document.createElement("dialog");
+    dialog.id="messageToViewer";
+    dialog.classList.add("history-viewer__dialog");
+
+    dialog.innerHTML = returnHTML;
+
+    document.getElementById("app").appendChild(dialog);
+
+    document.getElementById("btnViewerClose").addEventListener("click", (event) => {
+        event.preventDefault();
+        document.getElementById("messageToViewer").remove();
+    });
+
+    dialog.showModal();
+}
+
+async function getRemoteGroupList(token) {
+    const response = await fetch('/api/v1/app/messages/grouplist', {
+        headers: {
+            authorization: "Bearer "+token
+        }
+    });
+    return await response.json();
+}
+
+
 function htmlMessage(msg) {
     let r=`<div class="list__group"><div class="list__group-item-grow">`;
     r+=`<button id="tglDrafts" class="btn btn-sm btn-wiki" data-msg-tgl-inbox>Save</button>`;
@@ -83,6 +115,32 @@ function htmlMessage(msg) {
     return r;
 }
 
+function htmlToGroup(groups) {
+    let r=`<div class="history-viewer__div"><div class="history-viewer__content">`;
+
+    r+=`<div class="form-group-col">`;
+    r+=`<label>Group</label>`;
+    r+=`<select id="toGroup" class="form-control">`;
+    r+=`<option value="0" selected>Select Group</option>`;
+    for (let g in groups) {
+        let grp = groups[g]
+        r+=`<option value="`+grp+`">`+grp+`</option>`;
+    }
+    r+=`</select>`;
+    r+=`</div>`;
+
+    r+=`</div></div>`;
+
+    r+=`<div class="history-viewer__close">`;
+    r+=`<div class="message__title">To:</div>`;
+    r+=`<div class="request__item-field-right">
+            <button id="btnViewerClose" class="btn btn-sm btn-outline-msg">close</button>
+        </div>`;
+    r+=`</div></div>`;
+
+    return r;
+}
+
 function formatDate(dte) {
     if (dte === null) { return "Sending..."; }
     let strDate = dte.split("T")[0];
@@ -92,4 +150,4 @@ function formatDate(dte) {
     return strDate + " " + partTime[0] + ":" + partTime[1];
 }
 
-export {  }
+export { showRemoteTo }

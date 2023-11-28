@@ -5,6 +5,7 @@ import net.dahliasolutions.models.*;
 import net.dahliasolutions.models.department.DepartmentRegional;
 import net.dahliasolutions.models.mail.EmailDetails;
 import net.dahliasolutions.models.order.OrderItem;
+import net.dahliasolutions.models.order.OrderNote;
 import net.dahliasolutions.models.order.OrderRequest;
 import net.dahliasolutions.models.records.BigIntegerStringModel;
 import net.dahliasolutions.models.records.SingleBigIntegerModel;
@@ -15,6 +16,7 @@ import net.dahliasolutions.services.EventService;
 import net.dahliasolutions.services.department.DepartmentRegionalService;
 import net.dahliasolutions.services.mail.EmailService;
 import net.dahliasolutions.services.mail.NotificationMessageService;
+import net.dahliasolutions.services.order.OrderNoteService;
 import net.dahliasolutions.services.order.OrderService;
 import net.dahliasolutions.services.store.CartItemService;
 import net.dahliasolutions.services.store.CartService;
@@ -43,6 +45,7 @@ public class CartAPIController {
     private final StoreSettingService storeSettingService;
     private final EventService eventService;
     private final DepartmentRegionalService departmentRegionalService;
+    private final OrderNoteService orderNoteService;
 
     @GetMapping("{id}")
     public Cart getCart(@PathVariable BigInteger id) {
@@ -280,10 +283,49 @@ public class CartAPIController {
                     EventType.New,
                     new ArrayList<>()
             ));
+
+            // add user supervisor if necessary
+            includeSupervisor(req);
         }
 
         // empty the cart
         cartService.emptyCart(cartModel.id());
         return new SingleBigIntegerModel(orderRequests.get(0).getId());
+    }
+
+    private void includeSupervisor(OrderRequest orderRequest) {
+        User newSuper = orderRequest.getUser().getDirector();
+        String noteDetail = newSuper.getLastName()+" was add to the request.";
+
+        // check if user super is not order super
+        if (!orderRequest.getSupervisor().getId().equals(newSuper.getId())) {
+            List<User> superList = orderRequest.getSupervisorList();
+            // check if super is not in superList
+            if (!superList.contains(newSuper)) {
+                // add super to oser superList and save
+                superList.add(newSuper);
+                orderRequest.setSupervisorList(superList);
+                orderService.save(orderRequest);
+                // create note for notification
+                orderNoteService.createOrderNote(new OrderNote(
+                        null,
+                        orderRequest.getId(),
+                        null,
+                        noteDetail,
+                        BigInteger.valueOf(0),
+                        orderRequest.getOrderStatus(),
+                        newSuper));
+                // send any additional notifications
+                AppEvent notifyEvent = eventService.createEvent(new AppEvent(
+                        null,
+                        newSuper.getFullName()+" was added to Request "+orderRequest.getId(),
+                        newSuper.getFullName()+" has been added to Request "+orderRequest.getId()+".",
+                        orderRequest.getId().toString(),
+                        EventModule.Request,
+                        EventType.Updated,
+                        new ArrayList<>()
+                ));
+            }
+        }
     }
 }

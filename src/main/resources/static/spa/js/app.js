@@ -29,6 +29,7 @@ import { updateRequest, updateRequestItem, showRequestHistory, updateSupervisor,
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
 import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-messaging.js";
 import { showRemoteMessage } from "./Messages.js";
+import { showRemoteTo } from "./MessagesNew.js";
 
 let appTheme = "dark";
 let username = "";
@@ -465,6 +466,9 @@ const postUserNew = async (id) => {
     } else {
         navigateTo("/app/user/" + theNewUser.id);
     }
+}
+const msgDraftTo = async () => {
+    await showRemoteTo(token);
 }
 
 
@@ -1067,6 +1071,10 @@ document.addEventListener("DOMContentLoaded", () => {
             let pSystem = document.getElementById("tglSystem").dataset.msgTglSystem === "true";
             let pDraft = e.target.dataset.msgTglDraft !== "true";
             navigateTo("/app/messages/"+pRead+"/"+pSystem+"/"+pDraft);
+        }
+        if ( e.target.matches("[data-draft-to]")) {
+            e.preventDefault();
+            msgDraftTo();
         }
 
         // settings

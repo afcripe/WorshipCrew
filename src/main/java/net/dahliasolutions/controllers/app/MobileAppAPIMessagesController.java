@@ -275,6 +275,17 @@ public class MobileAppAPIMessagesController {
         return new ResponseEntity<>(new SingleIntModel(0), HttpStatus.OK);
     }
 
+    @GetMapping("/grouplist")
+    public ResponseEntity<List<String>> getGrouList(HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
+        }
+        return new ResponseEntity<>(permissionList(apiUser.getUser()), HttpStatus.OK);
+
+    }
+
+
     private APIUser getUserFromToken(HttpServletRequest request) {
         final String authHeader = request.getHeader("Authorization");
         final String token;
@@ -292,6 +303,59 @@ public class MobileAppAPIMessagesController {
             }
         }
         return new APIUser(false, new User());
+    }
+
+    private List<String> permissionList(User currentUser) {
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+
+        List<String> permList = new ArrayList<>();
+        permList.add("All Users");
+
+        for (UserRoles role : roles) {
+            if (role.getName().equals("CAMPUS_WRITE") || role.getName().equals("CAMPUS_READ")
+                    || role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_SUPERVISOR")) {
+                if (!permList.contains("Campus Users")) { permList.add("Campus Users"); }
+                if (!permList.contains("Campus Department Directors")) { permList.add("Campus Department Directors"); }
+            }
+            if (role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")
+                    || role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_SUPERVISOR")) {
+                if (!permList.contains("Department Users")) { permList.add("Department Users"); }
+                if (!permList.contains("Campus Department Directors")) {permList.add("Campus Department Directors");}
+            }
+            if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_SUPERVISOR")) {
+                if (!permList.contains("Campus Directors")) { permList.add("Campus Directors"); }
+                if (!permList.contains("Campus Directors")) { permList.add("Campus Directors"); }
+            }
+
+            /*
+
+            if (role.getName().equals("USER_WRITE") || role.getName().equals("USER_READ")
+                    || role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_SUPERVISOR")) {
+                permList.add("NA");
+            }
+
+                select Individuals
+
+                campus department users
+
+                campus
+                    campus users
+                    campus department users
+                    campus department Directors
+
+                department
+                    department users
+                    department campus users
+                    department campus Directors
+
+                campus leads
+                department lead
+                all users
+
+             */
+
+        }
+        return permList;
     }
 
 }
