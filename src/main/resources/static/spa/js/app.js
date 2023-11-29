@@ -29,7 +29,7 @@ import { updateRequest, updateRequestItem, showRequestHistory, updateSupervisor,
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
 import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-messaging.js";
 import { showRemoteMessage } from "./Messages.js";
-import { showRemoteTo } from "./MessagesNew.js";
+import { showRemoteTo, saveRemoteDraftById, sendRemoteDraftById, deleteRemoteDraftById } from "./MessagesNew.js";
 
 let appTheme = "dark";
 let username = "";
@@ -469,6 +469,18 @@ const postUserNew = async (id) => {
 }
 const msgDraftTo = async () => {
     await showRemoteTo(token);
+}
+const msgDraftSave = async (id) => {
+    await saveRemoteDraftById(id, token);
+}
+const msgDraftSend = async (id) => {
+    let sentMessage = await sendRemoteDraftById(id, token);
+    navigateTo("/app/messages/false/false/true");
+}
+const msgDraftDelete = async (id) => {
+    debugger
+    let deletedMessage = await deleteRemoteDraftById(id, token);
+    navigateTo("/app/messages/false/false/true");
 }
 
 
@@ -1075,6 +1087,22 @@ document.addEventListener("DOMContentLoaded", () => {
         if ( e.target.matches("[data-draft-to]")) {
             e.preventDefault();
             msgDraftTo();
+        }
+        if ( e.target.matches("[data-msg-save]")) {
+            e.preventDefault();
+            msgDraftSave(e.target.dataset.msgSave);
+        }
+        if ( e.target.matches("[data-msg-send]")) {
+            e.preventDefault();
+            msgDraftSend(e.target.dataset.msgSend);
+        }
+        if ( e.target.matches("[data-msg-delete]")) {
+            e.preventDefault();
+            msgDraftDelete(e.target.dataset.msgDelete);
+        }
+        if ( e.target.matches("[data-msg-drafts]")) {
+            e.preventDefault();
+            navigateTo("/app/messages/false/false/true");
         }
 
         // settings

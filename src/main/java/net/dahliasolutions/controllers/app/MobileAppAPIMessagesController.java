@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import net.dahliasolutions.models.*;
 import net.dahliasolutions.models.campus.Campus;
+import net.dahliasolutions.models.department.DepartmentCampus;
 import net.dahliasolutions.models.department.DepartmentRegional;
 import net.dahliasolutions.models.mail.MailerCustomMessage;
 import net.dahliasolutions.models.mail.MailerCustomMessageModel;
@@ -15,6 +16,7 @@ import net.dahliasolutions.models.records.*;
 import net.dahliasolutions.models.support.*;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
+import net.dahliasolutions.models.user.UserSelectedModel;
 import net.dahliasolutions.services.JwtService;
 import net.dahliasolutions.services.campus.CampusService;
 import net.dahliasolutions.services.department.DepartmentCampusService;
@@ -26,6 +28,7 @@ import net.dahliasolutions.services.user.UserRolesService;
 import net.dahliasolutions.services.user.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -282,7 +285,246 @@ public class MobileAppAPIMessagesController {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
         }
         return new ResponseEntity<>(permissionList(apiUser.getUser()), HttpStatus.OK);
+    }
 
+    @GetMapping("/campuslist")
+    public ResponseEntity<List<String>> getMessageListCampus(HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
+        }
+
+        List<String> returnList = new ArrayList<>();
+
+        List<Campus> campuses = campusList(apiUser.getUser());
+        if (campuses.size()>1) { returnList.add("All");}
+
+        for (Campus campus : campuses) {
+            returnList.add(campus.getName());
+        }
+        return new ResponseEntity<>(returnList, HttpStatus.OK);
+    }
+
+    @GetMapping("/departmentlist")
+    public ResponseEntity<List<String>> getMessageListDepartment(HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
+        }
+        List<String> returnList = new ArrayList<>();
+
+        List<DepartmentRegional> departments = departmentList(apiUser.getUser());
+        if (departments.size()>1) { returnList.add("All");}
+
+        for (DepartmentRegional department : departments) {
+            returnList.add(department.getName());
+        }
+        return new ResponseEntity<>(returnList, HttpStatus.OK);
+    }
+
+    @PostMapping("/userlist/{id}")
+    public ResponseEntity<List<UserSelectedModel>> getUserList(@PathVariable BigInteger id, @ModelAttribute UserListFilterModel listFilter,HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
+        }
+
+        List<User> currentToUsers = new ArrayList<>();
+        Optional<MailerCustomMessage> message = mailerCustomMessageService.findById(id);
+        if (message.isPresent()) {
+            currentToUsers = message.get().getToUsers();
+        }
+
+        List<Campus> campusList = new ArrayList<>();
+        List<DepartmentRegional> departmentList = new ArrayList<>();
+        List<User> users = new ArrayList<>();
+        // get requested campuses
+        if (!listFilter.campus().equals("")) {
+            List<String> cItems = Arrays.asList(listFilter.campus().split("\s"));
+            if (cItems.contains("All")) {
+                campusList = campusService.findAll();
+            } else {
+                for (String s : cItems) {
+                    if (!s.equals("")) {
+                        try {
+                            Optional<Campus> c = campusService.findByName(s);
+                            if (c.isPresent()) {
+                                campusList.add(c.get());
+                            }
+                        } catch (Error e) {
+                            System.out.println(e);
+                        }
+                    }
+                }
+            }
+        }
+        // get requested departments
+        if (!listFilter.department().equals("")) {
+            List<String> dItems = Arrays.asList(listFilter.department().split("\s"));
+            if (dItems.contains("All")) {
+                departmentList = departmentRegionalService.findAll();
+            } else {
+                for (String s : dItems) {
+                    if (!s.equals("")) {
+                        try {
+                            Optional<DepartmentRegional> d = departmentRegionalService.findByName(s);
+                            if (d.isPresent()) {
+                                departmentList.add(d.get());
+                            }
+                        } catch (Error e) {
+                            System.out.println(e);
+                        }
+                    }
+                }
+            }
+        }
+
+        List<User> cUsers = new ArrayList<>();
+        List<User> dUsers = new ArrayList<>();
+
+        switch (listFilter.listType()) {
+            case "Campus Users":
+                for (Campus campus : campusList) {
+                    // Select all for campuses
+                    cUsers = userService.findAllByCampus(campus);
+                    for (User user : cUsers) {
+                        if (!dUsers.contains(user)) { dUsers.add(user);}
+                    }
+                    // filter for departments
+                    for (User user : dUsers) {
+                        if (!users.contains(user)
+                                && departmentList.contains(user.getDepartment().getRegionalDepartment())) {
+                            users.add(user);
+                        }
+                    }
+                }
+                break;
+            case "Department Users":
+                for (DepartmentRegional department : departmentList) {
+                    // Select all for department
+                    dUsers = userService.findAllByDepartment(department);
+                    for (User user : dUsers) {
+                        if (!cUsers.contains(user)) { cUsers.add(user);}
+                    }
+                    // filter for campus
+                    for (User user : cUsers) {
+                        if (!users.contains(user)
+                                && campusList.contains(user.getCampus())) {
+                            users.add(user);
+                        }
+                    }
+                }
+                break;
+            case "Campus Department Directors":
+                for (Campus campus : campusList) {
+                    // Select departments for campuses
+                    List<DepartmentCampus> campusDepartments = departmentCampusService.findAllByCampus(campus);
+                    for (DepartmentCampus dc : campusDepartments) {
+                        if (departmentList.contains(dc.getRegionalDepartment())) {
+                            Optional<User> dir = userService.findById(dc.getRegionalDepartment().getDirectorId());
+                            if (dir.isPresent()) {
+                                if (!users.contains(dir.get())) { users.add(dir.get());}
+                            }
+
+                        }
+                    }
+                }
+                break;
+            case "Campus Directors":
+                for (Campus campus : campusList) {
+                    // Select directors for campuses
+                    Optional<User> dir = userService.findById(campus.getDirectorId());
+                    if (dir.isPresent()) {
+                        if (!users.contains(dir.get())) {users.add(dir.get());}
+                    }
+                }
+                break;
+            case "Regional Department Directors":
+                for (DepartmentRegional department : departmentList) {
+                    // Select directors for department
+                    Optional<User> dir = userService.findById(department.getDirectorId());
+                    if (dir.isPresent()) {
+                        if (!users.contains(dir.get())) {users.add(dir.get());}
+                    }
+                }
+                break;
+            case "All Users":
+                users = userList(apiUser.getUser());
+        }
+
+        List<UserSelectedModel> selectUsers = new ArrayList<>();
+        if (users.size()>1) {
+            selectUsers.add(new UserSelectedModel(BigInteger.valueOf(0), "All", false));
+        }
+        for (User user : users) {
+            UserSelectedModel tempUser = new UserSelectedModel(user.getId(), user.getFullName(), false);
+            if (currentToUsers.contains(user)) {
+                tempUser.setSelected(true);
+            }
+            selectUsers.add(tempUser);
+        }
+        return new ResponseEntity<>(selectUsers, HttpStatus.OK);
+    }
+
+
+    @PostMapping("/save")
+    public ResponseEntity<SingleBigIntegerModel> saveDraft(@ModelAttribute MailerCustomMessageModel messageModel, HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new SingleBigIntegerModel(BigInteger.valueOf(0)), HttpStatus.FORBIDDEN);
+        }
+        // convert model to entity
+        MailerCustomMessage message = mailerCustomMessageService.convertModelToEntity(messageModel);
+        // save message
+        return new ResponseEntity<>(new SingleBigIntegerModel(mailerCustomMessageService.save(message).getId()), HttpStatus.OK);
+    }
+
+    @PostMapping("/delete")
+    public ResponseEntity<SingleBigIntegerModel> deleteDraft(@ModelAttribute SingleBigIntegerModel messageModel, HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new SingleBigIntegerModel(BigInteger.valueOf(0)), HttpStatus.FORBIDDEN);
+        }
+        mailerCustomMessageService.deleteById(messageModel.id());
+        return new ResponseEntity<>(messageModel, HttpStatus.OK);
+    }
+
+    @PostMapping("/send")
+    public ResponseEntity<SingleBigIntegerModel> sendMessage(@ModelAttribute MailerCustomMessageModel messageModel, HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new SingleBigIntegerModel(BigInteger.valueOf(0)), HttpStatus.FORBIDDEN);
+        }
+        // convert model to entity and save
+        MailerCustomMessage message = mailerCustomMessageService.convertModelToEntity(messageModel);
+        message = mailerCustomMessageService.save(message);
+
+        // loop over to users and send message
+        for (User user : message.getToUsers()) {
+            NotificationMessage returnMsg = notificationMessageService.createMessage(
+                    new NotificationMessage(
+                            null,
+                            message.getSubject(),
+                            "0",
+                            BigInteger.valueOf(0),
+                            null,
+                            false,
+                            false,
+                            null,
+                            false,
+                            message.getUser().getId(),
+                            EventModule.Messaging,
+                            EventType.Custom,
+                            user,
+                            message.getId()
+                    ));
+        }
+
+        // remove draft designation
+        message.setDraft(false);
+
+        // return id
+        return new ResponseEntity<>(new SingleBigIntegerModel(mailerCustomMessageService.save(message).getId()), HttpStatus.OK);
     }
 
 
@@ -356,6 +598,96 @@ public class MobileAppAPIMessagesController {
 
         }
         return permList;
+    }
+    private List<Campus> campusList(User currentUser) {
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+        List<Campus> campuses = new ArrayList<>();
+        int priority = 0;
+        for (UserRoles role : roles) {
+            if (role.getName().equals("USER_WRITE") || role.getName().equals("USER_READ")
+                    || role.getName().equals("CAMPUS_WRITE") || role.getName().equals("CAMPUS_READ")) {
+                if (priority < 2) {
+                    campuses.add(currentUser.getCampus());
+                    priority = 2;
+                }
+            } else if (role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")
+                    || role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_SUPERVISOR")) {
+                if (priority < 4) {
+                    campuses = campusService.findAll();
+                    priority = 4;
+                }
+            }
+        }
+        return campuses;
+    }
+    private List<DepartmentRegional> departmentList(User currentUser) {
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+        List<DepartmentRegional> departments = new ArrayList<>();
+        int priority = 0;
+        for (UserRoles role : roles) {
+            if (role.getName().equals("USER_WRITE") || role.getName().equals("USER_READ")
+                    || role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")) {
+                if (priority < 2) {
+                    departments.add(currentUser.getDepartment().getRegionalDepartment());
+                    priority = 2;
+                }
+            } else if (role.getName().equals("CAMPUS_WRITE") || role.getName().equals("CAMPUS_READ")
+                    || role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_SUPERVISOR")) {
+                if (priority < 4) {
+                    departments = departmentRegionalService.findAll();
+                    priority = 4;
+                }
+            }
+        }
+        return departments;
+    }
+
+    private String permissionType(User currentUser) {
+        Collection<UserRoles> roles = currentUser.getUserRoles();
+        String typeString = "Campus Users";
+        int priority = 0;
+        for (UserRoles role : roles) {
+            if (role.getName().equals("USER_WRITE") || role.getName().equals("USER_READ")) {
+                if (priority < 1) {
+                    typeString = "Campus Department Users";
+                    priority = 1;
+                }
+            } else if (role.getName().equals("CAMPUS_WRITE") || role.getName().equals("CAMPUS_READ")) {
+                if (priority < 2) {
+                    typeString = "Campus Users";
+                    priority = 2;
+                }
+            }   else if (role.getName().equals("DIRECTOR_WRITE") || role.getName().equals("DIRECTOR_READ")) {
+                if (priority < 3) {
+                    typeString = "Department Users";
+                    priority = 3;
+                }
+            } else if (role.getName().equals("ADMIN_WRITE") || role.getName().equals("USER_SUPERVISOR")) {
+                if (priority < 4) {
+                    typeString = "All Users";
+                    priority = 4;
+                }
+            }
+        }
+        return typeString;
+    }
+    private List<User> userList(User currentUser) {
+        String permission = permissionType(currentUser);
+        List<User> userList;
+        switch (permission){
+            case "All Users":
+                userList = userService.findAll();
+                break;
+            case "Department Users":
+                userList = userService.findAllByDepartmentAndDeleted(currentUser.getDepartment().getRegionalDepartment(), false);
+                break;
+            case "Campus Users":
+                userList = userService.findAllByCampus(currentUser.getCampus());
+                break;
+            default:
+                userList = userService.findAllByDepartmentCampus(currentUser.getDepartment());
+        }
+        return userList;
     }
 
 }

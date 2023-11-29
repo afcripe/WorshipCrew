@@ -160,7 +160,6 @@ public class MessagingAPIController {
 
     @PostMapping("/userlist/{id}")
     public List<UserSelectedModel> getMessageListUsers(@PathVariable BigInteger id, @ModelAttribute UserListFilterModel listFilter) {
-        System.out.println(listFilter);
         User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         List<User> currentToUsers = new ArrayList<>();
