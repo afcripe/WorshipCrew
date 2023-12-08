@@ -10,7 +10,7 @@
     </parent>
     <groupId>net.dahliasolutions</groupId>
     <artifactId>WorshipCrew</artifactId>
-    <version>0.2.0</version>
+    <version>0.2.4</version>
     <name>WorshipCrew</name>
     <description>Worship Crew Web App</description>
     <properties>
@@ -100,6 +100,15 @@
             <groupId>com.google.firebase</groupId>
             <artifactId>firebase-admin</artifactId>
             <version>9.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.integration</groupId>
+            <artifactId>spring-integration-mail</artifactId>
+            <version>6.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.integration</groupId>
+            <artifactId>spring-integration-test</artifactId>
         </dependency>
     </dependencies>
 

@@ -210,7 +210,7 @@ public class SupportAPIController {
             if (!isPrivate) {
                 // email note user on if public
                 EmailDetails emailDetailsUser =
-                        new EmailDetails(BigInteger.valueOf(0), ticket.get().getUser().getContactEmail(), "Support Ticket " + ticket.get().getId() + " has been updated", "", null);
+                        new EmailDetails(BigInteger.valueOf(0), ticket.get().getUser().getContactEmail(), "[" + ticket.get().getId() + "] has been updated", "", null);
                 emailService.sendUserUpdateTicket(emailDetailsUser, ticket.get(), note);
             }
         } else {
@@ -219,7 +219,7 @@ public class SupportAPIController {
                 NotificationMessage returnMsg2 = messageService.createMessage(
                         new NotificationMessage(
                                 null,
-                                "Support Ticket "+ticket.get().getId()+" has been updated",
+                                "["+ticket.get().getId()+"] has been updated",
                                 ticket.get().getId(),
                                 BigInteger.valueOf(0),
                                 null,
@@ -350,7 +350,7 @@ public class SupportAPIController {
             // email ticket user
             EmailDetails emailDetailsUser =
                     new EmailDetails(BigInteger.valueOf(0), ticket.get().getUser().getContactEmail(),
-                            "Support Ticket "+ticket.get().getId()+" status has been changed to "+statusModel.status(),
+                            "["+ticket.get().getId()+"] status has been changed to "+statusModel.status(),
                             "", null );
             BrowserMessage returnMsg = emailService.sendUserUpdateTicket(emailDetailsUser, ticket.get(), ticketNote);
 

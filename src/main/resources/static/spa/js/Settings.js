@@ -40,9 +40,7 @@ export default class extends AbstractView {
             r += `<div class="settings__container-field"><button class="btn btn-sm btn-wiki" data-settings-notify-false>Unsubscribe</button></div>`;
         }
 
-        r+=`<div class="settings__container-label">&nbsp;</div>`;
-        r+=`<div class="settings__container-field">&nbsp;</div>`;
-
+        r+=`<div id="msgNotify">&nbsp;</div>`;
 
         r+=`</div></div>`;
 

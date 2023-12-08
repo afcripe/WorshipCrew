@@ -1,4 +1,9 @@
 
+self.addEventListener('notificationclick', event => {
+    console.log(event)
+});
+
+
 self.addEventListener('install', event => {
     console.log('notification sw installing…');
     event.waitUntil(

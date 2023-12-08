@@ -327,7 +327,7 @@ public class EmailService implements EmailServiceInterface{
         try {
             message.setFrom(new InternetAddress(sender));
             message.setRecipients(MimeMessage.RecipientType.TO, emailDetails.getRecipient());
-            message.setSubject("[no-reply] "+emailDetails.getSubject());
+            message.setSubject("!DO NOT REPLY! "+emailDetails.getSubject());
             // Set the email's content to be the HTML template
             message.setContent(templateEngine.process("mailer/mailAgentTicket", context), "text/html; charset=utf-8");
 
@@ -365,7 +365,7 @@ public class EmailService implements EmailServiceInterface{
         try {
             message.setFrom(new InternetAddress(sender));
             message.setRecipients(MimeMessage.RecipientType.TO, emailDetails.getRecipient());
-            message.setSubject("[no-reply] "+emailDetails.getSubject());
+            message.setSubject("!DO NOT REPLY! "+emailDetails.getSubject());
             // Set the email's content to be the HTML template
             message.setContent(templateEngine.process("mailer/mailAgentListTicket", context), "text/html; charset=utf-8");
 
@@ -400,7 +400,7 @@ public class EmailService implements EmailServiceInterface{
         try {
             message.setFrom(new InternetAddress(sender));
             message.setRecipients(MimeMessage.RecipientType.TO, emailDetails.getRecipient());
-            message.setSubject("[no-reply] "+emailDetails.getSubject());
+            message.setSubject("!DO NOT REPLY! "+emailDetails.getSubject());
             // Set the email's content to be the HTML template
             message.setContent(templateEngine.process("mailer/mailUserUpdateTicket", context), "text/html; charset=utf-8");
 
@@ -429,7 +429,7 @@ public class EmailService implements EmailServiceInterface{
         try {
             message.setFrom(new InternetAddress(sender));
             message.setRecipients(MimeMessage.RecipientType.TO, emailDetails.getRecipient());
-            message.setSubject("[no-reply] "+emailDetails.getSubject());
+            message.setSubject("!DO NOT REPLY! "+emailDetails.getSubject());
             // Set the email's content to be the HTML template
             message.setContent(templateEngine.process("mailer/mailAgentUpdateTicket", context), "text/html; charset=utf-8");
 
@@ -456,7 +456,7 @@ public class EmailService implements EmailServiceInterface{
         try {
             message.setFrom(new InternetAddress(sender));
             message.setRecipients(MimeMessage.RecipientType.TO, emailDetails.getRecipient());
-            message.setSubject("[no-reply] "+emailDetails.getSubject());
+            message.setSubject("!DO NOT REPLY! "+emailDetails.getSubject());
             // Set the email's content to be the HTML template
             message.setContent(templateEngine.process("mailer/mailNotification", context), "text/html; charset=utf-8");
 
@@ -484,7 +484,7 @@ public class EmailService implements EmailServiceInterface{
             try {
                 message.setFrom(new InternetAddress(sender));
                 message.setRecipients(MimeMessage.RecipientType.TO, emailDetails.getRecipient());
-                message.setSubject("[no-reply] "+emailDetails.getSubject());
+                message.setSubject("!DO NOT REPLY! "+emailDetails.getSubject());
                 // Set the email's content to be the HTML template
                 message.setContent(templateEngine.process("mailer/mailCustomNotification", context), "text/html; charset=utf-8");
 
