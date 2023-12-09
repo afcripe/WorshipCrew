@@ -34,7 +34,6 @@
 <h4 th:text="${emailSubject}">Support Ticket</h4>
 
 <!-- Content -->
-
 <div class="card" th:object="${ticket}">
     <div>
         <div class="emphasis float-left">Ticket: <a th:href="${baseURL}+'/support/ticket/'+*{id}" th:text="*{id}"></a></div>
