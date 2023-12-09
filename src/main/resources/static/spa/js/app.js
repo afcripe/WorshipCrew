@@ -631,6 +631,7 @@ const browserInfo = () => {
     return thisOs+" - "+thisBsr;
 }
 const subscribe = async() => {
+    let FCMTokenTry = 2;
     document.getElementById("msgNotify").innerText = 'registering new service worker';
     navigator.serviceWorker.register('/firebase-messaging-sw.js')
         .then((sw) => {
@@ -639,6 +640,10 @@ const subscribe = async() => {
         });
 }
 const getSWToken = async(messaging) => {
+    if (FCMTokenTry < 1) {
+        document.getElementById("msgNotify").innerText = 'failed to get token';
+        return;
+    }
     document.getElementById("msgNotify").innerText = 'attempting to get token';
     // let regSW = await navigator.serviceWorker.register('/firebase-messaging-sw.js')
 
@@ -687,7 +692,9 @@ const getSWToken = async(messaging) => {
         .catch((err) => {
             console.log("Error getting token.")
             console.log(err)
-            document.getElementById("msgNotify").innerText = 'token not ready';
+            document.getElementById("msgNotify").innerText = 'token not ready: retrying';
+            FCMTokenTry--;
+            setTimeout(() => { getSWToken(messaging); }, 2000);
         });
 };
 

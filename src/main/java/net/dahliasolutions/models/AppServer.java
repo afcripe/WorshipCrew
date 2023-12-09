@@ -21,25 +21,25 @@ public class AppServer {
 
     public String getResourceURL() { return resourceURL; }
 
-    public void setBaseURL() {
-        this.baseURL = "https://www.destinyworshipcrew.com";
-    }
+//    public void setBaseURL() {
+//        this.baseURL = "https://www.destinyworshipcrew.com";
+//    }
 
     public void setBaseURL(String baseURL) {
         this.baseURL = baseURL;
     }
 
-    public void setResourceDir() {
-        this.resourceDir = "/var/destinyworshipexchange/content/";
-    }
+//    public void setResourceDir() {
+//        this.resourceDir = "/var/destinyworshipexchange/content/";
+//    }
 
     public void setResourceDir(String resourceDir) {
         this.resourceDir = resourceDir;
     }
 
-    public void setResourceURL() {
-        this.resourceURL = "/content";
-    }
+//    public void setResourceURL() {
+//        this.resourceURL = "/content";
+//    }
 
     public void setResourceURL(String resourceURL) {
         this.resourceURL = resourceURL;

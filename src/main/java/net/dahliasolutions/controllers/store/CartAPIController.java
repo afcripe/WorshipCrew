@@ -183,7 +183,7 @@ public class CartAPIController {
             // list departments
             List<DepartmentRegional> departmentRegionalList = departmentRegionalService.findAll();
             // find items for each department
-            for (DepartmentRegional dep : departmentRegionalService.findAll()) {
+            for (DepartmentRegional dep : departmentRegionalList) {
                 // create new order for each found department
                 List<CartItem> depItems = cartItemService.findAllByCartAndAndDepartment(cart, dep);
                 if (!depItems.isEmpty()) {

@@ -2,11 +2,13 @@ package net.dahliasolutions.controllers;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
 import lombok.RequiredArgsConstructor;
+import net.dahliasolutions.models.AppServer;
 import net.dahliasolutions.models.FirebaseMessage;
 import net.dahliasolutions.models.FirebaseMessageModel;
 import net.dahliasolutions.models.PushMessage;
 import net.dahliasolutions.models.records.SingleBigIntegerModel;
 import net.dahliasolutions.models.records.SingleStringModel;
+import net.dahliasolutions.models.user.EndpointModel;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserEndpoint;
 import net.dahliasolutions.services.FirebaseMessagingService;
@@ -15,6 +17,7 @@ import net.dahliasolutions.services.user.UserService;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigInteger;
 import java.util.Map;
 import java.util.Optional;
 
@@ -26,6 +29,7 @@ public class PushMessageAPIController {
     private final FirebaseMessagingService firebaseMessagingService;
     private final EndpointService endpointService;
     private final UserService userService;
+    private final AppServer appServer;
 
 
     @PostMapping("/sendmessagebytoken")
@@ -35,12 +39,17 @@ public class PushMessageAPIController {
 
     @PostMapping("/sendtestfiremessage")
     public SingleStringModel sendTestByToken(@ModelAttribute FirebaseMessageModel firebaseMessage) throws FirebaseMessagingException {
-        Map<String, String> data = Map.ofEntries(
-                    Map.entry("link", "https://www.destinyworshipcrew.com/app"),
-                    Map.entry("module", ""),
-                    Map.entry("moduleId", "")
-            );
+        Optional<UserEndpoint> ep = endpointService.findByToken(firebaseMessage.recipientToken());
+        BigInteger recipientId = BigInteger.valueOf(0);
+        if (ep.isPresent()) {
+            recipientId = ep.get().getUser().getId();
+        }
 
+        Map<String, String> data = Map.ofEntries(
+                    Map.entry("link", appServer.getBaseURL()+"/app"),
+                    Map.entry("module", "user"),
+                    Map.entry("moduleId", recipientId.toString())
+            );
 
         FirebaseMessage msg = new FirebaseMessage();
                         msg.setRecipientToken(firebaseMessage.recipientToken());
