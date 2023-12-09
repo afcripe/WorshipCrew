@@ -631,33 +631,20 @@ const browserInfo = () => {
     return thisOs+" - "+thisBsr;
 }
 const subscribe = async() => {
-    FCMTokenTry = 2;
     document.getElementById("msgNotify").innerText = 'registering new service worker';
-    let regSW = await navigator.serviceWorker.register('/firebase-messaging-sw.js')
+    navigator.serviceWorker.register('/firebase-messaging-sw.js')
         .then((sw) => {
-            let swState;
-            if (sw.active) {
-                document.getElementById("msgNotify").innerText = 'service worker active';
-                getSWToken();
-            } else {
-                sw.addEventListener('activate', event => {
-                    getSWToken();
-                })
-            }
+            document.getElementById("msgNotify").innerText = 'waiting on service worker';
+            setTimeout(() => {getSWToken(messaging);}, 2000);
         });
 }
-const getSWToken = async() => {
-    if (FCMTokenTry<1) {
-        console.log("failed to get token");
-        document.getElementById("msgNotify").innerText = 'failed to get token';
-        return;
-    }
+const getSWToken = async(messaging) => {
     document.getElementById("msgNotify").innerText = 'attempting to get token';
-    let regSW = await navigator.serviceWorker.register('/firebase-messaging-sw.js')
+    // let regSW = await navigator.serviceWorker.register('/firebase-messaging-sw.js')
 
     console.log("subscribe requested");
     // Add the public key generated from the console here.
-    await getToken(messaging, {vapidKey: "BPkHKoGBXYuuTEfyty0lBzi1RruJbGobRImxy9Jl008QPmgNxeo7Hj2BYaDb-AJD4hOraF6ZHirFl_VtxeMKiZk"})
+    getToken(messaging, {vapidKey: "BPkHKoGBXYuuTEfyty0lBzi1RruJbGobRImxy9Jl008QPmgNxeo7Hj2BYaDb-AJD4hOraF6ZHirFl_VtxeMKiZk"})
         .then(async (currentToken) => {
             console.log("Got token.")
             document.getElementById("msgNotify").innerText = 'got token from google';
@@ -690,6 +677,7 @@ const getSWToken = async() => {
                     .then((perm) => {
                         if (perm === 'granted') {
                             console.log("Permission Granted");
+                            getSWToken(messaging);
                         } else {
                             console.log("Permission Denied");
                         }
@@ -698,9 +686,8 @@ const getSWToken = async() => {
         })
         .catch((err) => {
             console.log("Error getting token.")
-            FCMTokenTry--;
+            console.log(err)
             document.getElementById("msgNotify").innerText = 'token not ready';
-            setTimeout(() => {getSWToken();}, 2000);
         });
 };
 
@@ -1145,6 +1132,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if ( e.target.matches("[data-settings-notify-true]")) {
             e.preventDefault();
             subscribe();
+            // getSWToken();
         }
         if ( e.target.matches("[data-settings-notify-false]")) {
             e.preventDefault();
