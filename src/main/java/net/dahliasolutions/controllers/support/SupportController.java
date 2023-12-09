@@ -225,7 +225,7 @@ public class SupportController {
             NotificationMessage returnMsg2 = messageService.createMessage(
                     new NotificationMessage(
                             null,
-                            "A New Support Ticket Needs Acknowledgement",
+                            "["+ticket.getId()+"] Needs Acknowledgement",
                             ticket.getId(),
                             BigInteger.valueOf(0),
                             null,
@@ -248,7 +248,7 @@ public class SupportController {
                 NotificationMessage returnMsg2 = messageService.createMessage(
                         new NotificationMessage(
                                 null,
-                                "A New Support Ticket Needs Acceptance",
+                                "["+ticket.getId()+"] Needs Acceptance",
                                 ticket.getId(),
                                 BigInteger.valueOf(0),
                                 null,

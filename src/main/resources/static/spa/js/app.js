@@ -37,6 +37,7 @@ let firstName = "";
 let lastName = "";
 let token = "";
 let isLoggedIn = false;
+let FCMTokenTry = 2;
 
 let filesToUpload;
 
@@ -629,15 +630,37 @@ const browserInfo = () => {
 
     return thisOs+" - "+thisBsr;
 }
-
 const subscribe = async() => {
+    FCMTokenTry = 2;
+    document.getElementById("msgNotify").innerText = 'registering new service worker';
+    let regSW = await navigator.serviceWorker.register('/firebase-messaging-sw.js')
+        .then((sw) => {
+            let swState;
+            if (sw.active) {
+                document.getElementById("msgNotify").innerText = 'service worker active';
+                getSWToken();
+            } else {
+                sw.addEventListener('activate', event => {
+                    getSWToken();
+                })
+            }
+        });
+}
+const getSWToken = async() => {
+    if (FCMTokenTry<1) {
+        console.log("failed to get token");
+        document.getElementById("msgNotify").innerText = 'failed to get token';
+        return;
+    }
+    document.getElementById("msgNotify").innerText = 'attempting to get token';
     let regSW = await navigator.serviceWorker.register('/firebase-messaging-sw.js')
 
     console.log("subscribe requested");
     // Add the public key generated from the console here.
-    getToken(messaging, {vapidKey: "BPkHKoGBXYuuTEfyty0lBzi1RruJbGobRImxy9Jl008QPmgNxeo7Hj2BYaDb-AJD4hOraF6ZHirFl_VtxeMKiZk"})
+    await getToken(messaging, {vapidKey: "BPkHKoGBXYuuTEfyty0lBzi1RruJbGobRImxy9Jl008QPmgNxeo7Hj2BYaDb-AJD4hOraF6ZHirFl_VtxeMKiZk"})
         .then(async (currentToken) => {
             console.log("Got token.")
+            document.getElementById("msgNotify").innerText = 'got token from google';
             if (currentToken) {
                 // Send token to server
                 // navigator.serviceWorker.register("/firebase-messaging-sw.js");
@@ -648,6 +671,7 @@ const subscribe = async() => {
                     formData.set("token", currentToken);
 
                 console.log("Sending token to server");
+                document.getElementById("msgNotify").innerText = 'send token to server';
                 const response = await fetch('/api/v1/app/swtoken', {
                     method: 'POST',
                     headers: {
@@ -660,6 +684,7 @@ const subscribe = async() => {
                 navigateTo("/app/settings");
             } else {
                 console.log("Needs browser permission");
+                document.getElementById("msgNotify").innerText = 'browser needs permission';
                 // Show permission request UI
                 Notification.requestPermission()
                     .then((perm) => {
@@ -673,11 +698,14 @@ const subscribe = async() => {
         })
         .catch((err) => {
             console.log("Error getting token.")
-            console.log(err);
+            FCMTokenTry--;
+            document.getElementById("msgNotify").innerText = 'token not ready';
+            setTimeout(() => {getSWToken();}, 2000);
         });
 };
 
 const unsubscribe = () =>{
+    document.getElementById("msgNotify").innerText = 'unsubscribing';
     getToken(messaging, {vapidKey: "BPkHKoGBXYuuTEfyty0lBzi1RruJbGobRImxy9Jl008QPmgNxeo7Hj2BYaDb-AJD4hOraF6ZHirFl_VtxeMKiZk"})
         .then(async (currentToken) => {
             if (currentToken) {
@@ -689,6 +717,7 @@ const unsubscribe = () =>{
                 formData.set("name", appInst);
                 formData.set("token", currentToken);
 
+                document.getElementById("msgNotify").innerText = 'removing token from server';
                 const response = await fetch('/api/v1/app/removetoken', {
                     method: 'POST',
                     headers: {
@@ -698,16 +727,23 @@ const unsubscribe = () =>{
                 });
                 let rsp = await response.json();
                 console.log(rsp.name);
+                document.getElementById("msgNotify").innerText = rsp.name;
             }
 
             let regs = await navigator.serviceWorker.getRegistrations();
             for(let reg of regs) {
                 await reg.unregister();
+                document.getElementById("msgNotify").innerText = 'unregistering service worker';
             }
             navigateTo("/app/settings");
         })
-        .catch((err) => {
-            console.log(err);
+        .catch(async(err) => {
+            let regs = await navigator.serviceWorker.getRegistrations();
+            for(let reg of regs) {
+                let deReg = await reg.unregister();
+                document.getElementById("msgNotify").innerText = 'unregistering service worker';
+            }
+            navigateTo("/app/settings");
         });
 };
 

@@ -10,7 +10,7 @@
     </parent>
     <groupId>net.dahliasolutions</groupId>
     <artifactId>WorshipCrew</artifactId>
-    <version>0.2.0</version>
+    <version>0.2.5</version>
     <name>WorshipCrew</name>
     <description>Worship Crew Web App</description>
     <properties>
@@ -108,7 +108,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${project.parent.version}</version>
                 <configuration>
                     <executable>true</executable>
                     <excludes>
