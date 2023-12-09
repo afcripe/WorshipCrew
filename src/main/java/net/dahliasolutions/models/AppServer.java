@@ -57,6 +57,7 @@ public class AppServer {
         File resFavIcon = new File(getClass().getResource("/static/img/favicon.ico").getFile());
         File resFavPng = new File(getClass().getResource("/static/img/favicon.png").getFile());
         File resVideo = new File(getClass().getResource("/static/img/home_page.mp4").getFile());
+        File resAppFolder = new File(getClass().getResource("/static/spa/js/app.webmanifest").getFile());
 
         // load content files
         File cntStyleDefault = new File(getResourceDir()+"/site/css/style.css");
@@ -64,6 +65,7 @@ public class AppServer {
         File cntFavIcon = new File(getResourceDir()+"/site/img/favicon.ico");
         File cntFavPng = new File(getResourceDir()+"/site/img/favicon.png");
         File cntVideo = new File(getResourceDir()+"/site/video/home_page.mp4");
+        File cntApp = new File(getResourceDir()+"/app/app.webmanifest");
 
         // create content dir if needed
         Path contentCSSPath = Paths.get(getResourceDir()+"/site/css");
