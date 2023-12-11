@@ -10,7 +10,7 @@
     </parent>
     <groupId>net.dahliasolutions</groupId>
     <artifactId>WorshipCrew</artifactId>
-    <version>0.2.5.2</version>
+    <version>0.2.6</version>
     <name>WorshipCrew</name>
     <description>Worship Crew Web App</description>
     <properties>

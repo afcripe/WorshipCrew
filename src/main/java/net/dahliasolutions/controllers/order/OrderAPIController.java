@@ -100,7 +100,6 @@ public class OrderAPIController {
                                 EventType.Cancelled,
                                 orderRequest.get().getSupervisor(),
                                 BigInteger.valueOf(0)
-
                         ));
 
 //                EmailDetails emailDetailsSupervisor =
@@ -292,6 +291,42 @@ public class OrderAPIController {
                             orderRequest.get().getOrderStatus(),
                             user));
 
+                    // reassign items if requested
+                    if (supervisorModel.items()) {
+                        for (OrderItem item : orderRequest.get().getRequestItems()) {
+                            item.setSupervisor(newSuper.get());
+                            orderItemService.save(item);
+                        }
+                        // add note
+                        orderNoteService.createOrderNote(new OrderNote(
+                                null,
+                                orderRequest.get().getId(),
+                                null,
+                                "All items have been assigned to "+newSuper.get().getFullName(),
+                                BigInteger.valueOf(0),
+                                orderRequest.get().getOrderStatus(),
+                                user));
+                    }
+
+                    // Notify supervisor
+                    NotificationMessage returnMsg = messageService.createMessage(
+                            new NotificationMessage(
+                                    null,
+                                    "You have been assigned as a Request Supervisor",
+                                    orderRequest.get().getId().toString(),
+                                    BigInteger.valueOf(0),
+                                    null,
+                                    false,
+                                    false,
+                                    null,
+                                    false,
+                                    BigInteger.valueOf(0),
+                                    EventModule.Request,
+                                    EventType.Updated,
+                                    newSuper.get(),
+                                    BigInteger.valueOf(0)
+                            ));
+
                     // send any additional notifications
                     AppEvent notifyEvent = eventService.createEvent(new AppEvent(
                             null,
@@ -383,7 +418,7 @@ public class OrderAPIController {
                 ));
             } else {
                 session.setAttribute("msgError", "Cannot remove someone who is assigned to request.");
-                return new AddSupervisorModel(BigInteger.valueOf(0), BigInteger.valueOf(0), false);
+                return new AddSupervisorModel(BigInteger.valueOf(0), BigInteger.valueOf(0), false, false);
             }
         }
         return supervisorModel;

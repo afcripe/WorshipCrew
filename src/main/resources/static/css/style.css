@@ -86,18 +86,18 @@
     width: 170px;
     min-width: 170px;
     max-width: 170px;
-    min-height: calc(100vh - 68px);
+    min-height: calc(100vh - 72px);
 }
 .side-nav-collapsed {
     background-color: var(--dwc-side-nav-bg);
     width: 45px;
     min-width: 45px;
     max-width: 45px;
-    min-height: calc(100vh - 68px);
+    min-height: calc(100vh - 72px);
 }
 .category-nav {
     border-radius: 5px;
-    min-height: calc(100vh - 150px);
+    min-height: calc(100vh - 154px);
 }
 .moduleTitle {
     cursor: pointer;

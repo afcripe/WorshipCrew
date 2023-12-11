@@ -3,7 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/defaultLayout}">
 
-<div class="container-fluid m-0 px-0" layout:fragment="content" th:object="${orderRequest}">
+<div class="container-fluid m-0 px-1" layout:fragment="content" th:object="${orderRequest}">
 
     <div th:replace="~{order/moduleHeader :: header}">Header</div>
 
@@ -130,7 +130,7 @@
         <script>
             async function loadPeople() {
                 let dispPersonSelect = document.getElementById('personSelect');
-                debugger
+                document.getElementById("assignItems").disabled = true;
                 const response = await fetch('/api/v1/request/getsupervisors')
                     .then(response => {
                         return response.json();
@@ -155,6 +155,7 @@
                 formData.set("requestId", document.getElementById('orderId').value);
                 formData.set("userId", document.getElementById('personSelect').value);
                 formData.set("primary", document.getElementById('personPrimary').checked);
+                formData.set("items", document.getElementById('assignItems').checked);
 
                 const response = await fetch('/api/v1/request/addsupervisor', {
                     method: 'POST',
@@ -178,6 +179,12 @@
                 document.getElementById("btnIncludeSubmit").removeAttribute("disabled");
                 document.getElementById("includePersonDialog").close();
             }
+            function enableAssignment() {
+                let chk = document.getElementById('personPrimary').checked;
+                console.log(chk);
+                document.getElementById('assignItems').checked = false;
+                document.getElementById("assignItems").disabled = !document.getElementById('personPrimary').checked;
+            }
         </script>
         <h2>Include Someone on Request</h2>
         <form id="formIncludePerson" onsubmit="postInclude()" style="width: 300px; max-width: 450px">
@@ -186,7 +193,10 @@
                 <option></option>
             </select>
             <label for="personPrimary" class="form-label">Set As Primary</label>
-            <input type="checkbox" id="personPrimary">
+            <input type="checkbox" id="personPrimary" onchange="enableAssignment()">
+            <span>&nbsp;&nbsp;</span>
+            <label for="assignItems" class="form-label">Assign All Items</label>
+            <input type="checkbox" id="assignItems" disabled>
             <div class="pt-2">
                 <button id="btnIncludeSubmit" type="button" class="btn btn-sm btn-primary" onclick="postInclude()">Add</button>
                 <button id="btnIncludeCancel" type="button" class="btn btn-sm btn-outline-primary" onclick="keyEscInclude()">Cancel</button>

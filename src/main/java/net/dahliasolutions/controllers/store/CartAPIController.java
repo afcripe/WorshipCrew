@@ -295,7 +295,7 @@ public class CartAPIController {
 
     private void includeSupervisor(OrderRequest orderRequest) {
         User newSuper = orderRequest.getUser().getDirector();
-        String noteDetail = newSuper.getLastName()+" was add to the request.";
+        String noteDetail = newSuper.getFullName()+" was add to the request.";
 
         // check if user super is not order super
         if (!orderRequest.getSupervisor().getId().equals(newSuper.getId())) {

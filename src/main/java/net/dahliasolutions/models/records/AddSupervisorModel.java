@@ -5,5 +5,6 @@ import java.math.BigInteger;
 public record AddSupervisorModel(
         BigInteger requestId,
         BigInteger userId,
-        boolean primary) {
+        boolean primary,
+        boolean items) {
 }
