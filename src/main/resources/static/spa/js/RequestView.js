@@ -302,6 +302,7 @@ async function postRequestAddAgent(token) {
     formData.set("requestId", document.getElementById("requestAgentId").value);
     formData.set("userId", document.getElementById('requestAgentSelect').value);
     formData.set("primary", "true");
+    formData.set("items", document.getElementById('assignItems').checked);
 
     const response = await fetch('/api/v1/app/request/addsupervisor', {
         method: 'POST',
@@ -399,6 +400,7 @@ function htmlRequest(req) {
 
     return r;
 }
+
 function htmlRequestItems(item) {
     let r=`<div class="request__item">`;
 
@@ -428,6 +430,7 @@ function htmlRequestItems(item) {
     r+=`</div>`;
     return r;
 }
+
 function htmlRequestAgents(agents, req) {
     let r=`<div class="request__item-detail detail-padding-top">`;
     r+=`<div class="request__item-field-header">Supervisors</div>`;
@@ -455,6 +458,7 @@ function htmlRequestAgents(agents, req) {
     r+=`</div>`;
     return r;
 }
+
 function htmlHistory(notes) {
     let r=`<div class="history-viewer__div"><div class="history-viewer__content">`;
     if ( notes.length > 0) {
@@ -526,6 +530,7 @@ function htmlDialogUpdateRequest(req, options) {
     r+=`</div></form></div>`;
     return r;
 }
+
 function htmlDialogUpdateRequestItem(item, options) {
     let r=`<div>`;
     r+=`<form><div class="form-content form__popup-content">`;
@@ -584,6 +589,11 @@ function htmlDialogRequestAgent(users, req) {
     r+=`</div>`;
 
     r+=`<div class="request__item-detail detail-padding-bottom">`;
+    r+=`<div class="form-control-label">Re-assign All Items</div>`;
+    r+=`<input id="assignItems" type="checkbox" class="form-check">`;
+    r+=`</div>`;
+
+    r+=`<div class="request__item-detail detail-padding-bottom">`;
     r+=`<div class="request__item-field-center">`;
     r+=`<button type="button" class="btn btn-sm btn-store" data-form-request-agent="update">Update</button>`;
     r+=`</div>`;
@@ -595,6 +605,7 @@ function htmlDialogRequestAgent(users, req) {
     r+=`</div></form></div>`;
     return r;
 }
+
 function htmlDialogRequestItemAgent(users, item) {
     let r=`<div>`;
     r+=`<form><div class="form-content form__popup-content">`;
@@ -626,6 +637,7 @@ function htmlDialogRequestItemAgent(users, item) {
     r+=`</div></form></div>`;
     return r;
 }
+
 function htmlDialogUpdateSupervisors(users, req) {
     let r=`<div>`;
     r+=`<form><div class="form-content form__popup-content">`;

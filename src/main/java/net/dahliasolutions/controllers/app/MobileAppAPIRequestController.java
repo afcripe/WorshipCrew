@@ -11,6 +11,7 @@ import net.dahliasolutions.models.records.*;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
 import net.dahliasolutions.services.JwtService;
+import net.dahliasolutions.services.mail.NotificationMessageService;
 import net.dahliasolutions.services.order.OrderItemService;
 import net.dahliasolutions.services.order.OrderNoteService;
 import net.dahliasolutions.services.order.OrderService;
@@ -36,6 +37,7 @@ public class MobileAppAPIRequestController {
     private final OrderItemService orderItemService;
     private final OrderNoteService orderNoteService;
     private final UserRolesService rolesService;
+    private final NotificationMessageService messageService;
 
     @GetMapping("/listbyuser")
     public ResponseEntity<List<AppItem>> getRequestsByUser(HttpServletRequest request) {
@@ -261,7 +263,7 @@ public class MobileAppAPIRequestController {
             return new ResponseEntity<>(new SingleStringModel("Acknowledge"), HttpStatus.OK);
         }
 
-        return new ResponseEntity<>(new SingleStringModel("Not Supervisor"), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new SingleStringModel("Not Supervisor"), HttpStatus.CONTINUE);
     }
 
     @PostMapping("/setacknowledge")
@@ -442,6 +444,43 @@ public class MobileAppAPIRequestController {
                             BigInteger.valueOf(0),
                             orderRequest.get().getOrderStatus(),
                             apiUser.getUser()));
+
+                    // reassign items if requested
+                    if (supervisorModel.items()) {
+                        for (OrderItem item : orderRequest.get().getRequestItems()) {
+                            item.setSupervisor(newSuper.get());
+                            orderItemService.save(item);
+                        }
+                        // add note
+                        orderNoteService.createOrderNote(new OrderNote(
+                                null,
+                                orderRequest.get().getId(),
+                                null,
+                                "All items have been assigned to "+newSuper.get().getFullName(),
+                                BigInteger.valueOf(0),
+                                orderRequest.get().getOrderStatus(),
+                                apiUser.getUser()));
+                    }
+
+                    // Notify supervisor of request assignment
+                    NotificationMessage returnMsg = messageService.createMessage(
+                            new NotificationMessage(
+                                    null,
+                                    "You have been assigned as a Request Supervisor",
+                                    orderRequest.get().getId().toString(),
+                                    BigInteger.valueOf(0),
+                                    null,
+                                    false,
+                                    false,
+                                    null,
+                                    false,
+                                    BigInteger.valueOf(0),
+                                    EventModule.Request,
+                                    EventType.Updated,
+                                    newSuper.get(),
+                                    BigInteger.valueOf(0)
+                            ));
+
                 } else {
                     noteDetail = newSuper.get().getFirstName()+" "+newSuper.get().getLastName()+" was add to the request.";
 
@@ -457,6 +496,42 @@ public class MobileAppAPIRequestController {
                             BigInteger.valueOf(0),
                             orderRequest.get().getOrderStatus(),
                             apiUser.getUser()));
+
+                    // reassign items if requested
+                    if (supervisorModel.items()) {
+                        for (OrderItem item : orderRequest.get().getRequestItems()) {
+                            item.setSupervisor(newSuper.get());
+                            orderItemService.save(item);
+                        }
+                        // add note
+                        orderNoteService.createOrderNote(new OrderNote(
+                                null,
+                                orderRequest.get().getId(),
+                                null,
+                                "All items have been assigned to "+newSuper.get().getFullName(),
+                                BigInteger.valueOf(0),
+                                orderRequest.get().getOrderStatus(),
+                                apiUser.getUser()));
+
+                        // Notify supervisor of items assigned
+                        NotificationMessage returnMsg = messageService.createMessage(
+                                new NotificationMessage(
+                                        null,
+                                        "You have been assigned request items",
+                                        orderRequest.get().getId().toString(),
+                                        BigInteger.valueOf(0),
+                                        null,
+                                        false,
+                                        false,
+                                        null,
+                                        false,
+                                        BigInteger.valueOf(0),
+                                        EventModule.Request,
+                                        EventType.Updated,
+                                        newSuper.get(),
+                                        BigInteger.valueOf(0)
+                                ));
+                    }
                 }
             }
         }
