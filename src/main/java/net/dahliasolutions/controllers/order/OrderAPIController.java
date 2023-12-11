@@ -308,7 +308,7 @@ public class OrderAPIController {
                                 user));
                     }
 
-                    // Notify supervisor
+                    // Notify supervisor of request assignment
                     NotificationMessage returnMsg = messageService.createMessage(
                             new NotificationMessage(
                                     null,
@@ -353,6 +353,42 @@ public class OrderAPIController {
                             BigInteger.valueOf(0),
                             orderRequest.get().getOrderStatus(),
                             user));
+
+                    // reassign items if requested
+                    if (supervisorModel.items()) {
+                        for (OrderItem item : orderRequest.get().getRequestItems()) {
+                            item.setSupervisor(newSuper.get());
+                            orderItemService.save(item);
+                        }
+                        // add note
+                        orderNoteService.createOrderNote(new OrderNote(
+                                null,
+                                orderRequest.get().getId(),
+                                null,
+                                "All items have been assigned to "+newSuper.get().getFullName(),
+                                BigInteger.valueOf(0),
+                                orderRequest.get().getOrderStatus(),
+                                user));
+
+                        // Notify supervisor of items assigned
+                        NotificationMessage returnMsg = messageService.createMessage(
+                                new NotificationMessage(
+                                        null,
+                                        "You have been assigned request items",
+                                        orderRequest.get().getId().toString(),
+                                        BigInteger.valueOf(0),
+                                        null,
+                                        false,
+                                        false,
+                                        null,
+                                        false,
+                                        BigInteger.valueOf(0),
+                                        EventModule.Request,
+                                        EventType.Updated,
+                                        newSuper.get(),
+                                        BigInteger.valueOf(0)
+                                ));
+                    }
 
                     // send any additional notifications
                     AppEvent notifyEvent = eventService.createEvent(new AppEvent(

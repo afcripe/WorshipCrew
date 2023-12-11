@@ -179,12 +179,6 @@
                 document.getElementById("btnIncludeSubmit").removeAttribute("disabled");
                 document.getElementById("includePersonDialog").close();
             }
-            function enableAssignment() {
-                let chk = document.getElementById('personPrimary').checked;
-                console.log(chk);
-                document.getElementById('assignItems').checked = false;
-                document.getElementById("assignItems").disabled = !document.getElementById('personPrimary').checked;
-            }
         </script>
         <h2>Include Someone on Request</h2>
         <form id="formIncludePerson" onsubmit="postInclude()" style="width: 300px; max-width: 450px">
@@ -193,10 +187,10 @@
                 <option></option>
             </select>
             <label for="personPrimary" class="form-label">Set As Primary</label>
-            <input type="checkbox" id="personPrimary" onchange="enableAssignment()">
+            <input type="checkbox" id="personPrimary">
             <span>&nbsp;&nbsp;</span>
             <label for="assignItems" class="form-label">Assign All Items</label>
-            <input type="checkbox" id="assignItems" disabled>
+            <input type="checkbox" id="assignItems">
             <div class="pt-2">
                 <button id="btnIncludeSubmit" type="button" class="btn btn-sm btn-primary" onclick="postInclude()">Add</button>
                 <button id="btnIncludeCancel" type="button" class="btn btn-sm btn-outline-primary" onclick="keyEscInclude()">Cancel</button>
