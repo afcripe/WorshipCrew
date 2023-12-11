@@ -58,14 +58,21 @@ public class MobileAppAPITicketController {
     private final AppServer appServer;
 
     @GetMapping("/listbyuser")
-    public ResponseEntity<List<AppItem>> getTicketsByUser(HttpServletRequest request) {
+    public ResponseEntity<List<AppItem>> getTicketsByUser(@RequestParam(required = false) String sortCol,
+                                                          @RequestParam(required = false) String sortOrder,
+                                                          HttpServletRequest request) {
         APIUser apiUser = getUserFromToken(request);
         if (!apiUser.isValid()) {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
         }
 
+        if (org.apache.commons.lang3.StringUtils.isBlank(sortCol)) { sortCol = "ticketDue"; }
+        if (org.apache.commons.lang3.StringUtils.isBlank(sortOrder)) { sortOrder = "DESC"; }
+
+
         List<AppItem> appItemList = new ArrayList<>();
         List<Ticket> openAgentTicketList = ticketService.findAllByUser(apiUser.getUser());
+        sortTickets(openAgentTicketList,sortCol,sortOrder);
 
         for (Ticket tkt : openAgentTicketList) {
             if (!tkt.getTicketStatus().equals(TicketStatus.Closed)) {
@@ -84,14 +91,20 @@ public class MobileAppAPITicketController {
     }
 
     @GetMapping("/listbyagent")
-    public ResponseEntity<List<AppItem>> getUserTickets(HttpServletRequest request) {
+    public ResponseEntity<List<AppItem>> getUserTickets(@RequestParam(required = false) String sortCol,
+                                                        @RequestParam(required = false) String sortOrder,
+                                                        HttpServletRequest request) {
         APIUser apiUser = getUserFromToken(request);
         if (!apiUser.isValid()) {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
         }
 
+        if (org.apache.commons.lang3.StringUtils.isBlank(sortCol)) { sortCol = "ticketDue"; }
+        if (org.apache.commons.lang3.StringUtils.isBlank(sortOrder)) { sortOrder = "DESC"; }
+
         List<AppItem> appItemList = new ArrayList<>();
         List<Ticket> openAgentTicketList = ticketService.findAllByAgentOpenOnly(apiUser.getUser());
+        sortTickets(openAgentTicketList,sortCol,sortOrder);
 
         for (Ticket tkt : openAgentTicketList) {
             appItemList.add(new AppItem(
@@ -132,14 +145,20 @@ public class MobileAppAPITicketController {
     }
 
     @GetMapping("/allopen")
-    public ResponseEntity<List<AppItem>> getTicketsAllOpen(HttpServletRequest request) {
+    public ResponseEntity<List<AppItem>> getTicketsAllOpen(@RequestParam(required = false) String sortCol,
+                                                           @RequestParam(required = false) String sortOrder,
+                                                           HttpServletRequest request) {
         APIUser apiUser = getUserFromToken(request);
         if (!apiUser.isValid()) {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
         }
 
+        if (org.apache.commons.lang3.StringUtils.isBlank(sortCol)) { sortCol = "ticketDue"; }
+        if (org.apache.commons.lang3.StringUtils.isBlank(sortOrder)) { sortOrder = "DESC"; }
+
         List<AppItem> appItemList = new ArrayList<>();
         List<Ticket> openAgentTicketList = ticketService.findAllOpen();
+        sortTickets(openAgentTicketList,sortCol,sortOrder);
 
         for (Ticket tkt : openAgentTicketList) {
             if (!tkt.getTicketStatus().equals(TicketStatus.Closed)) {
@@ -713,6 +732,25 @@ public class MobileAppAPITicketController {
         }
         departmentList.add(currentUser.getDepartment().getRegionalDepartment());
         return departmentList;
+    }
+
+    private List<Ticket> sortTickets(List<Ticket> tickets, String sortColumn, String sortOrder) {
+        if (sortColumn.equals("")) {sortColumn="ticketDue";}
+        if (sortOrder.equals("")) {sortColumn="ASC";}
+
+        switch (sortColumn) {
+            case "ticketDue":
+                tickets.sort(new Comparator<Ticket>() {
+                    @Override
+                    public int compare(Ticket t1, Ticket t2) {
+                        return t1.getTicketDue().compareTo(t2.getTicketDue());
+                    }
+                });
+                if (sortOrder.equals("DESC")) {
+                    Collections.reverse(tickets);
+                }
+        }
+        return tickets;
     }
 
 }

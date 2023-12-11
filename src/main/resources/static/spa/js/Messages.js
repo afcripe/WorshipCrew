@@ -302,7 +302,7 @@ function htmlMessage(msg, msgBody) {
 
     r+=`<div class="history-viewer__close">`;
     r+=`<div class="message__title">`+msg.subject+`</div>`;
-    r+=`<div class="request__item-field-right">
+    r+=`<div class="message__item-field-right">
             <button id="btnViewerRead" class="btn btn-sm btn-outline-msg">
                <i class="bi bi-envelope-open selectableItem"></i>
             </button>

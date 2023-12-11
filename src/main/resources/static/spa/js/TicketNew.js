@@ -161,7 +161,7 @@ function htmlForm(priorities, campuses, departments) {
 
     r+=`<div class="form-group-row detail-padding-bottom">`;
     r+=`<div class="request__item-field-center">`;
-    r+=`<button type="button" class="btn btn btn-support" data-form-ticket-new="submit">Submite</button>`;
+    r+=`<button type="button" class="btn btn btn-support" data-form-ticket-new="submit">Submit</button>`;
     r+=`</div>`;
     r+=`<div class="request__item-field-center">`;
     r+=`<button type="button" class="btn btn btn-outline-cancel" data-nav-link="tickets">Cancel</button>`;

@@ -784,20 +784,20 @@ progress::-webkit-progress-value {
     flex-grow: 1;
     text-align: center;
     height: 1.2rem;
-    overflow-x: hidden;
+    overflow: hidden;
 }
 
 .item-title {
     font-size: 1rem;
     flex-grow: 1;
     height: 1.2rem;
-    overflow-x: hidden;
+    overflow: hidden;
 }
 
 .item-detail {
     font-size: 1rem;
     height: 1.2rem;
-    overflow-x: hidden;
+    overflow: hidden;
 }
 
 .item-type {
@@ -999,6 +999,7 @@ progress::-webkit-progress-value {
     font-size: 1rem;
     text-align: right;
     padding-left: 0.1rem;
+    white-space: nowrap;
     /*padding-right: 0.1rem;*/
 }
 
@@ -1063,6 +1064,7 @@ progress::-webkit-progress-value {
 
 .history-viewer__content {
     padding-top: 2rem;
+    overflow-x: clip;
     overflow-y: scroll;
 }
 
@@ -1239,6 +1241,7 @@ progress::-webkit-progress-value {
 }
 
 .user-edit__content {
+    overflow-x: clip;
     overflow-y: scroll;
 }
 
@@ -1248,8 +1251,15 @@ progress::-webkit-progress-value {
     height: 1.6rem;
     font-weight: bold;
     text-align: left;
-    overflow-x: hidden;
+    overflow: hidden;
     padding: 0.2rem;
+}
+
+.message__item-field-right {
+    font-size: 1rem;
+    text-align: right;
+    white-space: nowrap;
+    /*padding-right: 0.1rem;*/
 }
 
 .message__item-detail {

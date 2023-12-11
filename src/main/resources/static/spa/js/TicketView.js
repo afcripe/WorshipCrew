@@ -587,7 +587,7 @@ function htmlDialogAddNote(tkt) {
     }
 
     r+=`<div class="request__item-detail detail-padding-bottom">`;
-    r+=`<textArea id="ticketNote" class="form-control""></textArea>`;
+    r+=`<textArea id="ticketNote" class="form-control" rows="5"></textArea>`;
     r+=`</div>`;
 
     r+=`<div class="request__item-detail detail-padding-bottom">`;
