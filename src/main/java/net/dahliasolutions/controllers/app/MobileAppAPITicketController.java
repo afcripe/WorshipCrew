@@ -60,31 +60,38 @@ public class MobileAppAPITicketController {
     @GetMapping("/listbyuser")
     public ResponseEntity<List<AppItem>> getTicketsByUser(@RequestParam(required = false) String sortCol,
                                                           @RequestParam(required = false) String sortOrder,
+                                                          @RequestParam(required = false) BigInteger sortSLA,
                                                           HttpServletRequest request) {
         APIUser apiUser = getUserFromToken(request);
         if (!apiUser.isValid()) {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
         }
 
+        List<Ticket> openAgentTicketList;
+
         if (org.apache.commons.lang3.StringUtils.isBlank(sortCol)) { sortCol = "ticketDue"; }
         if (org.apache.commons.lang3.StringUtils.isBlank(sortOrder)) { sortOrder = "ASC"; }
-
+        if (sortSLA == null) {
+            openAgentTicketList = ticketService.findAllByUserOpenOnly(apiUser.getUser());
+        } else if (sortSLA.equals(BigInteger.valueOf(0))) {
+            openAgentTicketList = ticketService.findAllByUserOpenOnly(apiUser.getUser());
+        } else {
+            SLA getSLA = slaService.findById(sortSLA).orElse(null);
+            openAgentTicketList = ticketService.findAllByUserAndSlaOpenOnly(apiUser.getUser(), getSLA);
+        }
 
         List<AppItem> appItemList = new ArrayList<>();
-        List<Ticket> openAgentTicketList = ticketService.findAllByUser(apiUser.getUser());
         sortTickets(openAgentTicketList,sortCol,sortOrder);
 
         for (Ticket tkt : openAgentTicketList) {
-            if (!tkt.getTicketStatus().equals(TicketStatus.Closed)) {
-                appItemList.add(new AppItem(
-                        tkt.getId(),
-                        tkt.getTicketStatus().toString(),
-                        tkt.getTicketDetail(),
-                        tkt.getTicketDue(),
-                        0,
-                        tkt.getUser().getFullName(),
-                        "tickets"));
-            }
+            appItemList.add(new AppItem(
+                    tkt.getId(),
+                    tkt.getTicketStatus().toString(),
+                    tkt.getTicketDetail(),
+                    tkt.getTicketDue(),
+                    0,
+                    tkt.getUser().getFullName(),
+                    "tickets"));
         }
 
         return new ResponseEntity<>(appItemList, HttpStatus.OK);
@@ -93,17 +100,26 @@ public class MobileAppAPITicketController {
     @GetMapping("/listbyagent")
     public ResponseEntity<List<AppItem>> getUserTickets(@RequestParam(required = false) String sortCol,
                                                         @RequestParam(required = false) String sortOrder,
+                                                        @RequestParam(required = false) BigInteger sortSLA,
                                                         HttpServletRequest request) {
         APIUser apiUser = getUserFromToken(request);
         if (!apiUser.isValid()) {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
         }
+        List<Ticket> openAgentTicketList;
 
         if (org.apache.commons.lang3.StringUtils.isBlank(sortCol)) { sortCol = "ticketDue"; }
         if (org.apache.commons.lang3.StringUtils.isBlank(sortOrder)) { sortOrder = "ASC"; }
+        if (sortSLA == null) {
+            openAgentTicketList = ticketService.findAllByAgentOpenOnly(apiUser.getUser());
+        } else if (sortSLA.equals(BigInteger.valueOf(0))) {
+            openAgentTicketList = ticketService.findAllByAgentOpenOnly(apiUser.getUser());
+        } else {
+            SLA getSLA = slaService.findById(sortSLA).orElse(null);
+            openAgentTicketList = ticketService.findAllByAgentAndSlaOpenOnly(apiUser.getUser(), getSLA);
+        }
 
         List<AppItem> appItemList = new ArrayList<>();
-        List<Ticket> openAgentTicketList = ticketService.findAllByAgentOpenOnly(apiUser.getUser());
         sortTickets(openAgentTicketList,sortCol,sortOrder);
 
         for (Ticket tkt : openAgentTicketList) {
@@ -121,14 +137,29 @@ public class MobileAppAPITicketController {
     }
 
     @GetMapping("/listbyincluded")
-    public ResponseEntity<List<AppItem>> getUserTicketMentions(HttpServletRequest request) {
+    public ResponseEntity<List<AppItem>> getUserTicketMentions(@RequestParam(required = false) String sortCol,
+                                                               @RequestParam(required = false) String sortOrder,
+                                                               @RequestParam(required = false) BigInteger sortSLA,
+                                                               HttpServletRequest request) {
         APIUser apiUser = getUserFromToken(request);
         if (!apiUser.isValid()) {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
         }
 
+        List<Ticket> openAgentTicketList;
+
+        if (org.apache.commons.lang3.StringUtils.isBlank(sortCol)) { sortCol = "ticketDue"; }
+        if (org.apache.commons.lang3.StringUtils.isBlank(sortOrder)) { sortOrder = "ASC"; }
+        if (sortSLA == null) {
+            openAgentTicketList = ticketService.findAllByMentionOpenOnly(apiUser.getUser());
+        } else if (sortSLA.equals(BigInteger.valueOf(0))) {
+            openAgentTicketList = ticketService.findAllByMentionOpenOnly(apiUser.getUser());
+        } else {
+            SLA getSLA = slaService.findById(sortSLA).orElse(null);
+            openAgentTicketList = ticketService.findAllByMentionAndSlaOpenOnly(apiUser.getUser(),getSLA);
+        }
+
         List<AppItem> appItemList = new ArrayList<>();
-        List<Ticket> openAgentTicketList = ticketService.findAllByMentionOpenOnly(apiUser.getUser());
         sortTickets(openAgentTicketList,"ticketDue","ASC");
 
         for (Ticket tkt : openAgentTicketList) {
@@ -148,30 +179,38 @@ public class MobileAppAPITicketController {
     @GetMapping("/allopen")
     public ResponseEntity<List<AppItem>> getTicketsAllOpen(@RequestParam(required = false) String sortCol,
                                                            @RequestParam(required = false) String sortOrder,
+                                                           @RequestParam(required = false) BigInteger sortSLA,
                                                            HttpServletRequest request) {
         APIUser apiUser = getUserFromToken(request);
         if (!apiUser.isValid()) {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
         }
 
+        List<Ticket> openAgentTicketList;
+
         if (org.apache.commons.lang3.StringUtils.isBlank(sortCol)) { sortCol = "ticketDue"; }
         if (org.apache.commons.lang3.StringUtils.isBlank(sortOrder)) { sortOrder = "ASC"; }
+        if (sortSLA == null) {
+            openAgentTicketList = ticketService.findAllOpen();
+        } else if (sortSLA.equals(BigInteger.valueOf(0))) {
+            openAgentTicketList = ticketService.findAllOpen();
+        } else {
+            SLA getSLA = slaService.findById(sortSLA).orElse(null);
+            openAgentTicketList = ticketService.findAllOpenBySla(getSLA);
+        }
 
         List<AppItem> appItemList = new ArrayList<>();
-        List<Ticket> openAgentTicketList = ticketService.findAllOpen();
         sortTickets(openAgentTicketList,sortCol,sortOrder);
 
         for (Ticket tkt : openAgentTicketList) {
-            if (!tkt.getTicketStatus().equals(TicketStatus.Closed)) {
-                appItemList.add(new AppItem(
-                        tkt.getId(),
-                        tkt.getTicketStatus().toString(),
-                        tkt.getTicketDetail(),
-                        tkt.getTicketDue(),
-                        0,
-                        tkt.getUser().getFullName(),
-                        "tickets"));
-            }
+            appItemList.add(new AppItem(
+                    tkt.getId(),
+                    tkt.getTicketStatus().toString(),
+                    tkt.getTicketDetail(),
+                    tkt.getTicketDue(),
+                    0,
+                    tkt.getUser().getFullName(),
+                    "tickets"));
         }
 
         return new ResponseEntity<>(appItemList, HttpStatus.OK);

@@ -144,6 +144,23 @@ public class TicketService implements TicketServiceInterface {
     }
 
     @Override
+    public List<Ticket> findAllBySla(SLA sla) {
+        return ticketRepository.findAllBySla(sla);
+    }
+
+    @Override
+    public List<Ticket> findAllOpenBySla(SLA sla) {
+        List<Ticket> tickets = ticketRepository.findAllBySla(sla);
+        List<Ticket> openTickets = new ArrayList<>();
+        for (Ticket ticket : tickets) {
+            if (!ticket.getTicketStatus().equals(TicketStatus.Closed)) {
+                openTickets.add(ticket);
+            }
+        }
+        return openTickets;
+    }
+
+    @Override
     public List<Ticket> findAllByUser(User user) {
         return ticketRepository.findAllByUser(user);
     }
@@ -151,6 +168,11 @@ public class TicketService implements TicketServiceInterface {
     @Override
     public List<Ticket> findAllByUserOpenOnly(User user) {
         return ticketRepository.findAllByUserAndTicketStatusNot(user, TicketStatus.Closed);
+    }
+
+    @Override
+    public List<Ticket> findAllByUserAndSlaOpenOnly(User user, SLA sla) {
+        return ticketRepository.findAllByUserAndSlaAndTicketStatusNot(user, sla, TicketStatus.Closed);
     }
 
     @Override
@@ -169,14 +191,38 @@ public class TicketService implements TicketServiceInterface {
     }
 
     @Override
+    public List<Ticket> findAllByAgentAndSlaOpenOnly(User user, SLA sla) {
+        return ticketRepository.findAllByAgentIdAndSLAOpenOnly(user.getId(), sla.getId());
+    }
+
+    @Override
     public List<Ticket> findAllByMentionOpenOnly(User user) {
         List<Tuple> agentList = ticketRepository.findAllMentionsByAgentId(user.getId());
         List<Ticket> ticketList = new ArrayList<>();
         for (Tuple tuple : agentList) {
-            String ticketId = tuple.get(1).toString();
-            Ticket ticket = ticketRepository.findById(ticketId).get();
-            if (!ticket.getTicketStatus().equals(TicketStatus.Closed)) {
-                ticketList.add(ticket);
+            String ticketId = tuple.get(0).toString();
+            Optional<Ticket> ticket = ticketRepository.findById(ticketId);
+            if (ticket.isPresent()) {
+                if (!ticket.get().getTicketStatus().equals(TicketStatus.Closed)) {
+                    ticketList.add(ticket.get());
+                }
+            }
+        }
+        return ticketList;
+    }
+
+    @Override
+    public List<Ticket> findAllByMentionAndSlaOpenOnly(User user, SLA sla) {
+        List<Tuple> agentList = ticketRepository.findAllMentionsByAgentId(user.getId());
+        List<Ticket> ticketList = new ArrayList<>();
+        for (Tuple tuple : agentList) {
+            String ticketId = tuple.get(0).toString();
+            Optional<Ticket> ticket = ticketRepository.findById(ticketId);
+            if (ticket.isPresent()) {
+                if (!ticket.get().getTicketStatus().equals(TicketStatus.Closed)
+                        && ticket.get().getSla().getId().equals(sla.getId())) {
+                    ticketList.add(ticket.get());
+                }
             }
         }
         return ticketList;

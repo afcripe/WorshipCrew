@@ -5,6 +5,7 @@ import net.dahliasolutions.models.campus.Campus;
 import net.dahliasolutions.models.department.DepartmentRegional;
 import net.dahliasolutions.models.order.OrderItem;
 import net.dahliasolutions.models.order.OrderRequest;
+import net.dahliasolutions.models.support.SLA;
 import net.dahliasolutions.models.support.Ticket;
 import net.dahliasolutions.models.support.TicketStatus;
 import net.dahliasolutions.models.user.User;
@@ -21,7 +22,9 @@ public interface TicketRepository extends JpaRepository<Ticket, BigInteger> {
 
 
     Optional<Ticket> findById(String id);
+    List<Ticket> findAllBySla(SLA sla);
     List<Ticket> findAllByUserAndTicketStatusNot(User user, TicketStatus status);
+    List<Ticket> findAllByUserAndSlaAndTicketStatusNot(User user, SLA sla, TicketStatus status);
     List<Ticket> findAllByUser(User user);
     List<Ticket> findAllByCampusAndTicketStatusNot(Campus campus, TicketStatus status);
     List<Ticket> findAllByCampus(Campus campus);
@@ -47,6 +50,8 @@ public interface TicketRepository extends JpaRepository<Ticket, BigInteger> {
     List<Ticket> findAllByAgentId(@Param("agentId") BigInteger agentId);
     @Query(value = "SELECT * FROM TICKET WHERE AGENT_ID = :agentId AND TICKET_STATUS <> 'Closed' ORDER BY TICKET_DATE DESC", nativeQuery = true)
     List<Ticket> findAllByAgentIdOpenOnly(@Param("agentId") BigInteger agentId);
+    @Query(value = "SELECT * FROM TICKET WHERE AGENT_ID = :agentId AND SLA_ID = :slaId AND TICKET_STATUS <> 'Closed' ORDER BY TICKET_DATE DESC", nativeQuery = true)
+    List<Ticket> findAllByAgentIdAndSLAOpenOnly(@Param("agentId") BigInteger agentId, @Param("slaId") BigInteger slaId);
     @Query(value = "SELECT * FROM TICKET_AGENT_LIST WHERE AGENT_LIST_ID = :agentId", nativeQuery = true)
     List<Tuple> findAllMentionsByAgentId(@Param("agentId") BigInteger agentId);
 

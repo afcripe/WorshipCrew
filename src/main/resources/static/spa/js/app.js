@@ -22,8 +22,8 @@ import SearchView from "./SearchView.js";
 import { postLogin, renewToken } from "./Login.js";
 import { toggleDetail, showTicketAgents, updateAgent, updateNote, updateTicketStatus, postTicketNote, postTicketStatus, postTicketAddAgent, postTicketRemoveAgent, updateTicketSLA, postTicketSLA, postTicketAccept } from "./TicketView.js";
 import { postNewTicket } from "./TicketNew.js";
-import { sortAllTickets } from "./TicketAll.js";
-import { sortMyTickets } from "./Tickets.js";
+import { sortAllTickets, showAllTicketSLADialog } from "./TicketAll.js";
+import { sortMyTickets, showMyTicketSLADialog } from "./Tickets.js";
 import { imageDialog } from "./ImageView.js";
 import { postUpdateAuth, showUserEdit, postUpdateUser } from "./UserView.js";
 import { postNewUser } from "./UserNew.js";
@@ -485,11 +485,17 @@ const msgDraftDelete = async (id) => {
     let deletedMessage = await deleteRemoteDraftById(id, token);
     navigateTo("/app/messages/false/false/true");
 }
-const ticketsAllSort = async(srt,ordr) => {
-    sortAllTickets(srt,ordr,token);
+const ticketsAllSort = async(srt,ordr,sla) => {
+    sortAllTickets(srt,ordr,sla,token);
 }
-const ticketsMySort = async(srt,ordr) => {
-    sortMyTickets(srt,ordr,token);
+const ticketsMySort = async(srt,ordr,sla) => {
+    sortMyTickets(srt,ordr,sla,token);
+}
+const ticketsAllSLAShow = async() => {
+    showAllTicketSLADialog(token);
+}
+const ticketsMySLAShow = async() => {
+    showMyTicketSLADialog(token);
 }
 
 
@@ -1054,14 +1060,60 @@ document.addEventListener("DOMContentLoaded", () => {
             e.preventDefault();
             let sorting = document.getElementById('allTicketsSorting').value;
             let args = sorting.split(",");
-            ticketsAllSort(args[0],args[1]);
+            let sla = document.getElementById('allTicketSLAInput').value;
+            ticketsAllSort(args[0],args[1],sla);
         }
 
         if ( e.target.matches("[data-nav-my-tickets-sort]") ) {
             e.preventDefault();
             let sorting = document.getElementById('myTicketsSorting').value;
             let args = sorting.split(",");
-            ticketsMySort(args[0],args[1]);
+            let sla = document.getElementById('myTicketSLAInput').value;
+            ticketsMySort(args[0],args[1],sla);
+        }
+
+        if ( e.target.matches("[data-nav-all-tickets-sla]") ) {
+            e.preventDefault();
+            ticketsAllSLAShow();
+        }
+
+        if ( e.target.matches("[data-nav-my-tickets-sla]") ) {
+            e.preventDefault();
+            ticketsMySLAShow();
+        }
+
+        if ( e.target.matches("[data-all-tickets-sla]") ) {
+            e.preventDefault();
+            // sorting
+            let sorting = document.getElementById('allTicketsSorting').value;
+            let args = sorting.split(",");
+
+            //sla
+            let slaEl = document.getElementById('slaSelect');
+            let sla = slaEl.value;
+            let slaText = slaEl.options[slaEl.selectedIndex].text;
+            document.getElementById('allTicketSLALabel').innerText = slaText;
+            document.getElementById('allTicketSLAInput').value = sla;
+
+            document.getElementById("formSLAChooser").remove();
+            ticketsAllSort(args[0],args[1],sla);
+        }
+
+        if ( e.target.matches("[data-my-tickets-sla]") ) {
+            e.preventDefault();
+            // sorting
+            let sorting = document.getElementById('myTicketsSorting').value;
+            let args = sorting.split(",");
+
+            //sla
+            let slaEl = document.getElementById('slaSelect');
+            let sla = slaEl.value;
+            let slaText = slaEl.options[slaEl.selectedIndex].text;
+            document.getElementById('myTicketSLALabel').innerText = slaText;
+            document.getElementById('myTicketSLAInput').value = sla;
+
+            document.getElementById("formSLAChooser").remove();
+            ticketsMySort(args[0],args[1],sla);
         }
 
         // resources

@@ -18,6 +18,7 @@ public interface OrderServiceInterface {
     Optional<OrderRequest> findById(BigInteger id);
     Optional<OrderRequest> findAllByIdAndCycle(BigInteger id, LocalDateTime startDate, LocalDateTime endDate);
     List<OrderRequest> findAll();
+    List<OrderRequest> findAllOpen();
     List<OrderRequest> findAllByUser(User user);
     List<OrderRequest> findAllByCampus(Campus campus);
     List<OrderRequest> findAllByCampusAndCycle(BigInteger campusId, LocalDateTime startDate, LocalDateTime endDate);

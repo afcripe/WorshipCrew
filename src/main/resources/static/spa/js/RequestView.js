@@ -674,7 +674,7 @@ function formatDate(dte) {
     let strTime = dte.split("T")[1];
     let partsDate = strDate.split("-");
     let partTime = strTime.split(":");
-    return strDate + " " + partTime[0] + ":" + partTime[1];
+    return partsDate[1] + " / " + partsDate[2] + " / " + partsDate[0] + partTime[0] + ":" + partTime[1];
 }
 
 export { updateRequest, updateRequestItem, showRequestHistory, updateSupervisor, updateRequestAgent, updateRequestItemAgent, postRequestAcknowledged,

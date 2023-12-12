@@ -85,6 +85,16 @@ public class OrderService implements OrderServiceInterface {
     }
 
     @Override
+    public List<OrderRequest> findAllOpen() {
+        List<OrderRequest> orderRequestList = orderRepository.findAllOpenOnly();
+        for (OrderRequest orderRequest : orderRequestList) {
+            orderRequest.setRequestItems(orderItemRepository.findAllByOrderRequest(orderRequest));
+            orderRequest.setItemCount(orderRequest.getItemCount());
+        }
+        return orderRequestList;
+    }
+
+    @Override
     public List<OrderRequest> findAllByUser(User user) {
         List<OrderRequest> orderRequestList = orderRepository.findAllByUser(user.getId());
         for (OrderRequest orderRequest : orderRequestList) {

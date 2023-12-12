@@ -12,7 +12,7 @@ export default class extends AbstractView {
         let returnHTML = `<div class="list__group">
                         <div class="list__group-item-grow title__module">Requests</div>
                         <div class="list__group-item-right">
-                        <span data-nav-my-requests>View Mine</span></div></div>`;
+                        <button class="btn btn-sm btn-generic" data-nav-my-requests>View Mine</button></div></div>`;
 
         this.setAppProgress(60);
         if (requests.length > 0) {
@@ -68,8 +68,7 @@ function htmlRequestLine(req) {
     let r = "";
     r+=`<div class="list__item" data-link-request="`+req.id+`">`;
     r+=`<div class="list__Item-line" data-link-request="`+req.id+`">`;
-    r+=`<div class="appList__item-id" data-link-request="`+req.id+`">Request: `+req.id+`</div>`;
-    r+=`<div class="appList__item-name" data-link-request="`+req.id+`">`+req.user+`</div>`;
+    r+=`<div class="appList__item-id" data-link-request="`+req.id+`">`+req.user+`</div>`;
     r+=`<div class="appList__item-right" data-link-request="`+req.id+`">`+formatDate(req.date)+`</div>`;
     r+=`</div><div class="list__Item-line" data-link-request="`+req.id+`">`;
     r+=`<div class="appList__item-detail" data-link-request="`+req.id+`">`+req.detail+`</div>`;
@@ -98,5 +97,5 @@ function formatDate(dte) {
     let strTime = dte.split("T")[1];
     let partsDate = strDate.split("-");
     let partTime = strTime.split(":");
-    return strDate + " " + partTime[0] + ":" + partTime[1];
+    return partsDate[1] + " / " + partsDate[2] + " / " + partsDate[0];
 }

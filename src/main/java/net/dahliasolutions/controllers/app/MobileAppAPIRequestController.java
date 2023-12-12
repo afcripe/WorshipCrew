@@ -8,6 +8,7 @@ import net.dahliasolutions.models.*;
 import net.dahliasolutions.models.mail.EmailDetails;
 import net.dahliasolutions.models.order.*;
 import net.dahliasolutions.models.records.*;
+import net.dahliasolutions.models.support.Ticket;
 import net.dahliasolutions.models.user.User;
 import net.dahliasolutions.models.user.UserRoles;
 import net.dahliasolutions.services.JwtService;
@@ -141,17 +142,15 @@ public class MobileAppAPIRequestController {
         }
 
         List<AppItem> appItemList = new ArrayList<>();
-        for (OrderRequest item : orderService.findAll()) {
-            if (!item.getOrderStatus().equals(OrderStatus.Complete) || !item.getOrderStatus().equals(OrderStatus.Cancelled)) {
-                appItemList.add(new AppItem(
-                        item.getId().toString(),
-                        item.getOrderStatus().toString(),
-                        item.getRequestNote(),
-                        item.getRequestDate(),
-                        item.getItemCount(),
-                        item.getUser().getFullName(),
-                        "requests"));
-            }
+        for (OrderRequest item : orderService.findAllOpen()) {
+            appItemList.add(new AppItem(
+                    item.getId().toString(),
+                    item.getOrderStatus().toString(),
+                    item.getRequestNote(),
+                    item.getRequestDate(),
+                    item.getItemCount(),
+                    item.getUser().getFullName(),
+                    "requests"));
         }
 
         return new ResponseEntity<>(appItemList, HttpStatus.OK);
@@ -263,7 +262,7 @@ public class MobileAppAPIRequestController {
             return new ResponseEntity<>(new SingleStringModel("Acknowledge"), HttpStatus.OK);
         }
 
-        return new ResponseEntity<>(new SingleStringModel("Not Supervisor"), HttpStatus.CONTINUE);
+        return new ResponseEntity<>(new SingleStringModel("Not Supervisor"), HttpStatus.NOT_FOUND);
     }
 
     @PostMapping("/setacknowledge")
@@ -705,6 +704,44 @@ public class MobileAppAPIRequestController {
         }
         list.add(user);
         return list;
+    }
+
+    private List<OrderRequest> sortRequests(List<OrderRequest> requests, String sortColumn, String sortOrder) {
+        if (sortColumn.equals("")) {sortColumn="requestDate";}
+        if (sortOrder.equals("")) {sortColumn="ASC";}
+
+        switch (sortColumn) {
+            case "requestDate":
+                requests.sort(new Comparator<OrderRequest>() {
+                    @Override
+                    public int compare(OrderRequest r1, OrderRequest r2) {
+                        return r1.getRequestDate().compareTo(r2.getRequestDate());
+                    }
+                });
+                if (sortOrder.equals("DESC")) {
+                    Collections.reverse(requests);
+                }
+        }
+        return requests;
+    }
+
+    private List<OrderItem> sortRequestItems(List<OrderItem> items, String sortColumn, String sortOrder) {
+        if (sortColumn.equals("")) {sortColumn="requestDate";}
+        if (sortOrder.equals("")) {sortColumn="ASC";}
+
+        switch (sortColumn) {
+            case "requestDate":
+                items.sort(new Comparator<OrderItem>() {
+                    @Override
+                    public int compare(OrderItem i1, OrderItem i2) {
+                        return i1.getRequestDate().compareTo(i2.getRequestDate());
+                    }
+                });
+                if (sortOrder.equals("DESC")) {
+                    Collections.reverse(items);
+                }
+        }
+        return items;
     }
 
 }

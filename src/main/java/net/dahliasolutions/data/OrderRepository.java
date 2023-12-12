@@ -16,6 +16,8 @@ public interface OrderRepository extends JpaRepository<OrderRequest, BigInteger>
 
     List<OrderRequest> findAllByCampus(Campus campus);
     List<OrderRequest> findAllByCampusOrderByRequestDateDesc(Campus campus);
+    @Query(value = "SELECT * FROM ORDER_REQUEST WHERE ORDER_STATUS <> 'Cancelled' AND ORDER_STATUS <> 'Complete' ORDER BY REQUEST_DATE DESC", nativeQuery = true)
+    List<OrderRequest> findAllOpenOnly();
     @Query(value = "SELECT * FROM ORDER_REQUEST WHERE ID = :id AND REQUEST_DATE BETWEEN :start AND :end ORDER BY REQUEST_DATE DESC", nativeQuery = true)
     Optional<OrderRequest> findAllByIdAndCycle(@Param("id") BigInteger id, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
     @Query(value = "SELECT * FROM ORDER_REQUEST WHERE USER_ID = :userId AND REQUEST_DATE BETWEEN :start AND :end ORDER BY REQUEST_DATE DESC", nativeQuery = true)

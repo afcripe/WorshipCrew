@@ -737,12 +737,19 @@ progress::-webkit-progress-value {
 .title__modul-item {
     font-size: 1.5rem;
     font-weight: bolder;
+    padding-top: 0;
+    padding-bottom: 0;
 }
 
 .list__group {
     display: flex;
     flex-direction: row;
     padding-top: 0.75rem;
+}
+
+.list__group-short {
+    display: flex;
+    flex-direction: row;
 }
 
 .list__group-item-grow {
