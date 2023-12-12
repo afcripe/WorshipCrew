@@ -67,7 +67,7 @@ public class MobileAppAPITicketController {
         }
 
         if (org.apache.commons.lang3.StringUtils.isBlank(sortCol)) { sortCol = "ticketDue"; }
-        if (org.apache.commons.lang3.StringUtils.isBlank(sortOrder)) { sortOrder = "DESC"; }
+        if (org.apache.commons.lang3.StringUtils.isBlank(sortOrder)) { sortOrder = "ASC"; }
 
 
         List<AppItem> appItemList = new ArrayList<>();
@@ -80,7 +80,7 @@ public class MobileAppAPITicketController {
                         tkt.getId(),
                         tkt.getTicketStatus().toString(),
                         tkt.getTicketDetail(),
-                        tkt.getTicketDate(),
+                        tkt.getTicketDue(),
                         0,
                         tkt.getUser().getFullName(),
                         "tickets"));
@@ -100,7 +100,7 @@ public class MobileAppAPITicketController {
         }
 
         if (org.apache.commons.lang3.StringUtils.isBlank(sortCol)) { sortCol = "ticketDue"; }
-        if (org.apache.commons.lang3.StringUtils.isBlank(sortOrder)) { sortOrder = "DESC"; }
+        if (org.apache.commons.lang3.StringUtils.isBlank(sortOrder)) { sortOrder = "ASC"; }
 
         List<AppItem> appItemList = new ArrayList<>();
         List<Ticket> openAgentTicketList = ticketService.findAllByAgentOpenOnly(apiUser.getUser());
@@ -111,7 +111,7 @@ public class MobileAppAPITicketController {
                     tkt.getId(),
                     tkt.getTicketStatus().toString(),
                     tkt.getTicketDetail(),
-                    tkt.getTicketDate(),
+                    tkt.getTicketDue(),
                     0,
                     tkt.getUser().getFullName(),
                     "tickets"));
@@ -129,13 +129,14 @@ public class MobileAppAPITicketController {
 
         List<AppItem> appItemList = new ArrayList<>();
         List<Ticket> openAgentTicketList = ticketService.findAllByMentionOpenOnly(apiUser.getUser());
+        sortTickets(openAgentTicketList,"ticketDue","ASC");
 
         for (Ticket tkt : openAgentTicketList) {
             appItemList.add(new AppItem(
                     tkt.getId(),
                     tkt.getTicketStatus().toString(),
                     tkt.getTicketDetail(),
-                    tkt.getTicketDate(),
+                    tkt.getTicketDue(),
                     0,
                     tkt.getUser().getFullName(),
                     "tickets"));
@@ -154,7 +155,7 @@ public class MobileAppAPITicketController {
         }
 
         if (org.apache.commons.lang3.StringUtils.isBlank(sortCol)) { sortCol = "ticketDue"; }
-        if (org.apache.commons.lang3.StringUtils.isBlank(sortOrder)) { sortOrder = "DESC"; }
+        if (org.apache.commons.lang3.StringUtils.isBlank(sortOrder)) { sortOrder = "ASC"; }
 
         List<AppItem> appItemList = new ArrayList<>();
         List<Ticket> openAgentTicketList = ticketService.findAllOpen();
@@ -166,7 +167,7 @@ public class MobileAppAPITicketController {
                         tkt.getId(),
                         tkt.getTicketStatus().toString(),
                         tkt.getTicketDetail(),
-                        tkt.getTicketDate(),
+                        tkt.getTicketDue(),
                         0,
                         tkt.getUser().getFullName(),
                         "tickets"));

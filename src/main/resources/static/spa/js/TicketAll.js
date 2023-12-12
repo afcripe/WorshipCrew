@@ -15,13 +15,25 @@ export default class extends AbstractView {
                         <span data-nav-my-tickets>View Mine</span></div></div>`;
 
         this.setAppProgress(60);
+        returnHTML += `<div class="list__group">
+                        <div class="list__group-item-grow"><h3>Open Tickets</h3></div>
+                        <div class="list__group-item-grow">
+                        <select class="form-control" id="allTicketsSorting"
+                                onchange="document.getElementById('allTicketsSortingBtn').click()">
+                            <option value="ticketDue,ASC">Date Due | ASC</option>
+                            <option value="ticketDue,DESC">Date Due | DESC</option>
+                        </select>
+                        <button type="button" class="btn btn-generic" style="display: none" 
+                         id="allTicketsSortingBtn" data-nav-all-tickets-sort></button>
+                        </div></div>`;
+        returnHTML += `<div id="ticketList">`;
         if (tickets.length > 0) {
-            returnHTML += '<h3>Open Tickets</h3>';
             for (let n in tickets) {
                 let mt = tickets[n];
                 returnHTML += htmlTicketLine(mt);
             }
         }
+        returnHTML += `</div>`;
 
         this.setAppProgress(90);
         returnHTML = returnHTML.replaceAll("\n","");
@@ -51,6 +63,26 @@ function setAppProgress(prg) {
     } catch (e) {
         document.getElementById("appProgress").style.display = "none";
     }
+}
+
+async function sortAllTickets (srt,ordr,token) {
+    const response = await fetch('/api/v1/app/ticket/allopen?sortCol='+srt+'&sortOrder='+ordr, {
+        headers: {
+            authorization: "Bearer "+token
+        }
+    });
+    const tickets = await response.json();
+    const status = response.status;
+
+    document.getElementById('ticketList').innerHTML = "";
+    let newHTML = "";
+    if (tickets.length > 0) {
+        for (let n in tickets) {
+            let mt = tickets[n];
+            newHTML += htmlTicketLine(mt);
+        }
+    }
+    document.getElementById('ticketList').innerHTML = newHTML;
 }
 
 async function getRemoteTicketsAll(token) {
@@ -85,3 +117,5 @@ function formatDate(dte) {
     let partTime = strTime.split(":");
     return strDate + " " + partTime[0] + ":" + partTime[1];
 }
+
+export { sortAllTickets }

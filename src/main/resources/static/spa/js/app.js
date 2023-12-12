@@ -22,6 +22,8 @@ import SearchView from "./SearchView.js";
 import { postLogin, renewToken } from "./Login.js";
 import { toggleDetail, showTicketAgents, updateAgent, updateNote, updateTicketStatus, postTicketNote, postTicketStatus, postTicketAddAgent, postTicketRemoveAgent, updateTicketSLA, postTicketSLA, postTicketAccept } from "./TicketView.js";
 import { postNewTicket } from "./TicketNew.js";
+import { sortAllTickets } from "./TicketAll.js";
+import { sortMyTickets } from "./Tickets.js";
 import { imageDialog } from "./ImageView.js";
 import { postUpdateAuth, showUserEdit, postUpdateUser } from "./UserView.js";
 import { postNewUser } from "./UserNew.js";
@@ -482,6 +484,12 @@ const msgDraftDelete = async (id) => {
     debugger
     let deletedMessage = await deleteRemoteDraftById(id, token);
     navigateTo("/app/messages/false/false/true");
+}
+const ticketsAllSort = async(srt,ordr) => {
+    sortAllTickets(srt,ordr,token);
+}
+const ticketsMySort = async(srt,ordr) => {
+    sortMyTickets(srt,ordr,token);
 }
 
 
@@ -1040,6 +1048,20 @@ document.addEventListener("DOMContentLoaded", () => {
         if ( e.target.matches("[data-nav-my-tickets]") ) {
             e.preventDefault();
             navigateTo("/app/tickets");
+        }
+
+        if ( e.target.matches("[data-nav-all-tickets-sort]") ) {
+            e.preventDefault();
+            let sorting = document.getElementById('allTicketsSorting').value;
+            let args = sorting.split(",");
+            ticketsAllSort(args[0],args[1]);
+        }
+
+        if ( e.target.matches("[data-nav-my-tickets-sort]") ) {
+            e.preventDefault();
+            let sorting = document.getElementById('myTicketsSorting').value;
+            let args = sorting.split(",");
+            ticketsMySort(args[0],args[1]);
         }
 
         // resources
