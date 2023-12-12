@@ -130,7 +130,6 @@
         <script>
             async function loadPeople() {
                 let dispPersonSelect = document.getElementById('personSelect');
-                document.getElementById("assignItems").disabled = true;
                 const response = await fetch('/api/v1/request/getsupervisors')
                     .then(response => {
                         return response.json();
@@ -235,6 +234,7 @@
                     formData.set("requestId", document.getElementById('orderId').value);
                     formData.set("requestStatus", dispStatusSelect.value);
                     formData.set("requestNote", dispStatusNote.value);
+                    formData.set("items", document.getElementById('statusItems').checked);
 
                 const response = await fetch('/api/v1/request/changestatus', {
                     method: 'POST',
@@ -265,6 +265,10 @@
             <select class="form-control py-1" id="statusSelect" onkeyup="keyStatus(event)">
                 <option></option>
             </select>
+
+            <label for="statusItems" class="form-label">Assign All Items</label>
+            <input type="checkbox" id="statusItems">
+
             <label class="form-control-label">Note</label>
             <textarea id="statusNote" class="form-control w-100"></textarea>
 

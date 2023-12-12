@@ -5,5 +5,6 @@ import java.math.BigInteger;
 public record ChangeStatusModel(
         BigInteger requestId,
         String requestStatus,
-        String requestNote) {
+        String requestNote,
+        boolean items) {
 }

@@ -55,6 +55,10 @@ export default class extends AbstractView {
             }
         }
 
+        if (tickets.length === 0 && ticketsInclude.length === 0) {
+            returnHTML += '<h4>No Tickets Found</h4>';
+        }
+
         returnHTML += `</div>`;
 
         this.setAppProgress(90);
@@ -179,7 +183,8 @@ function htmlTicketLine(tkt) {
     r+=`<div class="item-user" data-link-ticket="`+tkt.id+`">`+tkt.user+`</div>`;
     r+=`<div class="item-date" data-link-ticket="`+tkt.id+`">`+formatDate(tkt.date)+`</div>`;
     r+=`</div><div class="list__Item-line" data-link-ticket="`+tkt.id+`">`;
-    r+=`<div class="item-detail" data-link-ticket="`+tkt.id+`">`+tkt.detail+`</div>`;
+    r+=`<div class="appList__item-detail" data-link-ticket="`+tkt.id+`">`+tkt.detail+`</div>`;
+    r+=`<div class="appList__item-right appList__item-outline" data-link-ticket="`+tkt.id+`" style="white-space: nowrap">`+tkt.name+`</div>`;
     r+=`</div></div>`;
 
     return r;
@@ -189,27 +194,23 @@ function htmlDialogSLA(slas) {
     let r=`<div>`;
     r+=`<form><div class="form-content form__popup-content">`;
 
-    r+=`<div class="request__item-detail">`;
-    r+=`<h4>Select Service Level Agreement</h4>`;
-    r+=`</div>`;
+    r+=`<div class="list__Item-line">
+            <div class="request__item-field-grow">&nbsp;</div>
+            <div class="request__item-field-right">
+                <button id="btnSLASortSelect" type="button" class="btn btn-sm btn-support" style="display: none" data-my-tickets-sla>Select</button>
+                <button id="btnSLASortCancel" type="button" class="btn btn-sm btn-outline-cancel">Cancel</button>
+            </div>
+        </div>`;
 
     r+=`<div class="request__item-detail detail-padding-bottom">`;
-    r+=`<select id="slaSelect" class="form-control">`;
+    r+=`<select id="slaSelect" class="form-control" onchange="document.getElementById('btnSLASortSelect').click()">`;
+    r+=`<option value="0">Select Service Level Agreement</option>`;
     r+=`<option value="0">All SLAs</option>`;
     for (let s in slas) {
         let opt = slas[s];
         r+=`<option value="`+opt.id+`">`+opt.name+`</option>`;
     }
     r+=`</select>`;
-    r+=`</div>`;
-
-    r+=`<div class="request__item-detail detail-padding-bottom">`;
-    r+=`<div class="request__item-field-center">`;
-    r+=`<button type="button" class="btn btn-sm btn-support" data-my-tickets-sla>Select</button>`;
-    r+=`</div>`;
-    r+=`<div class="request__item-field-center">`;
-    r+=`<button id="btnSLASortCancel" type="button" class="btn btn-sm btn-outline-cancel">Cancel</button>`;
-    r+=`</div>`;
     r+=`</div>`;
 
     r+=`</div></form></div>`;

@@ -28,6 +28,8 @@ import { imageDialog } from "./ImageView.js";
 import { postUpdateAuth, showUserEdit, postUpdateUser } from "./UserView.js";
 import { postNewUser } from "./UserNew.js";
 import { updateRequest, updateRequestItem, showRequestHistory, updateSupervisor, updateRequestAgent, updateRequestItemAgent, postRequestStatus, postRequestItemStatus, postRequestAddAgent, postRequestItemAddAgent, postRequestAddSupervisor, postRequestRemoveSupervisor, postRequestAcknowledged } from "./RequestView.js";
+import { sortAllRequests } from "./RequestAll.js";
+import { sortMyRequests } from "./Requests.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
 import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-messaging.js";
 import { showRemoteMessage } from "./Messages.js";
@@ -438,6 +440,14 @@ const postRequestAck = async () => {
     updateAppProgress(101);
     navigateTo("/app/request/"+rsp);
 }
+
+const requestsAllSort = async(srt,ordr) => {
+    sortAllRequests(srt,ordr,token);
+}
+const requestsMySort = async(srt,ordr) => {
+    sortMyRequests(srt,ordr,token);
+}
+
 
 const postTicketAcc = async () => {
     updateAppProgress(0);
@@ -963,6 +973,20 @@ document.addEventListener("DOMContentLoaded", () => {
         if ( e.target.matches("[data-nav-my-requests]") ) {
             e.preventDefault();
             navigateTo("/app/requests");
+        }
+
+        if ( e.target.matches("[data-nav-all-requests-sort]") ) {
+            e.preventDefault();
+            let sorting = document.getElementById('allRequestsSorting').value;
+            let args = sorting.split(",");
+            requestsAllSort(args[0],args[1]);
+        }
+
+        if ( e.target.matches("[data-nav-my-requests-sort]") ) {
+            e.preventDefault();
+            let sorting = document.getElementById('myRequestsSorting').value;
+            let args = sorting.split(",");
+            requestsMySort(args[0],args[1]);
         }
 
         // Tickets

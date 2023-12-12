@@ -86,7 +86,7 @@ public class MobileAppAPITicketController {
         for (Ticket tkt : openAgentTicketList) {
             appItemList.add(new AppItem(
                     tkt.getId(),
-                    tkt.getTicketStatus().toString(),
+                    tkt.getSla().getName(),
                     tkt.getTicketDetail(),
                     tkt.getTicketDue(),
                     0,
@@ -125,7 +125,8 @@ public class MobileAppAPITicketController {
         for (Ticket tkt : openAgentTicketList) {
             appItemList.add(new AppItem(
                     tkt.getId(),
-                    tkt.getTicketStatus().toString(),
+                    tkt.getSla().getName(),
+                    // tkt.getTicketStatus().toString(),
                     tkt.getTicketDetail(),
                     tkt.getTicketDue(),
                     0,
@@ -165,7 +166,8 @@ public class MobileAppAPITicketController {
         for (Ticket tkt : openAgentTicketList) {
             appItemList.add(new AppItem(
                     tkt.getId(),
-                    tkt.getTicketStatus().toString(),
+                    tkt.getSla().getName(),
+                    // tkt.getTicketStatus().toString(),
                     tkt.getTicketDetail(),
                     tkt.getTicketDue(),
                     0,
@@ -205,7 +207,8 @@ public class MobileAppAPITicketController {
         for (Ticket tkt : openAgentTicketList) {
             appItemList.add(new AppItem(
                     tkt.getId(),
-                    tkt.getTicketStatus().toString(),
+                    tkt.getSla().getName(),
+                    // tkt.getTicketStatus().toString(),
                     tkt.getTicketDetail(),
                     tkt.getTicketDue(),
                     0,

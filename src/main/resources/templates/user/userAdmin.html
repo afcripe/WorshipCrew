@@ -33,14 +33,14 @@
         <div class="row">
           <div class="col-md-6">
             <select id="filterCampus" class="form-control" style="display: inline-block" onchange="onChangeFilter()">
-              <option value="">Selected Campus</option>
+              <option value="">Select Campus</option>
               <option th:each="l : ${campusList}" th:value="${l.name}"
                       th:text="${l.name}" th:selected="${l.name} == ${selectedCampus}"></option>
             </select>
           </div>
           <div class="col-md-6">
             <select id="filterDepartment" class="form-control" style="display: inline-block" onchange="onChangeFilter()">
-              <option value="">Selected Campus</option>
+              <option value="">Select Department</option>
               <option th:each="d : ${departmentList}" th:value="${d.name}"
                       th:text="${d.name}" th:selected="${d.name} == ${selectedDepartment}"></option>
             </select>

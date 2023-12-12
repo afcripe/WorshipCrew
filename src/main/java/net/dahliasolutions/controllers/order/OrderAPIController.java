@@ -151,7 +151,7 @@ public class OrderAPIController {
         OrderStatus setStatus = OrderStatus.valueOf(statusModel.requestStatus());
         Optional<OrderRequest> orderRequest = orderService.findById(statusModel.requestId());
         if (orderRequest.isPresent()) {
-            orderRequest.get().setOrderStatus(OrderStatus.valueOf(statusModel.requestStatus()));
+            orderRequest.get().setOrderStatus(setStatus);
             orderService.save(orderRequest.get());
             OrderNote orderNote = orderNoteService.createOrderNote(new OrderNote(
                     null,
@@ -161,6 +161,23 @@ public class OrderAPIController {
                     BigInteger.valueOf(0),
                     setStatus,
                     user));
+
+            // set item status if requested
+            if (statusModel.items()) {
+                for (OrderItem item : orderRequest.get().getRequestItems()) {
+                    item.setItemStatus(setStatus);
+                    orderItemService.save(item);
+                }
+                // add note
+                OrderNote orderItemsNote = orderNoteService.createOrderNote(new OrderNote(
+                        null,
+                        orderRequest.get().getId(),
+                        null,
+                        statusModel.requestNote()+" - applied to all items -",
+                        BigInteger.valueOf(0),
+                        setStatus,
+                        user));
+            }
         }
 
         EmailDetails emailDetailsUser =

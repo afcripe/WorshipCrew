@@ -16,9 +16,22 @@ export default class extends AbstractView {
                         <div class="list__group-item-right">
                         <button class="btn btn-sm btn-generic" data-nav-all-requests>View All</button></div></div>`;
 
+        returnHTML += `<div class="list__group">
+                        <div class="list__group-item-grow">&nbsp;</div>
+                        <div class="list__group-item-grow">
+                        <select class="form-control" id="myRequestsSorting" style="float: right"
+                                onchange="document.getElementById('myRequestsSortingBtn').click()">
+                            <option value="requestDate,ASC">Request Date | ASC</option>
+                            <option value="requestDate,DESC">Request Date | DESC</option>
+                        </select>
+                        <button type="button" class="btn btn-generic btn-sm" style="display: none"
+                         id="myRequestsSortingBtn" data-nav-my-requests-sort></button>
+                        </div></div>`;
+        returnHTML += `<div id="requestList">`;
+
         this.setAppProgress(40);
         if (myRequests.length > 0) {
-            returnHTML += `<h2>My Requests</h2>`;
+            returnHTML += `<h3>My Requests</h3>`;
             for (let m in myRequests) {
                 let mr = myRequests[m];
                 returnHTML += htmlRequestLine(mr);
@@ -27,7 +40,7 @@ export default class extends AbstractView {
 
         this.setAppProgress(60);
         if (requestItems.length > 0) {
-            returnHTML += `<h2>Items to Fulfill</h2>`;
+            returnHTML += `<h3>Items to Fulfill</h3>`;
             for (let i in requestItems) {
                 let itm = requestItems[i];
                 returnHTML += htmlItemLine(itm);
@@ -36,12 +49,18 @@ export default class extends AbstractView {
 
         this.setAppProgress(80);
         if (requests.length > 0) {
-            returnHTML += `<h2>Requests</h2>`;
+            returnHTML += `<h3>Requests</h3>`;
             for (let r in requests) {
                 let req = requests[r];
                 returnHTML += htmlRequestLine(req);
             }
         }
+
+        if (myRequests.length === 0 && requestItems.length === 0 && requests.length === 0) {
+            returnHTML += '<h4>No Requests Found</h4>';
+        }
+
+        returnHTML += `</div>`;
 
         this.setAppProgress(90);
         returnHTML = returnHTML.replaceAll("\n","");
@@ -71,6 +90,60 @@ function setAppProgress(prg) {
     } catch (e) {
         document.getElementById("appProgress").style.display = "none";
     }
+}
+
+async function sortMyRequests (srt,ordr,token) {
+    const responseU = await fetch('/api/v1/app/request/listbyuser?sortCol='+srt+'&sortOrder='+ordr, {
+        headers: {
+            authorization: "Bearer "+token
+        }
+    });
+    const uRequests = await responseU.json();
+    const uStatus = responseU.status;
+
+    const responseR = await fetch('/api/v1/app/request/listbysupervisor?sortCol='+srt+'&sortOrder='+ordr, {
+        headers: {
+            authorization: "Bearer "+token
+        }
+    });
+    const rRequests = await responseR.json();
+    const rStatus = responseR.status;
+
+    const responseI = await fetch('/api/v1/app/request/listitems?sortCol='+srt+'&sortOrder='+ordr, {
+        headers: {
+            authorization: "Bearer "+token
+        }
+    });
+    const iRequests = await responseI.json();
+    const iStatus = responseI.status;
+
+    document.getElementById('requestList').innerHTML = "";
+    let newHTML = "";
+    if (uRequests.length > 0) {
+        newHTML += `<h3>My Requests</h3>`;
+        for (let r in uRequests) {
+            let item = uRequests[r];
+            newHTML += htmlRequestLine(item);
+        }
+    }
+
+    if (iRequests.length > 0) {
+        newHTML += `<h3>Items to Fulfill</h3>`;
+        for (let r in iRequests) {
+            let item = iRequests[r];
+            newHTML += htmlRequestLine(item);
+        }
+    }
+
+    if (rRequests.length > 0) {
+        newHTML += `<h3>Requests</h3>`;
+        for (let r in rRequests) {
+            let item = rRequests[r];
+            newHTML += htmlRequestLine(item);
+        }
+    }
+
+    document.getElementById('requestList').innerHTML = newHTML;
 }
 
 async function getRemoteUserRequests(token) {
@@ -114,7 +187,7 @@ function htmlRequestLine(req) {
     r+=`<div class="appList__item-right" data-link-request="`+req.id+`">`+formatDate(req.date)+`</div>`;
     r+=`</div><div class="list__Item-line" data-link-request="`+req.id+`">`;
     r+=`<div class="appList__item-detail" data-link-request="`+req.id+`">`+req.detail+`</div>`;
-    r+=`<div class="appList__item-right" data-link-request="`+req.id+`">Items: `+req.itemCount+`</div>`;
+    r+=`<div class="appList__item-right appList__item-outline" data-link-request="`+req.id+`" style="white-space: nowrap">Items: `+req.itemCount+`</div>`;
     r+=`</div></div>`;
 
     return r;
@@ -128,7 +201,7 @@ function htmlItemLine(req) {
     r+=`<div class="appList__item-right" data-link-request="`+req.id+`">`+formatDate(req.date)+`</div>`;
     r+=`</div><div class="list__Item-line" data-link-request="`+req.id+`">`;
     r+=`<div class="appList__item-detail" data-link-request="`+req.id+`">`+req.detail+`</div>`;
-    r+=`<div class="appList__item-right" data-link-request="`+req.id+`">Items: `+req.itemCount+`</div>`;
+    r+=`<div class="appList__item-right appList__item-outline" data-link-request="`+req.id+`" style="white-space: nowrap">Items: `+req.itemCount+`</div>`;
     r+=`</div></div>`;
 
     return r;
@@ -141,3 +214,5 @@ function formatDate(dte) {
     let partTime = strTime.split(":");
     return partsDate[1] + " / " + partsDate[2] + " / " + partsDate[0];
 }
+
+export { sortMyRequests }

@@ -64,17 +64,46 @@ public class SupportController {
     }
 
     @GetMapping("")
-    public String goSupportHome(Model model, HttpSession session) {
+    public String goSupportHome(@RequestParam(required = false) String sortCol,
+                                @RequestParam(required = false) String sortOrder,
+                                @RequestParam(required = false) BigInteger sla,
+                                Model model, HttpSession session) {
         User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        List<Ticket> openUserTicketList = ticketService.findAllByUserOpenOnly(currentUser);
-        List<Ticket> openAgentTicketList = ticketService.findAllByAgentOpenOnly(currentUser);
-        List<Ticket> ticketMentionList = ticketService.findAllByMentionOpenOnly(currentUser);
+        Optional<SLA> selectedSLA = Optional.ofNullable(null);
+        if (org.apache.commons.lang3.StringUtils.isBlank(sortCol)) { sortCol = "ticketDue"; }
+        if (org.apache.commons.lang3.StringUtils.isBlank(sortOrder)) { sortOrder = "ASC"; }
+
+        List<Ticket> openUserTicketList;
+        List<Ticket> openAgentTicketList;
+        List<Ticket> ticketMentionList;
+
+        if (sla != null) {
+            selectedSLA = slaService.findById(sla);
+        }
+
+        if (selectedSLA.isPresent()) {
+            openUserTicketList = ticketService.findAllByUserAndSlaOpenOnly(currentUser, selectedSLA.get());
+            openAgentTicketList = ticketService.findAllByAgentAndSlaOpenOnly(currentUser, selectedSLA.get());
+            ticketMentionList = ticketService.findAllByMentionAndSlaOpenOnly(currentUser, selectedSLA.get());
+            model.addAttribute("selectedSLAid", selectedSLA.get().getId());
+        } else {
+            openUserTicketList = ticketService.findAllByUserOpenOnly(currentUser);
+            openAgentTicketList = ticketService.findAllByAgentOpenOnly(currentUser);
+            ticketMentionList = ticketService.findAllByMentionOpenOnly(currentUser);
+            model.addAttribute("selectedSLAid", BigInteger.valueOf(0));
+        }
+
+        sortTickets(openUserTicketList,sortCol,sortOrder);
+        sortTickets(openAgentTicketList,sortCol,sortOrder);
+        sortTickets(ticketMentionList,sortCol,sortOrder);
 
         model.addAttribute("user", currentUser);
         model.addAttribute("openUserTicketList", openUserTicketList);
         model.addAttribute("openAgentTicketList", openAgentTicketList);
         model.addAttribute("ticketMentionList", ticketMentionList);
+        model.addAttribute("slaList", slaService.findAll());
+        model.addAttribute("selectedSort", sortCol+","+sortOrder);
 
 
         redirectService.setHistory(session, "/support");
@@ -82,7 +111,10 @@ public class SupportController {
     }
 
     @GetMapping("/openticketmanager")
-    public String goAllOpenTickets(Model model, HttpSession session) {
+    public String goAllOpenTickets(@RequestParam(required = false) String sortCol,
+                                   @RequestParam(required = false) String sortOrder,
+                                   @RequestParam(required = false) BigInteger sla,
+                                   Model model, HttpSession session) {
         User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         String perm = permissionType(currentUser);
@@ -91,10 +123,31 @@ public class SupportController {
             return redirectService.pathName(session, "/support");
         }
 
+        Optional<SLA> selectedSLA = Optional.ofNullable(null);
+        if (org.apache.commons.lang3.StringUtils.isBlank(sortCol)) { sortCol = "ticketDue"; }
+        if (org.apache.commons.lang3.StringUtils.isBlank(sortOrder)) { sortOrder = "ASC"; }
+
         List<Ticket> ticketList = ticketService.findAllOpen();
+
+        if (sla != null) {
+            selectedSLA = slaService.findById(sla);
+        }
+
+        if (selectedSLA.isPresent()) {
+            ticketList = ticketService.findAllBySla(selectedSLA.get());
+            model.addAttribute("selectedSLAid", selectedSLA.get().getId());
+        } else {
+            ticketList = ticketService.findAllOpen();
+            model.addAttribute("selectedSLAid", BigInteger.valueOf(0));
+        }
+
+        sortTickets(ticketList,sortCol,sortOrder);
 
         model.addAttribute("user", currentUser);
         model.addAttribute("ticketList", ticketList);
+        model.addAttribute("slaList", slaService.findAll());
+        model.addAttribute("selectedSort", sortCol+","+sortOrder);
+
 
         redirectService.setHistory(session, "/support/openticketmanager");
         return "support/openTicketManager";
@@ -803,6 +856,25 @@ public class SupportController {
         }
 //        returnDate = returnDate.plusDays(1);
         return returnDate;
+    }
+
+    private List<Ticket> sortTickets(List<Ticket> tickets, String sortColumn, String sortOrder) {
+        if (sortColumn.equals("")) {sortColumn="ticketDue";}
+        if (sortOrder.equals("")) {sortColumn="ASC";}
+
+        switch (sortColumn) {
+            case "ticketDue":
+                tickets.sort(new Comparator<Ticket>() {
+                    @Override
+                    public int compare(Ticket t1, Ticket t2) {
+                        return t1.getTicketDue().compareTo(t2.getTicketDue());
+                    }
+                });
+                if (sortOrder.equals("DESC")) {
+                    Collections.reverse(tickets);
+                }
+        }
+        return tickets;
     }
 
 }

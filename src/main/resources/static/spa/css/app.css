@@ -727,6 +727,12 @@ progress::-webkit-progress-value {
     text-align: right;
 }
 
+.appList__item-outline {
+    border: 1px solid var(--dwc-border-color);
+    border-radius: 0.25rem;
+    padding: 2px;
+}
+
 /* Module Lists */
 
 .title__module {

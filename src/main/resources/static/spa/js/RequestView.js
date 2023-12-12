@@ -270,6 +270,7 @@ async function postRequestStatus(token) {
     formData.set("requestId", document.getElementById("requestStatusId").value);
     formData.set("requestStatus", document.getElementById("statusOrderSelect").value);
     formData.set("requestNote", document.getElementById("statusOrderNote").value);
+    formData.set("items", document.getElementById('statusItems').checked);
 
     const response = await fetch('/api/v1/app/request/changerequeststatus', {
         method: 'POST',
@@ -512,6 +513,11 @@ function htmlDialogUpdateRequest(req, options) {
         }
     }
     r+=`</select>`;
+    r+=`</div>`;
+
+    r+=`<div class="request__item-detail detail-padding-bottom">`;
+    r+=`<div class="form-control-label">Set for All Items</div>`;
+    r+=`<input id="statusItems" type="checkbox" class="form-check">`;
     r+=`</div>`;
 
     r+=`<div class="request__item-detail detail-padding-bottom">`;

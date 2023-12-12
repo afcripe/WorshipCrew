@@ -15,13 +15,28 @@ export default class extends AbstractView {
                         <button class="btn btn-sm btn-generic" data-nav-my-requests>View Mine</button></div></div>`;
 
         this.setAppProgress(60);
+        returnHTML += `<div class="list__group">
+                        <div class="list__group-item-grow"><h3>All Requests</h3></div>
+                        <div class="list__group-item-grow">
+                        <select class="form-control" id="allRequestsSorting" style="float: right"
+                                onchange="document.getElementById('allRequestsSortingBtn').click()">
+                            <option value="requestDate,ASC">Request Date | ASC</option>
+                            <option value="requestDate,DESC">Request Date | DESC</option>
+                        </select>
+                        <button type="button" class="btn btn-generic btn-sm" style="display: none"
+                         id="allRequestsSortingBtn" data-nav-all-requests-sort></button>
+                        </div></div>`;
+        returnHTML += `<div id="requestList">`;
+
         if (requests.length > 0) {
-            returnHTML += `<h2>All Requests</h2>`;
             for (let m in requests) {
                 let mr = requests[m];
                 returnHTML += htmlRequestLine(mr);
             }
+        } else {
+            returnHTML += '<h4>No Requests Found</h4>';
         }
+        returnHTML += `</div>`;
 
         this.setAppProgress(90);
         returnHTML = returnHTML.replaceAll("\n","");
@@ -53,15 +68,35 @@ function setAppProgress(prg) {
     }
 }
 
+async function sortAllRequests (srt,ordr,token) {
+    const response = await fetch('/api/v1/app/request/allopen?sortCol='+srt+'&sortOrder='+ordr, {
+        headers: {
+            authorization: "Bearer "+token
+        }
+    });
+    const requests = await response.json();
+    const status = response.status;
+
+    document.getElementById('requestList').innerHTML = "";
+    let newHTML = "";
+    if (requests.length > 0) {
+        for (let n in requests) {
+            let mt = requests[n];
+            newHTML += htmlRequestLine(mt);
+        }
+    }
+    document.getElementById('requestList').innerHTML = newHTML;
+}
+
 async function getRemoteRequestsAll(token) {
     const response = await fetch('/api/v1/app/request/allopen', {
         headers: {
             authorization: "Bearer "+token
         }
     });
-    const tickets = await response.json();
+    const requests = await response.json();
     const status = response.status;
-    return tickets;
+    return requests;
 }
 
 function htmlRequestLine(req) {
@@ -72,21 +107,7 @@ function htmlRequestLine(req) {
     r+=`<div class="appList__item-right" data-link-request="`+req.id+`">`+formatDate(req.date)+`</div>`;
     r+=`</div><div class="list__Item-line" data-link-request="`+req.id+`">`;
     r+=`<div class="appList__item-detail" data-link-request="`+req.id+`">`+req.detail+`</div>`;
-    r+=`<div class="appList__item-right" data-link-request="`+req.id+`">Items: `+req.itemCount+`</div>`;
-    r+=`</div></div>`;
-
-    return r;
-}
-
-function htmlItemLine(req) {
-    let r = "";
-    r+=`<div class="list__item" data-link-request="`+req.id+`">`;
-    r+=`<div class="list__Item-line" data-link-request="`+req.id+`">`;
-    r+=`<div class="appList__item-id" data-link-request="`+req.id+`">`+req.name+`</div>`;
-    r+=`<div class="appList__item-right" data-link-request="`+req.id+`">`+formatDate(req.date)+`</div>`;
-    r+=`</div><div class="list__Item-line" data-link-request="`+req.id+`">`;
-    r+=`<div class="appList__item-detail" data-link-request="`+req.id+`">`+req.detail+`</div>`;
-    r+=`<div class="appList__item-right" data-link-request="`+req.id+`">Items: `+req.itemCount+`</div>`;
+    r+=`<div class="appList__item-right appList__item-outline" data-link-request="`+req.id+`" style="white-space: nowrap">Items: `+req.itemCount+`</div>`;
     r+=`</div></div>`;
 
     return r;
@@ -99,3 +120,5 @@ function formatDate(dte) {
     let partTime = strTime.split(":");
     return partsDate[1] + " / " + partsDate[2] + " / " + partsDate[0];
 }
+
+export { sortAllRequests }

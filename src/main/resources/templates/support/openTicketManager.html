@@ -10,8 +10,7 @@
     <div class="wrapper flex-grow-1">
     <div id="mainContent" class="wrapper d-flex">
 
-
-            <div class="flex-fill p-1 pb-4 w-100 mx-2">
+            <div class="flex-fill p-1 w-100 mx-2">
 
                 <div class="row p-2">
                     <div class="support-list-header">
@@ -27,15 +26,54 @@
                     </div>
                 </div>
 
-            <div class="row pt-5 pb-5 py-2">
-                <div class="py-1" th:if="${not #lists.isEmpty(ticketList)}" th:each="ticket : ${ticketList}">
+                <div class="row">
+                    <div class="col-12 col-md-4 p-1">
+                        <select id="filterSLA" class="form-control" style="display: inline-block" onchange="onChangeFilter()">
+                            <option value="">Select SLA</option>
+                            <option th:each="sla : ${slaList}" th:value="${sla.id}"
+                                    th:text="${sla.name}" th:selected="${sla.id} == ${selectedSLAid}"></option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-4 p-1">
+                        <select id="filterSort"  class="form-control" style="display: inline-block" onchange="onChangeFilter()">
+                            <option value="ticketDue,ASC" th:selected="${selectedSort} == 'ticketDue,ASC'">Date Due | ASC</option>
+                            <option value="ticketDue,DESC" th:selected="${selectedSort} == 'ticketDue,DESC'">Date Due | DESC</option>
+                        </select>
+                    </div>
+                </div>
+
+            <div class="row pt-5 pb-5 py-2" th:if="${not #lists.isEmpty(ticketList)}">
+                <div class="py-1" th:each="ticket : ${ticketList}">
                     <div th:replace="~{components/cardTicketLine :: cardFragment(${ticket})}">No Tickets to Display</div>
                 </div>
             </div>
 
         </div>
-        </div>
+
     </div>
+    </div>
+
+    <script>
+        const selectSLA = document.getElementById("filterSLA");
+        const selectSort = document.getElementById("filterSort");
+
+        function onChangeFilter() {
+            // SLA
+            let paramString = "?";
+            if (selectSLA.selectedIndex > 0) {
+                paramString = paramString+"sla="+selectSLA.value;
+            }
+
+            // sorting
+            let sorting = selectSort.value;
+            let args = sorting.split(",");
+            paramString = paramString+"&sortCol="+args[0]+"&sortOrder="+args[1];
+
+            let path = window.location.href.split('?')[0];
+            window.location.href=path+paramString;
+        }
+    </script>
+
 </div>
 
 

@@ -41,14 +41,22 @@ public class MobileAppAPIRequestController {
     private final NotificationMessageService messageService;
 
     @GetMapping("/listbyuser")
-    public ResponseEntity<List<AppItem>> getRequestsByUser(HttpServletRequest request) {
+    public ResponseEntity<List<AppItem>> getRequestsByUser(@RequestParam(required = false) String sortCol,
+                                                           @RequestParam(required = false) String sortOrder,
+                                                           HttpServletRequest request) {
         APIUser apiUser = getUserFromToken(request);
         if (!apiUser.isValid()) {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
         }
 
+        List<OrderRequest> requests = orderService.findAllByUser(apiUser.getUser());
+
+        if (org.apache.commons.lang3.StringUtils.isBlank(sortCol)) { sortCol = "requestDate"; }
+        if (org.apache.commons.lang3.StringUtils.isBlank(sortOrder)) { sortOrder = "ASC"; }
+        sortRequests(requests, sortCol, sortOrder);
+
         List<AppItem> appItemList = new ArrayList<>();
-        for (OrderRequest item : orderService.findAllByUser(apiUser.getUser())) {
+        for (OrderRequest item : requests) {
             if (!item.getOrderStatus().equals(OrderStatus.Complete) || !item.getOrderStatus().equals(OrderStatus.Cancelled)) {
                 appItemList.add(new AppItem(
                         item.getId().toString(),
@@ -65,16 +73,22 @@ public class MobileAppAPIRequestController {
     }
 
     @GetMapping("/listbysupervisor")
-    public ResponseEntity<List<AppItem>> getUserRequests(HttpServletRequest request) {
+    public ResponseEntity<List<AppItem>> getUserRequests(@RequestParam(required = false) String sortCol,
+                                                         @RequestParam(required = false) String sortOrder,
+                                                         HttpServletRequest request) {
         APIUser apiUser = getUserFromToken(request);
         if (!apiUser.isValid()) {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
         }
 
-        List<OrderRequest> openSuperRequestList = orderService.findAllBySupervisorOpenOnly(apiUser.getUser());
+        List<OrderRequest> requests = orderService.findAllBySupervisorOpenOnly(apiUser.getUser());
+
+        if (org.apache.commons.lang3.StringUtils.isBlank(sortCol)) { sortCol = "requestDate"; }
+        if (org.apache.commons.lang3.StringUtils.isBlank(sortOrder)) { sortOrder = "ASC"; }
+        sortRequests(requests, sortCol, sortOrder);
 
         List<AppItem> appItemList = new ArrayList<>();
-        for (OrderRequest item : orderService.findAllBySupervisorOpenOnly(apiUser.getUser())) {
+        for (OrderRequest item : requests) {
             appItemList.add(new AppItem(
                     item.getId().toString(),
                     item.getOrderStatus().toString(),
@@ -89,14 +103,22 @@ public class MobileAppAPIRequestController {
     }
 
     @GetMapping("/listitems")
-    public ResponseEntity<List<AppItem>> getRequestItemsById(HttpServletRequest request) {
+    public ResponseEntity<List<AppItem>> getRequestItemsById(@RequestParam(required = false) String sortCol,
+                                                             @RequestParam(required = false) String sortOrder,
+                                                             HttpServletRequest request) {
         APIUser apiUser = getUserFromToken(request);
         if (!apiUser.isValid()) {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
         }
 
+        List<OrderItem> requestItems = orderItemService.findAllBySupervisorOpenOnly(apiUser.getUser());
+
+        if (org.apache.commons.lang3.StringUtils.isBlank(sortCol)) { sortCol = "requestDate"; }
+        if (org.apache.commons.lang3.StringUtils.isBlank(sortOrder)) { sortOrder = "ASC"; }
+        sortRequestItems(requestItems, sortCol, sortOrder);
+
         List<AppItem> appItemList = new ArrayList<>();
-        for (OrderItem item : orderItemService.findAllBySupervisorOpenOnly(apiUser.getUser())) {
+        for (OrderItem item : requestItems) {
             appItemList.add(new AppItem(
                     item.getOrderRequest().getId().toString(),
                     item.getProductName(),
@@ -112,14 +134,22 @@ public class MobileAppAPIRequestController {
     }
 
     @GetMapping("/listbyincluded")
-    public ResponseEntity<List<AppItem>> getRequestByIncluded(HttpServletRequest request) {
+    public ResponseEntity<List<AppItem>> getRequestByIncluded(@RequestParam(required = false) String sortCol,
+                                                              @RequestParam(required = false) String sortOrder,
+                                                              HttpServletRequest request) {
         APIUser apiUser = getUserFromToken(request);
         if (!apiUser.isValid()) {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
         }
 
+        List<OrderRequest> requests = orderService.findAllByMentionOpenOnly(apiUser.getUser());
+
+        if (org.apache.commons.lang3.StringUtils.isBlank(sortCol)) { sortCol = "requestDate"; }
+        if (org.apache.commons.lang3.StringUtils.isBlank(sortOrder)) { sortOrder = "ASC"; }
+        sortRequests(requests, sortCol, sortOrder);
+
         List<AppItem> appItemList = new ArrayList<>();
-        for (OrderRequest item : orderService.findAllByMentionOpenOnly(apiUser.getUser())) {
+        for (OrderRequest item : requests) {
             appItemList.add(new AppItem(
                     item.getId().toString(),
                     item.getOrderStatus().toString(),
@@ -135,14 +165,22 @@ public class MobileAppAPIRequestController {
     }
 
     @GetMapping("/allopen")
-    public ResponseEntity<List<AppItem>> getRequestsAllOpen(HttpServletRequest request) {
+    public ResponseEntity<List<AppItem>> getRequestsAllOpen(@RequestParam(required = false) String sortCol,
+                                                            @RequestParam(required = false) String sortOrder,
+                                                            HttpServletRequest request) {
         APIUser apiUser = getUserFromToken(request);
         if (!apiUser.isValid()) {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
         }
 
+        List<OrderRequest> requests = orderService.findAllOpen();
+
+        if (org.apache.commons.lang3.StringUtils.isBlank(sortCol)) { sortCol = "requestDate"; }
+        if (org.apache.commons.lang3.StringUtils.isBlank(sortOrder)) { sortOrder = "ASC"; }
+        sortRequests(requests, sortCol, sortOrder);
+
         List<AppItem> appItemList = new ArrayList<>();
-        for (OrderRequest item : orderService.findAllOpen()) {
+        for (OrderRequest item : requests) {
             appItemList.add(new AppItem(
                     item.getId().toString(),
                     item.getOrderStatus().toString(),
@@ -355,7 +393,7 @@ public class MobileAppAPIRequestController {
         }
 
         if (orderRequest.isPresent()) {
-            orderRequest.get().setOrderStatus(OrderStatus.valueOf(statusModel.requestStatus()));
+            orderRequest.get().setOrderStatus(setStatus);
             orderService.save(orderRequest.get());
             OrderNote orderNote = orderNoteService.createOrderNote(new OrderNote(
                     null,
@@ -365,6 +403,23 @@ public class MobileAppAPIRequestController {
                     BigInteger.valueOf(0),
                     setStatus,
                     apiUser.getUser()));
+
+            // set item status if requested
+            if (statusModel.items()) {
+                for (OrderItem item : orderRequest.get().getRequestItems()) {
+                    item.setItemStatus(setStatus);
+                    orderItemService.save(item);
+                }
+                // add note
+                OrderNote orderItemsNote = orderNoteService.createOrderNote(new OrderNote(
+                        null,
+                        orderRequest.get().getId(),
+                        null,
+                        statusModel.requestNote()+" - applied to all items -",
+                        BigInteger.valueOf(0),
+                        setStatus,
+                        apiUser.getUser()));
+            }
         }
 
         return new ResponseEntity<>(new SingleStringModel(setStatus.toString()), HttpStatus.OK);
