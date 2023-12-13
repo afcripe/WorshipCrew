@@ -201,8 +201,14 @@ async function postUpdateUser(id, token) {
 
 function htmlUser(user, director, permission, appUser) {
     let r = `<div class="user__group">`;
-    r+=`<div class="ticket__left ticket__title">`+user.fullName+`</div>`;
-    r+=`<button class="btn btn-sm btn-generic"  data-user-edit data-user-update-id="`+user.id+`">Edit</button>`;
+    r+=`<div class="ticket__right">`;
+    r+=`<button class="btn btn-sm btn-generic" data-nav-link="requestuser/`+user.id+`">Requests</button>&nbsp;`;
+    r+=`<button class="btn btn-sm btn-generic" data-nav-link="ticketuser/`+user.id+`">Tickets</button>&nbsp;`;
+    r+=`<button class="btn btn-sm btn-generic" data-nav-link="requestuser/`+user.id+`">Edit</button>`;
+    r+=`</div></div>`;
+
+    r+=`<div class="user__group">`;
+    r+=`<div class="ticket__left- ticket__title">`+user.fullName+`</div>`;
     r+=`</div>`;
 
     r+=`<div class="user__detail-group">`;

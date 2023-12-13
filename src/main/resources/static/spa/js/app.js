@@ -5,9 +5,11 @@ import Tickets from "./Tickets.js";
 import TicketAll from "./TicketAll.js";
 import TicketView from "./TicketView.js";
 import TicketNew from "./TicketNew.js";
+import TicketUser from "./TicketUser.js";
 import Requests from "./Requests.js";
 import RequestView from "./RequestView.js";
 import RequestAll from "./RequestAll.js";
+import RequestUser from "./RequestUser.js";
 import Resources from "./Resources.js";
 import ResourceView from "./ResourceView.js";
 import ResourceArticle from "./ResourceArticle.js";
@@ -109,9 +111,11 @@ const router = async () => {
         { path: "/app/ticketAll", view: TicketAll },
         { path: "/app/ticket/:id", view: TicketView },
         { path: "/app/ticketNew", view: TicketNew },
+        { path: "/app/ticketuser/:id", view: TicketUser },
         { path: "/app/requests", view: Requests },
         { path: "/app/requestAll", view: RequestAll },
         { path: "/app/request/:id", view: RequestView },
+        { path: "/app/requestuser/:id", view: RequestUser },
         { path: "/app/resources", view: Resources },
         { path: "/app/resource/:id", view: ResourceView },
         { path: "/app/article/:id", view: ResourceArticle },

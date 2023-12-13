@@ -72,6 +72,58 @@ public class MobileAppAPIRequestController {
         return new ResponseEntity<>(appItemList, HttpStatus.OK);
     }
 
+    @GetMapping("/listbyuser/{id}")
+    public ResponseEntity<List<AppItem>> getRequestsByUser(@RequestParam(required = false) String status, @PathVariable BigInteger id, HttpServletRequest request) {
+        APIUser apiUser = getUserFromToken(request);
+        if (!apiUser.isValid()) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.FORBIDDEN);
+        }
+
+        if (org.apache.commons.lang3.StringUtils.isBlank(status)) { status = "open"; }
+        Optional<User> reqUser = userService.findById(id);
+        List<OrderRequest> requests;
+        List<AppItem> appItemList = new ArrayList<>();
+
+        if (reqUser.isPresent()) {
+
+            if (status.equals("open")) {
+                requests = orderService.findAllByUserOpenOnly(reqUser.get());
+                sortRequests(requests, "requestDate", "ASC");
+                for (OrderRequest item : requests) {
+                    if (!item.getOrderStatus().equals(OrderStatus.Complete) || !item.getOrderStatus().equals(OrderStatus.Cancelled)) {
+                        appItemList.add(new AppItem(
+                                item.getId().toString(),
+                                item.getOrderStatus().toString(),
+                                item.getRequestNote(),
+                                item.getRequestDate(),
+                                item.getItemCount(),
+                                item.getUser().getFullName(),
+                                "requests"));
+                    }
+                }
+
+            } else {
+
+                requests = orderService.findAllByUserNotOpen(reqUser.get());
+                for (OrderRequest item : requests) {
+                    if (item.getOrderStatus().equals(OrderStatus.Complete) || item.getOrderStatus().equals(OrderStatus.Cancelled)) {
+                        appItemList.add(new AppItem(
+                                item.getId().toString(),
+                                item.getOrderStatus().toString(),
+                                item.getRequestNote(),
+                                item.getRequestDate(),
+                                item.getItemCount(),
+                                item.getUser().getFullName(),
+                                "requests"));
+                    }
+                }
+            }
+
+        }
+
+        return new ResponseEntity<>(appItemList, HttpStatus.OK);
+    }
+
     @GetMapping("/listbysupervisor")
     public ResponseEntity<List<AppItem>> getUserRequests(@RequestParam(required = false) String sortCol,
                                                          @RequestParam(required = false) String sortOrder,

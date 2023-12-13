@@ -24,6 +24,7 @@ public interface TicketRepository extends JpaRepository<Ticket, BigInteger> {
     Optional<Ticket> findById(String id);
     List<Ticket> findAllBySla(SLA sla);
     List<Ticket> findAllByUserAndTicketStatusNot(User user, TicketStatus status);
+    List<Ticket> findAllByUserAndTicketStatus(User user, TicketStatus status);
     List<Ticket> findAllByUserAndSlaAndTicketStatusNot(User user, SLA sla, TicketStatus status);
     List<Ticket> findAllByUser(User user);
     List<Ticket> findAllByCampusAndTicketStatusNot(Campus campus, TicketStatus status);

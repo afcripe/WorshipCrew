@@ -25,6 +25,7 @@ public interface TicketServiceInterface {
     List<Ticket> findAllOpenBySla(SLA sla);
     List<Ticket> findAllByUser(User user);
     List<Ticket> findAllByUserOpenOnly(User user);
+    List<Ticket> findAllByUserNotOpen(User user);
     List<Ticket> findAllByUserAndSlaOpenOnly(User user, SLA sla);
     List<Ticket> findFirst5ByUser(User user);
     List<Ticket> findAllByAgent(User user);

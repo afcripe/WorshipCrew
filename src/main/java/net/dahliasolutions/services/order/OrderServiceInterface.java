@@ -20,6 +20,8 @@ public interface OrderServiceInterface {
     List<OrderRequest> findAll();
     List<OrderRequest> findAllOpen();
     List<OrderRequest> findAllByUser(User user);
+    List<OrderRequest> findAllByUserOpenOnly(User user);
+    List<OrderRequest> findAllByUserNotOpen(User user);
     List<OrderRequest> findAllByCampus(Campus campus);
     List<OrderRequest> findAllByCampusAndCycle(BigInteger campusId, LocalDateTime startDate, LocalDateTime endDate);
     List<OrderRequest> findAllByUserAndCycle(BigInteger userId, LocalDateTime startDate, LocalDateTime endDate);

@@ -171,6 +171,11 @@ public class TicketService implements TicketServiceInterface {
     }
 
     @Override
+    public List<Ticket> findAllByUserNotOpen(User user) {
+        return ticketRepository.findAllByUserAndTicketStatus(user, TicketStatus.Closed);
+    }
+
+    @Override
     public List<Ticket> findAllByUserAndSlaOpenOnly(User user, SLA sla) {
         return ticketRepository.findAllByUserAndSlaAndTicketStatusNot(user, sla, TicketStatus.Closed);
     }
