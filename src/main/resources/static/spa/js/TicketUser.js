@@ -31,7 +31,7 @@ export default class extends AbstractView {
                 returnHTML += htmlTicketLine(ct);
             }
         }
-        if (ticketsOpen.length === 0 && ticketsOpen.length === 0) {
+        if (ticketsOpen.length === 0 && ticketsClosed.length === 0) {
             returnHTML += '<h4>No Tickets Found</h4>';
         }
         returnHTML += `</div>`;
