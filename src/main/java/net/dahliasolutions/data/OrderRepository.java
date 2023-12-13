@@ -30,10 +30,6 @@ public interface OrderRepository extends JpaRepository<OrderRequest, BigInteger>
     List<OrderRequest> findAllOrderByCycle(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
     @Query(value = "SELECT * FROM ORDER_REQUEST WHERE USER_ID = :userId ORDER BY REQUEST_DATE DESC", nativeQuery = true)
     List<OrderRequest> findAllByUser(@Param("userId") BigInteger userId);
-    @Query(value = "SELECT * FROM ORDER_REQUEST WHERE USER_ID = :userId AND ORDER_STATUS <> 'Cancelled' AND ORDER_STATUS <> 'Complete' ORDER BY REQUEST_DATE DESC", nativeQuery = true)
-    List<OrderRequest> findAllByUserOpenOnly(@Param("userId") BigInteger userId);
-    @Query(value = "SELECT * FROM ORDER_REQUEST WHERE USER_ID = :userId AND ORDER_STATUS = 'Cancelled' OR ORDER_STATUS = 'Complete' ORDER BY REQUEST_DATE DESC", nativeQuery = true)
-    List<OrderRequest> findAllByUserNotOpen(@Param("userId") BigInteger userId);
     @Query(value = "SELECT * FROM ORDER_REQUEST WHERE USER_ID = :userId ORDER BY REQUEST_DATE DESC LIMIT 5", nativeQuery = true)
     List<OrderRequest> findFirst5ByUserId(@Param("userId") BigInteger userId);
     @Query(value = "SELECT * FROM ORDER_REQUEST WHERE SUPERVISOR_ID = :supervisorId ORDER BY REQUEST_DATE DESC", nativeQuery = true)

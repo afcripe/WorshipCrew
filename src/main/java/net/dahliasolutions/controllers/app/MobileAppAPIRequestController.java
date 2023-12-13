@@ -90,16 +90,14 @@ public class MobileAppAPIRequestController {
                 requests = orderService.findAllByUserOpenOnly(reqUser.get());
                 sortRequests(requests, "requestDate", "ASC");
                 for (OrderRequest item : requests) {
-                    if (!item.getOrderStatus().equals(OrderStatus.Complete) || !item.getOrderStatus().equals(OrderStatus.Cancelled)) {
-                        appItemList.add(new AppItem(
-                                item.getId().toString(),
-                                item.getOrderStatus().toString(),
-                                item.getRequestNote(),
-                                item.getRequestDate(),
-                                item.getItemCount(),
-                                item.getUser().getFullName(),
-                                "requests"));
-                    }
+                    appItemList.add(new AppItem(
+                            item.getId().toString(),
+                            item.getOrderStatus().toString(),
+                            item.getRequestNote(),
+                            item.getRequestDate(),
+                            item.getItemCount(),
+                            item.getUser().getFullName(),
+                            "requests"));
                 }
 
             } else {

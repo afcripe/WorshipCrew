@@ -106,22 +106,37 @@ public class OrderService implements OrderServiceInterface {
 
     @Override
     public List<OrderRequest> findAllByUserOpenOnly(User user) {
-        List<OrderRequest> orderRequestList = orderRepository.findAllByUserOpenOnly(user.getId());
+        List<OrderRequest> orderRequestList = orderRepository.findAllByUser(user.getId());
+        List<OrderRequest> requestList = new ArrayList<>();
+
+        for (OrderRequest r : orderRequestList) {
+            if (r.getOrderStatus() != OrderStatus.Complete && r.getOrderStatus() != OrderStatus.Cancelled) {
+                requestList.add(r);
+            }
+        }
         for (OrderRequest orderRequest : orderRequestList) {
             orderRequest.setRequestItems(orderItemRepository.findAllByOrderRequest(orderRequest));
             orderRequest.setItemCount(orderRequest.getItemCount());
         }
-        return orderRequestList;
+        return requestList;
     }
 
     @Override
     public List<OrderRequest> findAllByUserNotOpen(User user) {
-        List<OrderRequest> orderRequestList = orderRepository.findAllByUserNotOpen(user.getId());
-        for (OrderRequest orderRequest : orderRequestList) {
+        List<OrderRequest> orderRequestList = orderRepository.findAllByUser(user.getId());
+        List<OrderRequest> requestList = new ArrayList<>();
+
+        for (OrderRequest r : orderRequestList) {
+            if (r.getOrderStatus() == OrderStatus.Complete || r.getOrderStatus() == OrderStatus.Cancelled) {
+                requestList.add(r);
+            }
+        }
+
+        for (OrderRequest orderRequest : requestList) {
             orderRequest.setRequestItems(orderItemRepository.findAllByOrderRequest(orderRequest));
             orderRequest.setItemCount(orderRequest.getItemCount());
         }
-        return orderRequestList;
+        return requestList;
     }
 
     @Override
