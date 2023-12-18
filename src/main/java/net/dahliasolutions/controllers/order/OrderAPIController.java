@@ -79,9 +79,9 @@ public class OrderAPIController {
                 }
                 orderService.save(orderRequest.get());
 
-                EmailDetails emailDetailsUser =
-                        new EmailDetails(BigInteger.valueOf(0), orderRequest.get().getSupervisor().getContactEmail(),"Request Cancelled", "", null );
-                BrowserMessage returnMsg = emailService.sendUserRequest(emailDetailsUser, orderRequest.get());
+//                EmailDetails emailDetailsUser =
+//                        new EmailDetails(BigInteger.valueOf(0), orderRequest.get().getSupervisor().getContactEmail(),"Request Cancelled", "", null );
+//                BrowserMessage returnMsg = emailService.sendUserRequest(emailDetailsUser, orderRequest.get());
 
                 // Notify supervisor
                 NotificationMessage returnMsg2 = messageService.createMessage(
@@ -150,6 +150,7 @@ public class OrderAPIController {
         User user = (User) auth.getPrincipal();
         OrderStatus setStatus = OrderStatus.valueOf(statusModel.requestStatus());
         Optional<OrderRequest> orderRequest = orderService.findById(statusModel.requestId());
+
         if (orderRequest.isPresent()) {
             orderRequest.get().setOrderStatus(setStatus);
             orderService.save(orderRequest.get());
@@ -178,27 +179,46 @@ public class OrderAPIController {
                         setStatus,
                         user));
             }
-        }
 
-        EmailDetails emailDetailsUser =
-                new EmailDetails(BigInteger.valueOf(0), user.getContactEmail(),"Your Request Has Been Updated", "", null );
-        BrowserMessage returnMsg = emailService.sendUserRequest(emailDetailsUser, orderRequest.get());
+//            EmailDetails emailDetailsUser =
+//                    new EmailDetails(BigInteger.valueOf(0), user.getContactEmail(),"Your Request Has Been Updated", "", null );
+//            BrowserMessage returnMsg = emailService.sendUserRequest(emailDetailsUser, orderRequest.get());
 
-        // send any additional notifications
-        AppEvent notifyEvent = eventService.createEvent(new AppEvent(
-                null,
-                "Request "+orderRequest.get().getId()+" Status has been updated to "+setStatus,
-                "The Status for Request "+orderRequest.get().getId()+
-                        " has been updated to ["+setStatus+"] by "+user.getFullName(),
-                orderRequest.get().getId().toString(),
-                EventModule.Request,
-                EventType.Updated,
-                new ArrayList<>()
-        ));
-        //closed
-        if (setStatus.equals(OrderStatus.Complete)) {
-            notifyEvent.setType(EventType.Closed);
-            eventService.createEvent(notifyEvent);
+            // notify user of request status change
+            NotificationMessage returnMsgUser = messageService.createMessage(
+                    new NotificationMessage(
+                            null,
+                            "["+orderRequest.get().getId().toString()+"] Request has been Updated",
+                            orderRequest.get().getId().toString(),
+                            BigInteger.valueOf(0),
+                            null,
+                            false,
+                            false,
+                            null,
+                            false,
+                            BigInteger.valueOf(0),
+                            EventModule.Request,
+                            EventType.Updated,
+                            user,
+                            orderNote.getId()
+                    ));
+
+            // send any additional notifications
+            AppEvent notifyEvent = eventService.createEvent(new AppEvent(
+                    null,
+                    "Request "+orderRequest.get().getId()+" Status has been updated to "+setStatus,
+                    "The Status for Request "+orderRequest.get().getId()+
+                            " has been updated to ["+setStatus+"] by "+user.getFullName(),
+                    orderRequest.get().getId().toString(),
+                    EventModule.Request,
+                    EventType.Updated,
+                    new ArrayList<>()
+            ));
+            //closed
+            if (setStatus.equals(OrderStatus.Complete)) {
+                notifyEvent.setType(EventType.Closed);
+                eventService.createEvent(notifyEvent);
+            }
         }
 
         return statusModel;
@@ -228,10 +248,30 @@ public class OrderAPIController {
                     requestItem.get().getId(),
                     requestItem.get().getItemStatus(),
                     user));
+
             // Email everyone
-            EmailDetails emailDetailsUser =
-                    new EmailDetails(BigInteger.valueOf(0), requestItem.get().getOrderRequest().getUser().getContactEmail(),"The Status of a Request Item Changed", "", null );
-            BrowserMessage returnMsg = emailService.sendItemUpdate(emailDetailsUser, requestItem.get(), orderNote);
+//            EmailDetails emailDetailsUser =
+//                    new EmailDetails(BigInteger.valueOf(0), requestItem.get().getOrderRequest().getUser().getContactEmail(),"The Status of a Request Item Changed", "", null );
+//            BrowserMessage returnMsg = emailService.sendItemUpdate(emailDetailsUser, requestItem.get(), orderNote);
+
+            // notify user of request item status change
+            NotificationMessage returnMsgUser = messageService.createMessage(
+                    new NotificationMessage(
+                            null,
+                            "["+requestItem.get().getId().toString()+"] Request Item has been Updated",
+                            requestItem.get().getId().toString(),
+                            BigInteger.valueOf(0),
+                            null,
+                            false,
+                            false,
+                            null,
+                            false,
+                            BigInteger.valueOf(0),
+                            EventModule.Request,
+                            EventType.Updated,
+                            user,
+                            orderNote.getId()
+                    ));
 
             // Notify supervisor
             NotificationMessage returnMsg2 = messageService.createMessage(

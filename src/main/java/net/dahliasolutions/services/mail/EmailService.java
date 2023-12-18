@@ -155,12 +155,13 @@ public class EmailService implements EmailServiceInterface{
     }
 
     @Override
-    public BrowserMessage sendUserRequest(EmailDetails emailDetails, OrderRequest orderRequest) {
+    public BrowserMessage sendUserRequest(EmailDetails emailDetails, OrderRequest orderRequest, OrderNote orderNote) {
         // set template variables
         Context context = new Context();
         context.setVariable("baseURL", appServer.getBaseURL());
         context.setVariable("messageId", emailDetails.getMessageId());
         context.setVariable("orderRequest", orderRequest);
+        context.setVariable("orderNote", orderNote);
         context.setVariable("emailSubject", emailDetails.getSubject());
 
         // create mail message

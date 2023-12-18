@@ -250,15 +250,34 @@ public class CartAPIController {
         // loop through orders and send
         for (OrderRequest req : orderRequests) {
             // E-mail User
-            EmailDetails emailDetailsUser =
-                    new EmailDetails(BigInteger.valueOf(0), user.get().getContactEmail(), "Your Request", "", null);
-            BrowserMessage returnMsg = emailService.sendUserRequest(emailDetailsUser, req);
+//            EmailDetails emailDetailsUser =
+//                    new EmailDetails(BigInteger.valueOf(0), user.get().getContactEmail(), "Your Request", "", null);
+//            BrowserMessage returnMsg = emailService.sendUserRequest(emailDetailsUser, req);
+
+            // notify user of new request
+            NotificationMessage returnMsgUser = messageService.createMessage(
+                    new NotificationMessage(
+                            null,
+                            "["+req.getId().toString()+"] New Request Submitted",
+                            req.getId().toString(),
+                            BigInteger.valueOf(0),
+                            null,
+                            true,
+                            false,
+                            null,
+                            false,
+                            BigInteger.valueOf(0),
+                            EventModule.Request,
+                            EventType.New,
+                            user.get(),
+                            BigInteger.valueOf(0)
+                    ));
 
             // Notify supervisor
             NotificationMessage returnMsg2 = messageService.createMessage(
                     new NotificationMessage(
                             null,
-                            "A New Request",
+                            "["+req.getId().toString()+"] New Request",
                             req.getId().toString(),
                             BigInteger.valueOf(0),
                             null,

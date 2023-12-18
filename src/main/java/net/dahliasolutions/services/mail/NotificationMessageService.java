@@ -342,11 +342,21 @@ public class NotificationMessageService implements NotificationMessageServiceInt
                             new EmailDetails(message.getId(), message.getUser().getContactEmail(), message.getSubject(), "", null);
                     notificationStatus = emailService.sendSystemNotification(emailEventDetails, appEvent);
                 } else {
+                    OrderNote note = orderNoteService.findById(message.getNoteId()).orElse(null);
+                    if (note == null) {
+                        note = new OrderNote(BigInteger.valueOf(0),BigInteger.valueOf(0),null,"",BigInteger.valueOf(0),null, null);
+                    }
                     switch (message.getType()) {
                         case New -> {
-                            EmailDetails emailDetailsSupervisor =
-                                    new EmailDetails(message.getId(), message.getUser().getContactEmail(), message.getSubject(), "", null);
-                            notificationStatus = emailService.sendSupervisorRequest(emailDetailsSupervisor, newRequest.get(), message.getUser().getId());
+                            if (message.getUser().getId().equals(newRequest.get().getUser().getId())) {
+                                EmailDetails emailDetailsUser =
+                                        new EmailDetails(message.getId(), message.getUser().getContactEmail(), message.getSubject(), "", null);
+                                notificationStatus = emailService.sendUserRequest(emailDetailsUser, newRequest.get(), note);
+                            } else {
+                                EmailDetails emailDetailsSupervisor =
+                                        new EmailDetails(message.getId(), message.getUser().getContactEmail(), message.getSubject(), "", null);
+                                notificationStatus = emailService.sendSupervisorRequest(emailDetailsSupervisor, newRequest.get(), message.getUser().getId());
+                            }
                         }
                         case NewItem -> {
                             EmailDetails emailDetailsSupervisor =
@@ -354,15 +364,16 @@ public class NotificationMessageService implements NotificationMessageServiceInt
                             notificationStatus = emailService.sendSupervisorItemRequest(emailDetailsSupervisor, requestItem, requestItem.getOrderRequest().getSupervisor().getId());
                         }
                         case ItemUpdated -> {
-                            OrderNote note = orderNoteService.findById(message.getNoteId()).get();
+
                             EmailDetails emailDetailsSupervisor =
                                     new EmailDetails(message.getId(), message.getUser().getContactEmail(), message.getSubject(), "", null);
                             notificationStatus = emailService.sendItemUpdate(emailDetailsSupervisor, requestItem, note);
                         }
                         case Updated -> {
+
                             EmailDetails emailDetailsSupervisor =
                                     new EmailDetails(message.getId(), message.getUser().getContactEmail(), message.getSubject(), "", null);
-                            notificationStatus = emailService.sendUserRequest(emailDetailsSupervisor, newRequest.get());
+                            notificationStatus = emailService.sendUserRequest(emailDetailsSupervisor, newRequest.get(), note);
                         }
                     }
                 }

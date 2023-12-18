@@ -18,7 +18,7 @@ public interface EmailServiceInterface {
     String sendSimpleMailWithAttachment(EmailDetails emailDetails);
     BrowserMessage sendWelcomeMail(EmailDetails emailDetails, BigInteger id);
     BrowserMessage sendPasswordResetMail(EmailDetails emailDetails, BigInteger id);
-    BrowserMessage sendUserRequest(EmailDetails emailDetails, OrderRequest orderRequest);
+    BrowserMessage sendUserRequest(EmailDetails emailDetails, OrderRequest orderRequest, OrderNote orderNote);
     BrowserMessage sendSupervisorRequest(EmailDetails emailDetails, OrderRequest orderRequest, BigInteger id);
     BrowserMessage sendSupervisorItemRequest(EmailDetails emailDetails, OrderItem orderItem, BigInteger id);
     BrowserMessage sendItemUpdate(EmailDetails emailDetails, OrderItem orderItem, OrderNote orderNote);

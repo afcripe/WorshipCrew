@@ -43,8 +43,12 @@
 
     <br><br>
 
+
+    <div th:if="${orderNote.id} > 0">
+        Notes: <span class="emphasis" th:text="${orderNote.orderNote}"></span>
+    </div>
     <div>
-        <div>Status: <span class="emphasis" th:text="*{requestNote}"></span></div>
+        <div>Status: <span th:text="*{requestNote}"></span></div>
     </div>
 
     <br><br>

@@ -209,9 +209,27 @@ public class SupportAPIController {
         if (isAgent) {
             if (!isPrivate) {
                 // email note user on if public
-                EmailDetails emailDetailsUser =
-                        new EmailDetails(BigInteger.valueOf(0), ticket.get().getUser().getContactEmail(), "[Support Ticket ]" + ticket.get().getId() + "] has been updated", "", null);
-                emailService.sendUserUpdateTicket(emailDetailsUser, ticket.get(), note);
+//                EmailDetails emailDetailsUser =
+//                        new EmailDetails(BigInteger.valueOf(0), ticket.get().getUser().getContactEmail(), "[Support Ticket ]" + ticket.get().getId() + "] has been updated", "", null);
+//                emailService.sendUserUpdateTicket(emailDetailsUser, ticket.get(), note);
+                // notify user of request status change
+                NotificationMessage returnMsgUser = messageService.createMessage(
+                        new NotificationMessage(
+                                null,
+                                "["+ticket.get().getId()+"] has been updated",
+                                ticket.get().getId(),
+                                BigInteger.valueOf(0),
+                                null,
+                                false,
+                                false,
+                                null,
+                                false,
+                                BigInteger.valueOf(0),
+                                EventModule.Support,
+                                EventType.Updated,
+                                ticket.get().getUser(),
+                                note.getId()
+                        ));
             }
         } else {
             // only send if assigned to agent
@@ -219,7 +237,7 @@ public class SupportAPIController {
                 NotificationMessage returnMsg2 = messageService.createMessage(
                         new NotificationMessage(
                                 null,
-                                "[Support Ticket ]"+ticket.get().getId()+"] has been updated",
+                                "["+ticket.get().getId()+"] has been updated",
                                 ticket.get().getId(),
                                 BigInteger.valueOf(0),
                                 null,

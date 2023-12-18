@@ -50,6 +50,7 @@ public class EmailController {
     private final TicketService ticketService;
     private final TicketNoteService ticketNoteService;
     private final EmailService emailService;
+    private final NotificationMessageService messageService;
     private final EventService eventService;
     private final MailerCustomMessageService mailerCustomMessageService;
     private final NotificationMessageService notificationMessageService;
@@ -146,7 +147,7 @@ public class EmailController {
             String statusNote = "Request Marked Received by "+supervisor.get().getFirstName()+" "+supervisor.get().getLastName();
             orderRequest.get().setOrderStatus(OrderStatus.Received);
             orderService.save(orderRequest.get());
-            orderNoteService.createOrderNote(new OrderNote(
+            OrderNote orderNote = orderNoteService.createOrderNote(new OrderNote(
                     null,
                     orderRequest.get().getId(),
                     null,
@@ -155,9 +156,28 @@ public class EmailController {
                     orderRequest.get().getOrderStatus(),
                     supervisor.get()));
 
-            EmailDetails emailDetailsUser =
-                    new EmailDetails(BigInteger.valueOf(0), user.getContactEmail(),"Your Request Has Been Received", "", null );
-            BrowserMessage returnMsg = emailService.sendUserRequest(emailDetailsUser, orderRequest.get());
+//            EmailDetails emailDetailsUser =
+//                    new EmailDetails(BigInteger.valueOf(0), user.getContactEmail(),"Your Request Has Been Received", "", null );
+//            BrowserMessage returnMsg = emailService.sendUserRequest(emailDetailsUser, orderRequest.get());
+
+            // notify user of request status change
+            NotificationMessage returnMsgUser = messageService.createMessage(
+                    new NotificationMessage(
+                            null,
+                            "["+orderRequest.get().getId().toString()+"] Request Marked Received",
+                            orderRequest.get().getId().toString(),
+                            BigInteger.valueOf(0),
+                            null,
+                            false,
+                            false,
+                            null,
+                            false,
+                            BigInteger.valueOf(0),
+                            EventModule.Request,
+                            EventType.Updated,
+                            user,
+                            orderNote.getId()
+                    ));
         }
 
         mailerLinks.setForceExpire(true);
@@ -175,7 +195,7 @@ public class EmailController {
             requestItem.get().setItemStatus(OrderStatus.Received);
             orderItemService.save(requestItem.get());
             // add new note to order
-            orderNoteService.createOrderNote(new OrderNote(
+            OrderNote orderNote = orderNoteService.createOrderNote(new OrderNote(
                     null,
                     requestItem.get().getOrderRequest().getId(),
                     null,
@@ -184,9 +204,28 @@ public class EmailController {
                     requestItem.get().getItemStatus(),
                     supervisor.get()));
 
-            EmailDetails emailDetailsSupervisor =
-                    new EmailDetails(BigInteger.valueOf(0), OrderSupervisor.getContactEmail(),"Request Item was Received", "", null );
-            BrowserMessage returnMsg2 = emailService.sendUserRequest(emailDetailsSupervisor, requestItem.get().getOrderRequest());
+//            EmailDetails emailDetailsSupervisor =
+//                    new EmailDetails(BigInteger.valueOf(0), OrderSupervisor.getContactEmail(),"Request Item was Received", "", null );
+//            BrowserMessage returnMsg2 = emailService.sendUserRequest(emailDetailsSupervisor, requestItem.get().getOrderRequest());
+
+            // notify user of request status change
+            NotificationMessage returnMsgUser = messageService.createMessage(
+                    new NotificationMessage(
+                            null,
+                            "["+requestItem.get().getOrderRequest().getId().toString()+"] Request Marked Received",
+                            requestItem.get().getOrderRequest().getId().toString(),
+                            requestItem.get().getId(),
+                            null,
+                            false,
+                            false,
+                            null,
+                            false,
+                            BigInteger.valueOf(0),
+                            EventModule.Request,
+                            EventType.Updated,
+                            OrderSupervisor,
+                            orderNote.getId()
+                    ));
         }
 
         mailerLinks.setForceExpire(true);
